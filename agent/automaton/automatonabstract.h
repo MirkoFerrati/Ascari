@@ -10,6 +10,7 @@
 struct transitionTable
 {
 	std::map< automaton_state ,std::map<transition, automaton_state> >  internalTable; //newstate=internalTable[oldstate][transition]
+
 };
 
 class automatonAbstract

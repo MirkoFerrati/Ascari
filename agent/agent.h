@@ -7,7 +7,8 @@
 #include "automaton/automatonabstract.h"
 #include "controller/controller.h"
 #include "identifierModule/identifier.h"
-
+#include "communication/agent_communicator.h"
+#include "communication/world_communicator.h"
 
 class agent
 {
@@ -18,14 +19,14 @@ protected:
 	/**
 	 * The continuos state of the agent, used in the dynamic
 	 */
-	agentState state;
+	agent_state state;
 	
 	automaton_state discreteState;
 	
 	//in dummy agent, we will initialize a nautomaton, in agent an automaton
 	automatonAbstract* automaton;
 	
-	vector<controller> controllers;
+	std::vector<controller> controllers;
 	
 	//in dummy we will not use this, since it is used for inter-agent communication
 	//Note that we need two versions, one for net and one for shared memory

@@ -21,22 +21,22 @@ typedef std::map<int,double> map_int_double;
 /**
  * Represents a state of an agent, where the key of the map is the index of the variable as indicated from an indexMap
  */
-BOOST_STRONG_TYPEDEF( map_int_double ,agentState) 
+BOOST_STRONG_TYPEDEF( map_int_double ,agent_state) 
 /**
  * Represents a control command, where the key of the map is the index of the variable as indicated from an indexMap
  */
-BOOST_STRONG_TYPEDEF( map_int_double ,controlCommand)
+BOOST_STRONG_TYPEDEF( map_int_double ,control_command)
 
 
 /** This map will be used to store informations about variables names and converting them to int
  * In this way we speed up the read access during simulations
  */
-typedef std::map<std::string,int> indexMap;
+typedef std::map<std::string,int> index_map;
 
 /**
  * automaton_state is the representation of a discrete state, an indexMap translates the value of automatonState into a string
  */
-BOOST_STRONG_TYPEDEF (int, automatonState)
+BOOST_STRONG_TYPEDEF (int, automaton_state)
 
 /**
  * An event is represented by an integer (the name of the event is stored in an IndexMap) and an integer value (extended boolean)
@@ -49,9 +49,9 @@ typedef std::map<int,int> event;
  */
 BOOST_STRONG_TYPEDEF( int, transition)
 
-struct agentStatePacket
+struct agent_state_packet
 {
-	agentState state;
+	agent_state state;
 	std::string identifier;
 };
 
