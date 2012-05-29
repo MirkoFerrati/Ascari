@@ -1,0 +1,4 @@
+[Project]
+Name=agent
+Manager=KDevCMakeManager
+VersionControl=kdevgit
