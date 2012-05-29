@@ -6,43 +6,34 @@
 
 #include "yaml-cpp/yaml.h"
 
-struct Vec3 {
-    float x, y, z;
-};
+using namespace std;
 
-struct Power {
+struct Agent {
     std::string name;
-    int damage;
+	vector<string> states;
+	map<string,string> expressions;
+
 };
 
-struct Monster {
-    std::string name;
-    Vec3 position;
-    std::vector <Power> powers;
-};
-
-// now the extraction operators for these types
-void operator >> (const YAML::Node& node, Vec3& v) {
-    node[0] >> v.x;
-    node[1] >> v.y;
-    node[2] >> v.z;
+void operator >> (const YAML::Node& node, Agent& ag)
+{
+		node["agent"]>>ag.name;
+		const YAML::Node& dynamics = node["DYNAMICS"][0];
+   //for(unsigned i=0;i<dynamics.size();i++) {
+      dynamics["states"]>>ag.states;
+	  string temp;
+	  for (int i=0;i<ag.states.size();i++)
+	  {
+		  dynamics[ag.states[i]]>>temp;
+		  ag.expressions.insert(std::make_pair<string,string>(ag.states[i],temp));
+		  //ag.states[i]>>expression.variable;
+		  //dynamics[ag.states[i]]>>expression.value;
+		  //ag.expressions.push_back(expression);
+	  }
+		  //ag.expressions.push_back(expression);
+   
 }
 
-void operator >> (const YAML::Node& node, Power& power) {
-    node["name"] >> power.name;
-    node["damage"] >> power.damage;
-}
-
-void operator >> (const YAML::Node& node, Monster& monster) {
-    node["name"] >> monster.name;
-    node["position"] >> monster.position;
-    const YAML::Node& powers = node["powers"];
-    for (unsigned i=0;i<powers.size();i++) {
-        Power power;
-        powers[i] >> power;
-        monster.powers.push_back(power);
-    }
-}
 
 
 
@@ -57,9 +48,14 @@ int main(int argc, char **argv) {
         YAML::Node doc;
         parser.GetNextDocument(doc);
         for (unsigned i=0;i<doc.size();i++) {
-            Monster monster;
-            doc[i] >> monster;
-            std::cout << monster.name << "\n";
+            Agent ag;
+            doc[i] >> ag;
+			std::cout << ag.name << "\n";
+			for (int i =0 ;i<ag.states.size();i++)
+			{
+				cout<<ag.states[i]<<endl;
+				cout<<ag.expressions[ag.states[i]]<<endl;
+			}
         }
     }
     LOGOG_SHUTDOWN();
