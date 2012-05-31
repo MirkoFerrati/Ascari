@@ -1,54 +1,58 @@
 - agent: Agente1
   #VISIBLE AREA: ./battle/exp_t_visuale.txt
-  DYNAMICS:
-     - y: 'v*sin(t)'
-       t: 'w'
-       states: [y,t,x]
-       inputs: [v,w]
-       x: 'v*cos(t)'
-  CONTROLLERS:
-     - name: fast
-        v: v_max
-        w: 0
-     - name: left
-        v: v
-        w: w_max
-     - name: right
-        v: v
-        w: -w_max
-     - name: slow
-        v: 0
-        w: 0
-  DISCRETE_STATES:
-     - name: fast
-       controller: fast
-     - name: slow
-       controller: slow
-     - name: alert
-       controller: slow
-  ENCODER:
-     - topology:[t1,t2]
-       lambda:[l1,l2]
-       t1:
-       t2:
-       l1:
-       l2:
-  EVENTS:
-     - events:[e1,e2]
-       e1:
-       e2:
-  AUTOMATON
-     - FAST:
-         - FAST: [e1,e2]
-           SLOW: []
-           
-   
-  #CONTROLLER=   ./battle/exp_con.txt
-  #ENCODER =     ./battle/exp_enc.txt
-  #AUTOMATON=    ./battle/exp_aut.txt:   EXPLORE
-  #DECODER =     ./battle/exp_dec.txt
   #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
-  #!OBSTACLES=  ./battle/exp_obstacles.txt
-  #STATE=    x=-7 : y= 7 : z= 6 : ax = 0 : ay= 0: az = 0 : tx =0 : ty=0 : tz=0: tax=0: tay=0: taz=0
   #MONITORING = 0
   #COLLABORATIVE = 1
+  DYNAMICS:
+     - states: [y,theta,x]
+       inputs: [v,w]
+       MAP:
+         - x: 'v*cos(t)'
+           y: 'v*sin(t)'
+           theta: 'w'
+       INITIAL:
+         - x: '0'
+           y: '0'
+           theta: '0'
+  CONTROLLERS:
+   - name: fast
+     v: v_max
+     w: 0
+   - name: left
+     v: v
+     w: w_max
+   - name: right
+     v: v
+     w: -w_max
+   - name: slow
+     v: 0
+     w: 0
+  DISCRETE_STATES:
+   - name: fast
+     controller: fast
+   - name: slow
+     controller: slow
+   - name: alert
+     controller: slow
+  ENCODER:
+   - topology: [t1,t2]
+     t1:
+     t2:
+     lambda: [l1,l2]
+     l1:
+     l2:
+  EVENTS:
+   - events: [e1,e2,e3,e4]
+     e1:
+     e2:
+     e3:
+     e4:
+  AUTOMATON:
+   - FAST:
+      - FAST: [e3,e4]
+        SLOW: [e2]
+        ALERT: [e1]
+     SLOW:
+      - FAST: [e1]
+           
+  
