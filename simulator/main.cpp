@@ -4,19 +4,16 @@
 #include <vector>
 #include <sstream>
 #include "logog.hpp"
-<<<<<<< .mine
 #include "typedefs.h"
 
-=======
 #include "simulator.h"
->>>>>>> .r6
 #include "yaml-cpp/yaml.h"
 #include <boost/algorithm/string.hpp>
 
 
 using namespace std;
 
-<<<<<<< .mine
+
 
 typedef vector<string> States;
 typedef vector<string> Inputs;
@@ -57,11 +54,6 @@ struct Agent {
 
 
 void operator >> (const YAML::Node& node, Agent& ag)
-=======
-void initialize_communication(simulator& s)
->>>>>>> .r6
-{
-<<<<<<< .mine
 		node["AGENT"]>>ag.name;
 		const YAML::Node& dynamics = node["DYNAMICS"][0];
 		   //for(unsigned i=0;i<dynamics.size();i++) {
@@ -193,9 +185,6 @@ void initialize_communication(simulator& s)
 		}
 		
 		
-=======
-	s.create_communicator(1);
->>>>>>> .r6
 }
 
 int main(int argc, char **argv) {
@@ -207,7 +196,6 @@ int main(int argc, char **argv) {
 		initialize_communication(s);
         std::cout << "Hello, world! simulator" << std::endl;
         std::ifstream fin("monsters.yaml");
-<<<<<<< .mine
 	std::ostringstream str;
 	str<<fin.rdbuf();
 	std::string new_str=str.str();
@@ -290,8 +278,6 @@ int main(int argc, char **argv) {
 			 }
 			
         }
-=======
->>>>>>> .r6
     }
     LOGOG_SHUTDOWN();
     return 0;
