@@ -1,17 +1,24 @@
 
 
-add_executable(simulator simulator.cpp main.cpp)
+add_executable(simulator communication/tcp_agent_communicator.cpp simulator.cpp main.cpp communication/agent_communicator_abstract.h)
 
 add_subdirectory(parser)
 add_subdirectory(visibility)
 add_subdirectory(communication)
 
+include_directories(communication)
+
 target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 
+ find_package(Boost REQUIRED system thread serialization)
+ 
+target_link_libraries(simulator ${Boost_LIBRARIES} pthread)
 
 include_directories(../shared)
 include_directories(../shared/logog/include)
 include_directories(../shared/parserYAML/include)
+
+
 
 configure_file(monsters.yaml monsters.yaml COPYONLY)

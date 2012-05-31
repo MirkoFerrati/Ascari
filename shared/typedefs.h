@@ -13,15 +13,26 @@
 							typedef a b;
 #endif
 
-
+#define MULTICAST_PORT "30000"
+#define SINGLECAST_PORT 20000
+#define MULTICAST_ADDRESS "239.255.0.1"
 
 //Used in the strong_typedef
 typedef std::map<int,double> map_int_double;
 
+
 /**
  * Represents a state of an agent, where the key of the map is the index of the variable as indicated from an indexMap
  */
-BOOST_STRONG_TYPEDEF( map_int_double ,agent_state) 
+struct agent_state: map_int_double
+{
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& *this;
+	}
+};
+
 /**
  * Represents a control command, where the key of the map is the index of the variable as indicated from an indexMap
  */
@@ -49,9 +60,27 @@ typedef std::map<int,int> events_map;
  */
 BOOST_STRONG_TYPEDEF( int, transition)
 
+
+/** The time used by the simulator and sent to agents for synchronization */
+typedef double simulation_time;
+
+
 struct agent_state_packet
 {
 	agent_state state;
+	std::string identifier;
+	
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& state;
+		ar& identifier;
+	}
+};
+
+struct control_command_packet
+{
+	control_command command;
 	std::string identifier;
 };
 
