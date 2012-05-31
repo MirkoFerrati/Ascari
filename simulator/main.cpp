@@ -194,6 +194,7 @@ int main(int argc, char **argv) {
         WARN("Foo is over %d!  Current value is %d.", 3, 5 );
 		simulator s;
 		initialize_communication(s);
+		s.start_sim();
         std::cout << "Hello, world! simulator" << std::endl;
         std::ifstream fin("monsters.yaml");
 	std::ostringstream str;

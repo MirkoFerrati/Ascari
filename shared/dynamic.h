@@ -6,7 +6,7 @@ class dynamic
 {
 public:
 	dynamic();
-	agentState getNextState(const agentState& oldState,const controlCommand& control ) const;
+	agent_state getNextState(const agent_state& oldState, const control_command& control);
 };
 
 #endif // DYNAMIC_H

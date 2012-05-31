@@ -13,9 +13,10 @@
 							typedef a b;
 #endif
 
-#define MULTICAST_PORT "30000"
+#define MULTICAST_PORT  30000
 #define SINGLECAST_PORT 20000
 #define MULTICAST_ADDRESS "239.255.0.1"
+#define SIMULATOR_PORT 10000
 
 //Used in the strong_typedef
 typedef std::map<int,double> map_int_double;
@@ -32,6 +33,8 @@ struct agent_state: map_int_double
 		ar& *this;
 	}
 };
+
+
 
 /**
  * Represents a control command, where the key of the map is the index of the variable as indicated from an indexMap
@@ -77,6 +80,22 @@ struct agent_state_packet
 		ar& identifier;
 	}
 };
+
+struct agents_name_to_states
+{
+	std::map<std::string,agent_state_packet> internal_map;
+
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		for (std::map<std::string,agent_state_packet>::iterator it=internal_map.begin();it!=internal_map.end();it++)
+		{
+			ar& it->second;	
+		}
+		
+	}
+};
+
 
 struct control_command_packet
 {
