@@ -66,81 +66,57 @@ void operator >> (const YAML::Node& node, Agent& ag)
     {
         dynamics["MAP"][0][ag.states[i]]>>temp;
         ag.expressions.insert(std::make_pair<string,string>(ag.states[i],temp));
-
         dynamics["INITIAL"][0][ag.states[i]]>>temp;
         ag.initial_states.insert(std::make_pair<string,string>(ag.states[i],temp));
     }
 
     const YAML::Node& controllers = node["CONTROLLERS"];
-
-
     for (int i=0;i<controllers.size();i++) {
         map_int_string temp1;
         controllers[i]["NAME"]>>temp;
-
         ag.controllers.insert(make_pair<string, map_int_string>(temp,temp1));
-
         for (int j=0;j<ag.inputs.size();j++)
         {
             string temp1;
             controllers[i][ag.inputs[j]]>> temp1;
-
             ag.controllers[temp][j]=temp1;
-
-
         }
     }
 
     const YAML::Node& disc_states = node["DISCRETE_STATES"];
-
     for (int i=0;i<disc_states.size();i++) {
         string n_state;
         disc_states[i]["NAME"]>>n_state;
         string c_name;
         disc_states[i]["CONTROLLER"]>>c_name;
         ag.discrete_states.insert(make_pair<string,string>(n_state,c_name));
-
     }
 
-
     const YAML::Node& encoder = node["ENCODER"][0];
-
     encoder["TOPOLOGY"]>> ag.topology;
-
-
     for (int i=0;i<ag.topology.size();i++) {
         string topology_exp;
         encoder[ag.topology[i]]>>topology_exp;
         ag.topology_expressions.insert(make_pair<string,string>(ag.topology[i],topology_exp));
-
     }
 
     encoder["LAMBDA"]>> ag.lambda;
-
-
     for (int i=0;i<ag.lambda.size();i++) {
         string lambda_exp;
         encoder[ag.lambda[i]]>>lambda_exp;
         ag.lambda_expressions.insert(make_pair<string,string>(ag.lambda[i],lambda_exp));
-
     }
 
-
     const YAML::Node& decoder = node["EVENTS"][0];
-
     decoder["EVENTS"]>> ag.events;
-
 
     for (int i=0;i<ag.events.size();i++) {
         string events_exp;
         decoder[ag.events[i]]>>events_exp;
         ag.events_expressions.insert(make_pair<string,string>(ag.events[i],events_exp));
-
     }
 
-
     const YAML::Node& automaton = node["AUTOMATON"];
-
 
     for (int i=0;i<automaton.size();i++) {
         for (map<string, string>::iterator iter=ag.discrete_states.begin(); iter!=ag.discrete_states.end();iter++)
@@ -150,20 +126,14 @@ void operator >> (const YAML::Node& node, Agent& ag)
             if (automaton[i].FindValue(actual_state)) {
                 map_string_string temp1;
                 ag.automaton.insert(make_pair<string, map_string_string>(actual_state,temp1));
-
                 const YAML::Node& transition = automaton[i][actual_state][0];
-
                 for (map<string, string>::iterator iiter=ag.discrete_states.begin(); iiter!=ag.discrete_states.end();iiter++)
                 {
                     string new_state;
                     new_state=(*iiter).first;
-
                     if (transition.FindValue(new_state)) {
                         vector<string> tran_ev;
-
                         transition[new_state]>> tran_ev;
-
-
                         for (int j=0; j< tran_ev.size();j++) {
                             if (ag.automaton[actual_state].count(tran_ev[j]))
                             {
@@ -177,7 +147,6 @@ void operator >> (const YAML::Node& node, Agent& ag)
             }
         }
     }
-
 }
 
 
