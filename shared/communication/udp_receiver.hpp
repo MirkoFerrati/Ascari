@@ -37,15 +37,17 @@ public:
         boost::asio::ip::multicast::join_group(multicast_address));
   }
 
-  void receive()
+  T receive()
   {
 	size_t size = socket_.receive_from(
 		boost::asio::buffer(data_,max_length), sender_endpoint_
 	);
-	
+	T inf; 
+    boost::archive::text_iarchive archive(data_);
+    archive >> inf;
       std::cout.write(data_, size);
       std::cout << std::endl;
-	
+	return inf;
   }
 
  
