@@ -1,8 +1,8 @@
 #ifndef TCP_AGENT_COMMUNICATOR_H
 #define TCP_AGENT_COMMUNICATOR_H
 #include <agent_communicator_abstract.h>
-#include "udp_sender.hpp"
-#include "udp_receiver.hpp"
+#include "communication/udp_sender.hpp"
+#include "communication/udp_receiver.hpp"
 
 
 class udp_agent_communicator: public agent_communicator_abstract

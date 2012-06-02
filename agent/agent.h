@@ -7,8 +7,8 @@
 #include "automaton/automatonabstract.h"
 #include "controller/controller.h"
 #include "identifierModule/identifier.h"
-#include "communication/agent_communicator.h"
-#include "communication/world_communicator.h"
+#include "communication/agent_communicator_abstract.h"
+#include "communication/world_communicator_abstract.h"
 
 class agent
 {
@@ -30,13 +30,15 @@ protected:
 	
 	//in dummy we will not use this, since it is used for inter-agent communication
 	//Note that we need two versions, one for net and one for shared memory
-	agent_communicator* agent_comm;
+	agent_communicator_abstract* agent_comm;
 	
 	//in dummy this will be a way to access identifier informations, in agent this will communicate with simulator (tcp or shared memory)
-	world_communicator* world_comm;
+	world_communicator_abstract* world_comm;
 	
 	//in dummy agent this will not be initialized
 	identifier* idModule;
+	
+	void main_loop();
 	
 };
 

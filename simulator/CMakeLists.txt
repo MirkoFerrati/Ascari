@@ -4,7 +4,7 @@ add_executable(simulator Dynamic_module.cpp ../shared/dynamic.cpp communication/
 
 add_subdirectory(parser)
 add_subdirectory(visibility)
-add_subdirectory(communication)
+include_directories(communication)
 
 include_directories(communication)
 
