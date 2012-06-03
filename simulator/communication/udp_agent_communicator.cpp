@@ -1,5 +1,7 @@
 #include "udp_agent_communicator.h"
 
+#include "typedefs.h"
+
 udp_agent_communicator::udp_agent_communicator():
         agent_communicator_abstract(),
         time_sender(service, boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT),
@@ -12,7 +14,10 @@ udp_agent_communicator::udp_agent_communicator():
 
 std::vector< control_command_packet > udp_agent_communicator::receive_control_commands()
 {
-	control_receiver.receive();
+	std::vector< control_command_packet> results;
+	for (int i=0;i<NUM_AGENTS;i++)
+		results.push_back(control_receiver.receive());
+	return results;
 }
 
 void udp_agent_communicator::send_broadcast(const simulation_time& time)

@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include "boost/serialization/map.hpp" 
 
 //if we are debugging we want a strong typedef, if we are releasing we want the code to be optimized
 #ifndef NDEBUG
@@ -17,6 +18,7 @@
 #define SINGLECAST_PORT 20000
 #define MULTICAST_ADDRESS "239.255.0.1"
 #define SIMULATOR_PORT 10000
+#define NUM_AGENTS 3
 
 //Used in the strong_typedef
 typedef std::map<int,double> map_int_double;
@@ -35,11 +37,36 @@ struct agent_state: map_int_double
 };
 
 
-
 /**
  * Represents a control command, where the key of the map is the index of the variable as indicated from an indexMap
  */
-BOOST_STRONG_TYPEDEF( map_int_double ,control_command)
+struct control_command
+{
+	map_int_double control_map;
+	
+	void insert(int const& index, double const& value)
+	{
+		control_map.insert(std::make_pair<int,double>(index,value));
+	}
+	
+	double& operator[] (unsigned int index)
+	{
+		return control_map[index];
+	}
+	
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& control_map;
+// 		for (std::map<int,double>::const_iterator it= control_map.begin();it!=control_map.end();it++)
+// 		{
+// 			ar& it->first;
+// 			ar& it->second;
+// 		}
+			
+	}
+};
+
 
 
 /** This map will be used to store informations about variables names and converting them to int
@@ -101,6 +128,13 @@ struct control_command_packet
 {
 	control_command command;
 	std::string identifier;
+	
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& command;
+		ar& identifier;
+	}
 };
 
 struct variable

@@ -15,15 +15,15 @@ udp_world_communicator::udp_world_communicator():
 
 simulation_time udp_world_communicator::receive_time()
 {
-
+	return time_receiver.receive();
 }
 
 agents_name_to_states udp_world_communicator::receive_agents_status()
 {
-
+	return agents_status_receiver.receive();
 }
 
-void udp_world_communicator::send_control_command(control_command_packet , const target_abstract* target)
+void udp_world_communicator::send_control_command(control_command_packet& command, const target_abstract* target)
 {
-
+	control_command_sender.send(command);
 }

@@ -15,7 +15,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <iomanip>
 #include <boost/serialization/vector.hpp>
-
+#include <boost/serialization/map.hpp>
 
 template <class T>
 class udp_sender
@@ -27,7 +27,7 @@ public:
       socket_(io_service, endpoint_.protocol())
   {
   }
-  void send(T inf)
+  void send(const T& inf)
   {
 	// Serialize the data first so we know how large it is.
     std::ostringstream archive_stream;

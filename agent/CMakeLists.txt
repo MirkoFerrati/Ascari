@@ -12,6 +12,9 @@ add_subdirectory(automaton)
 include_directories(communication)
 add_subdirectory(topology)
 
+target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
+target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
+
 include_directories(../shared)
 include_directories(../shared/logog/include)
 add_subdirectory(decoder)

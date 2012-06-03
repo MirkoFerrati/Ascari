@@ -16,7 +16,7 @@ public:
 private:
 	boost::asio::io_service service;//This must be written before any sender or receiver
 	udp_sender<agents_name_to_states> state_sender;
-	udp_receiver<std::vector<control_command_packet> > control_receiver;
+	udp_receiver<control_command_packet > control_receiver;
 	udp_sender<simulation_time> time_sender;
 };
 

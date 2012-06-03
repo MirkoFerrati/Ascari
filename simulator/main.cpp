@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
     {
         logog::Cout out;
         WARN("Foo is over %d!  Current value is %d.", 3, 5 );
-        simulator s;
+        simulator s(argc, argv);
         initialize_communication(s);
         s.start_sim();
         std::cout << "Hello, world! simulator" << std::endl;

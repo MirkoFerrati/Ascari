@@ -9,7 +9,8 @@
 class simulator
 {
 public:
-	simulator();
+	simulator(int argc, char **argv);
+	~simulator();
 	void start_sim();
 	void create_communicator(int communicator_type);
 private:
@@ -20,6 +21,8 @@ private:
 	std::vector<control_command_packet> commands;
 	index_map agent_name_to_index; 
 	void main_loop();
+	std::vector<std::string> identifiers;
+	simulation_time time;
 };
 
 #endif // SIMULATOR_H

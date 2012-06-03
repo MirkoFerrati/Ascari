@@ -8,8 +8,13 @@ include_directories(communication)
 
 include_directories(communication)
 
-target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
-target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
+#target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
+target_link_libraries(simulator liblogog.a)
+
+#target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
+
+target_link_libraries(simulator libyaml-cpp.a)
+
 
  find_package(Boost REQUIRED system thread serialization)
  

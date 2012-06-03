@@ -13,7 +13,8 @@
 class agent
 {
 public:
-	agent();
+	agent(std::string name);
+	~agent();
 	
 protected:
 	/**
@@ -36,7 +37,9 @@ protected:
 	world_communicator_abstract* world_comm;
 	
 	//in dummy agent this will not be initialized
-	identifier* idModule;
+	identifier_module* idModule;
+	
+	std::string identifier;
 	
 	void main_loop();
 	
