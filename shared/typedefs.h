@@ -7,6 +7,7 @@
 #include "boost/serialization/map.hpp" 
 
 //if we are debugging we want a strong typedef, if we are releasing we want the code to be optimized
+//we are going to remove all strong_typedef during the code writing
 #ifndef NDEBUG
 #include <boost/strong_typedef.hpp>
 #else

@@ -27,6 +27,11 @@ protected:
 	//in dummy agent, we will initialize a nautomaton, in agent an automaton
 	automatonAbstract* automaton;
 	
+	
+	/**
+	 * every possible controller must be created and pushed inside this vector from the constructor
+	 * and never modified again
+	 */
 	std::vector<controller> controllers;
 	
 	//in dummy we will not use this, since it is used for inter-agent communication
