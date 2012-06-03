@@ -1,7 +1,8 @@
 
 
 
-add_executable(agent communication/udp_agent_communicator.cpp communication/udp_world_communicator.cpp identifierModule/identifier.cpp controller/controller.cpp agent.cpp main.cpp)
+add_executable(agent communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp
+					communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp)
 
 
 add_subdirectory(identifierModule)
