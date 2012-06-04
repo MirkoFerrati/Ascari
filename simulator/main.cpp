@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include "logog.hpp"
 #include "typedefs.h"
 
 #include "simulator.h"
