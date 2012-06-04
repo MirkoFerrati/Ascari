@@ -1,0 +1,73 @@
+- agent: Agente1
+  #VISIBLE AREA: ./battle/exp_t_visuale.txt
+  #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+  #MONITORING = 0
+  #COLLABORATIVE = 1
+  states: [y,theta,x]
+  control_commands: [v,w]
+  INITIAL:
+   - x: '0'
+     y: '0'
+     theta: '0'
+  DYNAMIC_MAP:
+   - x: 'v*cos(t)'
+     y: 'v*sin(t)'
+     theta: 'w'
+  BEHAVIOR:
+   - &rh 
+     CONTROLLERS:
+     - name: fast
+       v: v_max
+       w: 0
+     - name: left
+       v: v
+       w: w_max
+     - name: right
+       v: v
+       w: -w_max
+     - name: slow
+       v: 0
+       w: 0
+     DISCRETE_STATES:
+     - name: fast
+       controller: fast
+     - name: slow
+       controller: slow
+     - name: alert
+       controller: slow
+     ENCODER:
+     - topology: [t1,t2]
+       t1:
+       t2:
+       lambda: [l1,l2]
+       l1:
+       l2:
+     EVENTS:
+     - events: [e1,e2,e3,e4]
+       e1:
+       e2:
+       e3:
+       e4:
+     AUTOMATON:
+     - FAST:
+        - FAST: [e3,e4]
+          SLOW: [e2]
+          ALERT: [e1]
+       SLOW:
+        - FAST: [e1]
+    
+- agent: Agente2
+  #VISIBLE AREA: ./battle/exp_t_visuale.txt
+  #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+  #MONITORING = 0
+  #COLLABORATIVE = 1
+  states: [y,x]
+  control_commands: [v,w]
+  INITIAL:
+   - x: '0'
+     y: '0'
+  DYNAMIC_MAP:
+   - x: 'v*cos(t)'
+     y: 'v*sin(t)'
+  BEHAVIOR:
+   - *rh

@@ -1,6 +1,6 @@
 
 
-add_executable(simulator Dynamic_module.cpp ../shared/dynamic.cpp communication/udp_agent_communicator.cpp simulator.cpp main.cpp communication/agent_communicator_abstract.h)
+add_executable(simulator Dynamic_module.cpp ../shared/dynamic.cpp communication/udp_agent_communicator.cpp simulator.cpp main.cpp communication/agent_communicator_abstract.h parser/yaml_parser.cpp)
 
 add_subdirectory(parser)
 add_subdirectory(visibility)
@@ -26,4 +26,4 @@ include_directories(../shared/parserYAML/include)
 
 
 
-configure_file(monsters.yaml monsters.yaml COPYONLY)
+configure_file(rob_soc.yaml rob_soc.yaml COPYONLY)

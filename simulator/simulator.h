@@ -1,6 +1,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 #include "communication/agent_communicator_abstract.h"
+#include "parser/yaml_parser.h"
 #include "Dynamic_module.h"
 #include <vector>
 #include <map>
