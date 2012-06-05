@@ -154,23 +154,25 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
 
     const YAML::Node& encoder = behavior["ENCODER"][0];
-
-    encoder["TOPOLOGY"]>> ag.topology;
+    const YAML::Node& topology=encoder["TOPOLOGY"][0];
+    topology["TOPOLOGY"]>> ag.topology;
 
 
     for (int i=0;i<ag.topology.size();i++) {
         string topology_exp;
-        encoder[ag.topology[i]]>>topology_exp;
+        topology[ag.topology[i]]>>topology_exp;
         ag.topology_expressions.insert(make_pair<string,string>(ag.topology[i],topology_exp));
 
     }
 
-    encoder["LAMBDA"]>> ag.lambda;
+    const YAML::Node& lambda=encoder["LAMBDA"][0];
+   
+    lambda["LAMBDA"]>> ag.lambda;
 
 
     for (int i=0;i<ag.lambda.size();i++) {
         string lambda_exp;
-        encoder[ag.lambda[i]]>>lambda_exp;
+        lambda[ag.lambda[i]]>>lambda_exp;
         ag.lambda_expressions.insert(make_pair<string,string>(ag.lambda[i],lambda_exp));
 
     }

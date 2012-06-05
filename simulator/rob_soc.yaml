@@ -38,12 +38,15 @@
      - name: alert
        controller: slow
      ENCODER:
-     - topology: [t1,t2]
-       t1:
-       t2:
-       lambda: [l1,l2]
-       l1:
-       l2:
+     - TOPOLOGY:
+        - &top
+          topology: [t1,t2]
+          t1:
+          t2:
+       LAMBDA:
+        - lambda: [l1,l2]
+          l1:
+          l2:
      EVENTS:
      - events: [e1,e2,e3,e4]
        e1:
@@ -77,12 +80,13 @@
      DISCRETE_STATES:
      - *rh_st_fast
      ENCODER:
-     - topology: [t1,t2]
-       t1:
-       t2:
-       lambda: [l1,l2]
-       l1:
-       l2:
+     - TOPOLOGY:
+        - *top
+       LAMBDA:
+        - lambda: [l1,l2,l3]
+          l1:
+          l2:
+          l3:
      EVENTS:
      - events: [e1,e2,e3,e4]
        e1:
