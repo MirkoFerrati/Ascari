@@ -2,7 +2,8 @@
 
 
 add_executable(agent communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp
-					communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp)
+					communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
+			  ../shared/yaml_parser.cpp)
 
 
 add_subdirectory(identifierModule)
@@ -17,6 +18,7 @@ target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 
 include_directories(../shared)
 include_directories(../shared/logog/include)
+include_directories(../shared/parserYAML/include)
 add_subdirectory(decoder)
 add_subdirectory(graph_routing)
 
