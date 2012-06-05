@@ -18,7 +18,7 @@ void simulator::main_loop()
         while (1) {
             communicator->send_broadcast(time++);
             //communicator->send_broadcast(states_index);
-            dynamic_module.evolve(states_index,commands);
+            //dynamic_module.evolve();
 			sleep(1);
 			//TODO: we don't need to copy, we need a function that overwrites only values inside the same memory!!
 			commands=communicator->receive_control_commands();
