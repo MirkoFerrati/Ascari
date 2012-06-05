@@ -18,7 +18,6 @@ void initialize_communication(simulator& s)
 
 
 
-
 int main(int argc, char **argv) {
   
     LOGOG_INITIALIZE();
@@ -27,11 +26,13 @@ int main(int argc, char **argv) {
         WARN("Foo is over %d!  Current value is %d.", 3, 5 );
         simulator s(argc, argv);
         initialize_communication(s);
+	
         //s.start_sim();
         std::cout << "Hello, world! simulator" << std::endl;
 	
         vector<Parsed_Agent>Agents=parse_file("rob_soc.yaml");
-	cout<<Agents;
+// 	cout<<Agents;
+	s.initialize(Agents);
     }
     LOGOG_SHUTDOWN();
     return 0;

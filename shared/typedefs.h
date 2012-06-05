@@ -41,24 +41,13 @@ struct agent_state: map_int_double
 /**
  * Represents a control command, where the key of the map is the index of the variable as indicated from an indexMap
  */
-struct control_command
+struct control_command :map_int_double
 {
-	map_int_double control_map;
-	
-	void insert(int const& index, double const& value)
-	{
-		control_map.insert(std::make_pair<int,double>(index,value));
-	}
-	
-	double& operator[] (unsigned int index)
-	{
-		return control_map[index];
-	}
 	
 	template <typename Archive>
 	void serialize(Archive& ar, const unsigned int version)
 	{
-		ar& control_map;
+		ar& *this;
 // 		for (std::map<int,double>::const_iterator it= control_map.begin();it!=control_map.end();it++)
 // 		{
 // 			ar& it->first;

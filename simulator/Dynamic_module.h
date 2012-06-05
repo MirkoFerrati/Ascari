@@ -10,8 +10,9 @@
 class Dynamic_module
 {
 public:
-	Dynamic_module(agents_name_to_states& old_states, const std::vector< control_command_packet >& commands,
-	std::map<std::string,std::string> expressions, std::vector<std::string> variables);
+	Dynamic_module();
+	void createModule(agents_name_to_states& old_states, const std::vector< control_command_packet >& commands,
+	std::map<std::string,std::string> expressions, std::vector<std::string> variables, index_map agents_name_to_dynamics);
 private:
 	std::vector<dynamic> dynamics;
 	index_map agents_name_to_dynamics;
