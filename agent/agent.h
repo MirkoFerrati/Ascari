@@ -9,30 +9,44 @@
 #include "identifierModule/identifier_module.h"
 #include "communication/agent_communicator_abstract.h"
 #include "communication/world_communicator_abstract.h"
+#include "../shared/yaml_parser.h"
 
 class agent
 {
 public:
-	agent(std::string name);
+	agent(std::string name, bool isDummy);
 	~agent();
 	
 protected:
 	/**
+	 * name of agent and it is used for univocal indentification
+	 */
+	std::string identifier;
+	
+	/**
 	 * The continuos state of the agent, used in the dynamic
 	 */
 	agent_state state;
+	index_map map_statename_to_id;
 	
 	automaton_state discreteState;
+	index_map map_discreteStatename_to_id;
 	
 	//in dummy agent, we will initialize a nautomaton, in agent an automaton
 	automatonAbstract* automaton;
 	
-	
+	/**
+	 * The value of control variables, update by controllers
+	 */
+	control_command inputs;
+	index_map inputs_name_to_id;
+  
 	/**
 	 * every possible controller must be created and pushed inside this vector from the constructor
 	 * and never modified again
 	 */
 	std::vector<controller> controllers;
+	index_map map_controllername_to_id;
 	
 	//in dummy we will not use this, since it is used for inter-agent communication
 	//Note that we need two versions, one for net and one for shared memory
@@ -43,8 +57,6 @@ protected:
 	
 	//in dummy agent this will not be initialized
 	identifier_module* idModule;
-	
-	std::string identifier;
 	
 	void main_loop();
 	

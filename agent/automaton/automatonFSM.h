@@ -3,12 +3,12 @@
 
 #include <automatonabstract.h>
 
+using namespace std;
 
 
 class automatonFSM:public automatonAbstract
 {
-	using namespace std;
-
+	
 public:
   automatonFSM(const transitionTable& table);
   vector<automaton_state> getNextAutomatonState(vector<automaton_state>const& oldStates, vector<transition>const& transitions);
