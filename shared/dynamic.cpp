@@ -1,6 +1,6 @@
 #include "dynamic.h"
 #include "typedefs.h"
-dynamic::dynamic()
+dynamic::dynamic(const agent_state& StateReferenceWARN, const control_command& controlReferenceWARN)
 {
 
 }
