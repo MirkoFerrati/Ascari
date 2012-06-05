@@ -29,7 +29,9 @@ int main(int argc, char **argv) {
         initialize_communication(s);
         //s.start_sim();
         std::cout << "Hello, world! simulator" << std::endl;
-        parse_file("rob_soc.yaml");
+	
+        vector<Parsed_Agent>Agents=parse_file("rob_soc.yaml");
+	cout<<Agents;
     }
     LOGOG_SHUTDOWN();
     return 0;

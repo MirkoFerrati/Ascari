@@ -1,6 +1,6 @@
 #include "yaml_parser.h"
 
-void parse_file(const char * file_name){
+std::vector<Parsed_Agent> parse_file(const char * file_name){
 	std::ifstream fin(file_name);
         std::ostringstream str;
         str<<fin.rdbuf();
@@ -16,12 +16,18 @@ void parse_file(const char * file_name){
 	std::vector<Parsed_Agent> Agents(doc.size());
         for (unsigned i=0;i<doc.size();i++) {
           doc[i] >> Agents[i];
-	  cout<<Agents[i];
-	  cout<<endl;
 	  
-           
         }
+	  return Agents;
   
+}
+
+ostream& operator<< (ostream& os, std::vector<Parsed_Agent>& ag){
+   for (int i=0; i<ag.size();i++)
+            {
+	    cout<<ag[i];
+	    cout<<endl;
+	    }
 }
     
 ostream& operator<< (ostream& os, Parsed_Agent& ag){

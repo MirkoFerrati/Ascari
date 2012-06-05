@@ -16,7 +16,8 @@
   BEHAVIOR:
    - &rh 
      CONTROLLERS:
-     - name: fast
+     - &rh_cont_fast
+       name: fast
        v: v_max
        w: 0
      - name: left
@@ -29,7 +30,8 @@
        v: 0
        w: 0
      DISCRETE_STATES:
-     - name: fast
+     - &rh_st_fast
+       name: fast
        controller: fast
      - name: slow
        controller: slow
@@ -70,4 +72,27 @@
    - x: 'v*cos(t)'
      y: 'v*sin(t)'
   BEHAVIOR:
-   - *rh
+   - CONTROLLERS:
+     - *rh_cont_fast
+     DISCRETE_STATES:
+     - *rh_st_fast
+     ENCODER:
+     - topology: [t1,t2]
+       t1:
+       t2:
+       lambda: [l1,l2]
+       l1:
+       l2:
+     EVENTS:
+     - events: [e1,e2,e3,e4]
+       e1:
+       e2:
+       e3:
+       e4:
+     AUTOMATON:
+     - FAST:
+        - FAST: [e3,e4]
+          SLOW: [e2]
+          ALERT: [e1]
+       SLOW:
+        - FAST: [e1]

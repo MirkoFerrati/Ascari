@@ -51,9 +51,11 @@ public:
     Automaton_table automaton;
     
 };
-    void parse_file(const char * file_name);
+    std::vector<Parsed_Agent> parse_file(const char * file_name);
     void operator>>(const YAML::Node& node, Parsed_Agent& ag);
     ostream& operator<<(ostream& os, Parsed_Agent& ag);
+    ostream& operator<< (ostream& os, std::vector<Parsed_Agent>& ag);
+
 
     
     
