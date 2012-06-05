@@ -22,79 +22,72 @@ std::vector<Parsed_Agent> parse_file(const char * file_name){
   
 }
 
-ostream& operator<< (ostream& os, std::vector<Parsed_Agent>& ag){
-   for (int i=0; i<ag.size();i++)
-            {
-	    cout<<ag[i];
-	    cout<<endl;
-	    }
-}
     
-ostream& operator<< (ostream& os, Parsed_Agent& ag){
+ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
   
-	    cout << ag.name << "\n";
+	    os << ag.name << "\n";
             for (int i =0 ;i<ag.states.size();i++)
             {
-                cout<< "State:"<<ag.states[i]<<endl;
-                cout<< "Map: "<<ag.expressions[ag.states[i]]<<endl;
-                cout<< "initial value: "<<ag.initial_states[ag.states[i]]<<endl;
+                os<< "State:"<<ag.states.at(i)<<endl;
+                os<< "Map: "<<ag.expressions.at(ag.states.at(i))<<endl;
+                os<< "initial value: "<<ag.initial_states.at(ag.states.at(i))<<endl;
             }
 
-            std::cout << "Controllers" << "\n";
+            os << "Controllers" << "\n";
             int i=0;
-            for (map<string, map_int_string>::iterator iter=ag.controllers.begin(); iter!=ag.controllers.end();iter++)
+            for (map<string, map_int_string>::const_iterator iter=ag.controllers.begin(); iter!=ag.controllers.end();iter++)
             {
                 i++;
-                cout<< "Controller "<<i<<endl;
-                cout<< "Name:"<<((*iter).first)<<endl;
-                cout<< "Values for Command: "<<endl;
+                os<< "Controller "<<i<<endl;
+                os<< "Name:"<<((*iter).first)<<endl;
+                os<< "Values for Command: "<<endl;
 
                 for (int j=0; j<(*iter).second.size();j++)
                 {
-                    cout<< ag.inputs[j]<<": "<<((*iter).second[j])<<endl;
+                    os<< ag.inputs[j]<<": "<<((*iter).second.at(j))<<endl;
 
                 }
             }
-            cout<< "Discrete States: "<<endl;
-            for (map<string, string>::iterator iter=ag.discrete_states.begin(); iter!=ag.discrete_states.end();iter++)
+            os<< "Discrete States: "<<endl;
+            for (map<string, string>::const_iterator iter=ag.discrete_states.begin(); iter!=ag.discrete_states.end();iter++)
             {
-                cout<< "Name:"<<((*iter).first)<<endl;
-                cout<< "Controller: "<<((*iter).second)<<endl;
+                os<< "Name:"<<((*iter).first)<<endl;
+                os<< "Controller: "<<((*iter).second)<<endl;
             }
 
-            cout<< "Topologies: "<<endl;
-            for (map<string, string>::iterator iter=ag.topology_expressions.begin(); iter!=ag.topology_expressions.end();iter++)
+            os<< "Topologies: "<<endl;
+            for (map<string, string>::const_iterator iter=ag.topology_expressions.begin(); iter!=ag.topology_expressions.end();iter++)
             {
-                cout<< "Name:"<<((*iter).first)<<endl;
-                cout<< "Expression: "<<((*iter).second)<<endl;
+                os<< "Name:"<<((*iter).first)<<endl;
+                os<< "Expression: "<<((*iter).second)<<endl;
             }
 
-            cout<< "Lambda: "<<endl;
-            for (map<string, string>::iterator iter=ag.lambda_expressions.begin(); iter!=ag.lambda_expressions.end();iter++)
+            os<< "Lambda: "<<endl;
+            for (map<string, string>::const_iterator iter=ag.lambda_expressions.begin(); iter!=ag.lambda_expressions.end();iter++)
             {
-                cout<< "Name:"<<((*iter).first)<<endl;
-                cout<< "Expression: "<<((*iter).second)<<endl;
+                os<< "Name:"<<((*iter).first)<<endl;
+                os<< "Expression: "<<((*iter).second)<<endl;
             }
 
-            cout<< "Events: "<<endl;
-            for (map<string, string>::iterator iter=ag.events_expressions.begin(); iter!=ag.events_expressions.end();iter++)
+            os<< "Events: "<<endl;
+            for (map<string, string>::const_iterator iter=ag.events_expressions.begin(); iter!=ag.events_expressions.end();iter++)
             {
-                cout<< "Event:"<<((*iter).first)<<endl;
-                cout<< "Expression: "<<((*iter).second)<<endl;
+                os<< "Event:"<<((*iter).first)<<endl;
+                os<< "Expression: "<<((*iter).second)<<endl;
             }
 
-            cout<< "Automaton: "<<endl;
-            for (map<string, map_string_string>::iterator iter=ag.automaton.begin(); iter!=ag.automaton.end();iter++)
+            os<< "Automaton: "<<endl;
+            for (map<string, map_string_string>::const_iterator iter=ag.automaton.begin(); iter!=ag.automaton.end();iter++)
             {
 
                 string actual_state=((*iter).first);
 
-                cout<< "Actual State:"<<actual_state<<endl;
+                os<< "Actual State:"<<actual_state<<endl;
 
 
-                for (map<string,string>::iterator iiter=ag.automaton[actual_state].begin(); iiter!=ag.automaton[actual_state].end();iiter++)
+                for (map<string,string>::const_iterator iiter=ag.automaton.at(actual_state).begin(); iiter!=ag.automaton.at(actual_state).end();iiter++)
                 {
-                    cout<< "Event:"<<((*iiter).first)<<"->"<<((*iiter).second)<<endl;
+                    os<< "Event:"<<((*iiter).first)<<"->"<<((*iiter).second)<<endl;
 
                 }
             }
@@ -102,6 +95,13 @@ ostream& operator<< (ostream& os, Parsed_Agent& ag){
 }
 
 
+ostream& operator<< (ostream& os, const std::vector<Parsed_Agent>& ag){
+   for (int i=0; i<ag.size();i++)
+            {
+	    os<<ag.at(i);
+	    os<<endl;
+	    }
+}
 
 
 void operator>> (const YAML::Node& node, Parsed_Agent& ag)

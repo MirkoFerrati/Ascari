@@ -35,6 +35,8 @@ typedef map<string, map_string_string> Automaton_table;
 class Parsed_Agent {
 
 public:
+    friend ostream& operator<<(ostream& os, const Parsed_Agent& ag );
+    
     string name;
     States states;
     Inputs inputs;
@@ -49,12 +51,13 @@ public:
     Events events;
     Events_expressions events_expressions;
     Automaton_table automaton;
+   
+     
     
 };
     std::vector<Parsed_Agent> parse_file(const char * file_name);
     void operator>>(const YAML::Node& node, Parsed_Agent& ag);
-    ostream& operator<<(ostream& os, Parsed_Agent& ag);
-    ostream& operator<< (ostream& os, std::vector<Parsed_Agent>& ag);
+    ostream& operator<< (ostream& , const vector<Parsed_Agent>& );
 
 
     
