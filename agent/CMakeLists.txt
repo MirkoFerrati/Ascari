@@ -1,17 +1,17 @@
 
 
 
-add_executable(agent communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp
+add_executable(agent automaton/automatonFSM.cpp communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp
 					communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
 			  ../shared/yaml_parser.cpp)
 
 
-add_subdirectory(identifierModule)
-add_subdirectory(controller)
-add_subdirectory(encoder)
-add_subdirectory(automaton)
+include_directories(identifierModule)
+include_directories(controller)
+include_directories(encoder)
+include_directories(automaton)
 include_directories(communication)
-add_subdirectory(topology)
+include_directories(topology)
 
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
@@ -19,8 +19,8 @@ target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 include_directories(../shared)
 include_directories(../shared/logog/include)
 include_directories(../shared/parserYAML/include)
-add_subdirectory(decoder)
-add_subdirectory(graph_routing)
+include_directories(decoder)
+include_directories(graph_routing)
 
  find_package(Boost REQUIRED system thread serialization)
  

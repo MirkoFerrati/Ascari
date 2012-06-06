@@ -20,9 +20,13 @@ public:
 	 * Creates the automaton with the transitionTable table as internal transition rule
 	 * The transitionTable can't be changed, and should not be read
 	 */
-	automatonAbstract(const transitionTable& table);
-	virtual std::vector<automaton_state> getNextAutomatonState(std::vector<automaton_state>const& oldStates,std::vector<transition>const& transitions)=0; 
+	automatonAbstract(const transitionTable& table):table(table)
+	{
 		
+	}
+	virtual std::vector<automaton_state> getNextAutomatonState(std::vector<automaton_state>const& oldStates,std::vector<transition>const& transitions)=0; 
+private:
+	transitionTable table;
 };
 
 #endif // AUTOMATONABSTRACT_H

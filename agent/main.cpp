@@ -3,7 +3,8 @@
 #include "logog.hpp"
 
 int main(int argc, char **argv) {
-    agent a1(argv[1]);
+    vector<Parsed_Agent>Agents=parse_file("rob_soc.yaml");
+	agent a1(argv[1],false,Agents);
     std::cout << "Hello, world! agent" << std::endl;
     return 0;
 }

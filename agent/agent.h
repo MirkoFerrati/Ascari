@@ -14,7 +14,7 @@
 class agent
 {
 public:
-	agent(std::string name, bool isDummy);
+	agent(string name, bool isDummy, const std::vector< Parsed_Agent >& agents);
 	~agent();
 	
 protected:
@@ -30,7 +30,7 @@ protected:
 	index_map map_statename_to_id;
 	
 	automaton_state discreteState;
-	index_map map_discreteStatename_to_id;
+	index_map map_discreteStateName_to_id;
 	
 	//in dummy agent, we will initialize a nautomaton, in agent an automaton
 	automatonAbstract* automaton;
@@ -59,6 +59,8 @@ protected:
 	identifier_module* idModule;
 	
 	void main_loop();
+	
+	transitionTable createAutomatonTableFromParsedAgent(const Parsed_Agent& agent);
 	
 };
 
