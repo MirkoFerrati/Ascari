@@ -39,7 +39,7 @@ protected:
 	 * The value of control variables, update by controllers
 	 */
 	control_command inputs;
-	index_map inputs_name_to_id;
+	index_map map_inputs_name_to_id;
   
 	/**
 	 * every possible controller must be created and pushed inside this vector from the constructor
