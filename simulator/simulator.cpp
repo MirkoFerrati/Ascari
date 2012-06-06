@@ -3,7 +3,7 @@
 #include "typedefs.h"
 #include "logog.hpp"
 
-
+using namespace std;
 
 void simulator::create_communicator(int communicator_type)
 {
@@ -24,10 +24,10 @@ for(int i=0; i<ag.size();i++){
   index_map states_to_index_tmp;
   index_map commands_to_index_tmp;
   
-  for (int j=0; j<ag.at(i).states.size();j++)
+  for (int j=0; j<ag.at(i).state.size();j++)
   {
     agent_packet.state.insert(make_pair<int,double>(j,0));
-    states_to_index_tmp.insert(make_pair<std::string,int>(ag.at(i).states.at(j),j));
+    states_to_index_tmp.insert(make_pair<std::string,int>(ag.at(i).state.at(j),j));
    }
   
   for (int j=0; j<ag.at(i).inputs.size();j++)

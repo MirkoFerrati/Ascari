@@ -20,8 +20,8 @@ private:
 	Dynamic_module dynamic_module;
 	agent_communicator_abstract* communicator;
 	agents_name_to_states states_index;
-	vector<index_map> agent_states_to_index;
-	vector<index_map> agent_commands_to_index;
+	std::vector<index_map> agent_states_to_index;
+	std::vector<index_map> agent_commands_to_index;
 	
 	
 	std::vector<control_command_packet> commands;

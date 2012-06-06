@@ -10,54 +10,52 @@
 
 #include "yaml-cpp/yaml.h"
 #include <boost/algorithm/string.hpp>
+#include <boost/strong_typedef.hpp>
 
-using namespace std;
+// using namespace std;
 
-
-typedef vector<string> States;
-typedef vector<string> Inputs;
-typedef map<string,string> Map_expressions;
-typedef map<string,string> Initial_states;
-typedef map<int,string> map_int_string;
-typedef map<string, map_int_string> Controllers;
-typedef map<string, string> Discrete_states;
-typedef vector<string> Topology;
-typedef map<string, string> Topology_expressions;
-typedef vector<string> Lambda;
-typedef map<string, string> Lambda_expressions;
-typedef vector<string> Events;
-typedef map<string, string> Events_expressions;
-typedef map<string,string> map_string_string;
-typedef map<string, map_string_string> Automaton_table;
-
-
+typedef std::string stateVariable;
+typedef std::string controlVariable;
+typedef std::string initial_state_value;
+typedef std::string controller_name;
+typedef std::string controllerRule;
+typedef std::map<int,controllerRule> controller_MapRules;
+typedef std::string discreteState_Name;
+typedef std::string Topology_name;
+typedef std::string Topology_expression;
+typedef std::string lambda_name;
+typedef std::string lambda_expression;
+typedef std::map<lambda_name, lambda_expression> Lambda_MapExpressions;
+typedef std::string event_name;
+typedef std::string event_expression;
+typedef std::map<event_name, event_expression> Events_MapExpressions;
 
 class Parsed_Agent {
 
 public:
-    friend ostream& operator<<(ostream& os, const Parsed_Agent& ag );
+    friend std::ostream& operator<<(std::ostream& os, const Parsed_Agent& ag );
     
-    string name;
-    States states;
-    Inputs inputs;
-    Map_expressions expressions;
-    Initial_states initial_states;
-    Controllers controllers;
-    Discrete_states discrete_states;
-    Topology	topology;
-    Topology_expressions topology_expressions;
-    Lambda lambda;
-    Lambda_expressions lambda_expressions;
-    Events events;
-    Events_expressions events_expressions;
-    Automaton_table automaton;
+    std::string name;
+    std::vector<stateVariable> state;
+    std::vector<controlVariable> inputs;
+    std::map<lambda_name, lambda_expression> expressions;
+    std::map<stateVariable,initial_state_value> initial_states;
+    std::map<controller_name,controller_MapRules> controllers;
+    std::map<discreteState_Name, controller_name> discrete_states;
+    std::vector<Topology_name>	topology;
+    std::map<Topology_name, Topology_expression> topology_expressions;
+    std::vector<lambda_name> lambda;
+    std::map<lambda_name, lambda_expression> lambda_expressions;
+    std::vector<event_name> events;
+    std::map<event_name, event_expression> events_expressions;
+    std::map<discreteState_Name, std::map<event_name,discreteState_Name> > automaton;
    
      
     
 };
     std::vector<Parsed_Agent> parse_file(const char * file_name);
     void operator>>(const YAML::Node& node, Parsed_Agent& ag);
-    ostream& operator<< (ostream& , const vector<Parsed_Agent>& );
+    std::ostream& operator<< (std::ostream& , const std::vector<Parsed_Agent>& );
 
 
     

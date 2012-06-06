@@ -8,7 +8,7 @@
 #include "simulator.h"
 
   
-
+using namespace std;
 
 
 void initialize_communication(simulator& s)

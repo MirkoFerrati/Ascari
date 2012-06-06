@@ -14,7 +14,7 @@
 class agent
 {
 public:
-	agent(string name, bool isDummy, const std::vector< Parsed_Agent >& agents);
+	agent(std::string name, bool isDummy, const std::vector< Parsed_Agent >& agents);
 	~agent();
 	
 protected:
