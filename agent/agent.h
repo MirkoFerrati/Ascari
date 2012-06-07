@@ -10,6 +10,7 @@
 #include "communication/agent_communicator_abstract.h"
 #include "communication/world_communicator_abstract.h"
 #include "../shared/yaml_parser.h"
+#include <encoderAbstract.h>
 
 class agent
 {
@@ -34,6 +35,18 @@ protected:
 	
 	//in dummy agent, we will initialize a nautomaton, in agent an automaton
 	automatonAbstract* automaton;
+	
+	encoderAbstract* encoder;
+	
+	/**
+	 * Valori dei sottoeventi lambda e topology
+	 */
+	std::map<int,sub_event_value> sub_events; 
+	
+	/**
+	 * Mappa dei nomi dei sottoeventi e dei relativi indici
+	 */
+	index_map sub_event_to_index;
 	
 	/**
 	 * The value of control variables, update by controllers

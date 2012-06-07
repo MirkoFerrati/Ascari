@@ -1,7 +1,7 @@
 
 
 
-add_executable(agent automaton/automatonFSM.cpp communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp
+add_executable(agent encoder/encoderDet.cpp automaton/automatonFSM.cpp communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp
 					communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
 			  ../shared/yaml_parser.cpp)
 

@@ -65,6 +65,15 @@ struct control_command :map_int_double
  */
 typedef std::map<std::string,int> index_map;
 
+enum sub_event_value
+{
+	_TRUE,
+	_FALSE,
+	_UNDEFINED
+};
+	
+
+
 /**
  * automaton_state is the representation of a discrete state, an indexMap translates the value of automatonState into a string
  */
