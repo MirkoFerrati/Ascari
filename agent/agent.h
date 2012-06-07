@@ -29,7 +29,7 @@ protected:
 	agent_state state;
 	index_map map_statename_to_id;
 	
-	automaton_state discreteState;
+	vector<automaton_state> discreteState;
 	index_map map_discreteStateName_to_id;
 	
 	//in dummy agent, we will initialize a nautomaton, in agent an automaton
@@ -64,6 +64,7 @@ protected:
 	 * crea la tabella di transizione dell'automaton
 	 */
 	transitionTable createAutomatonTableFromParsedAgent(const Parsed_Agent& agent);
+	
 	/**
 	 * crea le strutture dati che rappresentano lo stato continuo e il risultato del controllo
 	 */

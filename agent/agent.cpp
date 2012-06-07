@@ -18,7 +18,7 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents):i
 
     if (!isDummy)
     {
-		automaton=new automatonFSM(createAutomatonTableFromParsedAgent(agents[myAgent]));
+		automaton=new automatonFSM(createAutomatonTableFromParsedAgent(agents[myAgent]), "TODO");
     }
     else {
         //TODO: we will think about identifierModule later
@@ -60,8 +60,6 @@ void agent::main_loop()
 {
 
     try {
-
-      
         while (1)
         {
 // 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;

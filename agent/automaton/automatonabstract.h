@@ -5,11 +5,11 @@
 #include <string>
 #include <map>
 
-
+using namespace std;
 
 struct transitionTable
 {
-	std::map< automaton_state, std::map<transition, automaton_state> >  internalTable; //newstate=internalTable[oldstate][transition]
+	map< automaton_state, map<transition, automaton_state> >  internalTable; //newstate=internalTable[oldstate][transition]
 
 };
 
@@ -20,12 +20,11 @@ public:
 	 * Creates the automaton with the transitionTable table as internal transition rule
 	 * The transitionTable can't be changed, and should not be read
 	 */
-	automatonAbstract(const transitionTable& table):table(table)
-	{
-		
-	}
-	virtual std::vector<automaton_state> getNextAutomatonState(std::vector<automaton_state>const& oldStates,std::vector<transition>const& transitions)=0; 
-private:
+	automatonAbstract(const transitionTable& table, const string& name):table(table),name_automaton(name)
+	{}
+	virtual vector<automaton_state> getNextAutomatonState(vector<automaton_state>const& oldStates,vector<transition>const& transitions)=0; 
+protected:
+	string name_automaton;
 	transitionTable table;
 };
 
