@@ -15,8 +15,8 @@ void simulator::create_communicator(int communicator_type)
 
 void simulator::initialize(const vector<Parsed_Agent>& ag)
 { 
-for(int i=0; i<ag.size();i++){
-  agent_name_to_index.insert(make_pair<string,int>(ag.at(i).name,i));
+for(unsigned int i=0; i<ag.size();i++){
+  agent_name_to_index.insert(make_pair(ag.at(i).name,i));
   agent_state_packet agent_packet;
   control_command_packet command_packet;
   agent_packet.identifier=ag.at(i).name;
@@ -24,19 +24,19 @@ for(int i=0; i<ag.size();i++){
   index_map states_to_index_tmp;
   index_map commands_to_index_tmp;
   
-  for (int j=0; j<ag.at(i).state.size();j++)
+  for (unsigned int j=0; j<ag.at(i).state.size();j++)
   {
-    agent_packet.state.insert(make_pair<int,double>(j,0));
-    states_to_index_tmp.insert(make_pair<std::string,int>(ag.at(i).state.at(j),j));
+    agent_packet.state.insert(make_pair(j,0));
+    states_to_index_tmp.insert(make_pair(ag.at(i).state.at(j),j));
    }
   
-  for (int j=0; j<ag.at(i).inputs.size();j++)
+  for (unsigned int j=0; j<ag.at(i).inputs.size();j++)
   {
-    command_packet.command.insert(make_pair<int,double>(j,0));
-    commands_to_index_tmp.insert(make_pair<std::string,int>(ag.at(i).inputs.at(j),j));
+    command_packet.command.insert(make_pair(j,0));
+    commands_to_index_tmp.insert(make_pair(ag.at(i).inputs.at(j),j));
     
   }
-    states_index.internal_map.insert(make_pair<string,agent_state_packet>(ag.at(i).name,agent_packet));
+    states_index.internal_map.insert(pair<string,agent_state_packet>(ag.at(i).name,agent_packet));
     agent_states_to_index.push_back(states_to_index_tmp);
     commands[i]=command_packet;
     agent_commands_to_index.push_back(commands_to_index_tmp);

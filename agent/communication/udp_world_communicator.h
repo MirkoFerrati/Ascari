@@ -23,8 +23,9 @@ public:
 private:
 	boost::asio::io_service io_service;
     udp_receiver<agents_name_to_states > agents_status_receiver;
-	udp_sender<control_command_packet> control_command_sender;
 	udp_receiver<simulation_time> time_receiver;
+	udp_sender<control_command_packet> control_command_sender;
+	
 };
 
 #endif // UDP_WORLD_COMMUNICATOR_H

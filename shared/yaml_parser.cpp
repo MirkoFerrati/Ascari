@@ -28,7 +28,7 @@ std::vector<Parsed_Agent> parse_file(const char * file_name) {
 ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
 
     os << ag.name << "\n";
-    for (int i =0 ;i<ag.state.size();i++)
+    for (unsigned int i =0 ;i<ag.state.size();i++)
     {
         os<< "State:"<<ag.state.at(i)<<endl;
         os<< "Map: "<<ag.expressions.at(ag.state.at(i))<<endl;
@@ -44,7 +44,7 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
         os<< "Name:"<<((*iter).first)<<endl;
         os<< "Values for Command: "<<endl;
 
-        for (int j=0; j<(*iter).second.size();j++)
+        for (unsigned int j=0; j<(*iter).second.size();j++)
         {
             os<< ag.inputs[j]<<": "<<((*iter).second.at(j))<<endl;
 
@@ -93,16 +93,17 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
 
         }
     }
-
+	return os;
 }
 
 
 ostream& operator<< (ostream& os, const std::vector<Parsed_Agent>& ag) {
-    for (int i=0; i<ag.size();i++)
+    for (unsigned int i=0; i<ag.size();i++)
     {
         os<<ag.at(i);
         os<<endl;
     }
+    return os;
 }
 
 
@@ -113,26 +114,26 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     node["CONTROL_COMMANDS"]>>ag.inputs;
 
     string temp;
-    for (int i=0;i<ag.state.size();i++)
+    for (unsigned int i=0;i<ag.state.size();i++)
     {
         node["DYNAMIC_MAP"][0][ag.state[i]]>>temp;
-        ag.expressions.insert(std::make_pair<lambda_name,lambda_expression>(ag.state[i],temp));
+        ag.expressions.insert(std::pair<lambda_name,lambda_expression>(ag.state[i],temp));
 
         node["INITIAL"][0][ag.state[i]]>>temp;
-        ag.initial_states.insert(std::make_pair<stateVariable,initial_state_value>(ag.state[i],temp));
+        ag.initial_states.insert(pair<stateVariable,initial_state_value>(ag.state[i],temp));
     }
 
     const YAML::Node& behavior= node["BEHAVIOR"][0];
     const YAML::Node& controllers = behavior["CONTROLLERS"];
 
 
-    for (int i=0;i<controllers.size();i++) {
+    for (unsigned int i=0;i<controllers.size();i++) {
         map<int,string> temp1;
         controllers[i]["NAME"]>>temp;
 
-        ag.controllers.insert(make_pair<controller_name, map<int,controllerRule> >(temp,temp1));
+        ag.controllers.insert(pair<controller_name, map<int,controllerRule> >(temp,temp1));
 
-        for (int j=0;j<ag.inputs.size();j++)
+        for (unsigned int j=0;j<ag.inputs.size();j++)
         {
             string temp1;
             controllers[i][ag.inputs[j]]>> ag.controllers[temp][j];
@@ -141,12 +142,12 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
     const YAML::Node& disc_states = behavior["DISCRETE_STATES"];
 
-    for (int i=0;i<disc_states.size();i++) {
+    for (unsigned int i=0;i<disc_states.size();i++) {
         string n_state;
         disc_states[i]["NAME"]>>n_state;
         string c_name;
         disc_states[i]["CONTROLLER"]>>c_name;
-        ag.discrete_states.insert(make_pair<string,string>(n_state,c_name));
+        ag.discrete_states.insert(pair<string,string>(n_state,c_name));
 
     }
 
@@ -156,10 +157,10 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     topology["TOPOLOGY"]>> ag.topology;
 
 
-    for (int i=0;i<ag.topology.size();i++) {
+    for (unsigned int i=0;i<ag.topology.size();i++) {
         string topology_exp;
         topology[ag.topology[i]]>>topology_exp;
-        ag.topology_expressions.insert(make_pair<string,string>(ag.topology[i],topology_exp));
+        ag.topology_expressions.insert(pair<string,string>(ag.topology[i],topology_exp));
 
     }
 
@@ -168,10 +169,10 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     lambda["LAMBDA"]>> ag.lambda;
 
 
-    for (int i=0;i<ag.lambda.size();i++) {
+    for (unsigned int i=0;i<ag.lambda.size();i++) {
         string lambda_exp;
         lambda[ag.lambda[i]]>>lambda_exp;
-        ag.lambda_expressions.insert(make_pair<string,string>(ag.lambda[i],lambda_exp));
+        ag.lambda_expressions.insert(pair<string,string>(ag.lambda[i],lambda_exp));
 
     }
 
@@ -181,10 +182,10 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     decoder["EVENTS"]>> ag.events;
 
 
-    for (int i=0;i<ag.events.size();i++) {
+    for (unsigned int i=0;i<ag.events.size();i++) {
         string events_exp;
         decoder[ag.events[i]]>>events_exp;
-        ag.events_expressions.insert(make_pair<string,string>(ag.events[i],events_exp));
+        ag.events_expressions.insert(pair<string,string>(ag.events[i],events_exp));
 
     }
 
@@ -192,14 +193,14 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     const YAML::Node& automaton = behavior["AUTOMATON"];
 
 
-    for (int i=0;i<automaton.size();i++) {
+    for (unsigned int i=0;i<automaton.size();i++) {
         for (map< discreteState_Name, controller_name >::const_iterator iter=ag.discrete_states.begin(); iter!=ag.discrete_states.end();iter++)
         {
             string actual_state;
             actual_state=((*iter).first);
             if (automaton[i].FindValue(actual_state)) {
                 map<string,string> temp1;
-                ag.automaton.insert(make_pair<string, map<string,string> >(actual_state,temp1));
+                ag.automaton.insert(pair<string, map<string,string> >(actual_state,temp1));
 
                 const YAML::Node& transition = automaton[i][actual_state][0];
 
@@ -214,13 +215,13 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
                         transition[new_state]>> tran_ev;
 
 
-                        for (int j=0; j< tran_ev.size();j++) {
+                        for (unsigned int j=0; j< tran_ev.size();j++) {
                             if (ag.automaton[actual_state].count(tran_ev[j]))
                             {
                                 ERR("DUPLICATED EVENT %s", tran_ev[j].c_str());
                                 throw "DUPLICATED EVENT";
                             }
-                            ag.automaton[actual_state].insert(make_pair<event_name, discreteState_Name>(tran_ev[j],new_state));
+                            ag.automaton[actual_state].insert(pair<event_name, discreteState_Name>(tran_ev[j],new_state));
                         }
                     }
                 }

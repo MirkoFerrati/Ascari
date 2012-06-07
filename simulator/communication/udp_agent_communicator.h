@@ -15,9 +15,10 @@ public:
     void send_target(const agents_name_to_states&  infos, const target_abstract* target);
 private:
 	boost::asio::io_service service;//This must be written before any sender or receiver
+	udp_sender<simulation_time> time_sender;
 	udp_sender<agents_name_to_states> state_sender;
 	udp_receiver<control_command_packet > control_receiver;
-	udp_sender<simulation_time> time_sender;
+	
 };
 
 #endif // TCP_AGENT_COMMUNICATOR_H
