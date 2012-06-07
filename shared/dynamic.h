@@ -11,15 +11,19 @@
 class dynamic
 {
 public:
-	dynamic(const agent_state& StateReferenceWARN, const control_command& controlReferenceWARN,
-			std::map<std::string,std::string> expression,
-			std::vector<std::string> variables_name
-	);
+	dynamic(agent_state& StateReferenceWARN, control_command& controlReferenceWARN, 
+		std::map< std::string, std::string > expression, std::vector< std::string > state_variables_name, 
+	 std::vector< std::string > control_variables_name);
 	agent_state getNextState();
+	
 	
 	
 private:
 	std::vector<exprtk::expression<double> > expressions;
+	exprtk::symbol_table<double> symbol_table;
+	std::map<std::string,int> map_expressions;
+	const agent_state& StateReferenceWARN;
+	
 };
 
 #endif // DYNAMIC_H

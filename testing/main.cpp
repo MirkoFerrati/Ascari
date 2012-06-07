@@ -1,5 +1,6 @@
 
 #include "testcontroller.hpp"
+#include "testdynamic.hpp"
 
 int main(int argc, char **argv) {
 
@@ -16,4 +17,22 @@ int main(int argc, char **argv) {
         throw;
     }
 
+try {
+        cout<<"inizio test della dinamica"<<endl;
+        testDynamic d;
+        d.test();
+        cout<<"il test della dinamica è andato a buon fine"<<endl;
+    }
+    catch (...)
+    {
+        cout<<"il test della dinamica è fallito"<<endl;
+        throw;
+    }
+    
+    
+    
+    
 }
+
+
+

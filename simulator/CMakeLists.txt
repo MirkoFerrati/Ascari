@@ -1,6 +1,6 @@
 
 
-add_executable(simulator Dynamic_module.cpp ../shared/dynamic.cpp communication/udp_agent_communicator.cpp simulator.cpp main.cpp communication/agent_communicator_abstract.h ../shared/yaml_parser.cpp)
+add_executable(simulator ../shared/dynamic.cpp communication/udp_agent_communicator.cpp simulator.cpp main.cpp communication/agent_communicator_abstract.h ../shared/yaml_parser.cpp)
 
 add_subdirectory(parser)
 add_subdirectory(visibility)
