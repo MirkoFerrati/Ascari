@@ -1,6 +1,7 @@
 
 #include "testcontroller.hpp"
 #include "testdynamic.hpp"
+#include "testudpsenderreceiver.hpp"
 
 int main(int argc, char **argv) {
 
@@ -29,9 +30,17 @@ try {
         throw;
     }
     
-    
-    
-    
+try {
+        cout<<"inizio test della comunicazione udp"<<endl;
+        testUDPSenderReceiver u;
+        u.test();
+        cout<<"il test della comunicazione udp è andato a buon fine"<<endl;
+    }
+    catch (...)
+    {
+        cout<<"il test della comunicazione udp è fallito"<<endl;
+        throw;
+    }
 }
 
 
