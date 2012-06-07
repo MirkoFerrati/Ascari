@@ -37,9 +37,9 @@ public:
 	
 	agent_state new_state=d.getNextState();
 	
-	assert(stato[0]==1+0.01*(5*1+2*2+3*1));
-        assert(stato[1]==2+0.01*(3*10+3*2));
-	assert(stato[2]==10+0.01*(4*10+2*1+2));
+	assert(abs(new_state[0]-(1+0.01*(5*1+2*2+3*1)))<0.0001);
+    assert(abs(new_state[1]-(2+0.01*(3*10+3*2)))<0.0001);
+	assert(abs(new_state[2]-(10+0.01*(4*10+2*1+2)))<0.0001);
 	}
 
 };

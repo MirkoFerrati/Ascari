@@ -8,7 +8,6 @@ dynamic::dynamic(agent_state& StateReferenceWARN, control_command& controlRefere
 		 std::map< std::string, std::string > expression_map, std::vector< std::string > state_variables_name, 
 		 std::vector< std::string > control_variables_name):StateReferenceWARN(StateReferenceWARN)
 {
-exprtk::symbol_table<double> symbol_table;
     
 	for (int i=0;i<StateReferenceWARN.size();i++)
 	{
