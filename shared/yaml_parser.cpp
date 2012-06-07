@@ -58,7 +58,7 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
     }
 
     os<< "Topologies: "<<endl;
-    for (map< Topology_name, Topology_expression >::const_iterator iter=ag.topology_expressions.begin(); iter!=ag.topology_expressions.end();iter++)
+    for (map< topology_name, topology_expression >::const_iterator iter=ag.topology_expressions.begin(); iter!=ag.topology_expressions.end();iter++)
     {
         os<< "Name:"<<((*iter).first)<<endl;
         os<< "Expression: "<<((*iter).second)<<endl;
@@ -117,7 +117,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     for (unsigned int i=0;i<ag.state.size();i++)
     {
         node["DYNAMIC_MAP"][0][ag.state[i]]>>temp;
-        ag.expressions.insert(std::pair<lambda_name,lambda_expression>(ag.state[i],temp));
+        ag.expressions.insert(std::pair<stateVariable,dynamic_expression>(ag.state[i],temp));
 
         node["INITIAL"][0][ag.state[i]]>>temp;
         ag.initial_states.insert(pair<stateVariable,initial_state_value>(ag.state[i],temp));
