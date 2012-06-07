@@ -1,8 +1,7 @@
 
 
 
-add_executable(test main.cpp)
+add_executable(test main.cpp ../agent/controller/controller.cpp)
 
-include_directories(agent shared simulator)
 
-list( APPEND CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+#list( APPEND CMAKE_CXX_FLAGS "-std=c++0x -pedantic ${CMAKE_CXX_FLAGS}")
