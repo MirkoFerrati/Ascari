@@ -8,10 +8,11 @@
 #include <map>
 #include <string>
 #include "typedefs.h"
+#include "testClass.h"
 
 using namespace std;
 
-class testDynamic
+class testDynamic:public testClass
 {
 public:
     void test() {

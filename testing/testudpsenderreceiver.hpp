@@ -10,10 +10,11 @@
 #include <map>
 #include <string>
 #include "typedefs.h"
+#include "testClass.h"
 
 using namespace std;
 
-class testUDPSenderReceiver
+class testUDPSenderReceiver:public testClass
 {
 public:
 	void test()

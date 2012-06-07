@@ -8,10 +8,11 @@
 #include <map>
 #include <string>
 #include "typedefs.h"
+#include "testClass.h"
 
 using namespace std;
 
-class testController
+class testController:public testClass
 {
 public:
     void test() {

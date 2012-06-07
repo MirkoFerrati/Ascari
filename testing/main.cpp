@@ -2,45 +2,38 @@
 #include "testcontroller.hpp"
 #include "testdynamic.hpp"
 #include "testudpsenderreceiver.hpp"
+#include "testClass.h"
+
+/**
+ * @author MirkoF
+ * Questo progetto è ancora troppo piccolo per avere un vero framework di unit testing, per adesso 
+ * basta e avanza un sistema banale come quello qui sotto: una classe base di test e tutti i test
+ * che derivano da quella, e un vettore con i test aggiunti manualmente.
+ */
 
 int main(int argc, char **argv) {
 
+	vector<pair<testClass*,string> > tests;
 
-    try {
-        cout<<"inizio test del controllore"<<endl;
-        testController c;
-        c.test();
-        cout<<"il test del controllore è andato a buon fine"<<endl;
-    }
-    catch (...)
-    {
-        cout<<"il test del controllore è fallito"<<endl;
-        throw;
-    }
-
-try {
-        cout<<"inizio test della dinamica"<<endl;
-        testDynamic d;
-        d.test();
-        cout<<"il test della dinamica è andato a buon fine"<<endl;
-    }
-    catch (...)
-    {
-        cout<<"il test della dinamica è fallito"<<endl;
-        throw;
-    }
-    
-try {
-        cout<<"inizio test della comunicazione udp"<<endl;
-        testUDPSenderReceiver u;
-        u.test();
-        cout<<"il test della comunicazione udp è andato a buon fine"<<endl;
-    }
-    catch (...)
-    {
-        cout<<"il test della comunicazione udp è fallito"<<endl;
-        throw;
-    }
+	tests.push_back(make_pair(new testController(),"controllore"));
+	tests.push_back(make_pair(new testDynamic(),"dinamica"));
+	tests.push_back(make_pair(new testUDPSenderReceiver(),"UDP sender receiver"));
+	
+	for (unsigned int i=0;i<tests.size();i++)
+	{
+		try 
+		{
+			cout<<"inizio test "<<tests[i].second<<endl;
+			tests[i].first->test();
+			cout<<"il test "<<tests[i].second<<" è andato a buon fine"<<endl;
+		}
+		catch (...)
+		{
+			cout<<"il test "<<tests[i].second<<" è fallito"<<endl;
+			throw;
+		}
+	}
+	
 }
 
 
