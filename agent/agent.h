@@ -60,8 +60,14 @@ protected:
 	
 	void main_loop();
 	
+	/**
+	 * crea la tabella di transizione dell'automaton
+	 */
 	transitionTable createAutomatonTableFromParsedAgent(const Parsed_Agent& agent);
-	
+	/**
+	 * crea le strutture dati che rappresentano lo stato continuo e il risultato del controllo
+	 */
+	void createStateFromParsedAgent(const Parsed_Agent& agent);
 };
 
 #endif // AGENT_H

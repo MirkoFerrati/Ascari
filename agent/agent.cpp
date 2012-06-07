@@ -12,19 +12,8 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents):i
 	for (unsigned int i =0;i<agents.size();i++)
             if (agents[i].name.compare(name)==0)
 				myAgent=i;
+	createStateFromParsedAgent(agents[myAgent]);
 	
-	for (unsigned int i=0;i<agents[myAgent].state.size();i++)
-	{	
-		state[i]=0;
-		map_statename_to_id.insert(std::pair<string,int>(agents[myAgent].state.at(i),i));
-		i++;
-	}	
-	for (unsigned int i=0;i<agents[myAgent].inputs.size();i++)
-	{	
-		inputs[i]=0;
-		map_inputs_name_to_id.insert(make_pair(agents[myAgent].inputs.at(i),i));
-		i++;
-	}	
     world_comm=new udp_world_communicator();
 
     if (!isDummy)
@@ -50,6 +39,22 @@ transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& a
 	throw "not implemented";
 }
 
+
+void agent::createStateFromParsedAgent(const Parsed_Agent& agent)
+{
+	for (unsigned int i=0;i<agent.state.size();i++)
+	{	
+		state[i]=0;
+		map_statename_to_id.insert(std::pair<string,int>(agent.state.at(i),i));
+		i++;
+	}	
+	for (unsigned int i=0;i<agent.inputs.size();i++)
+	{	
+		inputs[i]=0;
+		map_inputs_name_to_id.insert(make_pair(agent.inputs.at(i),i));
+		i++;
+	}	
+}
 
 void agent::main_loop()
 {
