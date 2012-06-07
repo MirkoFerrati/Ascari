@@ -28,7 +28,7 @@ public:
     void computeControl();
 
 private:
-    
+    exprtk::symbol_table<double> symbol_table;
     std::vector< exprtk::expression<double> > expressions;
 };
 
