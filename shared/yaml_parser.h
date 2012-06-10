@@ -26,10 +26,10 @@ typedef std::string topology_name;
 typedef std::string topology_expression;
 typedef std::string lambda_name;
 typedef std::string lambda_expression;
-typedef std::map<lambda_name, lambda_expression> Lambda_MapExpressions;
+// typedef std::map<lambda_name, lambda_expression> Lambda_MapExpressions;
 typedef std::string event_name;
 typedef std::string event_expression;
-typedef std::map<event_name, event_expression> Events_MapExpressions;
+// typedef std::map<event_name, event_expression> Events_MapExpressions;
 
 class Parsed_Agent {
 

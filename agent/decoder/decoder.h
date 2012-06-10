@@ -1,8 +1,28 @@
 #ifndef DECODER_H
 #define DECODER_H
 
+#include <map>
+#include <string>
+#include <typedefs.h>
+
 class decoder
 {
+public:
+	decoder(std::map< int, sub_event_value >& sub_events, std::map< int, bool >& events);
+	void create(std::map<std::string,std::string> events,
+		index_map const& sub_events_map,
+		index_map const& events_map);
+	void decode();
+	
+private:
+	std::map<int,sub_event_value>& sub_events;
+	std::map<int,bool>& events;
+	
+	/**
+	 * Dall'indice dell'evento trovo l'indice dei sottoeventi e i loro valori richiesti
+	 */
+	std::map<int,std::map<int,sub_event_value> > internal_table; //if internal_table[i][j]==sub_events[j] ...
+	
 };
 
 #endif // DECODER_H

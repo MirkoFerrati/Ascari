@@ -6,14 +6,15 @@
 using namespace std;
 
 
-agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents):identifier(name)
+agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
+:identifier(name),event_decoder(sub_events,events)
 {
 	int myAgent;
 	for (unsigned int i =0;i<agents.size();i++)
             if (agents[i].name.compare(name)==0)
 				myAgent=i;
 	createStateFromParsedAgent(agents[myAgent]);
-	
+	createEventsFromParsedAgent(agents[myAgent]);
     world_comm=new udp_world_communicator();
 
     if (!isDummy)
@@ -30,6 +31,7 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents):i
 		controllers.push_back(c);
 		map_controllername_to_id.insert(make_pair(it->first,i++));
 	}
+	event_decoder.create(agents[myAgent].events_expressions,sub_event_to_index,events_to_index);
     main_loop();
 }
 
@@ -37,6 +39,17 @@ transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& a
 {
 	ERR("not implemented");
 	throw "not implemented";
+}
+
+void agent::createEventsFromParsedAgent(const Parsed_Agent& agent)
+{
+	int i=0;
+	for (map<string,string>::const_iterator it=agent.events_expressions.begin();it!=agent.events_expressions.end();it++)
+	{
+		events_to_index.insert(make_pair(it->first,i));
+		events.insert(make_pair(i,false));
+		i++;
+	}
 }
 
 
