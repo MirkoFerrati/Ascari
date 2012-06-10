@@ -13,38 +13,51 @@ decoder::decoder(std::map< int, sub_event_value >& sub_events,std::map< int, boo
 
 void decoder::create(map< string, string > events,  const index_map& sub_events_map, const index_map& events_map)
 {
-	map<int,sub_event_value> temp_map;
-	for (auto it=events_map.begin();it!=events_map.end();it++)
-	{
-		temp_map.clear();
-		
-		stringstream ss(events[it->first]);
-		string token;
-		while (ss>>token)
-		{
-			bool negative;
-			sub_event_value value=_UNDEFINED;
-			if (token[0]=='!')
-			{
-				negative=false;
-				token=token.substr(1,token.length()-1);
-			}
-			if (sub_events_map.count(token))
-			{
-				if (negative)
-					value=_FALSE;
-				else
-					value=_TRUE;
-			}
-			else
-				ERR("evento non esistente %s",token.c_str());
-			temp_map.insert(make_pair(sub_events_map.at(token),value));
-		}
-		internal_table.insert(make_pair(it->second,temp_map));
-	}
+    map<int,sub_event_value> temp_map;
+    for (auto it=events_map.begin();it!=events_map.end();it++)
+    {
+        temp_map.clear();
+
+        stringstream ss(events[it->first]);
+        string token;
+        while (ss>>token)
+        {
+            bool negative;
+            sub_event_value value=_UNDEFINED;
+            if (token[0]=='!')
+            {
+                negative=false;
+                token=token.substr(1,token.length()-1);
+            }
+            if (sub_events_map.count(token))
+            {
+                if (negative)
+                    value=_FALSE;
+                else
+                    value=_TRUE;
+            }
+            else
+                ERR("evento non esistente %s",token.c_str());
+            temp_map.insert(make_pair(sub_events_map.at(token),value));
+        }
+        internal_table.insert(make_pair(it->second,temp_map));
+    }
 }
 
 void decoder::decode()
 {
-	throw "not implemented";
+    for (map<int,bool>::iterator it=events.begin();it!=events.end();it++)
+    {
+		it->second=true;
+        for (map<int,sub_event_value>::const_iterator iit=internal_table.at(it->first).begin();iit!=internal_table.at(it->first).end();iit++)
+        {
+			if (sub_events.at(iit->first)==_UNDEFINED || iit->second==_UNDEFINED)
+				continue;
+            if (iit->second!=sub_events.at(iit->first))
+            {
+				it->second=false;
+            }
+        }
+	}
+
 }
