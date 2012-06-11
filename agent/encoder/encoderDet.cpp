@@ -1,14 +1,15 @@
 #include "encoderDet.h"
+#include "../agent/topology/topology.h"
 
 using namespace std;
 
-encoderDet::encoderDet(
-	std::map< int, sub_event_value >& sub_events, 
-	 agent_state& state, const std::map< string, int >& stateVariablesName_to_Index, 
+encoderDet::encoderDet(std::map< int, sub_event_value >& topology,
+	std::map< int, sub_event_value >& lambda, 
+	 agent_state& state, agent_state& state_ith_agent, const std::map< string, int >& stateVariablesName_to_Index, 
 	 std::map< int, double >& bonusVariables, const std::map< string, int >& bonusVariablesName_to_Index, 
 	const std::map< string, string >& topology_expres, const std::vector< string >& topology_names, 
 	const std::map< string, string >& lambda_expres, const std::vector< string >& lambda_names)
-:ref_sub_events(sub_events)
+:ref_lambda(lambda), topologies(topology, state,state_ith_agent, stateVariablesName_to_Index,bonusVariables,bonusVariablesName_to_Index,topology_expres,topology_names)
 {
 	for (map<string,int>::const_iterator it=stateVariablesName_to_Index.begin();it!=stateVariablesName_to_Index.end();++it)
 	{
@@ -41,8 +42,10 @@ void encoderDet::computeSubEvents()
 	for (map<string,int>::const_iterator it=lambda_to_index.begin();it!=lambda_to_index.end();it++)
 	{
 		if (lambda_expressions.at(it->second).value()==1)
-			ref_sub_events[it->second]=_TRUE;
+			ref_lambda[it->second]=_TRUE;
 		if (lambda_expressions.at(it->second).value()==0)
-			ref_sub_events[it->second]=_FALSE;
+			ref_lambda[it->second]=_FALSE;
 	}
+	
+	topologies.computeTopologies();
 }

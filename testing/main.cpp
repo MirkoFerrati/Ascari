@@ -2,6 +2,7 @@
 #include "testcontroller.hpp"
 #include "testdynamic.hpp"
 #include "testudpsenderreceiver.hpp"
+#include "testencoder.hpp"
 #include "testClass.h"
 
 /**
@@ -18,6 +19,8 @@ int main(int argc, char **argv) {
 	tests.push_back(make_pair(new testController(),"controllore"));
 	tests.push_back(make_pair(new testDynamic(),"dinamica"));
 	tests.push_back(make_pair(new testUDPSenderReceiver(),"UDP sender receiver"));
+	tests.push_back(make_pair(new testEncoder(),"Encoder"));
+	
 	
 	for (unsigned int i=0;i<tests.size();i++)
 	{
