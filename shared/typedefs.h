@@ -59,7 +59,6 @@ struct control_command :map_int_double
 };
 
 
-
 /** This map will be used to store informations about variables names and converting them to int
  * In this way we speed up the read access during simulations
  */
@@ -122,7 +121,6 @@ struct agents_name_to_states
 		
 	}
 };
-
 
 struct control_command_packet
 {

@@ -1,7 +1,7 @@
 #ifndef AUTOMATONFSM_H
 #define AUTOMATONFSM_H
 
-#include <automatonabstract.h>
+#include "automatonabstract.h"
 
 using namespace std;
 
