@@ -29,19 +29,19 @@ public:
 		transition e3=(transition) 2;
 		
 		map<transition, automaton_state> tmp;
-		trans_table.internalTable[fast].insert(make_pair<transition,automaton_state>(e1,fast));
+		trans_table.internalTable[fast].insert(make_pair(e1,fast));
 		
-		trans_table.internalTable[fast].insert(make_pair<transition,automaton_state>(e2,slow));
+		trans_table.internalTable[fast].insert(make_pair(e2,slow));
 		
-		trans_table.internalTable[slow].insert(make_pair<transition,automaton_state>(e1,left));
+		trans_table.internalTable[slow].insert(make_pair(e1,left));
 		
-		trans_table.internalTable[slow].insert(make_pair<transition,automaton_state>(e2,slow));
+		trans_table.internalTable[slow].insert(make_pair(e2,slow));
 		
-		trans_table.internalTable[slow].insert(make_pair<transition,automaton_state>(e3,fast));
+		trans_table.internalTable[slow].insert(make_pair(e3,fast));
 
-		trans_table.internalTable[left].insert(make_pair<transition,automaton_state>(e3,slow));
+		trans_table.internalTable[left].insert(make_pair(e3,slow));
 		
-		trans_table.internalTable[left].insert(make_pair<transition,automaton_state>(e1,fast));
+		trans_table.internalTable[left].insert(make_pair(e1,fast));
 		
 		
 		automatonFSM test_automaton(trans_table,name);
