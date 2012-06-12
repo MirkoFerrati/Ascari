@@ -14,7 +14,14 @@ class testDecoder: public testClass
 		void test()
 		{
 			std::map< int, sub_event_value > sub_events;
-			std::map< int, bool > events;
+			std::map< transition, bool > events;
+			
+			transition t1=(transition)1;
+			transition t2=(transition)2;
+			transition t3=(transition)3;
+			transition t4=(transition)4;
+			transition t5=(transition)5;
+			
 			
 			sub_events[1]=_TRUE;
 			sub_events[2]=_TRUE;
@@ -22,8 +29,8 @@ class testDecoder: public testClass
 			sub_events[4]=_TRUE;
 			sub_events[5]=_TRUE;
 			
-			events[1]=false;
-			events[5]=false;
+			events[t1]=false;
+			events[t5]=false;
 			
 			std::map<std::string,std::string> parsed_events;
 			index_map sub_events_map;
@@ -52,8 +59,8 @@ class testDecoder: public testClass
 			
 			
 			d.decode();
-			assert(events[1]==true);
-			assert(events[5]==false);
+			assert(events[t1]==true);
+			assert(events[t5]==false);
 		}
 };
 

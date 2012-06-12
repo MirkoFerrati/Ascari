@@ -16,7 +16,7 @@ struct udp_target
 class udp_world_communicator: public world_communicator_abstract
 {
 public:
-    agents_name_to_states receive_agents_status();
+    std::map<std::string,agent_state_packet> receive_agents_status();
 	simulation_time receive_time();
     void send_control_command(control_command_packet& command, const target_abstract* target);
 	udp_world_communicator();

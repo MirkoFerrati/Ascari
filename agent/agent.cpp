@@ -31,7 +31,7 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
 		controllers.push_back(c);
 		map_controllername_to_id.insert(make_pair(it->first,i++));
 	}
-	event_decoder.create(agents[myAgent].events_expressions,sub_event_to_index,events_to_index);
+	event_decoder.create(agents[myAgent].events_expressions,sub_events_to_index,events_to_index);
     main_loop();
 }
 
@@ -43,7 +43,7 @@ transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& a
 
 void agent::createEventsFromParsedAgent(const Parsed_Agent& agent)
 {
-	int i=0;
+	transition i=(transition)0;
 	for (map<string,string>::const_iterator it=agent.events_expressions.begin();it!=agent.events_expressions.end();it++)
 	{
 		events_to_index.insert(make_pair(it->first,i));

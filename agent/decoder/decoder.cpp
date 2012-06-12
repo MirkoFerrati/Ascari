@@ -5,7 +5,7 @@
 using namespace std;
 
 
-decoder::decoder(std::map< int, sub_event_value >& sub_events,std::map< int, bool >& events):sub_events(sub_events),events(events)
+decoder::decoder(std::map< int, sub_event_value >& sub_events,std::map< transition, bool >& events):sub_events(sub_events),events(events)
 {
 //Nothing to do here?
 }
@@ -22,16 +22,16 @@ void decoder::create(map< string, string > events,  const index_map& sub_events_
         string token;
         while (ss>>token)
         {
-            bool negative;
+            bool negateVariable=false;
             sub_event_value value=_UNDEFINED;
             if (token[0]=='!')
             {
-                negative=false;
+                negateVariable=true;
                 token=token.substr(1,token.length()-1);
             }
             if (sub_events_map.count(token))
             {
-                if (negative)
+                if (negateVariable)
                     value=_FALSE;
                 else
                     value=_TRUE;
@@ -46,7 +46,7 @@ void decoder::create(map< string, string > events,  const index_map& sub_events_
 
 void decoder::decode()
 {
-    for (map<int,bool>::iterator it=events.begin();it!=events.end();it++)
+    for (map<transition,bool>::iterator it=events.begin();it!=events.end();it++)
     {
 		it->second=true;
         for (map<int,sub_event_value>::const_iterator iit=internal_table.at(it->first).begin();iit!=internal_table.at(it->first).end();iit++)

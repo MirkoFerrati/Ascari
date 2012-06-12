@@ -47,12 +47,12 @@ protected:
 	/**
 	 * Mappa dei nomi dei sottoeventi e dei relativi indici
 	 */
-	index_map sub_event_to_index;
+	index_map sub_events_to_index;
 	
 	/**
 	 * Valori degli eventi
 	 */
-	std::map<int,bool> events;
+	std::map<transition,bool> events;
 	
 	/**
 	 * Mappa dei nomi degli eventi e dei relativi indici

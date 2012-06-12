@@ -78,10 +78,7 @@ enum sub_event_value
  */
 BOOST_STRONG_TYPEDEF (int, automaton_state)
 
-/**
- * An event is represented by an integer (the name of the event is stored in an IndexMap) and an integer value (extended boolean)
- */
-typedef std::map<int,int> events_map;
+
 
 /**
  * A transition is an event used by the automaton to change his state (automatonState)

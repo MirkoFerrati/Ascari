@@ -18,9 +18,9 @@ simulation_time udp_world_communicator::receive_time()
 	return time_receiver.receive();
 }
 
-agents_name_to_states udp_world_communicator::receive_agents_status()
+std::map<std::string,agent_state_packet> udp_world_communicator::receive_agents_status()
 {
-	return agents_status_receiver.receive();
+	return agents_status_receiver.receive().internal_map;
 }
 
 void udp_world_communicator::send_control_command(control_command_packet& command, const target_abstract* target)
