@@ -1,7 +1,7 @@
 
 
 
-add_executable(test main.cpp ../agent/controller/controller.cpp ../agent/decoder/decoder.cpp ../shared/dynamic.cpp ../agent/encoder/encoderDet.cpp ../agent/topology/topology.cpp ../agent/automaton/automatonFSM.cpp)
+add_executable(test main.cpp ../agent/controller/controller.cpp ../agent/decoder/decoder.cpp ../shared/dynamic.cpp ../agent/encoder/encoderDet.cpp ../agent/automaton/automatonFSM.cpp)
 
  find_package(Boost REQUIRED system thread serialization)
  

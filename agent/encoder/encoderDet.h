@@ -2,7 +2,6 @@
 #define ENCODERDET_H
 
 #include "encoderAbstract.h"
-#include "../topology/topology.h"
 #include <typedefs.h>
 #include <exprtk.hpp>
 #include <vector>
@@ -12,30 +11,30 @@ class encoderDet:encoderAbstract
 {
 public:
 	/**
-	 * @param lambda reference alla locazione di memoria dove si trovano i valori dei lambda
-	 * @param state reference alla locazione di memoria dove si trovano i valori dello stato
-	 * @param bonusVariables reference alla locazione di memoria dove si trovano i valori delle variabili bonus
-	 * @param stateVariablesName_to_Index mappa tra nomi delle variabili di stato e relativi indici
-	 * @param bonusVariablesName_to_Index mappa tra nomi delle variabili bonus e relativi indici
-	 * @param topology_expres mappa tra nomi delle topologie e relative espressioni
-	 * @param topology_names nomi delle topologie
-	 * @param lambda_expres mappa tra nomi delle lambda e relative espressioni
-	 * @param lambda_names nomi delle lambda
+	 * @param lambda reference alla locazione di memoria dove si trovano i valori dei lambda OUTPUT
+	 * @param state reference alla locazione di memoria dove si trovano i valori dello stato INPUT 
+	 * @param state_other_agents reference alla locazione di memoria dove verranno messi i valori dello stato dei vicini INPUT
+	 * @param bonusVariables reference alla locazione di memoria dove si trovano i valori delle variabili bonus INPUT
+	 * @param stateVariablesName_to_Index mappa tra nomi delle variabili di stato e relativi indici INPUT Constructor
+	 * @param bonusVariablesName_to_Index mappa tra nomi delle variabili bonus e relativi indici INPUT Constructor
+	 * @param topology_expres mappa tra nomi delle topologie e relative espressioni INPUT Constructor
+	 * @param lambda_expres mappa tra nomi delle lambda e relative espressioni INPUT Constructor
+	 * @param sub_events_to_index mappa tra gli indici delle topologie dei lambda e il relativo valore in sub_events
 	 */
-		encoderDet(std::map< int, sub_event_value >& topologies, std::map< int, sub_event_value >& lambda,
-			agent_state& state,agent_state& state_ith_agent,const std::map< std::string,int >& stateVariablesName_to_Index, 
+		encoderDet(std::map< int, sub_event_value >& sub_events, const std::string & agent_name,
+			agent_state& state,const std::map< std::string,int >& stateVariablesName_to_Index, const std::map<std::string, agent_state_packet>& state_other_agents,
 			std::map<int,double> & bonusVariables,const std::map<std::string,int>& bonusVariablesName_to_Index,
-			std::map<std::string,std::string>const& topology_expres, std::vector<std::string> const& topology_names,
-			std::map<std::string,std::string>const& lambda_expres, std::vector<std::string> const& lambda_names
-		);
+			std::map<std::string,std::string>const& topology_expres,index_map const& sub_events_to_index,
+			std::map<std::string,std::string>const& lambda_expres);
 		void computeSubEvents();
 		
 		
 private:
-	std::map<int,sub_event_value>& ref_lambda;
-	topology topologies;
-	index_map lambda_to_index;
-	std::vector<exprtk::expression<double> > lambda_expressions;
+	std::map<int,sub_event_value>& ref_sub_events; //lambda+topologies
+	agent_state state_target;
+	std::vector<const agent_state_packet*> ref_other_agents;
+	std::map<int,exprtk::expression<double> > lambda_expressions;
+	std::map<int,exprtk::expression<double> > topology_expressions;
 	exprtk::symbol_table<double> symbol_table;
 };
 
