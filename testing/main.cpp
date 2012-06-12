@@ -3,6 +3,7 @@
 #include "testdynamic.hpp"
 #include "testudpsenderreceiver.hpp"
 #include "testencoder.hpp"
+#include "testdecoder.hpp"
 #include "testClass.h"
 
 /**
@@ -21,7 +22,7 @@ int main(int argc, char **argv) {
 	tests.push_back(make_pair(new testUDPSenderReceiver(),"UDP sender receiver"));
 	tests.push_back(make_pair(new testEncoder(),"Encoder"));
 	tests.push_back(make_pair(new testAutomaton(),"automaton"));
-	
+	tests.push_back(make_pair(new testDecoder(),"Decoder"));
 	
 	for (unsigned int i=0;i<tests.size();i++)
 	{
