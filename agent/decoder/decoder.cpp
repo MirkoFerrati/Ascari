@@ -5,7 +5,11 @@
 using namespace std;
 
 
+<<<<<<< .mine
+decoder::decoder(std::map< int, sub_event_value >& sub_events, std::map< transition, bool >& events):sub_events(sub_events),events(events)
+=======
 decoder::decoder(std::map< int, sub_event_value >& sub_events,std::map< transition, bool >& events):sub_events(sub_events),events(events)
+>>>>>>> .r60
 {
 //Nothing to do here?
 }
@@ -46,10 +50,14 @@ void decoder::create(map< string, string > events,  const index_map& sub_events_
 
 void decoder::decode()
 {
+<<<<<<< .mine
+    for (map<transition,bool>::iterator it=events.begin(); it!=events.end(); it++)
+=======
     for (map<transition,bool>::iterator it=events.begin();it!=events.end();it++)
+>>>>>>> .r60
     {
 		it->second=true;
-        for (map<int,sub_event_value>::const_iterator iit=internal_table.at(it->first).begin();iit!=internal_table.at(it->first).end();iit++)
+        for (map<int,sub_event_value>::const_iterator iit=internal_table.at(it->first).begin(); iit!=internal_table.at(it->first).end(); iit++)
         {
 			if (sub_events.at(iit->first)==_UNDEFINED || iit->second==_UNDEFINED)
 				continue;

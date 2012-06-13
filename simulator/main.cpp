@@ -31,8 +31,8 @@ int main(int argc, char **argv) {
         std::cout << "Hello, world! simulator" << std::endl;
 	
         vector<Parsed_Agent>Agents=parse_file("rob_soc.yaml");
-// 	cout<<Agents;
-	s.initialize(Agents);
+		cout<<Agents;
+		s.initialize(Agents);
     }
     LOGOG_SHUTDOWN();
     return 0;

@@ -50,6 +50,8 @@ public:
 	std::vector<event_name> events;
     std::map<event_name, event_expression> events_expressions;
     std::map<discreteState_Name, std::map<event_name,discreteState_Name> > automaton;
+	std::string automaton_name;
+	
    
      
     

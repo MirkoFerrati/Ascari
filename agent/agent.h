@@ -10,8 +10,8 @@
 #include "communication/agent_communicator_abstract.h"
 #include "communication/world_communicator_abstract.h"
 #include "../shared/yaml_parser.h"
-#include <encoderAbstract.h>
-#include <decoder.h>
+#include "encoderAbstract.h"
+#include "decoder.h"
 
 class agent
 {
@@ -33,6 +33,7 @@ protected:
 	
 	vector<automaton_state> discreteState;
 	index_map map_discreteStateName_to_id;
+	map<automaton_state, int> map_discreteStateId_to_controllerId;
 	
 	//in dummy agent, we will initialize a nautomaton, in agent an automaton
 	automatonAbstract* automaton;
@@ -58,7 +59,6 @@ protected:
 	 * Mappa dei nomi degli eventi e dei relativi indici
 	 */
 	index_map events_to_index;
-	
 	
 	/**
 	 * The value of control variables, update by controllers
@@ -98,9 +98,10 @@ protected:
 	void createEventsFromParsedAgent(const Parsed_Agent& agent);
 	
 	/**
-	 * crea le strutture dati che rappresentano lo stato continuo e il risultato del controllo
+	 * crea le strutture dati che rappresentano lo stato continuo, le variabili di controllo e lo stato discreto
 	 */
 	void createStateFromParsedAgent(const Parsed_Agent& agent);
+
 };
 
 #endif // AGENT_H

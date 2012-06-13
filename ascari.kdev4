@@ -1,4 +1,4 @@
 [Project]
 Manager=KDevCMakeManager
-Name=ascari
+Name=trunk
 VersionControl=kdevgit

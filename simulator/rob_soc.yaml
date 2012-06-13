@@ -54,7 +54,8 @@
        e3:
        e4:
      AUTOMATON:
-     - FAST:
+     - name: a1 
+       FAST:
         - FAST: [e3,e4]
           SLOW: [e2]
           ALERT: [e1]
@@ -94,7 +95,8 @@
        e3:
        e4:
      AUTOMATON:
-     - FAST:
+     - name: a2
+       FAST:
         - FAST: [e3,e4]
           SLOW: [e2]
           ALERT: [e1]

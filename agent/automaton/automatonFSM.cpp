@@ -1,17 +1,19 @@
 #include "automatonFSM.h"
 
-automatonFSM::automatonFSM(const transitionTable& table, const string& name): automatonAbstract(table,name)
-{}
+automatonFSM::automatonFSM(const transitionTable& table)
+:automatonAbstract(table){}
 
-vector<automaton_state> automatonFSM::getNextAutomatonState(const vector<automaton_state>& oldState, const vector<transition>& transitions)
+vector<automaton_state> automatonFSM::getNextAutomatonState(const vector<automaton_state>& oldState, const map<transition,bool>& event)
 {
 	vector<automaton_state> result;
 	result.push_back(oldState.at(0));
-	for (vector<transition>::const_iterator it=transitions.begin(); it!=transitions.end(); it++)
+	for (map<transition,bool>::const_iterator it=event.begin(); it!=event.end(); it++)
 	{ 
-		if (table.internalTable.at(oldState.at(0)).count(*it)) {
-			result[0] = (table.internalTable.at(oldState.at(0)).at(*it));
-			break;
+		if (it->second) { 
+			if (table.internalTable.at(oldState.at(0)).count(it->first)) {
+				result[0] = (table.internalTable.at(oldState.at(0)).at(it->first));
+				break;
+			}
 		}
 	}
 	return result;

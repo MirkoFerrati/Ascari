@@ -78,7 +78,7 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
         os<< "Expression: "<<((*iter).second)<<endl;
     }
 
-    os<< "Automaton: "<<endl;
+    os<< "Automaton: "<< ag.automaton_name<<endl;
     for (map< discreteState_Name, map< event_name, discreteState_Name > >::const_iterator iter=ag.automaton.begin(); iter!=ag.automaton.end();iter++)
     {
 
@@ -191,6 +191,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
 
     const YAML::Node& automaton = behavior["AUTOMATON"];
+	automaton[0]["NAME"]>>ag.automaton_name;
 
 
     for (unsigned int i=0;i<automaton.size();i++) {

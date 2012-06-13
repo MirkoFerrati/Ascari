@@ -19,7 +19,7 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
 
     if (!isDummy)
     {
-		automaton=new automatonFSM(createAutomatonTableFromParsedAgent(agents[myAgent]), "TODO");
+		automaton=new automatonFSM(createAutomatonTableFromParsedAgent(agents[myAgent]));
     }
     else {
         //TODO: we will think about identifierModule later
@@ -37,13 +37,30 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
 
 transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& agent)
 {
+	transitionTable automaton_table_tmp;
+	automaton_table_tmp.name = agent.automaton_name;
+	automaton_state g1, g2;
+	for (map<string,map<string,string> >::const_iterator it=agent.automaton.begin(); it!=agent.automaton.end();it++)
+	{
+		g1 = (automaton_state) map_discreteStateName_to_id.at(it->first);
+		for (map<string,string>::const_iterator iit=it->second.begin();iit!=it->second.end();iit++){
+		
+// 		g2 = (automaton_state) map_discreteStateName_to_id.at(it->second);
+// 		automaton_table_tmp.internalTable[id]; 
+		}
+	}
+	//agent.automaton
 	ERR("not implemented");
 	throw "not implemented";
 }
 
 void agent::createEventsFromParsedAgent(const Parsed_Agent& agent)
 {
+<<<<<<< .mine
+	transition i = (transition)0;
+=======
 	transition i=(transition)0;
+>>>>>>> .r60
 	for (map<string,string>::const_iterator it=agent.events_expressions.begin();it!=agent.events_expressions.end();it++)
 	{
 		events_to_index.insert(make_pair(it->first,i));
@@ -66,7 +83,17 @@ void agent::createStateFromParsedAgent(const Parsed_Agent& agent)
 		inputs[i]=0;
 		map_inputs_name_to_id.insert(make_pair(agent.inputs.at(i),i));
 		i++;
-	}	
+	}
+	automaton_state s = (automaton_state) 0;
+	unsigned int i = 0;
+	for (map<string,string>::const_iterator it=agent.discrete_states.begin(); it!=agent.discrete_states.end(); it++)
+	{	
+		discreteState[i] = s;
+		map_discreteStateName_to_id.insert(make_pair(it->first,i));
+		map_discreteStateId_to_controllerId.insert(make_pair(s,map_controllername_to_id.at(it->second)));
+		i++;
+		s++;
+	}
 }
 
 void agent::main_loop()

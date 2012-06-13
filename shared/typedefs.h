@@ -62,7 +62,7 @@ struct control_command :map_int_double
 /** This map will be used to store informations about variables names and converting them to int
  * In this way we speed up the read access during simulations
  */
-typedef std::map<std::string,int> index_map;
+typedef std::map<std::string, int> index_map;
 
 enum sub_event_value
 {
@@ -76,7 +76,7 @@ enum sub_event_value
 /**
  * automaton_state is the representation of a discrete state, an indexMap translates the value of automatonState into a string
  */
-BOOST_STRONG_TYPEDEF (int, automaton_state)
+typedef int automaton_state;
 
 
 

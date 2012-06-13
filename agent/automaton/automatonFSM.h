@@ -10,8 +10,8 @@ class automatonFSM:public automatonAbstract
 {
 	
 public:
-  automatonFSM(const transitionTable& table, const string& name);
-  vector<automaton_state> getNextAutomatonState(vector<automaton_state>const& oldStates, vector<transition>const& transitions);
+  automatonFSM(const transitionTable& table);
+  vector<automaton_state> getNextAutomatonState(vector<automaton_state>const& oldStates, map<transition,bool>const& event);
 
 private:
   //string name;
