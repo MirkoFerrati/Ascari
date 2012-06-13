@@ -19,7 +19,7 @@
 #define SINGLECAST_PORT 20000
 #define MULTICAST_ADDRESS "239.255.0.1"
 #define SIMULATOR_PORT 10000
-#define NUM_AGENTS 3
+#define NUM_AGENTS 1
 #define T_CAMP 0.01							
 
 //Used in the strong_typedef
@@ -29,34 +29,35 @@ typedef std::map<int,double> map_int_double;
 /**
  * Represents a state of an agent, where the key of the map is the index of the variable as indicated from an indexMap
  */
-struct agent_state: map_int_double
-{
-	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int version)
-	{
-		ar& *this;
-	}
-};
+// struct agent_state: map_int_double
+// {
+// 	template <typename Archive>
+// 	void serialize(Archive& ar, const unsigned int version)
+// 	{
+// 		ar& *this;
+// 	}
+// };
 
-
+typedef std::map<int,double> agent_state;
+typedef std::map<int,double> control_command;
 /**
  * Represents a control command, where the key of the map is the index of the variable as indicated from an indexMap
  */
-struct control_command :map_int_double
-{
-	
-	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int version)
-	{
-		ar& *this;
-// 		for (std::map<int,double>::const_iterator it= control_map.begin();it!=control_map.end();it++)
-// 		{
-// 			ar& it->first;
-// 			ar& it->second;
-// 		}
-			
-	}
-};
+// struct control_command :map_int_double
+// {
+// 	
+// 	template <typename Archive>
+// 	void serialize(Archive& ar, const unsigned int version)
+// 	{
+// 		ar& *this;
+// // 		for (std::map<int,double>::const_iterator it= control_map.begin();it!=control_map.end();it++)
+// // 		{
+// // 			ar& it->first;
+// // 			ar& it->second;
+// // 		}
+// 			
+// 	}
+// };
 
 
 /** This map will be used to store informations about variables names and converting them to int
@@ -93,7 +94,7 @@ typedef double simulation_time;
 
 struct agent_state_packet
 {
-	agent_state state;
+	std::map<int,double> state;
 	std::string identifier;
 	
 	template <typename Archive>
@@ -111,10 +112,7 @@ struct agents_name_to_states
 	template <typename Archive>
 	void serialize(Archive& ar, const unsigned int version)
 	{
-		for (std::map<std::string,agent_state_packet>::iterator it=internal_map.begin();it!=internal_map.end();it++)
-		{
-			ar& it->second;	
-		}
+		ar& internal_map;
 		
 	}
 };

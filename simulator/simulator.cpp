@@ -40,11 +40,11 @@ void simulator::initialize(const vector<Parsed_Agent>& ag)
         agent_states_to_index.push_back(states_to_index_tmp);
         commands.push_back(command_packet);
         agent_commands_to_index.push_back(commands_to_index_tmp);
-	
-	 dynamic *d= new dynamic(states_index.internal_map.at(ag.at(i).name).state, commands.at(agent_name_to_index.at(ag.at(i).name)).command, 
-		ag.at(i).expressions, ag.at(i).state,ag.at(i).inputs);
-	
-	dynamic_module.push_back(d);
+
+        dynamic *d= new dynamic(states_index.internal_map.at(ag.at(i).name).state, commands.at(agent_name_to_index.at(ag.at(i).name)).command,
+                                ag.at(i).expressions, ag.at(i).state,ag.at(i).inputs);
+
+        dynamic_module.push_back(d);
 
 
     }
@@ -65,9 +65,13 @@ void simulator::initialize(const vector<Parsed_Agent>& ag)
 void simulator::main_loop()
 {
     try {
+		int i=0;
         while (1) {
+			i++;
 //             communicator->send_broadcast(time++);
             communicator->send_broadcast(states_index);
+			cout<<"inviato pacchetto con gli stati"<<endl;
+            
             agent_state state_tmp;
             for (index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end();iter++) {
                 state_tmp=dynamic_module.at(iter->second)->getNextState();
@@ -76,21 +80,20 @@ void simulator::main_loop()
 
                 }
             }
-            sleep(1);
-            //TODO: we don't need to copy, we need a function that overwrites only values inside the same memory!!
-	    vector<control_command_packet> temp=communicator->receive_control_commands();
-	    
-	    for (unsigned i=0; i< temp.size();i++){
-	    
-	      for (map<int,double>::iterator it=commands.at(agent_name_to_index.at(temp.at(i).identifier)).command.begin(); it!=commands.at(agent_name_to_index.at(temp.at(i).identifier)).command.end();it++){
-	      
-		it->second=temp.at(i).command.at(it->first);
-		
-	      }
-	      
-	    }
-          
-	}
+			sleep(1);
+            vector<control_command_packet> temp=communicator->receive_control_commands();
+            cout<<"ricevuto pacchetto con i controlli"<<endl;
+            for (unsigned i=0; i< temp.size();i++) {
+
+                for (map<int,double>::iterator it=commands.at(agent_name_to_index.at(temp.at(i).identifier)).command.begin(); it!=commands.at(agent_name_to_index.at(temp.at(i).identifier)).command.end();it++) {
+
+                    it->second=temp.at(i).command.at(it->first);
+
+                }
+
+            }
+
+        }
     }
     catch (const char* e)
     {
