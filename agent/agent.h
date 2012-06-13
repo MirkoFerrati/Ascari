@@ -107,7 +107,7 @@ protected:
 	/**
 	 * crea i sottoeventi e l'encoder
 	 */
-	void createEncoderDetFromParsedAgent(const Parsed_Agent& agent);
+	void createSubEventsFromParsedAgent(const Parsed_Agent& agent);
 	
 	
 	

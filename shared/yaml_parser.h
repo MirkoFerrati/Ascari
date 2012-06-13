@@ -16,7 +16,7 @@
 
 typedef std::string stateVariable;
 typedef std::string controlVariable;
-typedef std::string initial_state_value;
+typedef double initial_state_value;
 typedef std::string controller_name;
 typedef std::string controllerRule;
 typedef std::string dynamic_expression;

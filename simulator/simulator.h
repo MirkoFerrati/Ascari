@@ -10,19 +10,18 @@
 class simulator
 {
 public:
-	simulator(int argc, char **argv);
 	~simulator();
 	void start_sim();
 	void create_communicator(int communicator_type);
 	void initialize(std::vector<Parsed_Agent> const&);
 
 private:
-	std::vector<dynamic> dynamic_module;
+	std::vector<dynamic*> dynamic_module;
 	agent_communicator_abstract* communicator;
 	agents_name_to_states states_index;
 	std::vector<index_map> agent_states_to_index;
 	std::vector<index_map> agent_commands_to_index;
-	index_map agents_name_to_dynamics;
+	index_map agents_name_to_index;
 	
 	
 	std::vector<control_command_packet> commands;

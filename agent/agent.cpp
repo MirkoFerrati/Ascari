@@ -16,6 +16,7 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
             if (agents[i].name.compare(name)==0)
 				myAgent=i;
 	createStateFromParsedAgent(agents[myAgent]);
+	createSubEventsFromParsedAgent(agents.at(myAgent));
 	createEventsFromParsedAgent(agents[myAgent]);
     world_comm=new udp_world_communicator();
     
@@ -26,7 +27,10 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
     if (!isDummy)
     {
 		automaton=new automatonFSM(createAutomatonTableFromParsedAgent(agents.at(myAgent)));
-		createEncoderDetFromParsedAgent(agents.at(myAgent));
+		encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id, state_other_agents,bonusVariables,
+		       bonus_variables_to_Index, agents.at(myAgent).topology_expressions,sub_events_to_index,agents.at(myAgent).lambda_expressions);
+
+		
     }
     else {
         //TODO: we will think about identifierModule later
@@ -63,7 +67,7 @@ transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& a
 }
 
 
-void agent::createEncoderDetFromParsedAgent(const Parsed_Agent& agent){
+void agent::createSubEventsFromParsedAgent(const Parsed_Agent& agent){
   
   unsigned i=0;
   for (map<string,string>::const_iterator it=agent.lambda_expressions.begin();it!=agent.lambda_expressions.end();it++){
@@ -81,8 +85,6 @@ void agent::createEncoderDetFromParsedAgent(const Parsed_Agent& agent){
     
   }
  
-encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id, state_other_agents,bonusVariables,
-		       bonus_variables_to_Index, agent.topology_expressions,sub_events_to_index,agent.lambda_expressions);
   
   
 }

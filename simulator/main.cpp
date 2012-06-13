@@ -24,15 +24,16 @@ int main(int argc, char **argv) {
     {
         logog::Cout out;
         WARN("Foo is over %d!  Current value is %d.", 3, 5 );
-        simulator s(argc, argv);
+        simulator s;
         initialize_communication(s);
 	
-        //s.start_sim();
+        
+        vector<Parsed_Agent>Agents=parse_file("esempio1.yaml");
+	//cout<<Agents;
+	s.initialize(Agents);
+	s.start_sim();
         std::cout << "Hello, world! simulator" << std::endl;
 	
-        vector<Parsed_Agent>Agents=parse_file("esempio4.yaml");
-	cout<<Agents;
-	s.initialize(Agents);
     }
     LOGOG_SHUTDOWN();
     return 0;

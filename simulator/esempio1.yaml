@@ -28,6 +28,7 @@
      EVENTS:
      - events: 
      AUTOMATON:
-     - FAST:
+     - name: es1
+       FAST:
         - FAST: 
                 

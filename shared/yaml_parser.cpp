@@ -113,20 +113,22 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     node["STATES"]>>ag.state;
     node["CONTROL_COMMANDS"]>>ag.inputs;
 
-    string temp;
+    
     for (unsigned int i=0;i<ag.state.size();i++)
-    {
-        node["DYNAMIC_MAP"][0][ag.state[i]]>>temp;
-        ag.expressions.insert(std::pair<stateVariable,dynamic_expression>(ag.state[i],temp));
+    {	dynamic_expression tmp_exp;
+        node["DYNAMIC_MAP"][0][ag.state[i]]>>tmp_exp;
+        ag.expressions.insert(std::pair<stateVariable,dynamic_expression>(ag.state[i],tmp_exp));
+	
 
-        node["INITIAL"][0][ag.state[i]]>>temp;
-        ag.initial_states.insert(pair<stateVariable,initial_state_value>(ag.state[i],temp));
+        initial_state_value tmp_initial;
+	node["INITIAL"][0][ag.state[i]]>>tmp_initial;
+        ag.initial_states.insert(pair<stateVariable,initial_state_value>(ag.state[i],tmp_initial));
     }
 
     const YAML::Node& behavior= node["BEHAVIOR"][0];
     const YAML::Node& controllers = behavior["CONTROLLERS"];
 
-
+    string temp;
     for (unsigned int i=0;i<controllers.size();i++) {
         map<int,string> temp1;
         controllers[i]["NAME"]>>temp;
