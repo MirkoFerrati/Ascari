@@ -16,7 +16,7 @@ void simulator::create_communicator(int communicator_type)
 void simulator::initialize(const vector<Parsed_Agent>& ag)
 {
     for (unsigned int i=0; i<ag.size();i++) {
-        agent_name_to_index.insert(make_pair(ag.at(i).name,i));
+        agents_name_to_index.insert(make_pair(ag.at(i).name,i));
         agent_state_packet agent_packet;
         control_command_packet command_packet;
         agent_packet.identifier=ag.at(i).name;
@@ -41,7 +41,7 @@ void simulator::initialize(const vector<Parsed_Agent>& ag)
         commands.push_back(command_packet);
         agent_commands_to_index.push_back(commands_to_index_tmp);
 
-        dynamic *d= new dynamic(states_index.internal_map.at(ag.at(i).name).state, commands.at(agent_name_to_index.at(ag.at(i).name)).command,
+        dynamic *d= new dynamic(states_index.internal_map.at(ag.at(i).name).state, commands.at(agents_name_to_index.at(ag.at(i).name)).command,
                                 ag.at(i).expressions, ag.at(i).state,ag.at(i).inputs);
 
         dynamic_module.push_back(d);
@@ -85,7 +85,7 @@ void simulator::main_loop()
             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {
 
-                for (map<int,double>::iterator it=commands.at(agent_name_to_index.at(temp.at(i).identifier)).command.begin(); it!=commands.at(agent_name_to_index.at(temp.at(i).identifier)).command.end();it++) {
+                for (map<int,double>::iterator it=commands.at(agents_name_to_index.at(temp.at(i).identifier)).command.begin(); it!=commands.at(agents_name_to_index.at(temp.at(i).identifier)).command.end();it++) {
 
                     it->second=temp.at(i).command.at(it->first);
 
