@@ -109,7 +109,7 @@ protected:
 	 */
 	void createSubEventsFromParsedAgent(const Parsed_Agent& agent);
 	
-	
+	void createDiscreteStateFromParsedAgent(const Parsed_Agent& agent);
 	
 	/**
 	 * crea le strutture dati che rappresentano lo stato continuo, le variabili di controllo e lo stato discreto

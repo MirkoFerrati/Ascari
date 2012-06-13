@@ -27,3 +27,8 @@ include_directories(graph_routing)
 target_link_libraries(agent ${Boost_LIBRARIES} pthread)
 
 message(${CMAKE_BUILD_TYPE})
+
+configure_file(../shared/esempio1.yaml esempio1.yaml COPYONLY)
+configure_file(../shared/esempio2.yaml esempio2.yaml COPYONLY)
+configure_file(../shared/esempio3.yaml esempio3.yaml COPYONLY)
+configure_file(../shared/esempio4.yaml esempio4.yaml COPYONLY)
