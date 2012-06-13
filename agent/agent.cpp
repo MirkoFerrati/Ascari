@@ -2,6 +2,8 @@
 #include "communication/udp_world_communicator.h"
 #include "logog.hpp"
 #include "automaton/automatonFSM.h"
+#include "encoder/encoderDet.h"
+
 
 using namespace std;
 
@@ -16,10 +18,15 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
 	createStateFromParsedAgent(agents[myAgent]);
 	createEventsFromParsedAgent(agents[myAgent]);
     world_comm=new udp_world_communicator();
+    
+    
+    
+    
 
     if (!isDummy)
     {
-		automaton=new automatonFSM(createAutomatonTableFromParsedAgent(agents[myAgent]));
+		automaton=new automatonFSM(createAutomatonTableFromParsedAgent(agents.at(myAgent)));
+		createEncoderDetFromParsedAgent(agents.at(myAgent));
     }
     else {
         //TODO: we will think about identifierModule later
@@ -39,20 +46,47 @@ transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& a
 {
 	transitionTable automaton_table_tmp;
 	automaton_table_tmp.name = agent.automaton_name;
-	automaton_state g1, g2;
+	automaton_state s1, s2;
+	transition e;
 	for (map<string,map<string,string> >::const_iterator it=agent.automaton.begin(); it!=agent.automaton.end();it++)
 	{
-		g1 = (automaton_state) map_discreteStateName_to_id.at(it->first);
+		s1 = (automaton_state) map_discreteStateName_to_id.at(it->first);
 		for (map<string,string>::const_iterator iit=it->second.begin();iit!=it->second.end();iit++){
 		
-// 		g2 = (automaton_state) map_discreteStateName_to_id.at(it->second);
-// 		automaton_table_tmp.internalTable[id]; 
+		e= (transition) events_to_index.at(iit->first);
+		s2 = (automaton_state) map_discreteStateName_to_id.at(iit->second);
+ 		automaton_table_tmp.internalTable[s1][e]=s2;
 		}
 	}
-	//agent.automaton
-	ERR("not implemented");
-	throw "not implemented";
+	
+	return automaton_table_tmp;
 }
+
+
+void agent::createEncoderDetFromParsedAgent(const Parsed_Agent& agent){
+  
+  unsigned i=0;
+  for (map<string,string>::const_iterator it=agent.lambda_expressions.begin();it!=agent.lambda_expressions.end();it++){
+	  
+	  	sub_events_to_index.insert(make_pair(it->first,i));
+		sub_events.insert(make_pair(i,_FALSE));
+		i++;
+    
+  }
+  
+  for (map<string,string>::const_iterator it=agent.topology_expressions.begin();it!=agent.topology_expressions.end();it++){
+	  
+	  	sub_events_to_index.insert(make_pair(it->first,i));
+		sub_events.insert(make_pair(i,_FALSE));
+    
+  }
+ 
+encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id, state_other_agents,bonusVariables,
+		       bonus_variables_to_Index, agent.topology_expressions,sub_events_to_index,agent.lambda_expressions);
+  
+  
+}
+
 
 void agent::createEventsFromParsedAgent(const Parsed_Agent& agent)
 {
@@ -91,6 +125,9 @@ void agent::createStateFromParsedAgent(const Parsed_Agent& agent)
 		s++;
 	}
 }
+
+
+
 
 void agent::main_loop()
 {

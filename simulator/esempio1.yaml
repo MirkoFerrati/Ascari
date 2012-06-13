@@ -1,0 +1,33 @@
+###Agente che va dritto
+- agent: Agente1
+  #VISIBLE AREA: ./battle/exp_t_visuale.txt
+  #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+  #MONITORING = 0
+  #COLLABORATIVE = 1
+  states: [x,y]
+  control_commands: [v]
+  INITIAL:
+   - x: '0'
+     y: '0'
+  DYNAMIC_MAP:
+   - x: 'v'
+     y: '0'
+  BEHAVIOR:
+   - name: Esempio 
+     CONTROLLERS:
+     - name: fast
+       v: '3'
+     DISCRETE_STATES:
+     - name: fast
+       controller: fast
+     ENCODER:
+     - TOPOLOGY:
+        - topology: 
+       LAMBDA:
+        - lambda: 
+     EVENTS:
+     - events: 
+     AUTOMATON:
+     - FAST:
+        - FAST: 
+                

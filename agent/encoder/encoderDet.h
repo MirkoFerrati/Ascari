@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 
-class encoderDet:encoderAbstract
+class encoderDet:public encoderAbstract
 {
 public:
 	/**

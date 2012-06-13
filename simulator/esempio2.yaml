@@ -1,0 +1,43 @@
+#Agente che va dritto e dopo 10 metri sterza
+
+- agent: Agente1
+  #VISIBLE AREA: ./battle/exp_t_visuale.txt
+  #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+  #MONITORING = 0
+  #COLLABORATIVE = 1
+  states: [y,theta,x]
+  control_commands: [v,w]
+  INITIAL:
+   - x: '0'
+     y: '0'
+     theta: '0'
+  DYNAMIC_MAP:
+   - x: 'v*cos(t)'
+     y: 'v*sin(t)'
+     theta: 'w'
+  BEHAVIOR:
+   - name: esempio2 
+     CONTROLLERS:
+     - name: fast
+       v: 3
+       w: 0
+     - name: left
+       v: 3
+       w: 5
+     DISCRETE_STATES:
+     - name: fast
+       controller: fast
+     - name: left
+       controller: left
+     ENCODER:
+     - TOPOLOGY:
+        - topology: 
+       LAMBDA:
+        - lambda: [l1]
+          l1: 'x>10'
+     EVENTS:
+     - events: [e1]
+       e1: l1
+     AUTOMATON:
+     - FAST:
+        - LEFT: [e1]

@@ -30,9 +30,9 @@ int main(int argc, char **argv) {
         //s.start_sim();
         std::cout << "Hello, world! simulator" << std::endl;
 	
-        vector<Parsed_Agent>Agents=parse_file("rob_soc.yaml");
-		cout<<Agents;
-		s.initialize(Agents);
+        vector<Parsed_Agent>Agents=parse_file("esempio4.yaml");
+	cout<<Agents;
+	s.initialize(Agents);
     }
     LOGOG_SHUTDOWN();
     return 0;
