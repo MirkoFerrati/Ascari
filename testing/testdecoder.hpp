@@ -29,7 +29,6 @@ class testDecoder: public testClass
 			sub_events[4]=_TRUE;
 			sub_events[5]=_TRUE;
 			
-<<<<<<< .mine
 			transition e1 = (transition) 0;
 			transition e2 = (transition) 1;
 			transition e3 = (transition) 2;
@@ -38,10 +37,6 @@ class testDecoder: public testClass
 					
 			events[e1]=false;
 			events[e5]=false;
-=======
-			events[t1]=false;
-			events[t5]=false;
->>>>>>> .r60
 			
 			std::map<std::string,std::string> parsed_events;
 			index_map sub_events_map;
@@ -69,13 +64,8 @@ class testDecoder: public testClass
 			sub_events[5]=_FALSE;
 			
 			d.decode();
-<<<<<<< .mine
 			assert(events[e1]==true);
 			assert(events[e5]==false);
-=======
-			assert(events[t1]==true);
-			assert(events[t5]==false);
->>>>>>> .r60
 		}
 };
 

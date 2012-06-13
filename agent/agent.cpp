@@ -56,11 +56,7 @@ transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& a
 
 void agent::createEventsFromParsedAgent(const Parsed_Agent& agent)
 {
-<<<<<<< .mine
-	transition i = (transition)0;
-=======
 	transition i=(transition)0;
->>>>>>> .r60
 	for (map<string,string>::const_iterator it=agent.events_expressions.begin();it!=agent.events_expressions.end();it++)
 	{
 		events_to_index.insert(make_pair(it->first,i));

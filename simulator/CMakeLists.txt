@@ -24,6 +24,7 @@ include_directories(../shared)
 include_directories(../shared/logog/include)
 include_directories(../shared/parserYAML/include)
 
-
-
-configure_file(rob_soc.yaml rob_soc.yaml COPYONLY)
+configure_file(esempio1.yaml esempio1.yaml COPYONLY)
+configure_file(esempio2.yaml esempio2.yaml COPYONLY)
+configure_file(esempio3.yaml esempio3.yaml COPYONLY)
+configure_file(esempio4.yaml esempio4.yaml COPYONLY)
