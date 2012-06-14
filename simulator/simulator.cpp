@@ -40,10 +40,10 @@ void simulator::initialize(const vector<Parsed_Agent>& ag)
         }
         states_index.internal_map.insert(make_pair(ag.at(i).name,agent_packet));
         agent_states_to_index.push_back(states_to_index_tmp);
-        commands.push_back(command_packet);
+        commands.insert(make_pair(command_packet.identifier,command_packet));
         agent_commands_to_index.push_back(commands_to_index_tmp);
 
-        dynamic *d= new dynamic(states_index.internal_map.at(ag.at(i).name).state, commands.at(agents_name_to_index.at(ag.at(i).name)).command,
+        dynamic *d= new dynamic(states_index.internal_map.at(ag.at(i).name).state, commands.at(ag.at(i).name).command,
                                 ag.at(i).expressions, ag.at(i).state,ag.at(i).inputs);
 
         dynamic_module.push_back(d);
@@ -87,7 +87,7 @@ void simulator::main_loop()
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {
 
-                for (map<int,double>::iterator it=commands.at(agents_name_to_index.at(temp.at(i).identifier)).command.begin(); it!=commands.at(agents_name_to_index.at(temp.at(i).identifier)).command.end();it++) {
+                for (map<int,double>::iterator it=commands.at(temp.at(i).identifier).command.begin(); it!=commands.at(temp.at(i).identifier).command.end();it++) {
 
                     it->second=temp.at(i).command.at(it->first);
 

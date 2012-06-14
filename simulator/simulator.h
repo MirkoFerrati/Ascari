@@ -24,7 +24,7 @@ private:
 	index_map agents_name_to_index;
 	
 	
-	std::vector<control_command_packet> commands;
+	std::map<std::string,control_command_packet> commands;
 	void main_loop();
 	std::vector<std::string> identifiers;
 	simulation_time time;

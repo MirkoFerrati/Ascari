@@ -21,12 +21,15 @@ dynamic::dynamic(agent_state& StateReferenceWARN, control_command& controlRefere
 	
     exprtk::parser<double> parser;
 	
+			
+	
+	
 	for (int i=0;i<state_variables_name.size();i++)
 	{
-		exprtk::expression<double> expression_tmp;
+		exprtk::expression<double> expression_tmp;//=new exprtk::expression<double>();
 		expression_tmp.register_symbol_table(*symbol_table);
-		string tmp_expression=expression_map.at(state_variables_name.at(i));
-		parser.compile(tmp_expression,expression_tmp);
+		string string_tmp_expression=expression_map.at(state_variables_name.at(i));
+		parser.compile(string_tmp_expression,expression_tmp);
 		expressions.push_back(expression_tmp);
 		map_expressions.insert(make_pair(state_variables_name.at(i),i));
 	}
@@ -35,7 +38,9 @@ dynamic::dynamic(agent_state& StateReferenceWARN, control_command& controlRefere
 
 dynamic::~dynamic()
 {
-	expressions.clear();
+// 	for (unsigned int i=0;i<expressions.size();i++)
+// 		delete(expressions[i]);
+expressions.clear();
 	delete(symbol_table);
 }
 
