@@ -72,7 +72,7 @@ void simulator::main_loop()
             loop++;
 //             communicator->send_broadcast(time++);
             communicator->send_broadcast(states_index);
-            cout<<"inviato pacchetto con gli stati"<<endl;
+//             cout<<"inviato pacchetto con gli stati"<<endl;
 
             agent_state state_tmp;
             for (index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end();iter++) {
@@ -84,7 +84,7 @@ void simulator::main_loop()
             }
             //sleep(1);
             vector<control_command_packet> temp=communicator->receive_control_commands();
-            cout<<"ricevuto pacchetto con i controlli"<<endl;
+//             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {
 
                 for (map<int,double>::iterator it=commands.at(agents_name_to_index.at(temp.at(i).identifier)).command.begin(); it!=commands.at(agents_name_to_index.at(temp.at(i).identifier)).command.end();it++) {
