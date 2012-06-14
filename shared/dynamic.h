@@ -15,7 +15,7 @@ public:
 		std::map< std::string, std::string > expression, std::vector< std::string > state_variables_name, 
 	 std::vector< std::string > control_variables_name);
 	agent_state getNextState();
-	
+	 ~dynamic();
 	
 	
 private:

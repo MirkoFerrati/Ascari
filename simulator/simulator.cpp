@@ -92,7 +92,7 @@ void simulator::main_loop()
                 }
 
             }
-		if (states_index.internal_map.at("AGENTE1").state.at(0)>10)
+		if (abs(states_index.internal_map.at("AGENTE1").state.at(0))>30)
 				break;
         }
     }

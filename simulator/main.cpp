@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
         initialize_communication(s);
 	
         
-        vector<Parsed_Agent>Agents=parse_file("esempio1.yaml");
+        vector<Parsed_Agent>Agents=parse_file("esempio2.yaml");
 	//cout<<Agents;
 	s.initialize(Agents);
 	s.start_sim();

@@ -167,9 +167,16 @@ void agent::main_loop()
 
 		world_comm->send_control_command(inputs,NULL);
 		
-		cout<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)<<endl;
+		string tmp;
+		for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();it++)
+		{
+			if (it->second==discreteState[0])
+				tmp=it->first;
+		}
 		
-		if (state_other_agents.at(identifier).state.at(0)>=9.99)
+		cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)<<endl;
+		
+		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
 			break;
 		
         //sleep(1);

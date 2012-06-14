@@ -33,6 +33,13 @@ dynamic::dynamic(agent_state& StateReferenceWARN, control_command& controlRefere
 	
 }
 
+dynamic::~dynamic()
+{
+	expressions.clear();
+	
+}
+
+
 agent_state dynamic::getNextState()
 {
   agent_state tmp;
