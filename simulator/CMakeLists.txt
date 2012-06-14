@@ -24,6 +24,8 @@ include_directories(../shared)
 include_directories(../shared/logog/include)
 include_directories(../shared/parserYAML/include)
 
+
+
 configure_file(../shared/esempio1.yaml esempio1.yaml COPYONLY)
 configure_file(../shared/esempio2.yaml esempio2.yaml COPYONLY)
 configure_file(../shared/esempio3.yaml esempio3.yaml COPYONLY)

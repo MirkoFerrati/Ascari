@@ -20,7 +20,7 @@ public:
 	
 private:
 	std::vector<exprtk::expression<double> > expressions;
-	exprtk::symbol_table<double> symbol_table;
+	exprtk::symbol_table<double>* symbol_table;
 	std::map<std::string,int> map_expressions;
 	const agent_state& StateReferenceWARN;
 	

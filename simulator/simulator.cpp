@@ -96,7 +96,7 @@ void simulator::main_loop()
             }
 // 		if (abs(states_index.internal_map.at("AGENTE1").state.at(0))>30)
 // 				break;
-            if (loop>MAXLOOPS)
+            if (loop>1000)
                 break;
         }
     }

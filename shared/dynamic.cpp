@@ -8,23 +8,23 @@ dynamic::dynamic(agent_state& StateReferenceWARN, control_command& controlRefere
 		 std::map< std::string, std::string > expression_map, std::vector< std::string > state_variables_name, 
 		 std::vector< std::string > control_variables_name):StateReferenceWARN(StateReferenceWARN)
 {
-    
+	symbol_table=new exprtk::symbol_table<double>();
 	for (int i=0;i<StateReferenceWARN.size();i++)
 	{
-		symbol_table.add_variable(state_variables_name.at(i),StateReferenceWARN.at(i));
+		symbol_table->add_variable(state_variables_name.at(i),StateReferenceWARN.at(i));
 	}
 	for (int i=0;i<controlReferenceWARN.size();i++)
 	{
-		symbol_table.add_variable(control_variables_name.at(i),controlReferenceWARN.at(i));
+		symbol_table->add_variable(control_variables_name.at(i),controlReferenceWARN.at(i));
 	}
-	symbol_table.add_constants();
+	symbol_table->add_constants();
 	
     exprtk::parser<double> parser;
 	
 	for (int i=0;i<state_variables_name.size();i++)
 	{
 		exprtk::expression<double> expression_tmp;
-		expression_tmp.register_symbol_table(symbol_table);
+		expression_tmp.register_symbol_table(*symbol_table);
 		string tmp_expression=expression_map.at(state_variables_name.at(i));
 		parser.compile(tmp_expression,expression_tmp);
 		expressions.push_back(expression_tmp);
