@@ -32,8 +32,8 @@
      ENCODER:
      - TOPOLOGY:
         - topology: [t1]
-          #t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
-          t1: 'abs(x-xi)<3'
+          t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+          #t1: 'abs(x-xi)<3'
        LAMBDA:
         - lambda: 
      EVENTS:
