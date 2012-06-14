@@ -81,18 +81,18 @@ void encoderDet::computeSubEvents(const map< string, agent_state_packet >& state
             {
                 state_target.at(iit->first)=iit->second;
             }
-        }
-        for (map<int,exprtk::expression<double> >::const_iterator iit=topology_expressions.begin();iit!=topology_expressions.end();iit++)
-        {
-            if (ref_sub_events.at(iit->first)==_FALSE) {
-                if (iit->second.value()==1)
-                    ref_sub_events.at(iit->first)=_TRUE;
-                else
-                    ref_sub_events.at(iit->first)=_FALSE;
+
+            for (map<int,exprtk::expression<double> >::const_iterator iit=topology_expressions.begin();iit!=topology_expressions.end();iit++)
+            {
+                if (ref_sub_events.at(iit->first)==_FALSE) {
+                    if (iit->second.value()==1)
+                        ref_sub_events.at(iit->first)=_TRUE;
+                    else
+                        ref_sub_events.at(iit->first)=_FALSE;
+                }
             }
+
         }
-
-
 
     }
 
