@@ -1,2 +1,2 @@
-#define FILENAME "esempio3.yaml"
-#define MAXLOOPS 100
+#define FILENAME "esempio4.yaml"
+#define MAXLOOPS 1000

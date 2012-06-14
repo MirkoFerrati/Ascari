@@ -3,7 +3,7 @@
 #include "logog.hpp"
 #include "automaton/automatonFSM.h"
 #include "encoder/encoderDet.h"
-
+#include "debug_constants.h"
 
 using namespace std;
 
@@ -16,22 +16,24 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
         if (agents.at(i).name.compare(name)==0)
             myAgent=i;
 
-	int i=0;	
+		
+    int i=0;
     for (map<controller_name,controller_MapRules>::const_iterator it =agents[myAgent].controllers.begin();it !=agents[myAgent].controllers.end();it++)
     {
         map_controllername_to_id.insert(make_pair(it->first,i++));
     }
     createDiscreteStateFromParsedAgent(agents.at(myAgent));
     createStateFromParsedAgent(agents.at(myAgent));
-	createControllersFromParsedAgent(agents.at(myAgent));
+    createControllersFromParsedAgent(agents.at(myAgent));
     createSubEventsFromParsedAgent(agents.at(myAgent));
     createEventsFromParsedAgent(agents.at(myAgent));
     world_comm=new udp_world_communicator();
+    
 
     if (!isDummy)
     {
         automaton=new automatonFSM(createAutomatonTableFromParsedAgent(agents.at(myAgent)));
-        encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id, state_other_agents,bonusVariables,
+        encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id,bonusVariables,
                                bonus_variables_to_Index, agents.at(myAgent).topology_expressions,sub_events_to_index,agents.at(myAgent).lambda_expressions);
     }
     else {
@@ -46,16 +48,16 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
 
 void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
 {
-	for (unsigned int i=0;i<state.size();i++)
-	{
-		symbol_table.add_variable(agent.state[i],state[i]);
-	}
-	for (unsigned int i=0;i<inputs.command.size();i++)
-	{
-		symbol_table.add_variable(agent.inputs[i],inputs.command[i]);
-	}
-	symbol_table.add_constants();
- for (map<controller_name,controller_MapRules>::const_iterator it =agent.controllers.begin();it !=agent.controllers.end();it++)
+    for (unsigned int i=0;i<state.size();i++)
+    {
+        symbol_table.add_variable(agent.state[i],state[i]);
+    }
+    for (unsigned int i=0;i<inputs.command.size();i++)
+    {
+        symbol_table.add_variable(agent.inputs[i],inputs.command[i]);
+    }
+    symbol_table.add_constants();
+    for (map<controller_name,controller_MapRules>::const_iterator it =agent.controllers.begin();it !=agent.controllers.end();it++)
     {
         controller c(it->second,agent.inputs,symbol_table);
         controllers.push_back(c);
@@ -85,7 +87,7 @@ transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& a
 
 void agent::createDiscreteStateFromParsedAgent(const Parsed_Agent& agent)
 {
-	automaton_state s = (automaton_state) 0;
+    automaton_state s = (automaton_state) 0;
     unsigned int i = 0;
     for (map<string,string>::const_iterator it=agent.discrete_states.begin(); it!=agent.discrete_states.end(); it++)
     {
@@ -138,7 +140,7 @@ void agent::createStateFromParsedAgent(const Parsed_Agent& agent)
         inputs.command[i]=0;
         map_inputs_name_to_id.insert(make_pair(agent.inputs.at(i),i));
     }
-    
+
 }
 
 
@@ -148,39 +150,45 @@ void agent::main_loop()
 {
 
     try {
-		inputs.identifier=identifier;
+        inputs.identifier=identifier;
+        int cicli=0;
         while (1)
         {
+            cicli++;
 // 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
 		state_other_agents=world_comm->receive_agents_status();
-		
-		for (map<int,double>::const_iterator it=state_other_agents.at(identifier).state.begin();
-			 it!=state_other_agents.at(identifier).state.end();it++)
-		{
-			state.at(it->first)=it->second;
-		}
-		
-		encoder->computeSubEvents();
-		event_decoder.decode();
-		discreteState= automaton->getNextAutomatonState(discreteState,events);
-		controllers.at(map_discreteStateId_to_controllerId.at(discreteState.at(0))).computeControl();
+           
+			//TODO: questo ciclo for copia informazioni che in teoria già abbiamo, forse non vale la pena di usare la variabile state
+            for (map<int,double>::const_iterator it=state_other_agents.at(identifier).state.begin();
+                    it!=state_other_agents.at(identifier).state.end();it++)
+            {
+                state.at(it->first)=it->second;
+            }
 
-		world_comm->send_control_command(inputs,NULL);
-		
-		string tmp;
-		for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();it++)
-		{
-			if (it->second==discreteState[0])
-				tmp=it->first;
-		}
-		
-		cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)<<endl;
-		
-		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
-			break;
-		
-        //sleep(1);
-		}
+            encoder->computeSubEvents(state_other_agents);
+            event_decoder.decode();
+            discreteState= automaton->getNextAutomatonState(discreteState,events);
+            controllers.at(map_discreteStateId_to_controllerId.at(discreteState.at(0))).computeControl();
+
+            world_comm->send_control_command(inputs,NULL);
+
+            string tmp;
+            for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();it++)
+            {
+                if (it->second==discreteState[0])
+                    tmp=it->first;
+            }
+
+            cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)<<endl;
+
+// 		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
+// 			break;
+            if (cicli > 1000)
+			{
+                break;
+			}
+            //sleep(1);
+        }
     }
     catch (const char* e)
     {
@@ -193,6 +201,6 @@ void agent::main_loop()
 agent::~agent()
 {
     delete world_comm;
-	delete automaton;
-	delete encoder;
+    delete automaton;
+    delete encoder;
 }

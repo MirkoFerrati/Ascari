@@ -2,6 +2,7 @@
 #include <udp_agent_communicator.h>
 #include "typedefs.h"
 #include "logog.hpp"
+#include "debug_constants.h"
 
 using namespace std;
 
@@ -15,7 +16,7 @@ void simulator::create_communicator(int communicator_type)
 
 void simulator::initialize(const vector<Parsed_Agent>& ag)
 {
-	num_agents=ag.size();
+    num_agents=ag.size();
     for (unsigned int i=0; i<num_agents;i++) {
         agents_name_to_index.insert(make_pair(ag.at(i).name,i));
         agent_state_packet agent_packet;
@@ -66,13 +67,13 @@ void simulator::initialize(const vector<Parsed_Agent>& ag)
 void simulator::main_loop()
 {
     try {
-		int i=0;
+        int loop=0;
         while (1) {
-			i++;
+            loop++;
 //             communicator->send_broadcast(time++);
             communicator->send_broadcast(states_index);
-			cout<<"inviato pacchetto con gli stati"<<endl;
-            
+            cout<<"inviato pacchetto con gli stati"<<endl;
+
             agent_state state_tmp;
             for (index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end();iter++) {
                 state_tmp=dynamic_module.at(iter->second)->getNextState();
@@ -81,7 +82,7 @@ void simulator::main_loop()
 
                 }
             }
-			//sleep(1);
+            //sleep(1);
             vector<control_command_packet> temp=communicator->receive_control_commands();
             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {
@@ -93,8 +94,10 @@ void simulator::main_loop()
                 }
 
             }
-		if (abs(states_index.internal_map.at("AGENTE1").state.at(0))>30)
-				break;
+// 		if (abs(states_index.internal_map.at("AGENTE1").state.at(0))>30)
+// 				break;
+            if (loop>MAXLOOPS)
+                break;
         }
     }
     catch (const char* e)
@@ -108,8 +111,8 @@ void simulator::main_loop()
 simulator::~simulator()
 {
     delete communicator;
-	for (unsigned int i=0;i<dynamic_module.size();i++)
-		delete dynamic_module[i];
+    for (unsigned int i=0;i<dynamic_module.size();i++)
+        delete dynamic_module[i];
 }
 
 void simulator::start_sim()

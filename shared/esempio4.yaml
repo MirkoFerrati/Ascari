@@ -4,15 +4,15 @@
   #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
   #MONITORING = 0
   #COLLABORATIVE = 1
-  states: [y,theta,x]
+  states: [x,y,theta]
   control_commands: [v,w]
   INITIAL:
    - x: '0'
      y: '0'
      theta: '0'
   DYNAMIC_MAP:
-   - x: 'v*cos(t)'
-     y: 'v*sin(t)'
+   - x: 'v*cos(theta)'
+     y: 'v*sin(theta)'
      theta: 'w'
   BEHAVIOR:
    - &es4 
@@ -32,15 +32,17 @@
      ENCODER:
      - TOPOLOGY:
         - topology: [t1]
-          t1: '((abs(x-xi)<3) and abs(y-y1)<3)'
+          #t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+          t1: 'abs(x-xi)<3'
        LAMBDA:
         - lambda: 
      EVENTS:
      - events: [e1,e2]
        e1: t1
-       e2: !t2
+       e2: !t1
      AUTOMATON:
-     - FAST:
+     - name: es4
+       FAST:
         - FAST: [e2]
           LEFT: [e1]
        LEFT:
@@ -52,15 +54,15 @@
   #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
   #MONITORING = 0
   #COLLABORATIVE = 1
-  states: [y,theta,x]
+  states: [x,y,theta]
   control_commands: [v,w]
   INITIAL:
-   - x: '100'
+   - x: '10'
      y: '0'
      theta: '0'
   DYNAMIC_MAP:
-   - x: '-v*cos(-t)'
-     y: '-v*sin(-t)'
+   - x: '-v*cos(-theta)'
+     y: '-v*sin(-theta)'
      theta: 'w'
   BEHAVIOR:
    - *es4 

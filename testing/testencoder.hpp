@@ -70,9 +70,9 @@ public:
 	
 	
 	
-	encoderDet E(sub_events,"pluto", state, stateVariablesName_to_Index, state_other_agents, bonusVariables, 
+	encoderDet E(sub_events,"pluto", state, stateVariablesName_to_Index, bonusVariables, 
 		       bonusVariablesName_to_Index, topology_expres, sub_event_to_index, lambda_expres); 
-	E.computeSubEvents();
+	E.computeSubEvents( state_other_agents);
 	
 	assert(sub_events.at(sub_event_to_index.at("t1"))==_TRUE);
 	assert(sub_events.at(sub_event_to_index.at("t2"))==_FALSE);
