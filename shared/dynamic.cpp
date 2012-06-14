@@ -36,7 +36,7 @@ dynamic::dynamic(agent_state& StateReferenceWARN, control_command& controlRefere
 dynamic::~dynamic()
 {
 	expressions.clear();
-	
+	delete(symbol_table);
 }
 
 
