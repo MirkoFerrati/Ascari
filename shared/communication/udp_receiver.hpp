@@ -35,6 +35,7 @@ public:
         // Join the multicast group.
         socket_.set_option(
             boost::asio::ip::multicast::join_group(multicast_address));
+		inbound_data_.resize(1000);
     }
 
     T receive()
@@ -42,12 +43,12 @@ public:
         using namespace std;
         //unsigned int size=socket_.available();//TODO: what if we have more than one packet in the socket buffer?
         // Start to receive the data.
-        inbound_data_.resize(1000);
+        //inbound_data_.resize(1000);
 
         int size=socket_.receive(boost::asio::buffer(inbound_data_));
         try
         {
-            std::string archive_data(&inbound_data_[header_length], inbound_data_.size());
+            std::string archive_data(&inbound_data_[header_length], inbound_data_.size()-header_length);
             std::istringstream archive_stream(archive_data);
             boost::archive::text_iarchive archive(archive_stream);
             T t;
@@ -65,6 +66,7 @@ public:
 
     ~udp_receiver() {
         socket_.close();
+		inbound_data_.clear();
     }
 
 private:

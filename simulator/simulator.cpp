@@ -80,7 +80,7 @@ void simulator::main_loop()
 
                 }
             }
-			sleep(1);
+			//sleep(1);
             vector<control_command_packet> temp=communicator->receive_control_commands();
             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {
@@ -92,7 +92,8 @@ void simulator::main_loop()
                 }
 
             }
-
+		if (states_index.internal_map.at("AGENTE1").state.at(0)>10)
+				break;
         }
     }
     catch (const char* e)

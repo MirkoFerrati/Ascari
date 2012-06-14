@@ -169,6 +169,9 @@ void agent::main_loop()
 		
 		cout<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(0)<<endl;
 		
+		if (state_other_agents.at(identifier).state.at(0)>10)
+			break;
+		
         //sleep(1);
 		}
     }
