@@ -20,7 +20,7 @@
 #define MULTICAST_ADDRESS "239.255.0.1"
 #define SIMULATOR_PORT 10000
 #define NUM_AGENTS 1
-#define T_CAMP 0.01							
+#define T_CAMP 0.01
 
 //Used in the strong_typedef
 typedef std::map<int,double> map_int_double;

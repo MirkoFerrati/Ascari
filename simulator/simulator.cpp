@@ -9,13 +9,14 @@ void simulator::create_communicator(int communicator_type)
 {
     if (communicator_type==1)
     {
-        communicator=new udp_agent_communicator();
+        communicator=new udp_agent_communicator(num_agents);
     }
 }
 
 void simulator::initialize(const vector<Parsed_Agent>& ag)
 {
-    for (unsigned int i=0; i<ag.size();i++) {
+	num_agents=ag.size();
+    for (unsigned int i=0; i<num_agents;i++) {
         agents_name_to_index.insert(make_pair(ag.at(i).name,i));
         agent_state_packet agent_packet;
         control_command_packet command_packet;

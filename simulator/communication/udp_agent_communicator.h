@@ -8,7 +8,7 @@
 class udp_agent_communicator: public agent_communicator_abstract
 {
 public:
-	udp_agent_communicator();
+	udp_agent_communicator(int num_agents);
     std::vector< control_command_packet > receive_control_commands();
     void send_broadcast(const agents_name_to_states& infos);
     void send_broadcast(const simulation_time& time );
@@ -18,7 +18,7 @@ private:
 	udp_sender<simulation_time> time_sender;
 	udp_sender<agents_name_to_states> state_sender;
 	udp_receiver<control_command_packet > control_receiver;
-	
+	int num_agents;
 };
 
 #endif // TCP_AGENT_COMMUNICATOR_H

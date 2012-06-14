@@ -5,7 +5,7 @@
   #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
   #MONITORING = 0
   #COLLABORATIVE = 1
-  states: [y,x]
+  states: [x,y]
   control_commands: [v]
   INITIAL:
    - x: '0'
@@ -30,7 +30,8 @@
      EVENTS:
      - events: 
      AUTOMATON:
-     - FAST:
+     - name: es3
+       FAST:
         - FAST: 
         
         
@@ -40,7 +41,7 @@
   #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
   #MONITORING = 0
   #COLLABORATIVE = 1
-  states: [y,x]
+  states: [x,y]
   control_commands: [v]
   INITIAL:
    - x: '0'

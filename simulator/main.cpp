@@ -4,7 +4,7 @@
 #include <vector>
 #include <sstream>
 #include "typedefs.h"
-
+#include "debug_constants.h"
 #include "simulator.h"
 
   
@@ -25,12 +25,12 @@ int main(int argc, char **argv) {
         logog::Cout out;
         WARN("Foo is over %d!  Current value is %d.", 3, 5 );
         simulator s;
-        initialize_communication(s);
-	
+    
         
-        vector<Parsed_Agent>Agents=parse_file("esempio2.yaml");
+        vector<Parsed_Agent>Agents=parse_file(FILENAME);
 	//cout<<Agents;
 	s.initialize(Agents);
+	initialize_communication(s);
 	s.start_sim();
         std::cout << "Hello, world! simulator" << std::endl;
 	

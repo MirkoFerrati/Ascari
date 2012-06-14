@@ -2,7 +2,7 @@
 
 #include "typedefs.h"
 
-udp_agent_communicator::udp_agent_communicator():
+udp_agent_communicator::udp_agent_communicator(int num_agents):num_agents(num_agents),
         agent_communicator_abstract(),
         time_sender(service, boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT),
         state_sender(service, boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT),
@@ -15,7 +15,7 @@ udp_agent_communicator::udp_agent_communicator():
 std::vector< control_command_packet > udp_agent_communicator::receive_control_commands()
 {
 	std::vector< control_command_packet> results;
-	for (int i=0;i<NUM_AGENTS;i++)
+	for (int i=0;i<num_agents;i++)
 		results.push_back(control_receiver.receive());
 	return results;
 }
