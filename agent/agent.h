@@ -70,7 +70,7 @@ protected:
 	/**
 	 * The value of control variables, update by controllers
 	 */
-	control_command inputs;
+	control_command_packet inputs;
 	index_map map_inputs_name_to_id;
   
 	/**
@@ -78,6 +78,7 @@ protected:
 	 * and never modified again
 	 */
 	std::vector<controller> controllers;
+	exprtk::symbol_table<double> symbol_table;
 	index_map map_controllername_to_id;
 	
 	decoder event_decoder;
@@ -108,6 +109,8 @@ protected:
 	 * crea i sottoeventi e l'encoder
 	 */
 	void createSubEventsFromParsedAgent(const Parsed_Agent& agent);
+	
+	void createControllersFromParsedAgent(const Parsed_Agent& agent);
 	
 	void createDiscreteStateFromParsedAgent(const Parsed_Agent& agent);
 	

@@ -10,23 +10,13 @@ void controller::computeControl()
 	}
 }
 
-controller::controller(agent_state& state_reference_WARN,
-                       const vector<string >& stateVariablesName,
-                       const map< int,string >& map_id_expressions,
+controller::controller(const map< int,string >& map_id_expressions,
                        const vector< string >& controlVariablesName,
-                       control_command& control_reference_WARN
+                       exprtk::symbol_table<double>& symbol_table
                       )
 {
 	
-	for (unsigned int i=0;i<state_reference_WARN.size();i++)
-	{
-		symbol_table.add_variable(stateVariablesName[i],state_reference_WARN[i]);
-	}
-	for (unsigned int i=0;i<control_reference_WARN.size();i++)
-	{
-		symbol_table.add_variable(controlVariablesName[i],control_reference_WARN[i]);
-	}
-	symbol_table.add_constants();
+	
 	
     exprtk::parser<double> parser;
 	

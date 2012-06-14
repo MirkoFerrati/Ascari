@@ -15,7 +15,7 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
     for (unsigned int i =0;i<agents.size();i++)
         if (agents.at(i).name.compare(name)==0)
             myAgent=i;
-    
+
 	int i=0;	
     for (map<controller_name,controller_MapRules>::const_iterator it =agents[myAgent].controllers.begin();it !=agents[myAgent].controllers.end();it++)
     {
@@ -23,32 +23,45 @@ agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
     }
     createDiscreteStateFromParsedAgent(agents.at(myAgent));
     createStateFromParsedAgent(agents.at(myAgent));
-	 for (map<controller_name,controller_MapRules>::const_iterator it =agents[myAgent].controllers.begin();it !=agents[myAgent].controllers.end();it++)
-    {
-        controller c(state,agents.at(myAgent).state,it->second,agents.at(myAgent).inputs,inputs);
-        controllers.push_back(c);
-    }
+	createControllersFromParsedAgent(agents.at(myAgent));
     createSubEventsFromParsedAgent(agents.at(myAgent));
     createEventsFromParsedAgent(agents.at(myAgent));
     world_comm=new udp_world_communicator();
-
 
     if (!isDummy)
     {
         automaton=new automatonFSM(createAutomatonTableFromParsedAgent(agents.at(myAgent)));
         encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id, state_other_agents,bonusVariables,
                                bonus_variables_to_Index, agents.at(myAgent).topology_expressions,sub_events_to_index,agents.at(myAgent).lambda_expressions);
-
-
     }
     else {
         //TODO: we will think about identifierModule later
     }
 
-
     event_decoder.create(agents[myAgent].events_expressions,sub_events_to_index,events_to_index);
     main_loop();
 }
+
+
+
+void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
+{
+	for (unsigned int i=0;i<state.size();i++)
+	{
+		symbol_table.add_variable(agent.state[i],state[i]);
+	}
+	for (unsigned int i=0;i<inputs.command.size();i++)
+	{
+		symbol_table.add_variable(agent.inputs[i],inputs.command[i]);
+	}
+	symbol_table.add_constants();
+ for (map<controller_name,controller_MapRules>::const_iterator it =agent.controllers.begin();it !=agent.controllers.end();it++)
+    {
+        controller c(it->second,agent.inputs,symbol_table);
+        controllers.push_back(c);
+    }
+}
+
 
 transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& agent)
 {
@@ -66,7 +79,6 @@ transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& a
             automaton_table_tmp.internalTable[s1][e]=s2;
         }
     }
-
     return automaton_table_tmp;
 }
 
@@ -90,22 +102,15 @@ void agent::createSubEventsFromParsedAgent(const Parsed_Agent& agent) {
 
     unsigned i=0;
     for (map<string,string>::const_iterator it=agent.lambda_expressions.begin();it!=agent.lambda_expressions.end();it++) {
-
         sub_events_to_index.insert(make_pair(it->first,i));
         sub_events.insert(make_pair(i,_FALSE));
         i++;
-
     }
 
     for (map<string,string>::const_iterator it=agent.topology_expressions.begin();it!=agent.topology_expressions.end();it++) {
-
         sub_events_to_index.insert(make_pair(it->first,i));
         sub_events.insert(make_pair(i,_FALSE));
-
     }
-
-
-
 }
 
 
@@ -127,13 +132,11 @@ void agent::createStateFromParsedAgent(const Parsed_Agent& agent)
     {
         state[i]=0;
         map_statename_to_id.insert(std::pair<string,int>(agent.state.at(i),i));
-        i++;
     }
     for (unsigned int i=0;i<agent.inputs.size();i++)
     {
-        inputs[i]=0;
+        inputs.command[i]=0;
         map_inputs_name_to_id.insert(make_pair(agent.inputs.at(i),i));
-        i++;
     }
     
 }
@@ -145,8 +148,7 @@ void agent::main_loop()
 {
 
     try {
-		control_command_packet command;
-	    
+		inputs.identifier=identifier;
         while (1)
         {
 // 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
@@ -162,23 +164,13 @@ void agent::main_loop()
 		event_decoder.decode();
 		discreteState= automaton->getNextAutomatonState(discreteState,events);
 		controllers.at(map_discreteStateId_to_controllerId.at(discreteState.at(0))).computeControl();
+
+		world_comm->send_control_command(inputs,NULL);
 		
-		//TODO: sistemare la prossima riga
+		cout<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(0)<<endl;
 		
-		control_command_packet c;
-		c.command=inputs;
-		c.identifier=identifier;
-		world_comm->send_control_command(c,NULL);
-		
-		cout<<state_other_agents.at(identifier).state.at(0)<<endl;
-		
-            sleep(1);
-		
-// 	    command.identifier=identifier;
-// 	    command.command[0]=3;
-	    
-// 		world_comm->send_control_command(command,NULL);
-        }
+        //sleep(1);
+		}
     }
     catch (const char* e)
     {

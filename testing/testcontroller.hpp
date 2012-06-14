@@ -33,7 +33,18 @@ public:
         control_command controllo;
         controllo[0]=0;
         controllo[1]=0;
-        controller c(stato,nomi_variabili,mappa_id_espressioni,nomi_controllo,controllo);
+		exprtk::symbol_table<double> symbol_table;
+		
+	for (unsigned int i=0;i<stato.size();i++)
+	{
+		symbol_table.add_variable(nomi_variabili[i],stato[i]);
+	}
+	for (unsigned int i=0;i<controllo.size();i++)
+	{
+		symbol_table.add_variable(nomi_controllo[i],controllo[i]);
+	}
+	symbol_table.add_constants();
+        controller c(mappa_id_espressioni,nomi_controllo,symbol_table);
         c.computeControl();
         assert(controllo[0]==5*1+2*2);
         assert(controllo[1]==3*10);

@@ -4,12 +4,14 @@
   #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
   #MONITORING = 0
   #COLLABORATIVE = 1
-  states: [x]
+  states: [x,y]
   control_commands: [v]
   INITIAL:
    - x: '1'
+     y: '4'
   DYNAMIC_MAP:
-   - x: 'v'
+   - x: 'v*2'
+     y: 'v/2'
   BEHAVIOR:
    - name: Esempio 
      CONTROLLERS:
