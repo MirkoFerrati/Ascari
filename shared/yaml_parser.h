@@ -43,6 +43,7 @@ public:
     std::map<stateVariable,initial_state_value> initial_states;
     std::map<controller_name,controller_MapRules> controllers;
     std::map<discreteState_Name, controller_name> discrete_states;
+    discreteState_Name state_start;
     std::vector<topology_name>	topology;
     std::map<topology_name, topology_expression> topology_expressions;
     std::vector<lambda_name> lambda;

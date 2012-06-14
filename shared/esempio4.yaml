@@ -10,6 +10,7 @@
    - x: '0'
      y: '0'
      theta: '0'
+  STATE_START: FAST
   DYNAMIC_MAP:
    - x: 'v*cos(theta)'
      y: 'v*sin(theta)'
@@ -60,6 +61,7 @@
    - x: '10'
      y: '0'
      theta: '0'
+  STATE_START: FAST
   DYNAMIC_MAP:
    - x: '-v*cos(-theta)'
      y: '-v*sin(-theta)'

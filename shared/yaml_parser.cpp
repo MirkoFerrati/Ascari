@@ -153,7 +153,17 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
     }
 
-
+    node["STATE_START"]>> ag.state_start;
+    
+    if (!ag.discrete_states.count(ag.state_start))
+                            {
+                                ERR("UNDEFINED START DISCRETE STATE %s", ag.state_start.c_str());
+                                throw "UNDEFINED DISCRETE START STATE";
+                            }
+    
+    
+    
+    
     const YAML::Node& encoder = behavior["ENCODER"][0];
     const YAML::Node& topology=encoder["TOPOLOGY"][0];
     topology["TOPOLOGY"]>> ag.topology;

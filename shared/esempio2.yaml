@@ -8,9 +8,10 @@
   states: [x,theta,y]
   control_commands: [v,w]
   INITIAL:
-   - x: '0'
-     y: '0'
+   - x: '1'
+     y: '1'
      theta: '0'
+  STATE_START: FAST
   DYNAMIC_MAP:
    - x: 'v*cos(theta)'
      y: 'v*sin(theta)'

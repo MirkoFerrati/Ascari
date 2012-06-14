@@ -91,12 +91,12 @@ void agent::createDiscreteStateFromParsedAgent(const Parsed_Agent& agent)
     unsigned int i = 0;
     for (map<string,string>::const_iterator it=agent.discrete_states.begin(); it!=agent.discrete_states.end(); it++)
     {
-        discreteState.push_back(s);
         map_discreteStateName_to_id.insert(make_pair(it->first,i));
         map_discreteStateId_to_controllerId.insert(make_pair(s,map_controllername_to_id.at(it->second)));
         i++;
         s++;
     }
+    discreteState.push_back(map_discreteStateName_to_id.at(agent.state_start));
 }
 
 
@@ -189,6 +189,7 @@ void agent::main_loop()
 			}
             //sleep(1);
         }
+
     }
     catch (const char* e)
     {
