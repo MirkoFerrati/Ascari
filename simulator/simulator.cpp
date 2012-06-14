@@ -107,6 +107,8 @@ void simulator::main_loop()
 simulator::~simulator()
 {
     delete communicator;
+	for (unsigned int i=0;i<dynamic_module.size();i++)
+		delete dynamic_module[i];
 }
 
 void simulator::start_sim()

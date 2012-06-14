@@ -12,6 +12,13 @@ udp_world_communicator::udp_world_communicator():
 {
 	
 }
+/*
+udp_world_communicator::~udp_world_communicator()
+{
+	io_service.~io_service();
+}*/
+
+
 
 simulation_time udp_world_communicator::receive_time()
 {

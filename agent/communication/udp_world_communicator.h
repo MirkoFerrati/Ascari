@@ -20,6 +20,7 @@ public:
 	simulation_time receive_time();
     void send_control_command(control_command_packet& command, const target_abstract* target);
 	udp_world_communicator();
+// 	~udp_world_communicator();
 private:
 	boost::asio::io_service io_service;
     udp_receiver<agents_name_to_states > agents_status_receiver;

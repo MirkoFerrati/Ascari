@@ -18,6 +18,7 @@ public:
 	virtual std::vector<control_command_packet> receive_control_commands()=0;
 	virtual void send_broadcast(const agents_name_to_states& infos)=0;
 	virtual void send_target(const agents_name_to_states& infos, const target_abstract* target)=0;
+	virtual ~agent_communicator_abstract(){};
 };
 
 #endif // AGENT_COMMUNICATOR_ABSTRACT_H

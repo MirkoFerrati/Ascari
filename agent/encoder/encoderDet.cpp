@@ -60,6 +60,12 @@ encoderDet::encoderDet(std::map< int, sub_event_value >& sub_events, const strin
 }
 
 
+// encoderDet::~encoderDet()
+// {
+// 	symbol_table.~symbol_table();
+// }
+
+
 void encoderDet::computeSubEvents()
 {
 	for (map<int,sub_event_value>::iterator it=ref_sub_events.begin();it!=ref_sub_events.end();it++){

@@ -167,9 +167,9 @@ void agent::main_loop()
 
 		world_comm->send_control_command(inputs,NULL);
 		
-		cout<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(0)<<endl;
+		cout<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)<<endl;
 		
-		if (state_other_agents.at(identifier).state.at(0)>10)
+		if (state_other_agents.at(identifier).state.at(0)>=9.99)
 			break;
 		
         //sleep(1);
@@ -186,4 +186,6 @@ void agent::main_loop()
 agent::~agent()
 {
     delete world_comm;
+	delete automaton;
+	delete encoder;
 }

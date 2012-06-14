@@ -27,7 +27,7 @@ public:
 			std::map<std::string,std::string>const& topology_expres,index_map const& sub_events_to_index,
 			std::map<std::string,std::string>const& lambda_expres);
 		void computeSubEvents();
-		
+// 		~encoderDet();
 		
 private:
 	std::map<int,sub_event_value>& ref_sub_events; //lambda+topologies
