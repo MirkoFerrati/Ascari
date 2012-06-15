@@ -117,6 +117,13 @@ struct agents_name_to_states
 	}
 };
 
+
+struct world_sim_packet{
+  std::map<std::string,double> bonus_variables;
+  agents_name_to_states state_agents;
+  
+};
+
 struct control_command_packet
 {
 	control_command command;

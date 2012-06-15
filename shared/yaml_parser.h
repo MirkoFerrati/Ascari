@@ -14,6 +14,10 @@
 
 // using namespace std;
 
+typedef std::string bonusVariable;
+typedef std::string bonus_expression;
+
+
 typedef std::string stateVariable;
 typedef std::string controlVariable;
 typedef double initial_state_value;
@@ -30,6 +34,8 @@ typedef std::string lambda_expression;
 typedef std::string event_name;
 typedef std::string event_expression;
 // typedef std::map<event_name, event_expression> Events_MapExpressions;
+
+
 
 class Parsed_Agent {
 
@@ -57,9 +63,31 @@ public:
      
     
 };
-    std::vector<Parsed_Agent> parse_file(const char * file_name);
+
+class Parsed_World{
+  
+  public:
+  friend std::ostream& operator<<(std::ostream& os, const Parsed_World& wo );
+  
+
+  std::vector<bonusVariable> bonus_variables;
+  std::map<bonusVariable, bonus_expression> bonus_expressions;
+  std::vector<Parsed_Agent> agents;
+  
+
+  Parsed_World(int num_agents):agents(num_agents){}
+   
+};
+
+
+
+    Parsed_World parse_file(const char * file_name);
+    
     void operator>>(const YAML::Node& node, Parsed_Agent& ag);
+    void operator>>(const YAML::Node& node, Parsed_World& wo);
+    
     std::ostream& operator<< (std::ostream& , const std::vector<Parsed_Agent>& );
+    
 
 
     

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-std::vector<Parsed_Agent> parse_file(const char * file_name) {
+    Parsed_World parse_file(const char * file_name) {
     std::ifstream fin(file_name);
     std::ostringstream str;
     str<<fin.rdbuf();
@@ -15,12 +15,14 @@ std::vector<Parsed_Agent> parse_file(const char * file_name) {
     YAML::Parser parser(new_new_str);
     YAML::Node doc;
     parser.GetNextDocument(doc);
-    std::vector<Parsed_Agent> Agents(doc.size());
-    for (unsigned i=0;i<doc.size();i++) {
-        doc[i] >> Agents[i];
-
-    }
-    return Agents;
+    
+    
+    Parsed_World World(doc[1]["AGENTS"].size());
+    
+    doc>>World;
+   
+    
+    return World;
 
 }
 
@@ -97,6 +99,8 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
 }
 
 
+
+
 ostream& operator<< (ostream& os, const std::vector<Parsed_Agent>& ag) {
     for (unsigned int i=0; i<ag.size();i++)
     {
@@ -106,6 +110,15 @@ ostream& operator<< (ostream& os, const std::vector<Parsed_Agent>& ag) {
     return os;
 }
 
+
+
+ostream& operator<<(std::ostream& os, const Parsed_World& wo)
+{
+os<<wo.agents;
+return os;
+}
+
+  
 
 void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 {
@@ -246,3 +259,28 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
 
 
+void operator>>(const YAML::Node& node, Parsed_World& wo)
+{
+
+    const YAML::Node &world_node=node[0]["WORLD"][0];
+    const YAML::Node &agent_nodes=node[1]["AGENTS"];
+    
+    
+    world_node["BONUS_VARIABLES"]>> wo.bonus_variables;
+
+
+    for (unsigned int i=0;i<wo.bonus_variables.size();i++) {
+        string bonus_exp;
+        world_node[wo.bonus_variables[i]]>>bonus_exp;
+        wo.bonus_expressions.insert(make_pair(wo.bonus_variables.at(i),bonus_exp));
+    }
+    
+    
+    
+    for (unsigned i=0;i<wo.agents.size();i++) {
+        agent_nodes[i] >> wo.agents[i];
+
+    }
+    
+  
+}

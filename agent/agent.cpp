@@ -157,6 +157,13 @@ void agent::main_loop()
             cicli++;
 // 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
 		state_other_agents=world_comm->receive_agents_status();
+		std::map<std::string,double> tmp_bonus;
+		//tmp_bonus=world_comm->receive_bonus_variables();
+		
+		for (std::map<std::string,double>::const_iterator it=tmp_bonus.begin();it!=tmp_bonus.end();it++)
+		{
+		 bonusVariables.at(bonus_variables_to_Index.at(it->first))=it->second; 
+		}
            
 			//TODO: questo ciclo for copia informazioni che in teoria già abbiamo, forse non vale la pena di usare la variabile state
             for (map<int,double>::const_iterator it=state_other_agents.at(identifier).state.begin();

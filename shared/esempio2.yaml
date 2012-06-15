@@ -1,48 +1,50 @@
 #Agente che va dritto e dopo 10 metri sterza
+- WORLD:
 
-- agent: Agente1
-  #VISIBLE AREA: ./battle/exp_t_visuale.txt
-  #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
-  #MONITORING = 0
-  #COLLABORATIVE = 1
-  states: [x,theta,y]
-  control_commands: [v,w]
-  INITIAL:
-   - x: '1'
-     y: '1'
-     theta: '0'
-  STATE_START: FAST
-  DYNAMIC_MAP:
-   - x: 'v*cos(theta)'
-     y: 'v*sin(theta)'
-     theta: 'w'
-  BEHAVIOR:
-   - name: esempio2 
-     CONTROLLERS:
-     - name: fast
-       v: 3
-       w: 0
-     - name: left
-       v: 3
-       w: 5
-     DISCRETE_STATES:
-     - name: fast
-       controller: fast
-     - name: left
-       controller: left
-     ENCODER:
-     - TOPOLOGY:
-        - topology: 
-       LAMBDA:
-        - lambda: [l1]
-          l1: 'x>10'
-     EVENTS:
-     - events: [e1,e2]
-       e1: 'l1'
-       e2: '!l1'
-     AUTOMATON:
-     - name: es2
-       FAST:
-        - LEFT: [e1]
-       LEFT:
-        - FAST: [e2]
+- AGENTS:
+  - agent: Agente1
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,theta,y]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '1'
+      y: '1'
+      theta: '0'
+    STATE_START: FAST
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+    BEHAVIOR:
+    - name: esempio2 
+      CONTROLLERS:
+      - name: fast
+        v: 3
+        w: 0
+      - name: left
+        v: 3
+        w: 5
+      DISCRETE_STATES:
+      - name: fast
+        controller: fast
+      - name: left
+        controller: left
+      ENCODER:
+      - TOPOLOGY:
+          - topology: 
+        LAMBDA:
+          - lambda: [l1]
+            l1: 'x>10'
+      EVENTS:
+      - events: [e1,e2]
+        e1: 'l1'
+        e2: '!l1'
+      AUTOMATON:
+      - name: es2
+        FAST:
+          - LEFT: [e1]
+        LEFT:
+          - FAST: [e2]
