@@ -75,7 +75,7 @@ class Parsed_World{
   std::vector<Parsed_Agent> agents;
   
 
-  Parsed_World(int num_agents):agents(num_agents){}
+//   Parsed_World(int num_agents):agents(num_agents){}
    
 };
 

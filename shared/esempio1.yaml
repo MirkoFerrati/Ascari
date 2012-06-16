@@ -3,7 +3,7 @@
   - bonus_variables: [b1,b2]
     b1: '10'
     b2: 'XAGENTE1'
-- AGENTS:
+  AGENTS:
   - agent: Agente1
     #VISIBLE AREA: ./battle/exp_t_visuale.txt
     #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt

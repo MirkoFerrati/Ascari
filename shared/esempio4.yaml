@@ -1,7 +1,7 @@
 #due agenti che si vanno incontro e quando si vedono sterzano
 - WORLD:
 
-- AGENTS:
+  AGENTS:
   - agent: Agente1
     #VISIBLE AREA: ./battle/exp_t_visuale.txt
     #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt

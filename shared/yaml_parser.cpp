@@ -1,4 +1,5 @@
 #include "yaml_parser.h"
+#include "parserYAML/include/yaml-cpp/node.h"
 
 using namespace std;
 
@@ -17,7 +18,7 @@ using namespace std;
     parser.GetNextDocument(doc);
     
     
-    Parsed_World World(doc[1]["AGENTS"].size());
+    Parsed_World World;//(doc[1]["AGENTS"].size());
     
     doc>>World;
    
@@ -261,23 +262,27 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
 void operator>>(const YAML::Node& node, Parsed_World& wo)
 {
+	if (node[0].FindValue("WORLD"))
+	{
+		if (node[0]["WORLD"].size()>0)
+		{
+			const YAML::Node &world_node=node[0]["WORLD"][0];
+			world_node["BONUS_VARIABLES"]>> wo.bonus_variables;
+			for (unsigned int i=0;i<wo.bonus_variables.size();i++) {
+				string bonus_exp;
+				world_node[wo.bonus_variables[i]]>>bonus_exp;
+				wo.bonus_expressions.insert(make_pair(wo.bonus_variables.at(i),bonus_exp));
+			}
 
-    const YAML::Node &world_node=node[0]["WORLD"][0];
-    const YAML::Node &agent_nodes=node[1]["AGENTS"];
-    
-    
-    world_node["BONUS_VARIABLES"]>> wo.bonus_variables;
+		}
+	}
+	
+	const YAML::Node &agent_nodes=node[0]["AGENTS"];
 
-
-    for (unsigned int i=0;i<wo.bonus_variables.size();i++) {
-        string bonus_exp;
-        world_node[wo.bonus_variables[i]]>>bonus_exp;
-        wo.bonus_expressions.insert(make_pair(wo.bonus_variables.at(i),bonus_exp));
-    }
-    
-    
-    
-    for (unsigned i=0;i<wo.agents.size();i++) {
+	wo.agents.resize(agent_nodes.size());
+	
+    for (unsigned int i=0;i<agent_nodes.size();i++) {
+		;
         agent_nodes[i] >> wo.agents[i];
 
     }

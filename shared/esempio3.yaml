@@ -1,6 +1,4 @@
 #due agenti che vanno dritti
-- WORLD:
-
 - AGENTS:
   - agent: Agente1
     #VISIBLE AREA: ./battle/exp_t_visuale.txt
