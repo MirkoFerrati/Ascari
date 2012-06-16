@@ -1,6 +1,8 @@
 #Agente che va dritto e dopo 10 metri sterza
 - WORLD:
-
+  - bonus_variables: [b1,b2]
+    b1: '10'
+    b2: 'XAGENTE1'
 - AGENTS:
   - agent: Agente1
     #VISIBLE AREA: ./battle/exp_t_visuale.txt

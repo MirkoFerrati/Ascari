@@ -7,7 +7,7 @@
 int main(int argc, char **argv) {
     Parsed_World World=parse_file(FILENAME);
 	std::string name=argv[1];
-	agent a1(name,false,World.agents);
+	agent a1(name,false,World);
     std::cout << "Hello, world! agent" << std::endl;
     return 0;
 }

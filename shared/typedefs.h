@@ -121,6 +121,13 @@ struct agents_name_to_states
 struct world_sim_packet{
   std::map<std::string,double> bonus_variables;
   agents_name_to_states state_agents;
+
+  template <typename Archive>
+  void serialize(Archive& ar,const unsigned int version)
+  {
+	ar& bonus_variables;
+	ar& state_agents;
+  }
   
 };
 
@@ -137,10 +144,6 @@ struct control_command_packet
 	}
 };
 
-struct variable
-{
-	std::string name;
-	double value;
-};
+
 
 #endif //TYPEDEFS_H

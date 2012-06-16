@@ -16,7 +16,7 @@ struct udp_target
 class udp_world_communicator: public world_communicator_abstract
 {
 public:
-    std::map<std::string,agent_state_packet> receive_agents_status();
+    world_sim_packet receive_agents_status();
 	  std::map<std::string,double> receive_bonus_variables();
     simulation_time receive_time();
 	void send_control_command(control_command_packet& command, const target_abstract* target);
@@ -24,8 +24,7 @@ public:
 // 	~udp_world_communicator();
 private:
 	boost::asio::io_service io_service;
-      udp_receiver<agents_name_to_states > agents_status_receiver;
-      udp_receiver<std::map<std::string,double> > bonus_variables_receiver;
+      udp_receiver<world_sim_packet > world_sim_receiver;
     
 	udp_receiver<simulation_time> time_receiver;
 	udp_sender<control_command_packet> control_command_sender;

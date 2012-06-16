@@ -16,7 +16,7 @@
 class agent
 {
 public:
-	agent(std::string name, bool isDummy, const std::vector< Parsed_Agent >& agents);
+	agent(std::string name, bool isDummy, const Parsed_World& agents);
 	~agent();
 	
 protected:
@@ -35,7 +35,7 @@ protected:
 	
 	
 	std::map<int,double> bonusVariables;
-	std::map<std::string,int> bonus_variables_to_Index;
+	std::map<std::string,int> map_bonus_variables_to_id;
 	
 	
 	vector<automaton_state> discreteState;
@@ -119,6 +119,7 @@ protected:
 	 */
 	void createStateFromParsedAgent(const Parsed_Agent& agent);
 
+    void createBonusVariablesFromWorld(map< bonusVariable, bonus_expression > bonus);
 };
 
 #endif // AGENT_H

@@ -8,42 +8,54 @@
 using namespace std;
 
 
-agent::agent(std::string name,bool isDummy,const vector<Parsed_Agent>& agents)
+agent::agent(std::string name,bool isDummy,const Parsed_World& world)
         :identifier(name),event_decoder(sub_events,events)
 {
     int myAgent;
-    for (unsigned int i =0;i<agents.size();i++)
-        if (agents.at(i).name.compare(name)==0)
+    for (unsigned int i =0;i<world.agents.size();i++)
+        if (world.agents.at(i).name.compare(name)==0)
             myAgent=i;
 
 		
     int i=0;
-    for (map<controller_name,controller_MapRules>::const_iterator it =agents[myAgent].controllers.begin();it !=agents[myAgent].controllers.end();it++)
+    for (map<controller_name,controller_MapRules>::const_iterator it =world.agents[myAgent].controllers.begin();it !=world.agents[myAgent].controllers.end();it++)
     {
         map_controllername_to_id.insert(make_pair(it->first,i++));
     }
-    createDiscreteStateFromParsedAgent(agents.at(myAgent));
-    createStateFromParsedAgent(agents.at(myAgent));
-    createControllersFromParsedAgent(agents.at(myAgent));
-    createSubEventsFromParsedAgent(agents.at(myAgent));
-    createEventsFromParsedAgent(agents.at(myAgent));
+    createBonusVariablesFromWorld(world.bonus_expressions);
+    createDiscreteStateFromParsedAgent(world.agents.at(myAgent));
+    createStateFromParsedAgent(world.agents.at(myAgent));
+    createControllersFromParsedAgent(world.agents.at(myAgent));
+    createSubEventsFromParsedAgent(world.agents.at(myAgent));
+    createEventsFromParsedAgent(world.agents.at(myAgent));
     world_comm=new udp_world_communicator();
     
 
     if (!isDummy)
     {
-        automaton=new automatonFSM(createAutomatonTableFromParsedAgent(agents.at(myAgent)));
+        automaton=new automatonFSM(createAutomatonTableFromParsedAgent(world.agents.at(myAgent)));
         encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id,bonusVariables,
-                               bonus_variables_to_Index, agents.at(myAgent).topology_expressions,sub_events_to_index,agents.at(myAgent).lambda_expressions);
+                               map_bonus_variables_to_id, world.agents.at(myAgent).topology_expressions,
+							   sub_events_to_index,world.agents.at(myAgent).lambda_expressions);
     }
     else {
         //TODO: we will think about identifierModule later
     }
 
-    event_decoder.create(agents[myAgent].events_expressions,sub_events_to_index,events_to_index);
+    event_decoder.create(world.agents[myAgent].events_expressions,sub_events_to_index,events_to_index);
     main_loop();
 }
 
+void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression > bonus)
+{
+	int i=0;
+	for (map<bonusVariable,bonus_expression>::const_iterator it=bonus.begin();it!=bonus.end();it++)
+    {
+		bonusVariables[i]=0;
+        map_bonus_variables_to_id.insert(std::pair<string,int>(it->first,i));
+		i++;
+    }
+}
 
 
 void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
@@ -156,13 +168,12 @@ void agent::main_loop()
         {
             cicli++;
 // 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
-		state_other_agents=world_comm->receive_agents_status();
-		std::map<std::string,double> tmp_bonus;
-		//tmp_bonus=world_comm->receive_bonus_variables();
+		world_sim_packet temp=world_comm->receive_agents_status();
+		state_other_agents.swap(temp.state_agents.internal_map);
 		
-		for (std::map<std::string,double>::const_iterator it=tmp_bonus.begin();it!=tmp_bonus.end();it++)
+		for (std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin();it!=temp.bonus_variables.end();it++)
 		{
-		 bonusVariables.at(bonus_variables_to_Index.at(it->first))=it->second; 
+		 bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
 		}
            
 			//TODO: questo ciclo for copia informazioni che in teoria già abbiamo, forse non vale la pena di usare la variabile state

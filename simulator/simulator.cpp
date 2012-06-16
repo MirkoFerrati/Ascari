@@ -17,19 +17,12 @@ void simulator::create_communicator(int communicator_type)
 void simulator::initialize(const Parsed_World& wo)
 {
   initialize_agents(wo.agents);
-  
-  
   bonus_symbol_table.add_constants();
 	
     exprtk::parser<double> parser;
-	
-			
-	
-	
 	for (int i=0;i<wo.bonus_variables.size();i++)
 	{	
 		sim_packet.bonus_variables.insert(make_pair(wo.bonus_variables.at(i),0));
-		
 		exprtk::expression<double> expression_tmp;
 		expression_tmp.register_symbol_table(bonus_symbol_table);
 		string string_tmp_expression=wo.bonus_expressions.at(wo.bonus_variables.at(i));
@@ -105,8 +98,8 @@ void simulator::main_loop()
             loop++;
 //             communicator->send_broadcast(time++);
 	    update_bonus_variables();
-            communicator->send_broadcast(sim_packet.state_agents);
-	    //communicator->send_broadcast(sim_packet.bonus_variables);
+            //communicator->send_broadcast(sim_packet.state_agents);
+	    communicator->send_broadcast(sim_packet);
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 
             agent_state state_tmp;
