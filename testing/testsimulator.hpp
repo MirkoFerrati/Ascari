@@ -14,7 +14,7 @@ public:
 	void test()
 	{
 	  agents_name_to_states states;
-	  
+	  cout<<"Attenzione, assicurarsi di far partire simulator con il file esempio1.yaml"<<endl;
 	  boost::asio::io_service service;
 	  
 	  

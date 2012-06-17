@@ -43,9 +43,9 @@ public:
     {
         if (!error)
         {
-			for (int i =0;i<bytes_recvd;i++)
-				std::cout<<inbound_data_[i];
-            std::cout<<std::endl;
+// 			for (int i =0;i<bytes_recvd;i++)
+// 				std::cout<<inbound_data_[i];
+//             std::cout<<std::endl;
             socket_.async_receive_from(
                 boost::asio::buffer(inbound_data_, MAX_PACKET_LENGTH), sender_endpoint_,
                 boost::bind(&async_udp_receiver::handle_receive_from, this,
