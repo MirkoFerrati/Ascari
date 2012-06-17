@@ -5,7 +5,7 @@
     #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
     #MONITORING = 0
     #COLLABORATIVE = 1
-    states: [x,theta,y]
+    states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
     - x: '1'

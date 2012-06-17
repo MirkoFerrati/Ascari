@@ -1,4 +1,4 @@
-#due agenti che si vanno incontro e quando si vedono sterzano
+#4 agenti che frenano e sterzano se sono vicini, e che sterzano se oltrepassano i 20 metri dall'origine sull'asse x o y
 - AGENTS:
   - agent: Agente1
     #VISIBLE AREA: ./battle/exp_t_visuale.txt
@@ -13,7 +13,8 @@
       theta: '0'
     STATE_START: FAST
     DYNAMIC_MAP:
-    - x: 'v*cos(theta)'
+    - &dyn
+      x: 'v*cos(theta)'
       y: 'v*sin(theta)'
       theta: 'w'
     BEHAVIOR:
@@ -24,8 +25,8 @@
         v: 3
         w: 0
       - name: left
-        v: 3
-        w: 5
+        v: 1
+        w: 0.5
       DISCRETE_STATES:
       - name: fast
         controller: fast
@@ -37,18 +38,21 @@
             t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
             #t1: 'abs(x-xi)<3'
         LAMBDA:
-          - lambda: 
+          - lambda: [l1]
+            l1: 'abs(x)>20 or abs(y)>20'
       EVENTS:
-      - events: [e1,e2]
-        e1: t1
-        e2: !t1
+      - events: [e1,e2,e3,e4]
+        e1: t1 
+        e2: '!t1 !l1'
+        e3: l1
+        e4: !l1
       AUTOMATON:
       - name: es4
         FAST:
           - FAST: [e2]
-            LEFT: [e1]
+            LEFT: [e1,e3]
         LEFT:
-          - LEFT: [e1]
+          - LEFT: [e1,e3]
             FAST: [e2]
       
   - agent: Agente2
@@ -64,9 +68,7 @@
       theta: '0'
     STATE_START: FAST
     DYNAMIC_MAP:
-    - x: '-v*cos(-theta)'
-      y: '-v*sin(-theta)'
-      theta: 'w'
+    - *dyn
     BEHAVIOR:
     - *es4 
     
@@ -83,9 +85,7 @@
       theta: '0'
     STATE_START: FAST
     DYNAMIC_MAP:
-    - x: '-v*cos(-theta)'
-      y: '-v*sin(-theta)'
-      theta: 'w'
+    - *dyn
     BEHAVIOR:
     - *es4 
     
@@ -103,9 +103,7 @@
       theta: '0'
     STATE_START: FAST
     DYNAMIC_MAP:
-    - x: 'v*cos(-theta)'
-      y: 'v*sin(-theta)'
-      theta: 'w'
+    - *dyn
     BEHAVIOR:
     - *es4    
 
