@@ -17,8 +17,6 @@ class udp_world_communicator: public world_communicator_abstract
 {
 public:
     world_sim_packet receive_agents_status();
-	  std::map<std::string,double> receive_bonus_variables();
-    simulation_time receive_time();
 	void send_control_command(control_command_packet& command, const target_abstract* target);
 	udp_world_communicator();
 // 	~udp_world_communicator();

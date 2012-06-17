@@ -30,10 +30,6 @@ void simulator::initialize(const Parsed_World& wo)
 		bonus_expressions.push_back(expression_tmp);
 		map_bonus_variables.insert(make_pair(wo.bonus_variables.at(i),i));
 	}
-	
-  
-  
-  
 }
 
 
@@ -53,7 +49,6 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
         {   agent_packet.state.insert(make_pair(j,ag.at(i).initial_states.at(ag.at(i).state.at(j))));
             states_to_index_tmp.insert(make_pair(ag.at(i).state.at(j),j));
 	    bonus_symbol_table.add_variable(ag.at(i).state.at(j)+ag.at(i).name,agent_packet.state.at(j));
-            
         }
 
         for (unsigned int j=0; j<ag.at(i).inputs.size();j++)
@@ -61,8 +56,6 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
             command_packet.command.insert(make_pair(j,0));
             commands_to_index_tmp.insert(make_pair(ag.at(i).inputs.at(j),j));
 	    bonus_symbol_table.add_variable(ag.at(i).inputs.at(j)+ag.at(i).name,command_packet.command.at(j));
-            
-
         }
         sim_packet.state_agents.internal_map.insert(make_pair(ag.at(i).name,agent_packet));
         agent_states_to_index.push_back(states_to_index_tmp);
@@ -103,6 +96,8 @@ void simulator::main_loop()
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 
             agent_state state_tmp;
+			for (int i=1;i<10;i++)//TODO: this is 1 second/(sampling time of dynamic)
+			{
             for (index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end();iter++) {
                 state_tmp=dynamic_module.at(iter->second)->getNextState();
                 for (agent_state::const_iterator iiter=state_tmp.begin();iiter!=state_tmp.end();iiter++) {
@@ -110,7 +105,8 @@ void simulator::main_loop()
 
                 }
             }
-            //sleep(1);
+			}
+            usleep(50000);
             vector<control_command_packet> temp=communicator->receive_control_commands();
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {
@@ -124,7 +120,7 @@ void simulator::main_loop()
             }
 // 		if (abs(states_index.internal_map.at("AGENTE1").state.at(0))>30)
 // 				break;
-            if (loop>1000)
+            if (loop>MAXLOOPS)
                 break;
         }
     }

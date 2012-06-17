@@ -20,11 +20,6 @@ udp_world_communicator::~udp_world_communicator()
 
 
 
-simulation_time udp_world_communicator::receive_time()
-{
-	return time_receiver.receive();
-}
-
 world_sim_packet udp_world_communicator::receive_agents_status()
 {
 	return world_sim_receiver.receive();
