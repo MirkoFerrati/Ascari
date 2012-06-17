@@ -4,40 +4,69 @@
 #include <math.h>
 #include <QtCore/QLocale>
 #include <QtGui/QWidget>
-Viewer::Viewer(QWidget *parent)
-    : QWidget(parent)
+#include "typedefs.h"
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <boost/asio.hpp>
+#include "boost/bind.hpp"
+#include "boost/date_time/posix_time/posix_time_types.hpp"
+#include <boost/lexical_cast.hpp>
+#include <vector>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <iomanip>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/map.hpp>
+
+#define BORDER 0.3+0.2
+
+Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_service, QWidget* parent)
+    : QWidget(parent),buffer(buffer),io_service(io_service)
 {
   time=0;
   backImage="";
-  paused = FALSE;
-  gameStarted = FALSE;
+  scalingFactorX=10;
+  scalingFactorY=10;
+  translateX=0;
+  translateY=0;
+  maxX=0;
+  maxY=0;
+  minX=0;
+  minY=0;
 }
 
-void Viewer::setScalingFactor(int scalingFactorX,int scalingFactorY)
+using namespace std;
+
+void Viewer::setScalingAndTranslateFactor(double maxX, double minX, double maxY, double minY)
 {
-    this->scalingFactorX=scalingFactorX;
-    this->scalingFactorY=scalingFactorY;
+	if (this->maxX<maxX)
+		this->maxX=maxX+abs(maxX)*BORDER;
+	if (this->minX>minX)
+		this->minX=minX-abs(minX)*BORDER;
+	if (this->minY>minY)
+		this->minY=minY-abs(minY)*BORDER;
+	if (this->maxY<maxY)
+		this->maxY=maxY+abs(maxY)*BORDER;
+	setScalingFactor(this->maxX-this->minX,this->maxY-this->minY);
+	setTranslateFactor((this->maxX+this->minX)/2,(this->maxY+this->minY)/2);
 }
 
-void Viewer::setTranslateFactor(int translateX, int translateY)
+
+void Viewer::setScalingFactor(double scalingFactorX,double scalingFactorY)
+{
+	if (this->scalingFactorX<scalingFactorX)
+		this->scalingFactorX=scalingFactorX;
+	if (this->scalingFactorY<scalingFactorY)	
+		this->scalingFactorY=scalingFactorY;
+}
+
+void Viewer::setTranslateFactor(double translateX, double translateY)
 {
     this->translateX=translateX;
     this->translateY=translateY;
 }
 
-void Viewer::setWallState(vector<wallState> w)
-{
-    walls=w;
-}
-
-void Viewer::setAgents(vector<Agent> a)
-{
-   agents.swap(a);
-   for (int i=0;i<agents.size();i++)
-   {
-       colors.push_back(QColor::fromHsv(1.0*i*359.0/agents.size(),180,180));
-   }
-}
 
 void Viewer::setBackImage(string path){
     this->backImage=path;
@@ -47,11 +76,6 @@ void Viewer::setBackImage(string path){
                                        Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
     }
     pixmap.convertFromImage(immagine);
-}
-
-void Viewer::setEndTime(int time)
-{
-    endtime=time;
 }
 
 Viewer::~Viewer() {
@@ -72,13 +96,9 @@ void Viewer::paintEvent(QPaintEvent *event)
     QPainter painter(this);
 
     if (backImage.compare("")){
-        //QImage immagine=QImage(QString(backImage.c_str()));
-        //painter.drawImage(QRect(0,0,sidex,sidey),immagine);
         painter.drawPixmap(0,0,sidex,sidey,pixmap);
     }
 
-    if (true||gameStarted)
-    {
     painter.save();
     QFont f = painter.font();
     f.setPointSizeF(height()/25.0);
@@ -88,104 +108,72 @@ void Viewer::paintEvent(QPaintEvent *event)
     s.setNum(time);
     painter.drawText(width()/2,1.1*painter.fontMetrics().height(),s);
     painter.restore();
-    }
+
     painter.setRenderHint(QPainter::Antialiasing);
 
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(hourColor);
+     painter.setBrush(hourColor);
     painter.translate(sidex/2,sidey/2);
 
     painter.scale(sidex/scalingFactorX,-sidey/scalingFactorY);
 
     painter.translate(-translateX,-translateY);
 
-
- if(gameStarted) {
-     QPen pen;
-     pen.setCapStyle(Qt::RoundCap);
-     QVector<qreal> dashes;
-     qreal space = 5;
-     dashes << 1 << space << 1 << space << 1 << space
-                << 1 << space << 1 << space;
-     pen.setDashPattern(dashes);
-     pen.setWidth(1);
-
-     paintWall(&painter);
-      for (unsigned int i=0;i<agents.size();i++)
-      {
+	painter.save();
+	painter.translate(0,0);
+	
+	painter.drawRect(0,0,10,10);
+	
+	painter.restore();
+	
+      for (map<string,Agent>::const_iterator it=agents.begin();it!=agents.end();it++)
+		{
         painter.save();
-        pen.setDashPattern(dashes);
-        pen.setDashOffset(i);
-        pen.setColor(colors[i]);
-        painter.setPen(pen);
-        int tsize=agents[i].targetlist.x.size();
-          for (int j=0;j<tsize-2;j++)
-          {
-              painter.drawLine(agents[i].targetlist.x[j],agents[i].targetlist.y[j],
-                               agents[i].targetlist.x[j+1],agents[i].targetlist.y[j+1]);
-          }
-
-          if (tsize>0)
-          {
-              pen.setStyle(Qt::SolidLine);
-              painter.setPen(pen);
-              painter.drawLine(agents[i].targetlist.x[tsize-1]-3,
-                               agents[i].targetlist.y[tsize-1]-3,
-                               agents[i].targetlist.x[tsize-1]+3,
-                               agents[i].targetlist.y[tsize-1]+3
-                               );
-              painter.drawLine(agents[i].targetlist.x[tsize-1]-3,
-                               agents[i].targetlist.y[tsize-1]+3,
-                               agents[i].targetlist.x[tsize-1]+3,
-                               agents[i].targetlist.y[tsize-1]-3
-                               );
-
-          }
-        painter.restore();
-        painter.save();
-        painter.setBrush(colors[i]);
-        painter.translate(agents[i].x,agents[i].y);
+        painter.setBrush(Qt::GlobalColor::red);
+        painter.translate(it->second.x,it->second.y);
         //TODO: Pessimo: lo zero degli angoli parte dall'asse y invece che da x
-        painter.rotate(agents[i].angle*180/M_PI-90);
-        painter.scale((scalingFactorX*2.0/sidex),(scalingFactorY*2.0/sidey));
+        double tmp=it->second.angle;
+		while(tmp>M_PI)
+			tmp=tmp-2*M_PI;
+		painter.rotate((tmp*180/M_PI)-90);
+        
+	  painter.scale((scalingFactorX*2.0/sidex),(scalingFactorY*2.0/sidey));
         painter.drawConvexPolygon(hourHand, 3);
         painter.restore();
     }
-  }
+  
 }
 
-void Viewer::paintWall(QPainter* painter)
-{
-    for (unsigned int i=0;i<walls.size();i++)
-    {
-        painter->save();
-        painter->setPen(QColor("blue"));
-        painter->drawRect(walls[i].getRect());
-        double factor= 1.0* walls[i].getRect().width() / painter->fontMetrics().width(QString(walls[i].name.c_str()));
-        QFont f = painter->font();
-        f.setPointSizeF(f.pointSizeF()*factor*0.9);
-        painter->setFont(f);
-        painter->setPen(QColor("orangered"));
-        painter->translate(walls[i].getRect().bottomLeft().rx(),walls[i].getRect().bottomLeft().ry()-painter->fontMetrics().height());
-        painter->scale(1,-1);
-        painter->drawText(0,0,QString(walls[i].name.c_str()));
-        painter->restore();
-    }
-}
 
 void Viewer::timerEvent(QTimerEvent *event)
 {
-    for (unsigned int i=0;i<agents.size();i++)
-    {
-    agents[i].translate(time);
-    }
+	 	try
+        {
+			io_service.poll();
+			if (buffer.size()>0)
+			{
+				std::string archive_data(&buffer[header_length], buffer.size()-header_length);
+				std::istringstream archive_stream(archive_data);
+				boost::archive::text_iarchive archive(archive_stream);
+				archive >> infos;
+			}
+        }
+        catch (std::exception& e)
+        {
+            // Unable to decode data.
+            boost::system::error_code error(boost::asio::error::invalid_argument);
+            throw "Problema nella decodifica di un pacchetto";
+        }
+
+	for (map<string, agent_state_packet>::const_iterator it=infos.state_agents.internal_map.begin();it!=infos.state_agents.internal_map.end();it++)
+	{
+		agents[it->first].translate(it->second);
+		//setScalingFactor(agents[it->first].getMaxX()-agents[it->first].getMinX(),agents[it->first].getMaxY()-agents[it->first].getMinY());
+		//setTranslateFactor((agents[it->first].getMaxX()+agents[it->first].getMinX())/2,(agents[it->first].getMaxY()+agents[it->first].getMinY())/2);
+		setScalingAndTranslateFactor(agents[it->first].getMaxX(),agents[it->first].getMinX(),agents[it->first].getMaxY(),agents[it->first].getMinY());
+	}
   repaint();
   time++;
-  if (time>endtime)
-      killTimer(timerId);
 }
-
-
 
 void Viewer::keyPressEvent(QKeyEvent *event)
 {
@@ -193,20 +181,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 
     case Qt::Key_P:
         {
-          pauseGame();
-        }
-        break;
-    case Qt::Key_R:
-    {
-        time=0;
-        killTimer(timerId);
-        timerId = startTimer(10);
-        paused=false;
-    }
-    break;
-    case Qt::Key_Space:
-        {
-          startGame();
+          pause();
         }
         break;
     case Qt::Key_Escape:
@@ -224,22 +199,15 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void Viewer::startGame()
+void Viewer::start()
 {
-  if (!gameStarted) {
-    gameStarted = TRUE;
-    timerId = startTimer(10);
-  }
+
+	    timerId = startTimer(10);
+
 }
 
-void Viewer::pauseGame()
+void Viewer::pause()
 {
-  if (paused) {
-    timerId = startTimer(10);
-    paused = FALSE;
-  } else {
-    paused = TRUE;
-    killTimer(timerId);
-   }
+  throw "not implemented";
 }
 

@@ -5,8 +5,8 @@ include_directories(gui communication)
 find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
 include(${QT_USE_FILE})
 
-set(viewer_HEADERS gui/Agent.h gui/AgentPath.h gui/filereader.h gui/parser.h gui/TargetList.h gui/wall.h gui/wallreader.h gui/viewer.h)
-set(viewer_SOURCES gui/main.cpp gui/Agent.cpp gui/filereader.cpp gui/parser.cpp gui/viewer.cpp gui/wallreader.cpp)
+set(viewer_HEADERS gui/Agent.h gui/viewer.h communication/udp_world_sniffer.h)
+set(viewer_SOURCES gui/main.cpp gui/Agent.cpp gui/viewer.cpp communication/udp_world_sniffer.cpp)
 #set(viewer_UIS myproject.ui)
 #set(viewer_RESOURCES myproject.qrc)
 
@@ -24,3 +24,7 @@ add_executable(viewer
 )
 
 target_link_libraries(viewer ${QT_LIBRARIES})
+target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
+ find_package(Boost REQUIRED system thread serialization)
+ 
+target_link_libraries(viewer ${Boost_LIBRARIES} pthread)

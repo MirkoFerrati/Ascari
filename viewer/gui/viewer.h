@@ -1,56 +1,51 @@
 #ifndef VIEWER
 #define VIEWER
 
-#include "AgentPath.h"
+
 #include "Agent.h"
 #include <QtGui/QWidget>
 #include <QtGui/QKeyEvent>
-#include "wall.h"
-#include "TargetList.h"
+#include <boost/asio.hpp>
 class Viewer : public QWidget
 {
-  Q_OBJECT
 
   public:
-    Viewer(QWidget *parent = 0);
+    Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_service,QWidget *parent = 0);
     ~Viewer();
-    void setAgents(vector<Agent> a);
-    void setWallState(vector<wallState> w);
-    void setEndTime(int time);
-    void setScalingFactor(int scalingFactorX=1,int scalingFactorY=1);
-    void setTranslateFactor(int tx=0,int ty=0);
-    void startGame();
-    void setBackImage(string path);
-    void setTargets(vector<TargetList> t);
+    void setScalingFactor(double scalingFactorX, double scalingFactorY);
+    void setTranslateFactor(double tx=0,double ty=0);
+    void setBackImage(std::string path);
+    void start();
+   
 protected:
     void paintEvent(QPaintEvent *event);
     void timerEvent(QTimerEvent *event);
     void keyPressEvent(QKeyEvent *event);
 
-    void pauseGame();
-    void stopGame();
-    void victory();
-    void checkCollision();
-
+    void pause();
+   
 
   private:
-    void paintWall(QPainter* painter);
-    int x;
     int timerId;
     int time;
-    //vector<AgentPath> paths;
-    vector<Agent> agents;
-    vector<QColor> colors;
-    int endtime;
-    bool gameOver;
-    bool gameWon;
-    bool gameStarted;
-    bool paused;
-    int scalingFactorX, scalingFactorY, translateX, translateY;
-    string backImage;
+    std::map<std::string,Agent> agents;
+    std::vector<QColor> colors;
+    double scalingFactorX, scalingFactorY, translateX, translateY;
+    std::string backImage;
     QImage immagine;
     QPixmap pixmap;
-    vector<wallState> walls;
+    const std::vector<char>& buffer;
+	    /// The size of a fixed length header.
+    enum { header_length = 8 };
+	world_sim_packet infos;
+	boost::asio::io_service& io_service;
+    void setScalingAndTranslateFactor(double maxX,double minX,double maxY,double minY);
+	double maxX;
+	double minX;
+	double maxY;
+	double minY;
+	
+   
 };
 
 #endif //VIEWER
