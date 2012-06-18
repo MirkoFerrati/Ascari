@@ -1,0 +1,89 @@
+###ABaseball
+- WORLD:
+  - bonus_variables: [b1,b2,b3,b4]
+    b1: 'abs(x-b1)<0.5 and abs(y-b2)<0.5'
+    b2: 'b2+1'
+    b3: 'tutti gli agenti in posizione'
+  AGENTS:
+  - agent: Ball
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y]
+    control_commands: [v,theta]
+    INITIAL:
+    - x: '0'
+      y: '20'
+    STATE_START: WAIT
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+    BEHAVIOR:
+    - name: Ball 
+      CONTROLLERS:
+      - name: lancio
+        v: '10'
+        theta: -pi/2 + rand
+      - name: battuta
+        v: '15'
+        theta: pi/2 + rand
+      - name: fine_corsa
+        v: '0'
+        theta: '0'
+      - name: rilancio
+        v: '5'
+        theta: atan((y-b2)/(x-b1)+ rand
+      - name: reset
+        v: 2
+        theta: atan((y-5)/(x)
+      DISCRETE_STATES:
+      - name: lancio
+        controller: lancio
+      - name: battuta
+        controller: battuta
+      - name: fine_corsa
+        controller: fine_corsa
+      - name: reset
+        controller: reset
+      - name: rilancio
+        controller: rilancio        
+      ENCODER:
+      - TOPOLOGY:
+          - topology: [t1]
+            t1: abs(x-xi)<0.5 and abs(y-yi)<0.5
+        LAMBDA:
+          - lambda: [l1,l2]
+            l1: b1
+            l2: y<0
+            l3: y>60
+            l4: abs(x-0)<0.5 and abs(y-5)<0.5
+            l5: b3
+      EVENTS:
+      - events: [e1,e2,e3] 
+        e1: l1
+        e2: !l1*l2
+        e3: l2
+        e4: t1
+        e5: l4
+        e6: l5
+      AUTOMATON:
+      - name: ball
+        LANCIO:
+          - BATTUTA: e1 
+            RESET: e2
+        BATTUTA:
+          - FINE_CORSA: e3
+            RILANCIO: e4
+        FINE_CORSA:
+          - RILANCIO: e4
+            LANCIO: e6
+        RILANCIO:
+          - RESET: e1
+        RESET:
+          - FINE_CORSA: e5 
+          
+          
+          
+          
+ 
