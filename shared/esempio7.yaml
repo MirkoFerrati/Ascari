@@ -1,4 +1,7 @@
 #4 agenti che frenano e sterzano random se sono vicini, e che sterzano se oltrepassano i 20 metri dall'origine sull'asse x o y
+- WORLD:
+  - bonus_variables: [b1]
+    b1: '1'
 - AGENTS:
   - agent: Agente1
     #VISIBLE AREA: ./battle/exp_t_visuale.txt
@@ -22,7 +25,7 @@
       name: esempio4
       CONTROLLERS:
       - name: fast
-        v: 3
+        v: 3*b1
         w: 0
       - name: left
         v: 1

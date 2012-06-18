@@ -69,6 +69,10 @@ void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
     {
         symbol_table.add_variable(agent.inputs[i],inputs.command[i]);
     }
+    for (index_map::const_iterator it=map_bonus_variables_to_id.begin();it!=map_bonus_variables_to_id.end();it++)
+    {
+        symbol_table.add_variable(it->first,bonusVariables[it->second]);
+    }
     symbol_table.add_constants();
 	f_rndom = new rndom<double>();
 	symbol_table.add_function("rand", *f_rndom);
