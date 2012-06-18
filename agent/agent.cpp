@@ -52,10 +52,11 @@ void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression >
 	for (map<bonusVariable,bonus_expression>::const_iterator it=bonus.begin();it!=bonus.end();it++)
     {
 		bonusVariables[i]=0;
-        map_bonus_variables_to_id.insert(std::pair<string,int>(it->first,i));
+        map_bonus_variables_to_id.insert(make_pair(it->first,i));
 		i++;
     }
 }
+
 
 
 void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
@@ -69,6 +70,9 @@ void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
         symbol_table.add_variable(agent.inputs[i],inputs.command[i]);
     }
     symbol_table.add_constants();
+	f_rndom = new rndom<double>();
+	symbol_table.add_function("rand", *f_rndom);
+	
     for (map<controller_name,controller_MapRules>::const_iterator it =agent.controllers.begin();it !=agent.controllers.end();it++)
     {
         controller c(it->second,agent.inputs,symbol_table);
@@ -222,4 +226,5 @@ agent::~agent()
     delete world_comm;
     delete automaton;
     delete encoder;
+	delete f_rndom;
 }

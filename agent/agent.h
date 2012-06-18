@@ -120,6 +120,10 @@ protected:
 	void createStateFromParsedAgent(const Parsed_Agent& agent);
 
     void createBonusVariablesFromWorld(map< bonusVariable, bonus_expression > bonus);
+
+private:
+	rndom<double>* f_rndom;
+	
 };
 
 #endif // AGENT_H

@@ -5,6 +5,7 @@
 #include <string>
 #include <list>
 #include "boost/serialization/map.hpp" 
+#include <exprtk.hpp>
 
 //if we are debugging we want a strong typedef, if we are releasing we want the code to be optimized
 //we are going to remove all strong_typedef during the code writing
@@ -145,6 +146,32 @@ struct control_command_packet
 	}
 };
 
+
+template <typename T>
+struct rndom : public exprtk::ifunction<T> {
+        rndom() : exprtk::ifunction<T>(2) {}
+
+        // Returns random number. v1 is inclusive and v2 is inclusive too.
+        inline T operator()(const T& v1, const T& v2) {
+
+            // If v1 or v2 are smaller than 0 or v2 is smaller than v1 (v1 is min, v2 is max)
+            // or v2 is bigger than RAND_MAX, then return nan.
+            if (v1 < 0 || v2 < 0 || v2 < v1 || v2 > RAND_MAX) {
+                return std::numeric_limits<T>::quiet_NaN();
+            }
+
+            unsigned int min = v1;
+            unsigned int max = v2;
+
+            if (max < min) {
+                return T(min);
+            }
+
+            unsigned int result;
+            result = (rand() % (max + 1 - min)) + min;
+            return T(result);
+        }
+};
 
 
 #endif //TYPEDEFS_H

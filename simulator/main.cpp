@@ -25,7 +25,15 @@ int main(int argc, char **argv) {
         logog::Cout out;
         WARN("Foo is over %d!  Current value is %d.", 3, 5 );
         simulator s;
-	Parsed_World World=parse_file(FILENAME);
+		Parsed_World World;
+		if (argc>1)
+		{
+			World=parse_file(argv[1]);
+		}
+		else
+		{
+			World=parse_file(FILENAME);
+		}
 // 	cout<<World;
 	s.initialize(World);
 	initialize_communication(s);
