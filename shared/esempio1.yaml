@@ -1,4 +1,4 @@
-esempio6.yaml###Agente che va dritto
+###Agente che va dritto
 - WORLD:
   - bonus_variables: [b1,b2]
     b1: '10'
