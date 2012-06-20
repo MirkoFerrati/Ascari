@@ -8,10 +8,10 @@
     Boldstrike: Bpallastrike
     Bpalla_in_reset: 'palla_in_resetBall>0.5'
     #Bnumstrike: '(Bnumstrike+if (not(Boldstrike) and Bpallastrike,0,1))'
-    Ballready: 'abs(xball)<0.5 and abs(yball-5)<0.7 and abs(xricevitore1-xbasericevitore1)<0.2 
-    and abs(yricevitore1-ybasericevitore1)<0.2 and abs(xricevitore2-xbasericevitore2)<0.2 and 
-    abs(yricevitore2-ybasericevitore2)<0.2 and abs(xricevitore3-xbasericevitore3)<0.2 and
-    abs(yricevitore3-ybasericevitore3)<0.2'
+    Ballready: 'abs(xball)<0.7 and abs(yball-5)<0.7 and abs(xricevitore1-xbasericevitore1)<0.7 
+    and abs(yricevitore1-ybasericevitore1)<0.7 and abs(xricevitore2-xbasericevitore2)<0.7 and 
+    abs(yricevitore2-ybasericevitore2)<0.7 and abs(xricevitore3-xbasericevitore3)<0.7 and
+    abs(yricevitore3-ybasericevitore3)<0.7'
     Ballready1: Ballready
     Ballready2: Ballready1
     percentuale_di_successo_battuta: 'rndom(0,1-palla_in_resetBall)>0.5'
@@ -57,7 +57,7 @@
       - name: battuta
         a: 'if (y<0.4,100+rndom(1,50),0)'
         #Sto barando perchè dovrei avere una dinamica che fa questa cosa e non un controllore
-        theta: if (y<0.4,pi_greco/2 + rndom(-pi_greco/6,+pi_greco/6+angle),theta)
+        theta: if (y<0.4,pi_greco/2 + rndom(-pi_greco/4,+pi_greco/4+angle),theta)
         controllo_reset: '0'
       - name: fine_corsa
         a: 'if(v>0,-10*v,0)'
@@ -65,7 +65,7 @@
         controllo_reset: '0'
       - name: rilancio
         a: '5+rndom(1,5+angle)'
-        theta: atan2(-y,-x)
+        theta: atan2(-y,-x)+0.01
         controllo_reset: '0'
       - name: reset
         a: if (abs(y-ybase)>10,10,abs((ybase-y)))
@@ -97,7 +97,7 @@
       ENCODER:
       - TOPOLOGY:
           - topology: [palla_presa]
-            palla_presa: 'abs(x-xi)<0.5 and abs(y-yi)<0.5'
+            palla_presa: 'abs(x-xi)<0.5 and abs(y-yi)<0.5 and y*y+x*x>4'
         LAMBDA:
           - lambda: [Ttuttiinposizione,Lpalla_zona_battitore,Lfaul,Lpallaferma,Lfuoricampo,Lpallainposizionedilancio,LpallaBattuta]
             Lpalla_zona_battitore: 'x*x+y*y<1'
@@ -197,8 +197,8 @@
           - topology:
         LAMBDA:
           - lambda: [Lpalla_vicina,Lpalla_lontana,Lpalla_presa,Linbase,Ltuttiinposizione,Lpalla_in_reset]
-            Lpalla_vicina: 'abs(x-xballD)<5 and abs(y-yballD)<5'
-            Lpalla_lontana: 'abs(x-xballd)>5 or abs(y-yballd)>5'
+            Lpalla_vicina: 'abs(x-xballD)<10 and abs(y-yballD)<10'
+            Lpalla_lontana: 'abs(x-xballd)>10 or abs(y-yballd)>10'
             Lpalla_presa: 'abs(x-xballD)<0.5 and abs(y-yballD)<0.5'
             Linbase: 'abs(x-xbase)<0.1 and abs(y-ybase)<0.1'
             Ltuttiinposizione: 'Ballready==1 or Ballready1==1'
