@@ -123,7 +123,7 @@ protected:
 
 private:
 	rndom<double>* f_rndom;
-	
+	double pi;
 };
 
 #endif // AGENT_H

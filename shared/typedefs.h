@@ -149,8 +149,12 @@ struct control_command_packet
 
 template <typename T>
 struct rndom : public exprtk::ifunction<T> {
-        rndom() : exprtk::ifunction<T>(2) {}
+        rndom() : exprtk::ifunction<T>(2) {
+			name="RNDOM";
+		}
 
+        std::string name;
+        
         // Returns random number. v1 is inclusive and v2 is inclusive too.
         inline T operator()(const T& v1, const T& v2) {
 

@@ -74,8 +74,11 @@ void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
         symbol_table.add_variable(it->first,bonusVariables[it->second]);
     }
     symbol_table.add_constants();
+	pi=exprtk::details::numeric::constant::pi;
+	  symbol_table.add_variable("PI_GRECO",pi,true);
+
 	f_rndom = new rndom<double>();
-	symbol_table.add_function("rand", *f_rndom);
+	symbol_table.add_function(f_rndom->name, *f_rndom);
 	
     for (map<controller_name,controller_MapRules>::const_iterator it =agent.controllers.begin();it !=agent.controllers.end();it++)
     {
@@ -132,6 +135,7 @@ void agent::createSubEventsFromParsedAgent(const Parsed_Agent& agent) {
     for (map<string,string>::const_iterator it=agent.topology_expressions.begin();it!=agent.topology_expressions.end();it++) {
         sub_events_to_index.insert(make_pair(it->first,i));
         sub_events.insert(make_pair(i,_FALSE));
+		i++;
     }
 }
 
@@ -175,14 +179,14 @@ void agent::main_loop()
         while (1)
         {
             cicli++;
-// 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
-		world_sim_packet temp=world_comm->receive_agents_status();
-		state_other_agents.swap(temp.state_agents.internal_map);
-		
-		for (std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin();it!=temp.bonus_variables.end();it++)
-		{
-		 bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
-		}
+	// 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
+			world_sim_packet temp=world_comm->receive_agents_status();
+			state_other_agents.swap(temp.state_agents.internal_map);
+			
+			for (std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin();it!=temp.bonus_variables.end();it++)
+			{
+			bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
+			}
            
 			//TODO: questo ciclo for copia informazioni che in teoria già abbiamo, forse non vale la pena di usare la variabile state
             for (map<int,double>::const_iterator it=state_other_agents.at(identifier).state.begin();

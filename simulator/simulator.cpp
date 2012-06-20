@@ -18,7 +18,21 @@ void simulator::initialize(const Parsed_World& wo)
 {
   initialize_agents(wo.agents);
   bonus_symbol_table.add_constants();
-	
+  int i=0;
+  	for (map<bonusVariable,bonus_expression>::const_iterator it=wo.bonus_expressions.begin();it!=wo.bonus_expressions.end();it++)
+    {
+		bonusVariables[i]=0;
+        map_bonus_variables_to_id.insert(make_pair(it->first,i));
+		i++;
+    }
+  for (index_map::const_iterator it=map_bonus_variables_to_id.begin();it!=map_bonus_variables_to_id.end();it++)
+    {
+        bonus_symbol_table.add_variable(it->first,bonusVariables[it->second]);
+    }
+  pi=exprtk::details::numeric::constant::pi;
+  bonus_symbol_table.add_variable("PI_GRECO",pi,true);
+	f_rndom = new rndom<double>();
+	bonus_symbol_table.add_function(f_rndom->name, *f_rndom);
     exprtk::parser<double> parser;
 	for (int i=0;i<wo.bonus_variables.size();i++)
 	{	
@@ -26,8 +40,16 @@ void simulator::initialize(const Parsed_World& wo)
 		exprtk::expression<double> expression_tmp;
 		expression_tmp.register_symbol_table(bonus_symbol_table);
 		string string_tmp_expression=wo.bonus_expressions.at(wo.bonus_variables.at(i));
-		parser.compile(string_tmp_expression,expression_tmp);
-		bonus_expressions.push_back(expression_tmp);
+		if (parser.compile(string_tmp_expression,expression_tmp))
+		{
+			bonus_expressions.push_back(expression_tmp);
+		}
+		else
+		{
+			ERR("impossibile creare l'espressione: %s",string_tmp_expression.c_str());
+			throw "impossibile creare l'espressione";
+		}
+		
 		map_bonus_variables.insert(make_pair(wo.bonus_variables.at(i),i));
 	}
 }
@@ -38,13 +60,17 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
     num_agents=ag.size();
     for (unsigned int i=0; i<num_agents;i++) {
         agents_name_to_index.insert(make_pair(ag.at(i).name,i));
-        agent_state_packet agent_packet;
-        control_command_packet command_packet;
+		agent_state_packet agent_packet_tmp;
+		control_command_packet command_packet_tmp;
+		sim_packet.state_agents.internal_map.insert(make_pair(ag.at(i).name,agent_packet_tmp));
+		commands.insert(make_pair(ag.at(i).name,command_packet_tmp));
+		agent_state_packet& agent_packet=sim_packet.state_agents.internal_map.at(ag.at(i).name);
+        control_command_packet& command_packet=commands.at(ag.at(i).name);
         agent_packet.identifier=ag.at(i).name;
         command_packet.identifier=ag.at(i).name;
         index_map states_to_index_tmp;
         index_map commands_to_index_tmp;
-
+		
         for (unsigned int j=0; j<ag.at(i).state.size();j++)
         {   agent_packet.state.insert(make_pair(j,ag.at(i).initial_states.at(ag.at(i).state.at(j))));
             states_to_index_tmp.insert(make_pair(ag.at(i).state.at(j),j));
@@ -55,11 +81,9 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
         {
             command_packet.command.insert(make_pair(j,0));
             commands_to_index_tmp.insert(make_pair(ag.at(i).inputs.at(j),j));
-	    bonus_symbol_table.add_variable(ag.at(i).inputs.at(j)+ag.at(i).name,command_packet.command.at(j));
+			bonus_symbol_table.add_variable(ag.at(i).inputs.at(j)+ag.at(i).name,command_packet.command.at(j));
         }
-        sim_packet.state_agents.internal_map.insert(make_pair(ag.at(i).name,agent_packet));
         agent_states_to_index.push_back(states_to_index_tmp);
-        commands.insert(make_pair(command_packet.identifier,command_packet));
         agent_commands_to_index.push_back(commands_to_index_tmp);
 
         dynamic *d= new dynamic(sim_packet.state_agents.internal_map.at(ag.at(i).name).state, commands.at(ag.at(i).name).command,
@@ -141,6 +165,8 @@ simulator::~simulator()
     
     for (unsigned int i=0;i<dynamic_module.size();i++)
         delete dynamic_module[i];
+	
+	delete f_rndom;
 }
 
 void simulator::start_sim()
@@ -156,5 +182,11 @@ void simulator::update_bonus_variables()
 for (map<std::string,double>::iterator it=sim_packet.bonus_variables.begin();it!=sim_packet.bonus_variables.end();it++){
   it->second=bonus_expressions.at(map_bonus_variables.at(it->first)).value();
 }
+//Copio i risultati alla fine per avere coerenza all'interno dello stesso clock
+for (map<string,double>::iterator it=sim_packet.bonus_variables.begin();it!=sim_packet.bonus_variables.end();it++)
+{
+	bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second;
+}
+
 }
 
