@@ -2,7 +2,7 @@
 - WORLD:
   - bonus_variables: [b1]
     b1: '1'
-- AGENTS:
+  AGENTS:
   - agent: Agente1
     #VISIBLE AREA: ./battle/exp_t_visuale.txt
     #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
