@@ -149,9 +149,7 @@ struct control_command_packet
 
 template <typename T>
 struct rndom : public exprtk::ifunction<T> {
-        rndom() : exprtk::ifunction<T>(2) {
-			name="RNDOM";
-		}
+        rndom() : exprtk::ifunction<T>(2) {name="RNDOM";	}
 
         std::string name;
         
@@ -160,19 +158,20 @@ struct rndom : public exprtk::ifunction<T> {
 
             // If v1 or v2 are smaller than 0 or v2 is smaller than v1 (v1 is min, v2 is max)
             // or v2 is bigger than RAND_MAX, then return nan.
-            if (v1 < 0 || v2 < 0 || v2 < v1 || v2 > RAND_MAX) {
+            if (v2 < v1 || v2 > RAND_MAX) {
                 return std::numeric_limits<T>::quiet_NaN();
             }
 
-            unsigned int min = v1;
-            unsigned int max = v2;
+            double min = v1;
+            double max = v2;
 
             if (max < min) {
                 return T(min);
             }
 
-            unsigned int result;
-            result = (rand() % (max + 1 - min)) + min;
+            double result;
+            result = (rand()*(max-min)/RAND_MAX+min);
+			//% (max + 1 - min)) + min;
             return T(result);
         }
 };

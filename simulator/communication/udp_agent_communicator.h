@@ -14,11 +14,12 @@ public:
     virtual void send_broadcast(const world_sim_packet& infos);
     void send_target(const world_sim_packet&  infos, const target_abstract* target);
 private:
+	unsigned int num_agents;
 	boost::asio::io_service service;//This must be written before any sender or receiver
 	udp_sender<simulation_time> time_sender;
 	udp_sender<world_sim_packet> state_sender;
 	udp_receiver<control_command_packet > control_receiver;
-	int num_agents;
+	
 };
 
 #endif // TCP_AGENT_COMMUNICATOR_H

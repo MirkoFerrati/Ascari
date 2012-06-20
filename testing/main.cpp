@@ -6,7 +6,8 @@
 #include "testdecoder.hpp"
 #include "testClass.h"
 #include "testsimulator.hpp"
-
+#include "testrandom.hpp"
+#include "time.h"
 /**
  * @author MirkoF
  * Questo progetto è ancora troppo piccolo per avere un vero framework di unit testing, per adesso 
@@ -15,16 +16,16 @@
  */
 
 int main(int argc, char **argv) {
-
+	srand(time(NULL));
 	vector<pair<testClass*,string> > tests;
-
+	tests.push_back(make_pair(new testRandom(),"random"));
 	tests.push_back(make_pair(new testController(),"controllore"));
 	tests.push_back(make_pair(new testDynamic(),"dinamica"));
 	tests.push_back(make_pair(new testUDPSenderReceiver(),"UDP sender receiver"));
 	tests.push_back(make_pair(new testEncoder(),"Encoder"));
 	tests.push_back(make_pair(new testAutomaton(),"automaton"));
 	tests.push_back(make_pair(new testDecoder(),"Decoder"));
-	tests.push_back(make_pair(new testSimulator(),"Simulator"));
+// 	tests.push_back(make_pair(new testSimulator(),"Simulator"));
 	
 	for (unsigned int i=0;i<tests.size();i++)
 	{

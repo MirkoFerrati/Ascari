@@ -16,6 +16,8 @@
 #include <iomanip>
 #include <boost/serialization/vector.hpp>
 
+#include <logog.hpp>
+
 template <class T>
 class udp_receiver
 {
@@ -45,7 +47,12 @@ public:
         // Start to receive the data.
         //inbound_data_.resize(1000);
 
-        int size=socket_.receive(boost::asio::buffer(inbound_data_));
+        unsigned int size=socket_.receive(boost::asio::buffer(inbound_data_));
+		
+		for (unsigned int i=0;i<size;i++)
+			cout<<inbound_data_[i];
+		cout<<endl;
+		
         try
         {
             std::string archive_data(&inbound_data_[header_length], inbound_data_.size()-header_length);
@@ -59,6 +66,10 @@ public:
         {
             // Unable to decode data.
             boost::system::error_code error(boost::asio::error::invalid_argument);
+			for (unsigned int i=0;i<size;i++)
+				cout<<inbound_data_[i];
+			cout<<endl;
+// 			ERR("pacchetto sbagliato: %s",inbound_data_);
             throw "Problema nella ricezione di un pacchetto";
         }
 

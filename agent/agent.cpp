@@ -209,7 +209,8 @@ void agent::main_loop()
                     tmp=it->first;
             }
 
-            cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)<<endl;
+            cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)
+			<<" "<<state_other_agents.at(identifier).state.at(3)<<endl;
 
 // 		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
 // 			break;

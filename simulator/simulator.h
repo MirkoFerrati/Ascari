@@ -31,7 +31,7 @@ private:
 	void main_loop();
 	std::vector<std::string> identifiers;
 	simulation_time time;
-	int num_agents;
+	unsigned int num_agents;
 	rndom<double> *f_rndom;
 	double pi;
 	std::vector<exprtk::expression<double> > bonus_expressions;

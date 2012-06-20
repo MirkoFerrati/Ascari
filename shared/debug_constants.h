@@ -1,2 +1,2 @@
-#define FILENAME "baseball.yaml"
+#define FILENAME "giocopalla.yaml"
 #define MAXLOOPS 10000

@@ -1,31 +1,36 @@
 ###Baseball
 - WORLD:
-  - bonus_variables: [Bpalla_in_reset,Bpalla_zona_battitore,Bpallastrike,Boldstrike,Bnumstrike,Btuttiinposizione,percentuale_di_successo_battuta,xballd,yballd]
-    Bpalla_zona_battitore: 'abs(xball)<0.5 and abs(yball)<0.5'
+  - bonus_variables: [Bpalla_zona_battitore,Bpallastrike,Boldstrike,Bpalla_in_reset,Ballready,Ballready1,Ballready2,
+      percentuale_di_successo_battuta,xballD,yballD,vballD
+]
+    Bpalla_zona_battitore: 'abs(xball)<1 and abs(yball)<1'
     Bpallastrike: 'yball<0'
     Boldstrike: Bpallastrike
-    Bpalla_in_reset: 'palla_in_resetBall'
-    Bnumstrike: '(Bnumstrike+if (not(Boldstrike) and Bpallastrike,0,1))'
-    Btuttiinposizione: 'abs(xball)<0.2 and abs(yball-5)<0.2 and abs(xricevitore1-xbasericevitore1)<0.2 
+    Bpalla_in_reset: 'palla_in_resetBall>0.5'
+    #Bnumstrike: '(Bnumstrike+if (not(Boldstrike) and Bpallastrike,0,1))'
+    Ballready: 'abs(xball)<0.5 and abs(yball-5)<0.7 and abs(xricevitore1-xbasericevitore1)<0.2 
     and abs(yricevitore1-ybasericevitore1)<0.2 and abs(xricevitore2-xbasericevitore2)<0.2 and 
-    abs(yricevitore2-ybasericevitore2)<0.2'
-    Btuttiinposizioneold: Btuttiinposizione
-    Btuttiinposizioneoldold: Btuttiinposizioneold
-    percentuale_di_successo_battuta: 'rndom(1.0,2.0)'
+    abs(yricevitore2-ybasericevitore2)<0.2 and abs(xricevitore3-xbasericevitore3)<0.2 and
+    abs(yricevitore3-ybasericevitore3)<0.2'
+    Ballready1: Ballready
+    Ballready2: Ballready1
+    percentuale_di_successo_battuta: 'rndom(0,1-palla_in_resetBall)>0.5'
     xballD: xball
     yballD: yball
+    vballD: vball
   AGENTS:
   - agent: Ball
     #VISIBLE AREA: ./battle/exp_t_visuale.txt
     #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
     #MONITORING = 0
     #COLLABORATIVE = 1
-    states: [x,y,angle,xbase,ybase,palla_in_reset]
-    control_commands: [v,theta,controllo_reset]
+    states: [x,y,angle,v,xbase,ybase,palla_in_reset]
+    control_commands: [a,theta,controllo_reset]
     INITIAL:
     - x: '0'
       y: '5'
       angle: '0'
+      v: '0'
       xbase: '0'
       ybase: '5'
       palla_in_reset: '1'
@@ -33,51 +38,60 @@
     DYNAMIC_MAP:
     - x: 'v*cos(theta)'
       y: 'v*sin(theta)'
+      v: 'a-0.2v*v'
       angle: '0'
       xbase: '0'
       ybase: '0'
-      palla_in_reset: if(palla_in_reset>1,0,if(palla_in_reset<-1,0,controllo_reset))
+      palla_in_reset: controllo_reset
     BEHAVIOR:
     - name: Ball 
       CONTROLLERS:
       - name: lancio
-        v: 'if (v=0,0.7,v)'
-        theta: -pi_greco/2 + rndom(-pi/16.0,pi/16.0)
-        controllo_reset: '-10'
+        a: '5+rndom(1,5+angle)'
+        theta: -pi_greco/2 + rndom(-pi_greco/16,+pi_greco/16+angle)
+        controllo_reset: 'if(palla_in_reset<-1,0,-10)'
+      - name: provabattuta
+        a: '0'
+        theta: '0'
+        controllo_reset: '0'
       - name: battuta
-        v: '10-v/10'
+        a: 'if (y<0.4,100+rndom(1,50),0)'
         #Sto barando perchè dovrei avere una dinamica che fa questa cosa e non un controllore
-        theta: pi_greco/2 + rndom(-3.14/16,+3.14/16)
+        theta: if (y<0.4,pi_greco/2 + rndom(-pi_greco/6,+pi_greco/6+angle),theta)
         controllo_reset: '0'
       - name: fine_corsa
-        v: '0'
+        a: 'if(v>0,-10*v,0)'
         theta: '0'
         controllo_reset: '0'
       - name: rilancio
-        v: '5'
+        a: '5+rndom(1,5+angle)'
         theta: atan2(-y,-x)
         controllo_reset: '0'
       - name: reset
-        v: 1*(ybase-y)
+        a: if (abs(y-ybase)>10,10,abs((ybase-y)))
         theta: atan2(ybase-y,xbase-x)
-        controllo_reset: '10'
+        controllo_reset: 'if(palla_in_reset>1,0,10)'
       - name: stop
-        v: 0
-        theta: 0
+        a: -5*v
+        theta: atan2(ybase-y,xbase-x)
         controllo_reset: '0'
+      - name: starting
+        a: -4*v
+        theta: atan2(ybase-y,xbase-x)
+        controllo_reset: 'if(palla_in_reset>1,0,10)'
       DISCRETE_STATES:
       - name: lancio
         controller: lancio
       - name: battuta
         controller: battuta
-      - name: fine_corsa
-        controller: fine_corsa
+      - name: provabattuta
+        controller: provabattuta
       - name: reset
         controller: reset
       - name: rilancio
         controller: rilancio
       - name: starting
-        controller: stop
+        controller: starting
       - name: waiting
         controller: stop
       ENCODER:
@@ -85,33 +99,38 @@
           - topology: [palla_presa]
             palla_presa: 'abs(x-xi)<0.5 and abs(y-yi)<0.5'
         LAMBDA:
-          - lambda: [Ttuttiinposizione,Lpalla_zona_battitore,Lfaul,Lfuoricampo,Lpallainposizionedilancio,LpallaBattuta]
-            Lpalla_zona_battitore: 'Bpalla_zona_battitore=1'
-            Lfaul: y<0
+          - lambda: [Ttuttiinposizione,Lpalla_zona_battitore,Lfaul,Lpallaferma,Lfuoricampo,Lpallainposizionedilancio,LpallaBattuta]
+            Lpalla_zona_battitore: 'x*x+y*y<1'
+            Lfaul: y<-1
+            Lpallaferma: v<0.5
             Lfuoricampo: y>60
-            Lpallainposizionedilancio: abs(x-0)<0.1 and abs(y-5)<0.1
+            Lpallainposizionedilancio: abs(x-0)<0.3 and abs(y-5)<0.3
             LpallaBattuta: percentuale_di_successo_battuta
-            Ttuttiinposizione: 'Btuttiinposizione==1'
+            Ttuttiinposizione: 'Ballready==1 or Ballready1==1'
             #or Btuttiinposizioneold==1 or Btuttiinposizioneoldold==1'
       EVENTS:
-      - events: [Ezonabattuta,Ereset,EpallaBattuta,Efuoricampo,Epresa,Epallaattesa,Etuttiinposizione] 
+      - events: [Ezonabattuta,Ereset,Epallaferma,EpallaNOTattesa,EpallaBattuta,EpallaNotBattuta,Efuoricampo,Epresa,Epallaattesa,Etuttiinposizione] 
         Ezonabattuta: Lpalla_zona_battitore
-        Ereset: '!Lpalla_zona_battitore Lfaul'
+        Ereset: 'Lfaul'
+        Epallaferma: 'Lpallaferma'
         EpallaBattuta: LpallaBattuta
+        EpallaNotBattuta: !LpallaBattuta
         Efuoricampo: Lfuoricampo
         Epresa: palla_presa
         Epallaattesa: Lpallainposizionedilancio
+        EpallaNOTattesa: !Lpallainposizionedilancio
         Etuttiinposizione: Ttuttiinposizione
       AUTOMATON:
       - name: ball
         LANCIO:
-          - PROVA_BATTUTA: [Ezonabattuta]
+          - PROVABATTUTA: [Ezonabattuta]
             RESET: [Ereset]
-        PROVA_BATTUTA:
+        PROVABATTUTA:
           - BATTUTA: [EpallaBattuta]
-            RESET: [!EpallaBattuta]
+            RESET: [EpallaNotBattuta]
         BATTUTA:
-          - WAITING: [Efuoricampo]
+          - RESET: [Efuoricampo]
+            WAITING: [Epallaferma]
             RILANCIO: [Epresa]
         WAITING:
           - RILANCIO: [Epresa]
@@ -126,20 +145,23 @@
     #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
     #MONITORING = 0
     #COLLABORATIVE = 1
-    states: [x,y,theta,xbase,ybase,palla_in_reset]
+    states: [x,y,theta,nul,xbase,ybase,palla_in_reset]
     control_commands: [v,w]
     INITIAL:
     - x: '10'
       y: '10'
       theta: '0'
+      nul: '0'
       xbase: '10'
       ybase: '10'
       palla_in_reset: '0'
     STATE_START: WAITING
     DYNAMIC_MAP:
-    - x: 'v*cos(theta)'
+    - &dynricevitore
+      x: 'v*cos(theta)'
       y: 'v*sin(theta)'
       theta: 'w'
+      nul: '0'
       xbase: 0
       ybase: 0
       palla_in_reset: '0'
@@ -149,7 +171,7 @@
       CONTROLLERS:
       - name: waiting
         v: 0
-        w: 0
+        w: sin(atan2(yballd-y,xballd-x)-theta)
       - name: searching
         v: 2
         w: 5*sin(atan2(yballd-y,xballd-x)-theta)
@@ -174,16 +196,18 @@
       - TOPOLOGY:
           - topology:
         LAMBDA:
-          - lambda: [Lpalla_vicina,Lpalla_presa,Linbase,Ltuttiinposizione,Lpalla_in_reset]
+          - lambda: [Lpalla_vicina,Lpalla_lontana,Lpalla_presa,Linbase,Ltuttiinposizione,Lpalla_in_reset]
             Lpalla_vicina: 'abs(x-xballD)<5 and abs(y-yballD)<5'
+            Lpalla_lontana: 'abs(x-xballd)>5 or abs(y-yballd)>5'
             Lpalla_presa: 'abs(x-xballD)<0.5 and abs(y-yballD)<0.5'
             Linbase: 'abs(x-xbase)<0.1 and abs(y-ybase)<0.1'
-            Ltuttiinposizione: 'Btuttiinposizione==1'
+            Ltuttiinposizione: 'Ballready==1 or Ballready1==1'
             #or Btuttiinposizioneold==1 or Btuttiinposizioneoldold==1'
             Lpalla_in_reset: 'Bpalla_in_reset==1'
       EVENTS:
-      - events: [Epalla_vicina,Epalla_presa,Einbase,Etuttiinposizione,Epalla_in_reset]
+      - events: [Epalla_vicina,Epalla_presa,Einbase,Etuttiinposizione,Epalla_in_reset,Epalla_lontana]
         Epalla_vicina: Lpalla_vicina
+        Epalla_lontana: Lpalla_lontana
         Epalla_presa: Lpalla_presa
         Einbase: Linbase
         Etuttiinposizione: Ltuttiinposizione
@@ -198,31 +222,87 @@
           - STARTING: [Einbase]
         SEARCHING:
           - RILANCIO: [Epalla_presa]
+            WAITING: [Epalla_lontana]
             RESET: [Epalla_in_reset]
         RILANCIO:
-          - RESET: [Epalla_presa,Epalla_in_reset]
-          
+          - RESET: [Epalla_in_reset]
   - agent: Ricevitore2
     #VISIBLE AREA: ./battle/exp_t_visuale.txt
     #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
     #MONITORING = 0
     #COLLABORATIVE = 1
-    states: [x,y,theta,xbase,ybase,palla_in_reset]
+    states: [x,y,theta,nul,xbase,ybase,palla_in_reset]
     control_commands: [v,w]
     INITIAL:
     - x: '0'
       y: '20'
       theta: '0'
+      nul: '0'
       xbase: '0'
       ybase: '20'
       palla_in_reset: '0'
     STATE_START: WAITING
     DYNAMIC_MAP:
-    - x: 'v*cos(theta)'
-      y: 'v*sin(theta)'
-      theta: 'w'
-      xbase: 0
-      ybase: 0
-      palla_in_reset: '0'
+    - *dynricevitore
     BEHAVIOR:
     - *ricevitore 
+  - agent: Ricevitore3
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta,nul,xbase,ybase,palla_in_reset]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '-10'
+      y: '10'
+      theta: '0'
+      nul: '0'
+      xbase: '-10'
+      ybase: '10'
+      palla_in_reset: '0'
+    STATE_START: WAITING
+    DYNAMIC_MAP:
+    - *dynricevitore
+    BEHAVIOR:
+    - *ricevitore 
+  - agent: Battitore1
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta,nul,xbase,ybase,palla_in_reset]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '0'
+      y: '0'
+      nul: '0'
+      theta: '0'
+      xbase: '0'
+      ybase: '0'
+      palla_in_reset: '0'
+    STATE_START: WAITING
+    DYNAMIC_MAP:
+    - *dynricevitore
+    BEHAVIOR:
+    - &battitore 
+      name: battitore
+      CONTROLLERS:
+      - name: waiting
+        v: 0
+        w: 0
+      DISCRETE_STATES:
+      - name: waiting
+        controller: waiting
+      ENCODER:
+      - TOPOLOGY:
+          - topology:
+        LAMBDA:
+          - lambda: 
+      EVENTS:
+      - events: 
+      AUTOMATON:
+      - name: battitore
+        WAITING:
+          - WAITING: []
+        

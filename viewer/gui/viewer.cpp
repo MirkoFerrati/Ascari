@@ -26,8 +26,8 @@ Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_servi
 {
   time=0;
   backImage="";
-  scalingFactorX=10;
-  scalingFactorY=10;
+  scalingFactorX=30;
+  scalingFactorY=60;
   translateX=0;
   translateY=0;
   maxX=0;
@@ -121,7 +121,7 @@ void Viewer::paintEvent(QPaintEvent *event)
 	painter.save();
 	painter.translate(0,0);
 	
-	painter.drawRect(0,0,10,10);
+	//painter.drawRect(0,0,10,10);
 	
 	painter.restore();
 	

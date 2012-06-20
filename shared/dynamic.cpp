@@ -9,11 +9,11 @@ dynamic::dynamic(agent_state& StateReferenceWARN, control_command& controlRefere
 		 std::vector< std::string > control_variables_name):StateReferenceWARN(StateReferenceWARN)
 {
 	symbol_table=new exprtk::symbol_table<double>();
-	for (int i=0;i<StateReferenceWARN.size();i++)
+	for (unsigned int i=0;i<StateReferenceWARN.size();i++)
 	{
 		symbol_table->add_variable(state_variables_name.at(i),StateReferenceWARN.at(i));
 	}
-	for (int i=0;i<controlReferenceWARN.size();i++)
+	for (unsigned int i=0;i<controlReferenceWARN.size();i++)
 	{
 		symbol_table->add_variable(control_variables_name.at(i),controlReferenceWARN.at(i));
 	}
@@ -24,7 +24,7 @@ dynamic::dynamic(agent_state& StateReferenceWARN, control_command& controlRefere
 			
 	
 	
-	for (int i=0;i<state_variables_name.size();i++)
+	for (unsigned int i=0;i<state_variables_name.size();i++)
 	{
 		exprtk::expression<double> expression_tmp;//=new exprtk::expression<double>();
 		expression_tmp.register_symbol_table(*symbol_table);

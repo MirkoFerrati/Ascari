@@ -1,7 +1,7 @@
 ###Agente che va dritto
 - WORLD:
   - bonus_variables: [b1,b2]
-    b1: '10'
+    b1: 'rndom(1,10)'
     b2: 'XAGENTE1'
   AGENTS:
   - agent: Agente1
@@ -22,7 +22,7 @@
     - name: Esempio 
       CONTROLLERS:
       - name: fast
-        v: '3'
+        v: 'b1'
       DISCRETE_STATES:
       - name: fast
         controller: fast

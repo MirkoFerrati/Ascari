@@ -17,9 +17,9 @@ class testDecoder: public testClass
 			std::map< transition, bool > events;
 			
 			transition t1=(transition)1;
-			transition t2=(transition)2;
-			transition t3=(transition)3;
-			transition t4=(transition)4;
+// 			transition t2=(transition)2;
+// 			transition t3=(transition)3;
+// 			transition t4=(transition)4;
 			transition t5=(transition)5;
 			
 			

@@ -6,7 +6,7 @@
 #include "typedefs.h"
 #include "debug_constants.h"
 #include "simulator.h"
-
+#include "time.h"
   
 using namespace std;
 
@@ -20,6 +20,7 @@ void initialize_communication(simulator& s)
 
 int main(int argc, char **argv) {
   
+	srand(time(NULL));
     LOGOG_INITIALIZE();
     {
         logog::Cout out;
