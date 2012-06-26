@@ -106,19 +106,32 @@ void Viewer::paintEvent(QPaintEvent *event)
     painter.drawRect(0,0,sidex,sidey);
     painter.restore();
 
-    painter.setBrush(hourColor);
-    painter.translate(sidex/2,sidey/2);
-    painter.scale(sidex/scalingFactorX,-sidey/scalingFactorY);
-
-    painter.translate(-translateX,-translateY);
 
     painter.save();
+	painter.setBrush(hourColor);
+    painter.translate(sidex/2,sidey/2);
+    painter.scale(sidex/scalingFactorX,-sidey/scalingFactorY);
     painter.setBrush(QColor("green"));
-    painter.rotate(45);
+	painter.translate(-translateX,-translateY);
+	painter.rotate(45);
     painter.drawRect(0,0,20,20);
     painter.restore();
 
+	painter.save();
+    QFont f = painter.font();
+    f.setPointSizeF(height()/25.0);
+    painter.setFont(f);
+    painter.setPen(QColor("blue"));
+    QString s;
+    s.setNum(time);
+    painter.drawText(width()/2,1.1*painter.fontMetrics().height(),s);
+    painter.restore();
 
+    painter.setBrush(hourColor);
+    painter.translate(sidex/2,sidey/2);
+    painter.scale(sidex/scalingFactorX,-sidey/scalingFactorY);
+    painter.translate(-translateX,-translateY);
+	
     painter.save();
     painter.translate(0,0);
     painter.rotate(45);
@@ -158,16 +171,7 @@ void Viewer::paintEvent(QPaintEvent *event)
     painter.drawRect(-2,-2,5,5);
     painter.restore();
 
-    painter.save();
-    QFont f = painter.font();
-    f.setPointSizeF(height()/25.0);
-    painter.setFont(f);
-    painter.setPen(QColor("blue"));
-    QString s;
-    s.setNum(time);
-    painter.drawText(width()/2,1.1*painter.fontMetrics().height(),s);
-    painter.restore();
-
+    
     for (map<string,Agent>::const_iterator it=agents.begin();it!=agents.end();it++)
     {
         painter.save();

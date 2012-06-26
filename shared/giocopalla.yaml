@@ -197,11 +197,11 @@
           - topology:
         LAMBDA:
           - lambda: [Lpalla_vicina,Lpalla_lontana,Lpalla_presa,Linbase,Ltuttiinposizione,Lpalla_in_reset]
-            Lpalla_vicina: 'abs(x-xballD)<10 and abs(y-yballD)<10'
-            Lpalla_lontana: 'abs(x-xballd)>10 or abs(y-yballd)>10'
+            Lpalla_vicina: '(x-xballD)^2+(y-yballD)^2<100'
+            Lpalla_lontana: '(x-xballd)^2+(y-yballd)^2>100'
             Lpalla_presa: 'abs(x-xballD)<0.5 and abs(y-yballD)<0.5'
             Linbase: 'abs(x-xbase)<0.1 and abs(y-ybase)<0.1'
-            Ltuttiinposizione: 'Ballready==1 or Ballready1==1'
+            Ltuttiinposizione: 'Ballready==1 or Ballready1==1 or Ballready2==1'
             #or Btuttiinposizioneold==1 or Btuttiinposizioneoldold==1'
             Lpalla_in_reset: 'Bpalla_in_reset==1'
       EVENTS:
