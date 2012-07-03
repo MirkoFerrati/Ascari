@@ -4,7 +4,12 @@
 #include "typedefs.h"
 #include "debug_constants.h"
 #include <time.h>
-#include "geometry.hpp"
+#include <boost/geometry/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+
+using namespace boost::geometry;
+
 int main(int argc, char **argv) {
 	srand(time(NULL));
 	LOGOG_INITIALIZE();

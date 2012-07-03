@@ -6,6 +6,9 @@ add_executable(agent encoder/encoderDet.cpp automaton/automatonFSM.cpp communica
 			  ../shared/yaml_parser.cpp decoder/decoder.cpp )
 
 
+
+
+
 include_directories(identifierModule)
 include_directories(controller)
 include_directories(encoder)
@@ -21,10 +24,11 @@ include_directories(../shared/logog/include)
 include_directories(../shared/parserYAML/include)
 include_directories(decoder)
 include_directories(graph_routing)
-include_directories(../shared/geometry)
-include_directories(../shared/geometry/*)
+include_directories(../shared/boost/geometry)
+include_directories(../shared/boost/geometry/*)
 
- find_package(Boost REQUIRED system thread serialization)
+
+find_package(Boost REQUIRED system thread serialization)
  
 target_link_libraries(agent ${Boost_LIBRARIES} pthread)
 

@@ -3,7 +3,6 @@
 
 class agent_communicator_abstract
 {
-	public 
 };
 
 #endif // AGENT_COMMUNICATOR_H
