@@ -4,6 +4,7 @@
 #include "automaton/automatonFSM.h"
 #include "encoder/encoderDet.h"
 #include "debug_constants.h"
+#include "geometry.hpp"
 
 using namespace std;
 

@@ -21,6 +21,8 @@ include_directories(../shared/logog/include)
 include_directories(../shared/parserYAML/include)
 include_directories(decoder)
 include_directories(graph_routing)
+include_directories(../shared/geometry)
+include_directories(../shared/geometry/*)
 
  find_package(Boost REQUIRED system thread serialization)
  
