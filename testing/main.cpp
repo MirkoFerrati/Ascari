@@ -8,6 +8,7 @@
 #include "testsimulator.hpp"
 #include "testrandom.hpp"
 #include "time.h"
+#include "testagentudpcommunicator.hpp"
 /**
  * @author MirkoF
  * Questo progetto è ancora troppo piccolo per avere un vero framework di unit testing, per adesso 
@@ -25,6 +26,7 @@ int main(int argc, char **argv) {
 	tests.push_back(make_pair(new testEncoder(),"Encoder"));
 	tests.push_back(make_pair(new testAutomaton(),"automaton"));
 	tests.push_back(make_pair(new testDecoder(),"Decoder"));
+	tests.push_back(make_pair(new testAgentUDPCommunicator(),"Agent Udp Communicator"));
 // 	tests.push_back(make_pair(new testSimulator(),"Simulator"));
 	
 	for (unsigned int i=0;i<tests.size();i++)

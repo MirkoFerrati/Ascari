@@ -1,8 +1,16 @@
 #ifndef AGENT_COMMUNICATOR_H
 #define AGENT_COMMUNICATOR_H
 
+#include "typedefs_topology.h"
+#include "typedefs.h"
+
 class agent_communicator_abstract
 {
+public:
+	virtual void send()=0;
+	virtual void startReceive()=0;
+	virtual ~agent_communicator_abstract(){};
+
 };
 
 #endif // AGENT_COMMUNICATOR_H

@@ -37,7 +37,7 @@ public:
         // Join the multicast group.
         socket_.set_option(
             boost::asio::ip::multicast::join_group(multicast_address));
-		inbound_data_.resize(1000);
+		inbound_data_.resize(MAX_PACKET_LENGTH);
     }
 
     T receive()
@@ -87,7 +87,7 @@ private:
 
     boost::asio::ip::udp::socket socket_;
     boost::asio::ip::udp::endpoint sender_endpoint_;
-    enum { max_length = 1024 };
+    enum { max_length = MAX_PACKET_LENGTH };
     /// Holds an inbound header.
 
 

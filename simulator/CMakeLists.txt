@@ -24,8 +24,6 @@ include_directories(../shared)
 include_directories(../shared/logog/include)
 include_directories(../shared/parserYAML/include)
 
-
-
 configure_file(../shared/esempio1.yaml esempio1.yaml COPYONLY)
 configure_file(../shared/esempio2.yaml esempio2.yaml COPYONLY)
 configure_file(../shared/esempio3.yaml esempio3.yaml COPYONLY)
@@ -33,5 +31,6 @@ configure_file(../shared/esempio4.yaml esempio4.yaml COPYONLY)
 configure_file(../shared/esempio5.yaml esempio5.yaml COPYONLY)
 configure_file(../shared/esempio6.yaml esempio6.yaml COPYONLY)
 configure_file(../shared/esempio7.yaml esempio7.yaml COPYONLY)
+configure_file(../shared/esempio7.yaml esempio9.yaml COPYONLY)
 configure_file(../shared/baseball.yaml baseball.yaml COPYONLY)
 configure_file(../shared/giocopalla.yaml giocopalla.yaml COPYONLY)
