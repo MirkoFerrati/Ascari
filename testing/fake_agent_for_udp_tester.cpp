@@ -20,10 +20,11 @@ public:
 	{
 		std::cout<<"starting sending thread"<<std::endl;
 		int i=0;
-		while (i<7)
+		while (i++<3)
 		{
+		std::cout<<"sending"<<std::endl;
 		communicator.send();
-		sleep(0);
+		sleep(1);
         printMap();
 		}
     }
@@ -58,6 +59,7 @@ void service_thread(void) {
     while (should_run) {
 		std::cout<<"starting thread"<<std::endl;
         io_service.run();
+		sleep(1);
 		std::cout<<"running"<<std::endl;
         io_service.reset();
     }
@@ -99,6 +101,7 @@ int main(int argc, char **argv) {
 	boost::thread   t(service_thread);
 	f.start();
 	should_run=false;
+	io_service.stop();
 	t.join();
 }
 

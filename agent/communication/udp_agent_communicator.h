@@ -22,7 +22,7 @@ private:
     void handle_receive_from(const boost::system::error_code& error,size_t bytes_recvd);
     boost::signals2::mutex& mutex;
 	boost::asio::ip::udp::socket socket_;
-    boost::asio::ip::udp::endpoint sender_endpoint_;
+    boost::asio::ip::udp::endpoint listen_endpoint_;
     char inbound_data_[MAX_PACKET_LENGTH];
     enum { header_length = 8 };
     topology_packet* tp;

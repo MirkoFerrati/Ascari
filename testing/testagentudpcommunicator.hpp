@@ -26,7 +26,7 @@ class testAgentUDPCommunicator: public testClass
 	udp_sender<topology_packet> senderTop(service, boost::asio::ip::address::from_string(multicast_address),AGENT_ROUTE_PORT);
 	sender.send(5);
 	int i=0;
-	while (i++<10)
+	while (i++<12)
 		senderTop.send(receiverTop.receive());
 	
 	
