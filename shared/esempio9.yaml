@@ -1,8 +1,8 @@
 #due agenti che vanno dritti
 - AGENTS:
   - agent: Agente1
-    #VISIBLE AREA: ./battle/exp_t_visuale.txt
-    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
     #MONITORING = 0
     #COLLABORATIVE = 1
     states: [x,y]
@@ -11,6 +11,7 @@
     - x: '0'
       y: '0'
     STATE_START: FAST
+    TARGET_LIST: [3,7,2,9]
     DYNAMIC_MAP:
     - x: 'v'
       y: '0'
@@ -37,19 +38,4 @@
           
           
           
-  - agent: Agente2
-    #VISIBLE AREA: ./battle/exp_t_visuale.txt
-    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
-    #MONITORING = 0
-    #COLLABORATIVE = 1
-    states: [x,y]
-    control_commands: [v]
-    INITIAL:
-    - x: '0'
-      y: '10'
-    STATE_START: FAST
-    DYNAMIC_MAP:
-    - x: '2*v'
-      y: '0'
-    BEHAVIOR:
-    - *es3 
+  

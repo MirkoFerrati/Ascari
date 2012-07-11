@@ -96,6 +96,17 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
 
         }
     }
+    
+    os<< "Target List: ";
+    for (std::vector<target_id>::const_iterator iter=ag.target_list.begin(); iter!=ag.target_list.end();iter++)
+    {
+        os<< " "<<*iter;
+      }
+       os<<endl; 
+       
+     os<< "Visibility:"<<ag.visibility<<endl;
+     os<< "Communication:"<<ag.communication<<endl;
+    
 	return os;
 }
 
@@ -122,7 +133,10 @@ return os;
   
 
 void operator>> (const YAML::Node& node, Parsed_Agent& ag)
-{
+{	
+  
+    node["VISIBLE_AREA"]>>ag.visibility;
+    node["COMMUNICATION_AREA"]>>ag.communication;
     node["AGENT"]>>ag.name;
     node["STATES"]>>ag.state;
     node["CONTROL_COMMANDS"]>>ag.inputs;
@@ -168,6 +182,10 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     }
 
     node["STATE_START"]>> ag.state_start;
+    
+    if (node.FindValue("TARGET_LIST")){
+    node["TARGET_LIST"]>> ag.target_list;
+    }
     
     if (!ag.discrete_states.count(ag.state_start))
                             {

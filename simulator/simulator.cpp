@@ -151,7 +151,7 @@ void simulator::main_loop()
     }
     catch (const char* e)
     {
-        ERR(e);
+        ERR("%s",e);
     }
 }
 

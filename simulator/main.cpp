@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 		{
 			World=parse_file(FILENAME);
 		}
-// 	cout<<World;
+ 	cout<<World;
 	s.initialize(World);
 	initialize_communication(s);
 	s.start_sim();

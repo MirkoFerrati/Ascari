@@ -33,6 +33,11 @@ typedef std::string lambda_expression;
 // typedef std::map<lambda_name, lambda_expression> Lambda_MapExpressions;
 typedef std::string event_name;
 typedef std::string event_expression;
+typedef std::string visible_area;
+typedef std::string communication_area;
+typedef int target_id;
+
+
 // typedef std::map<event_name, event_expression> Events_MapExpressions;
 
 
@@ -58,9 +63,12 @@ public:
     std::map<event_name, event_expression> events_expressions;
     std::map<discreteState_Name, std::map<event_name,discreteState_Name> > automaton;
 	std::string automaton_name;
-	
-   
-     
+    visible_area visibility;
+    communication_area communication;
+    
+    std::vector<target_id> target_list;
+    
+
     
 };
 
