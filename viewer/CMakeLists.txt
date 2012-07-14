@@ -10,7 +10,7 @@ set(viewer_SOURCES gui/main.cpp gui/Agent.cpp gui/viewer.cpp communication/udp_w
 #set(viewer_UIS myproject.ui)
 #set(viewer_RESOURCES myproject.qrc)
 
-qt4_wrap_cpp(viewer_MOC ${viewer_HEADERS})
+#qt4_wrap_cpp(viewer_MOC ${viewer_HEADERS})
 #qt4_wrap_ui(viewer_UIS_H ${viewer_UIS})
 #qt4_add_resources(viewer_RESOURCES_CPP ${viewer_RESOURCES})
 

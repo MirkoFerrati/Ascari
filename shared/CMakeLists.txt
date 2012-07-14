@@ -1,7 +1,10 @@
 
+# 
+# add_subdirectory(logog)
+# 
+# 
+# add_subdirectory(parserYAML)
+# 
+ add_subdirectory(lemon/lemon)
 
-#add_subdirectory(logog)
-
-
-#add_subdirectory(parserYAML)
-
+include_directories(../shared/lemon/lemon)

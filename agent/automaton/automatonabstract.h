@@ -23,6 +23,7 @@ public:
 	automatonAbstract(const transitionTable& table)
 	:table(table){}
 	virtual vector<automaton_state> getNextAutomatonState(vector<automaton_state>const& oldStates, map<transition,bool>const& event)=0; 
+	virtual ~automatonAbstract(){};
 protected:
 	transitionTable table;
 };

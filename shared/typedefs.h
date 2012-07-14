@@ -95,6 +95,25 @@ BOOST_STRONG_TYPEDEF( int, transition)
 /** The time used by the simulator and sent to agents for synchronization */
 typedef double simulation_time;
 
+struct graph_informations
+{
+	bool isLocked;
+	int lockedNode;
+	int lockedArc;
+	std::string id;
+	
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& isLocked;
+		ar& lockedNode;
+		ar& lockedArc;
+		ar& id;
+	}
+	
+};
+
+
 
 struct agent_state_packet
 {
@@ -152,6 +171,7 @@ struct control_command_packet
 struct visibleArea
 {
 	virtual bool contains(agent_state me,agent_state other);
+	virtual ~visibleArea();
 };
 
 struct circle:public visibleArea
