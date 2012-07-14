@@ -4,7 +4,7 @@ project (ascari)
 
 add_subdirectory(agent)
 add_subdirectory(simulator)
-
+add_subdirectory(gml2lgf)
 add_subdirectory(shared)
 
 include_directories(shared)
