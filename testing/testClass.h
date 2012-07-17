@@ -5,6 +5,7 @@
 class testClass{
 public:
 	virtual void test()=0;
+	virtual ~testClass(){};
 };
 
 

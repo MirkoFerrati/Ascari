@@ -46,8 +46,9 @@ private:
         mutex.unlock();
     }
     boost::signals2::mutex mutex;
+	    topology_packet* data;
+
     udp_agent_communicator communicator;
-    topology_packet* data;
     udp_receiver<int> start_sync;
 
 };

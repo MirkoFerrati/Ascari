@@ -11,6 +11,7 @@
 #include <string>
 #include "typedefs.h"
 #include <typedefs_topology.h>
+#include <../simulator/communication/udp_agent_router.h>
 
 
 class testAgentUDPCommunicator: public testClass
@@ -21,15 +22,18 @@ class testAgentUDPCommunicator: public testClass
 	string multicast_address=MULTICAST_ADDRESS;
 	int multicast_port=MULTICAST_PORT;
 	udp_sender<int> sender(service, boost::asio::ip::address::from_string(multicast_address),multicast_port);
-	udp_receiver<topology_packet> receiverTop(service,boost::asio::ip::address::from_string("0.0.0.0"), 
-											  boost::asio::ip::address::from_string(multicast_address),SIMULATOR_ROUTE_PORT);
-	udp_sender<topology_packet> senderTop(service, boost::asio::ip::address::from_string(multicast_address),AGENT_ROUTE_PORT);
+// 	udp_receiver<topology_packet> receiverTop(service,boost::asio::ip::address::from_string("0.0.0.0"), 
+// 											  boost::asio::ip::address::from_string(multicast_address),SIMULATOR_ROUTE_PORT);
+// 	udp_sender<topology_packet> senderTop(service, boost::asio::ip::address::from_string(multicast_address),AGENT_ROUTE_PORT);
+	Udp_agent_router r;
+		
 	sender.send(5);
-	int i=0;
-	while (i++<12)
-		senderTop.send(receiverTop.receive());
-	
-	
+// 	int i=0;
+// 	while (i++<12)
+// 		senderTop.send(receiverTop.receive());
+// 	
+		r.start_thread();
+		r.join_thread();
 	}
 };
 
