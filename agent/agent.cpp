@@ -5,6 +5,7 @@
 #include "encoder/encoderDet.h"
 #include "debug_constants.h"
 #include "geometry.hpp"
+#include <agent_router.h>
 
 using namespace std;
 
@@ -31,6 +32,12 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
     createEventsFromParsedAgent(world.agents.at(myAgent));
     world_comm=new udp_world_communicator();
     
+	
+	if (!world.agents.at(myAgent).target_list.empty())
+	{
+		plugins.push_back(new agent_router(world.agents.at(myAgent).target_list,events,events_to_index,identifier));
+	}
+	
 
     if (!isDummy)
     {
@@ -86,6 +93,8 @@ void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
         controller c(it->second,agent.inputs,symbol_table);
         controllers.push_back(c);
     }
+    
+
 }
 
 
@@ -195,9 +204,13 @@ void agent::main_loop()
             {
                 state.at(it->first)=it->second;
             }
-
+            
             encoder->computeSubEvents(state_other_agents);
             event_decoder.decode();
+			for (unsigned int i=0;i<plugins.size();i++)
+			{
+				plugins[i]->run_plugin();
+			}
             discreteState= automaton->getNextAutomatonState(discreteState,events);
             controllers.at(map_discreteStateId_to_controllerId.at(discreteState.at(0))).computeControl();
 

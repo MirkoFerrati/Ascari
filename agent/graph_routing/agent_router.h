@@ -6,20 +6,39 @@
 
 
 #include <lemon/random.h>
-#include "tcp_router.h"
+#include "plugin_module.h"
+#include <typedefs.h>
 
-class Agent;
-
-
-class agent_router
+class agent_router: public Plugin_module
 {
-    lemon::SmartDigraph *graph;
+	
+public:
+    agent_router(std::vector< int > tarlist, std::map< transition, bool >& events, const index_map& events_to_index, std::string identifier);
+    void setGraph(lemon::SmartDigraph& g);
+    std::pair<int,int> getTargetCoords();
+    void run_plugin();
+	bool findPath(const std::vector< graph_informations >& info);
+    bool setNextTarget(const std::vector< graph_informations >& info);
+    void setSource(lemon::SmartDigraph::Node s);
+    void setTarget(lemon::SmartDigraph::Node t);
+    void setMapLength(lemon::SmartDigraph::ArcMap<int> m);
+    int getLockedArc();
+    int getLockedNode();
+    ~agent_router();
+    /*! 
+     * Stampa su out la lista dei target provvisori e infine il target definitivo
+     */
+    std::ostream& toFile(std::ostream& out) const;
+	
+	//TODO: we will not expose this informations after communication is enabled
+    bool routeLock;
+	
+private:
+	lemon::SmartDigraph graph;
     lemon::SmartDigraph::Node source, target;  
-
     lemon::SmartDigraph::Node next;
-
-    lemon::SmartDigraph::ArcMap<int> length;
-    lemon::SmartDigraph::NodeMap<int> coord_x, coord_y;
+    lemon::SmartDigraph::ArcMap<int> *length;
+    lemon::SmartDigraph::NodeMap<int> *coord_x, *coord_y;
     bool pathFound;
     bool graphSet;
     bool targetSet;
@@ -30,35 +49,13 @@ class agent_router
     std::vector<int> targets;
     unsigned int tarc;
     int arc_id;
+	const index_map& events_to_index;
+    std::map< transition, bool >& events;
+    std::string& identifier;
 
-public:
-    agent_router(lemon::SmartDigraph *g, lemon::SmartDigraph::ArcMap<int> *m,
-		 lemon::SmartDigraph::Node s, 
-		 lemon::SmartDigraph::NodeMap<int> *x,lemon::SmartDigraph::NodeMap<int> *y,
-		 std::vector<int> tarlist
-		);
-    agent_router(const agent_router& other);
-    virtual ~agent_router();
-    void setGraph(lemon::SmartDigraph *g);
-    std::pair<int,int> getTargetCoords();
-    bool findPath(const std::vector< graph_informations >& info);
-    bool setNextTarget(const std::vector< graph_informations >& info);
-    void setSource(lemon::SmartDigraph::Node s);
-    void setTarget(lemon::SmartDigraph::Node t);
-    void setMapLength(lemon::SmartDigraph::ArcMap<int> m);
-    int getLockedArc();
-    int getLockedNode();
-    
-    /*! 
-     * Stampa su out la lista dei target provvisori e infine il target definitivo
-     */
-    std::ostream& toFile(std::ostream& out) const;
-	
-	//TODO: we will not expose this informations after communication is enabled
-    bool routeLock;
-    
-    
-    
+	void setTargetStop(bool stop);
+	bool checkIfTargetReached();
+	void parseGraph();
 };
 
 #endif // AGENT_ROUTER_H

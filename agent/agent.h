@@ -12,6 +12,7 @@
 #include "../shared/yaml_parser.h"
 #include "encoder/encoderAbstract.h"
 #include "decoder.h"
+#include "plugin_module.h"
 
 class agent
 {
@@ -92,6 +93,11 @@ protected:
 	
 	//in dummy agent this will not be initialized
 	identifier_module* idModule;
+	
+	/*!
+	 * Moduli aggiuntivi utilizzabili stile plugin (ma quanto sarebbe bello farlo in modo sistematico!)
+	 */
+	vector <Plugin_module*> plugins;
 	
 	void main_loop();
 	

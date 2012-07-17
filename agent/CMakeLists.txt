@@ -3,7 +3,7 @@
 
 add_executable(agent encoder/encoderDet.cpp automaton/automatonFSM.cpp communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp
 					communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
-			  ../shared/yaml_parser.cpp decoder/decoder.cpp)
+			  ../shared/yaml_parser.cpp decoder/decoder.cpp graph_routing/agent_router.cpp)
 
 
 
@@ -19,6 +19,7 @@ target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
 
+include_directories(../agent)
 include_directories(../shared)
 include_directories(../shared/logog/include)
 include_directories(../shared/parserYAML/include)
