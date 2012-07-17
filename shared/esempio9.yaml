@@ -1,41 +1,62 @@
-#due agenti che vanno dritti
-- AGENTS:
+#agente che gira nel magazzino con il modulo router attivo
+- WORLD:
+  - bonus_variables: [c]
+    c: 1
+  AGENTS:
   - agent: Agente1
     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
     #MONITORING = 0
     #COLLABORATIVE = 1
-    states: [x,y]
-    control_commands: [v]
+    states: [x,y,theta]
+    control_commands: [v,w]
     INITIAL:
     - x: '0'
       y: '0'
-    STATE_START: FAST
+      theta: '0'
+    STATE_START: WAIT
     TARGET_LIST: [3,7,2,9]
     DYNAMIC_MAP:
-    - x: 'v'
-      y: '0'
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: w
     BEHAVIOR:
-    - &es3
-      name: esempio2 
+    - &machine
+      name: machine 
       CONTROLLERS:
-      - name: fast
-        v: 3
+      - name: go
+        v: 1
+        w: sin(atan2(ytarget-y,xtarget-x)-theta)
+      - name: wait
+        v: 0
+        w: 0
       DISCRETE_STATES:
-      - name: fast
-        controller: fast
+      - name: go
+        controller: go
+      - name: wait
+        controller: wait
+      - name: wait_for_target
+        controller: wait
       ENCODER:
       - TOPOLOGY:
-          - topology: 
+          - topology: [t1]
+            t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
         LAMBDA:
-          - lambda:
+          - lambda: [reached] 
+            Lreached: abs(x-xtarget)<3 and abs(y-ytarget)<3
       EVENTS:
-      - events: 
+      - events: [someone, reached, new_target, stopped, started]
+        someone: t1
+        reached: Lreached
+        new_target: !Lreached
+        stopped: ''
+        started: ''
       AUTOMATON:
-      - name: es3
-        FAST:
-          - FAST: 
-          
-          
-          
-  
+      - name: aut_machine
+        GO:
+          - WAIT: [someone,stopped]
+            WAIT_FOR_TARGET: [reached]
+        WAIT:
+          - GO: [started]
+        WAIT_FOR_TARGET:
+          - GO: [new_target]
