@@ -5,6 +5,7 @@
 #include "dynamic.h"
 #include <vector>
 #include <map>
+#include <udp_agent_router.h>
 
 
 class simulator
@@ -24,7 +25,6 @@ private:
 	std::vector<index_map> agent_states_to_index;
 	std::vector<index_map> agent_commands_to_index;
 	index_map agents_name_to_index;
-	
 	std::map<int,double> bonusVariables;
 	std::map<std::string,int> map_bonus_variables_to_id;
 	std::map<std::string,control_command_packet> commands;
@@ -37,7 +37,7 @@ private:
 	std::vector<exprtk::expression<double> > bonus_expressions;
 	exprtk::symbol_table<double> bonus_symbol_table;
 	std::map<std::string,int> map_bonus_variables;
-	
+	Udp_agent_router router;
 };
 
 

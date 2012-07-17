@@ -148,6 +148,7 @@ void simulator::main_loop()
             if (loop>MAXLOOPS)
                 break;
         }
+		router.set_run(false);
     }
     catch (const char* e)
     {
@@ -159,6 +160,7 @@ void simulator::main_loop()
 
 simulator::~simulator()
 {
+	router.join_thread();
     delete communicator;
 
     for (unsigned int i=0; i< map_bonus_variables.size();i++)
@@ -174,6 +176,7 @@ void simulator::start_sim()
 {
     time=0;
     //communicator->send_broadcast(time);
+	router.start_thread();
     main_loop();
 }
 
