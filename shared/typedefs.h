@@ -103,7 +103,7 @@ struct graph_informations
 	std::string id;
 	
 	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int version)
+	void serialize(Archive& ar, const unsigned int /*version*/)
 	{
 		ar& isLocked;
 		ar& lockedNode;
@@ -121,7 +121,7 @@ struct agent_state_packet
 	std::string identifier;
 	
 	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int version)
+	void serialize(Archive& ar, const unsigned int /*version*/)
 	{
 		ar& state;
 		ar& identifier;
@@ -133,7 +133,7 @@ struct agents_name_to_states
 	std::map<std::string,agent_state_packet> internal_map;
 
 	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int version)
+	void serialize(Archive& ar, const unsigned int /*version*/)
 	{
 		ar& internal_map;
 		
@@ -146,7 +146,7 @@ struct world_sim_packet{
   agents_name_to_states state_agents;
 
   template <typename Archive>
-  void serialize(Archive& ar,const unsigned int version)
+  void serialize(Archive& ar,const unsigned int /*version*/)
   {
 	ar& bonus_variables;
 	ar& state_agents;
@@ -160,7 +160,7 @@ struct control_command_packet
 	std::string identifier;
 	
 	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int version)
+	void serialize(Archive& ar, const unsigned int /*version*/)
 	{
 		ar& command;
 		ar& identifier;
@@ -195,7 +195,7 @@ struct rndom : public exprtk::ifunction<T> {
         std::string name;
         
         // Returns random number. v1 is inclusive and v2 is inclusive too.
-        inline T operator()(const T& v1, const T& v2) {
+        T operator()(const T& v1, const T& v2) {
 
             // If v1 or v2 are smaller than 0 or v2 is smaller than v1 (v1 is min, v2 is max)
             // or v2 is bigger than RAND_MAX, then return nan.

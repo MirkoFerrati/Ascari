@@ -16,7 +16,7 @@ struct topology_packet
 	std::map<agent_name, behavior_topology> data;
 	
 	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int version)
+	void serialize(Archive& ar, const unsigned int /*version*/)
 	{
 		ar& data;
 	}
