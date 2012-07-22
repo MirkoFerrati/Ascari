@@ -11,6 +11,7 @@
 class simulator
 {
 public:
+	simulator();
 	~simulator();
 	void start_sim();
 	void create_communicator(int communicator_type);
@@ -37,7 +38,8 @@ private:
 	std::vector<exprtk::expression<double> > bonus_expressions;
 	exprtk::symbol_table<double> bonus_symbol_table;
 	std::map<std::string,int> map_bonus_variables;
-	Udp_agent_router router;
+	Udp_agent_router<topology_packet> topology_router;
+	Udp_agent_router<graph_packet> graph_router;
 };
 
 

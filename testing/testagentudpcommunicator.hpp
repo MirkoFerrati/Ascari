@@ -25,7 +25,7 @@ class testAgentUDPCommunicator: public testClass
 // 	udp_receiver<topology_packet> receiverTop(service,boost::asio::ip::address::from_string("0.0.0.0"), 
 // 											  boost::asio::ip::address::from_string(multicast_address),SIMULATOR_ROUTE_PORT);
 // 	udp_sender<topology_packet> senderTop(service, boost::asio::ip::address::from_string(multicast_address),AGENT_ROUTE_PORT);
-	Udp_agent_router r;
+	Udp_agent_router<topology_packet> r(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT);
 		
 	sender.send(5);
 // 	int i=0;
