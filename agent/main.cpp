@@ -13,6 +13,11 @@ int main(int argc, char **argv) {
     {
         logog::Cout out;
         Parsed_World World=parse_file(FILENAME);
+		if (argc<1)
+		{
+			ERR("%s","please insert the name of the agent");
+			return 1;
+		}
         std::string name=argv[1];
         agent a1(name,false,World);
         std::cout << "Hello, world! agent" << std::endl;

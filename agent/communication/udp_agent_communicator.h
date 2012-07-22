@@ -14,6 +14,10 @@
 class udp_agent_communicator : public agent_communicator_abstract
 {
 public:
+	/*!
+	 * Questa classe non garantisce che le reference a \param tp rimangano valide non appena udp_agent_communicator::startReceive
+	 * viene avviata
+	 */ 
     udp_agent_communicator(boost::signals2::mutex& mutex, topology_packet* tp, boost::asio::io_service& io_service);
     void send();
     void startReceive();

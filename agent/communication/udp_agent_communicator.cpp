@@ -14,6 +14,11 @@ udp_agent_communicator::udp_agent_communicator(boost::signals2::mutex& mutex,top
         boost::asio::ip::multicast::join_group(boost::asio::ip::address::from_string(MULTICAST_ADDRESS)));
 }
 
+/*!
+ * Per chi avesse dubbi, usare map::operator= implica distruggere e ricreare ogni volta ogni elemento della mappa
+ * Invece impostare i valori con un ciclo for crea solo i nuovi elementi, sovrascrive solo i valori di quelli
+ * già esistenti, non distrugge i vecchi
+ */
 void udp_agent_communicator::send()
 {
 //TODO in teoria un sender asincrono dovrebbe andare, ma devo costruire la struttura dati pulita
