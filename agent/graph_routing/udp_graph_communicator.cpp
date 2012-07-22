@@ -27,7 +27,7 @@ void Udp_graph_communicator::send()
     mutex.unlock();
     std::cout<<output_map_tp<<std::endl;
     sender.send(output_map_tp);
-    sleep(1);
+//     sleep(1);
 }
 
 void Udp_graph_communicator::startReceive()

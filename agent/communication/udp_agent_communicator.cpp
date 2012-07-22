@@ -39,7 +39,7 @@ void udp_agent_communicator::send()
     std::cout<<std::endl;
     mutex.unlock();
 	sender.send(output_map_tp);
-	sleep(1);
+// 	sleep(1);
 }
 
 void udp_agent_communicator::startReceive()

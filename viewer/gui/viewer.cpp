@@ -21,7 +21,7 @@
 
 #define BORDER 0.3+0.2
 
-Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_service, QWidget* parent)
+Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_service, QWidget* parent,int view_type)
         : QWidget(parent),buffer(buffer),io_service(io_service)
 {
     time=0;
@@ -34,6 +34,7 @@ Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_servi
     maxY=0;
     minX=0;
     minY=0;
+	this->view_type=view_type;
 }
 
 using namespace std;
@@ -100,7 +101,8 @@ void Viewer::paintEvent(QPaintEvent *event)
     }
 
     painter.setRenderHint(QPainter::Antialiasing);
-
+if (view_type==1)
+{
     painter.save();
     painter.setBrush(QColor("lightgreen"));
     painter.drawRect(0,0,sidex,sidey);
@@ -116,7 +118,7 @@ void Viewer::paintEvent(QPaintEvent *event)
 	painter.rotate(45);
     painter.drawRect(0,0,20,20);
     painter.restore();
-
+}
 	painter.save();
     QFont f = painter.font();
     f.setPointSizeF(height()/25.0);
@@ -131,7 +133,8 @@ void Viewer::paintEvent(QPaintEvent *event)
     painter.translate(sidex/2,sidey/2);
     painter.scale(sidex/scalingFactorX,-sidey/scalingFactorY);
     painter.translate(-translateX,-translateY);
-	
+if (view_type==1)
+{
     painter.save();
     painter.translate(0,0);
     painter.rotate(45);
@@ -170,7 +173,7 @@ void Viewer::paintEvent(QPaintEvent *event)
     painter.scale((scalingFactorX*4.0/sidex),(scalingFactorY*4.0/sidey));
     painter.drawRect(-2,-2,5,5);
     painter.restore();
-
+}
     
     for (map<string,Agent>::const_iterator it=agents.begin();it!=agents.end();it++)
     {

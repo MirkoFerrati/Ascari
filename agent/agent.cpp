@@ -232,7 +232,7 @@ void agent::main_loop()
 
             world_comm->send_control_command(inputs,NULL);
 
-            string tmp;
+            string tmp; //TODO non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
             for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();it++)
             {
                 if (it->second==discreteState[0])

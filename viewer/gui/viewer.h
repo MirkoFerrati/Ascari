@@ -10,12 +10,13 @@ class Viewer : public QWidget
 {
 
   public:
-    Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_service,QWidget *parent = 0);
+    Viewer(const std::vector< char >& buffer, boost::asio::io_service& io_service, QWidget* parent = 0, int view_type=0);
     ~Viewer();
     void setScalingFactor(double scalingFactorX, double scalingFactorY);
     void setTranslateFactor(double tx=0,double ty=0);
     void setBackImage(std::string path);
     void start();
+    int view_type;
    
 protected:
     void paintEvent(QPaintEvent *event);

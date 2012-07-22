@@ -14,8 +14,8 @@
     - x: '0'
       y: '0'
       theta: '0'
-    STATE_START: WAIT
-    TARGET_LIST: [3,7,2,9]
+    STATE_START: GO
+    TARGET_LIST: [1,2,3,4,5,6,7,8,9]
     DYNAMIC_MAP:
     - x: 'v*cos(theta)'
       y: 'v*sin(theta)'
@@ -25,7 +25,7 @@
       name: machine 
       CONTROLLERS:
       - name: go
-        v: 1
+        v: 10
         w: sin(atan2(ytarget-y,xtarget-x)-theta)
       - name: wait
         v: 0

@@ -40,6 +40,8 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 	xtarget=(*coord_x)[next];
 	ytarget=(*coord_y)[next];
 	arc_id=-1;
+	info[identifier].timestamp=0;
+	setTargetStop(false);
 }
 
 void agent_router::parseGraph()
@@ -72,16 +74,15 @@ void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_t
 
 void agent_router::run_plugin()
 {
-        graph_informations tmp;
+	_mutex.lock();
+        graph_informations& tmp = info.at(identifier);
         tmp.id=identifier;
         tmp.isLocked=routeLock;
         tmp.lockedArc=getLockedArc();
         tmp.lockedNode=getLockedNode();
-
-
-        //TODO questa istruzione sincronizza tutti gli agenti allo stesso istante ogni ciclo di clock
-//         communicator->send_and_receive(tmp);
-
+		tmp.timestamp++;
+		_mutex.unlock();
+		communicator.send();
 
 //         router_output<<fixed<<setprecision(1)<<setw(2)<<time<<" ";
 //         router->toFile(router_output);
@@ -104,7 +105,7 @@ void agent_router::run_plugin()
 void agent_router::setTargetStop(bool stop)
 {
 	events.at(events_to_index.at("STOPPED"))=stop;
-	events.at(events_to_index.at("STARTED"))=stop;
+	events.at(events_to_index.at("STARTED"))=!stop;
 }
 
 
@@ -134,7 +135,7 @@ bool agent_router::findPath(graph_packet& info)
     
     int real_distance;
     dijkstra(graph,*length).path(p).dist(real_distance).run(source,target);
-    
+    _mutex.lock();
 	for (graph_packet::const_iterator it=info.begin();it!=info.end();it++)
     {
 		bool isLocked = (*it).second.isLocked;
@@ -149,7 +150,7 @@ bool agent_router::findPath(graph_packet& info)
 	      useArc[arc1]=false;
         }
     }
-
+	_mutex.unlock();
     reached= dijkstra(filterArcs(graph,useArc),*length).path(p).dist(d).run(source,target);
 
     if (d>real_distance+2) return false;

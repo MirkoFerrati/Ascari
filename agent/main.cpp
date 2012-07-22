@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     {
         logog::Cout out;
         Parsed_World World=parse_file(FILENAME);
-		if (argc<1)
+		if (argc<2)
 		{
 			ERR("%s","please insert the name of the agent");
 			return 1;

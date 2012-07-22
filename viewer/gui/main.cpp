@@ -26,11 +26,13 @@ void center(QWidget &widget,int WIDTH=800,int HEIGHT=800)
 
 int main(int argc, char *argv[])
 {
+	if (argc<2)
+		std::cout<<"inserire il tipo di visualizzazione: 1-baseball 2-grafi 3-vuoto"<<std::endl;
     QApplication app(argc,argv);
 	boost::asio::io_service io_service;
 	std::vector<char> buffer;
 	buffer.resize(1000);
-    Viewer window(buffer,io_service);
+    Viewer window(buffer,io_service,NULL,atoi(argv[1]));
 	udp_world_sniffer sniffer(buffer,io_service);
    window.setWindowTitle("Visualizer");
    window.show();
