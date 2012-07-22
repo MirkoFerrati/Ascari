@@ -34,7 +34,7 @@ class testDecoder: public testClass
 			
 			std::map<std::string,std::string> parsed_events;
 			index_map sub_events_map;
-			index_map events_map;
+			std::map<std::string,transition> events_map;
 
 			sub_events_map.insert(make_pair("t1",1));
 			sub_events_map.insert(make_pair("t2",5));

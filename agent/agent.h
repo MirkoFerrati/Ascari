@@ -66,7 +66,7 @@ protected:
 	/**
 	 * Mappa dei nomi degli eventi e dei relativi indici
 	 */
-	index_map events_to_index;
+	std::map<string,transition> events_to_index;
 	
 	/**
 	 * The value of control variables, update by controllers
@@ -79,7 +79,7 @@ protected:
 	 * and never modified again
 	 */
 	std::vector<controller> controllers;
-	exprtk::symbol_table<double> symbol_table;
+	exprtk::symbol_table<double> symbol_table,encoder_symbol_table;
 	index_map map_controllername_to_id;
 	
 	decoder event_decoder;

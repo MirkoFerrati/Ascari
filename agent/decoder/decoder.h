@@ -11,7 +11,7 @@ public:
 	decoder(std::map< int, sub_event_value >& sub_events, std::map< transition, bool >& events);
 	void create(std::map<std::string,std::string> events,
 		index_map const& sub_events_map,
-		index_map const& events_map);
+		std::map<std::string,transition> const& events_map);
 	void decode();
 	
 private:

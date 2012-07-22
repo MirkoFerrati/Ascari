@@ -11,10 +11,10 @@ decoder::decoder(std::map< int, sub_event_value >& sub_events, std::map< transit
 }
 
 
-void decoder::create(map< string, string > events,  const index_map& sub_events_map, const index_map& events_map)
+void decoder::create(map< string, string > events, const index_map& sub_events_map, const std::map< string, transition >& events_map)
 {
     map<int,sub_event_value> temp_map;
-    for (map<string,int>::const_iterator it=events_map.begin();it!=events_map.end();it++)
+    for (map<string,transition>::const_iterator it=events_map.begin();it!=events_map.end();it++)
     {
         temp_map.clear();
 
