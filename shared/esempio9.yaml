@@ -42,7 +42,7 @@
           - topology: [t1]
             t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
         LAMBDA:
-          - lambda: [reached] 
+          - lambda: [Lreached] 
             Lreached: abs(x-xtarget)<3 and abs(y-ytarget)<3
       EVENTS:
       - events: [someone, reached, new_target, stopped, started]
