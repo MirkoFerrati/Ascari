@@ -27,7 +27,7 @@ public:
        state.insert(make_pair<int,double>(1,2));
        state.insert(make_pair<int,double>(2,5));
         map< string, agent_state_packet > state_other_agents;
-	
+		exprtk::symbol_table<double> tmp;
 	agent_state &state_ith_agent= state_other_agents["pippo"].state;
 	
        state_ith_agent.insert(make_pair<int,double>(0,3));
@@ -71,7 +71,7 @@ public:
 	
 	
 	encoderDet E(sub_events,"pluto", state, stateVariablesName_to_Index, bonusVariables, 
-		       bonusVariablesName_to_Index, topology_expres, sub_event_to_index, lambda_expres); 
+		       bonusVariablesName_to_Index, topology_expres, sub_event_to_index, lambda_expres,tmp); 
 	E.computeSubEvents( state_other_agents);
 	
 	assert(sub_events.at(sub_event_to_index.at("t1"))==_TRUE);

@@ -23,17 +23,23 @@ lemon::Random agent_router::generatorRandom;
 
 using namespace std;
 
-agent_router::agent_router(vector<int> tarlist,map<transition,bool>& events, index_map const& events_to_index,string identifier)
-        :targets(tarlist),events(events),events_to_index(events_to_index),identifier(identifier)
+agent_router::agent_router(std::vector< int > tarlist, std::map< transition, bool >& events, const std::map<std::string, transition>& events_to_index, string identifier)
+        :targets(tarlist),events(events),events_to_index(events_to_index),identifier(identifier),communicator(_mutex,&info,_io_service)
 {
     using namespace lemon;
+	parseGraph();
     tarc=0;
     int id=targets[tarc];
     tarc++;
+    source=graph.nodeFromId(id);
+	tarc++;
+	id=targets[tarc];
     target=graph.nodeFromId(id);
     routeLock=false;
     next=source;
-    arc_id=-1;
+	xtarget=(*coord_x)[next];
+	ytarget=(*coord_y)[next];
+	arc_id=-1;
 }
 
 void agent_router::parseGraph()
@@ -57,6 +63,11 @@ void agent_router::parseGraph()
     std::cout << "Number of arcs: " << lemon::countArcs(graph) << std::endl;
 }
 
+void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_table)
+{
+ 	symbol_table.add_variable("XTARGET",xtarget,false);
+ 	symbol_table.add_variable("YTARGET",ytarget,false);
+}
 
 
 void agent_router::run_plugin()
@@ -78,11 +89,11 @@ void agent_router::run_plugin()
 
         if (checkIfTargetReached())
         {//se riesco a raggiungere il prossimo target intermedio
-//             if (setNextTarget(communicator->getInfo()))//TODO: settare i valori di xtarget e ytarget, e new_target a true
+             if (setNextTarget(info))//TODO: settare i valori di xtarget e ytarget, e new_target a true
             {
                 setTargetStop(false);
             }
-//             else
+             else
             {
                 setTargetStop(true);
             }
@@ -92,14 +103,14 @@ void agent_router::run_plugin()
 
 void agent_router::setTargetStop(bool stop)
 {
-// 	events.at(events_to_index.at("stopped"))=stop;
-// 	events.at(events_to_index.at("started"))=stop;
+	events.at(events_to_index.at("STOPPED"))=stop;
+	events.at(events_to_index.at("STARTED"))=stop;
 }
 
 
 bool agent_router::checkIfTargetReached()
 {
-// 	return events.at(events_to_index.at("reached"));
+	return events.at(events_to_index.at("REACHED"));
 }
 
 
@@ -113,7 +124,7 @@ void agent_router::setTarget(lemon::SmartDigraphBase::Node t)
     target=t;
 }
 
-bool agent_router::findPath(const std::vector< graph_informations >& info)
+bool agent_router::findPath(graph_packet& info)
 {
     using namespace lemon;
     bool reached=false;
@@ -124,15 +135,12 @@ bool agent_router::findPath(const std::vector< graph_informations >& info)
     int real_distance;
     dijkstra(graph,*length).path(p).dist(real_distance).run(source,target);
     
-	for (vector<graph_informations>::const_iterator it=info.begin();it!=info.end();it++)
+	for (graph_packet::const_iterator it=info.begin();it!=info.end();it++)
     {
-		bool isLocked = (*it).isLocked;
-		int lockedNode =(*it).lockedNode;
-		int lockedArc = (*it).lockedArc;
-		//int lockedNode = (*it)->getLockedNode();
-		//int lockedArc = (*it)->getLockedArc();
-		//bool isLocked = (*it)->routeLock();
-      if (!isLocked) continue;
+		bool isLocked = (*it).second.isLocked;
+		int lockedNode =(*it).second.lockedNode;
+		int lockedArc = (*it).second.lockedArc;
+	  if (!isLocked) continue;
         for(SmartDigraph::OutArcIt arc1(graph, source);arc1!=INVALID;++arc1)
 	{
 	    if (lockedNode==graph.id(graph.target(arc1)))
@@ -140,7 +148,6 @@ bool agent_router::findPath(const std::vector< graph_informations >& info)
 	    if (lockedArc==graph.id(arc1))
 	      useArc[arc1]=false;
         }
-        
     }
 
     reached= dijkstra(filterArcs(graph,useArc),*length).path(p).dist(d).run(source,target);
@@ -157,6 +164,8 @@ bool agent_router::findPath(const std::vector< graph_informations >& info)
 	Path<SmartDigraph>::ArcIt a(p);
 	arc_id=graph.id(a);
 	next=graph.target(a);
+	xtarget=(*coord_x)[next];
+	ytarget=(*coord_y)[next];
         std::cout<<"percorso calcolato:";
         for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
             std::cout<<graph.id(i)<<">>";
@@ -188,7 +197,7 @@ lemon::digraphCopy<lemon::SmartDigraph,lemon::SmartDigraph>(g,graph); //graph=g;
 
 
 
-bool agent_router::setNextTarget(const std::vector< graph_informations >& info)
+bool agent_router::setNextTarget(graph_packet& info)
 {
 
     if (graph.id(next)==graph.id(target))

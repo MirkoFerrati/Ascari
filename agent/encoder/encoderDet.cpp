@@ -7,8 +7,8 @@ using namespace std;
 encoderDet::encoderDet(std::map< int, sub_event_value >& sub_events, const string& agent_name, agent_state& state, const std::map< string,
                        int >& stateVariablesName_to_Index,  std::map< int, double >& bonusVariables,
                        const std::map< string, int >& bonusVariablesName_to_Index, const map< string, string >& topology_expres, const index_map& sub_events_to_index,
-                       const map< string, string >& lambda_expres)
-        :ref_sub_events(sub_events),agent_name(agent_name)
+                       const map< string, string >& lambda_expres, exprtk::symbol_table<double>& symbol_table)
+        :ref_sub_events(sub_events),symbol_table(symbol_table),agent_name(agent_name)
 
 {
 
@@ -29,6 +29,7 @@ encoderDet::encoderDet(std::map< int, sub_event_value >& sub_events, const strin
     }
     symbol_table.add_constants();
 
+	
     exprtk::parser<double> parser;
 
     for (map<string,string>::const_iterator it=lambda_expres.begin();it!=lambda_expres.end();it++) {

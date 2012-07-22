@@ -27,7 +27,6 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
     createBonusVariablesFromWorld(world.bonus_expressions);
     createDiscreteStateFromParsedAgent(world.agents.at(myAgent));
     createStateFromParsedAgent(world.agents.at(myAgent));
-    createControllersFromParsedAgent(world.agents.at(myAgent));
     createSubEventsFromParsedAgent(world.agents.at(myAgent));
     createEventsFromParsedAgent(world.agents.at(myAgent));
     world_comm=new udp_world_communicator();
@@ -37,14 +36,24 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
 	{
 		plugins.push_back(new agent_router(world.agents.at(myAgent).target_list,events,events_to_index,identifier));
 	}
-	
+	  
+	/*!
+	 * Aggiungo le variabili richieste dai plugin
+	 */
+	for (unsigned int i=0;i<plugins.size();i++)
+	{
+		plugins[i]->addReservedVariables(symbol_table);
+		plugins[i]->addReservedVariables(encoder_symbol_table);
+	}
+		
+	createControllersFromParsedAgent(world.agents.at(myAgent));
 
     if (!isDummy)
     {
         automaton=new automatonFSM(createAutomatonTableFromParsedAgent(world.agents.at(myAgent)));
         encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id,bonusVariables,
                                map_bonus_variables_to_id, world.agents.at(myAgent).topology_expressions,
-							   sub_events_to_index,world.agents.at(myAgent).lambda_expressions);
+							   sub_events_to_index,world.agents.at(myAgent).lambda_expressions,encoder_symbol_table);
     }
     else {
         //TODO: we will think about identifierModule later
@@ -85,6 +94,8 @@ void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
 	pi=exprtk::details::numeric::constant::pi;
 	  symbol_table.add_variable("PI_GRECO",pi,true);
 
+	
+	
 	f_rndom = new rndom<double>();
 	symbol_table.add_function(f_rndom->name, *f_rndom);
 	
@@ -207,10 +218,15 @@ void agent::main_loop()
             
             encoder->computeSubEvents(state_other_agents);
             event_decoder.decode();
+			
+			/*!
+			 * Chiamo i plugin in fila
+			 */
 			for (unsigned int i=0;i<plugins.size();i++)
 			{
 				plugins[i]->run_plugin();
 			}
+			
             discreteState= automaton->getNextAutomatonState(discreteState,events);
             controllers.at(map_discreteStateId_to_controllerId.at(discreteState.at(0))).computeControl();
 
@@ -224,7 +240,7 @@ void agent::main_loop()
             }
 
             cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)
-			<<" "<<state_other_agents.at(identifier).state.at(3)<<endl;
+			<<" "<<state_other_agents.at(identifier).state.at(2)<<endl;
 
 // 		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
 // 			break;

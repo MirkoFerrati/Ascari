@@ -25,7 +25,7 @@ public:
 			agent_state& state,const std::map< std::string,int >& stateVariablesName_to_Index, 
 			std::map<int,double> & bonusVariables,const std::map<std::string,int>& bonusVariablesName_to_Index,
 			std::map<std::string,std::string>const& topology_expres,index_map const& sub_events_to_index,
-			std::map<std::string,std::string>const& lambda_expres);
+			std::map<std::string,std::string>const& lambda_expres,exprtk::symbol_table<double>& symbol_table);
 		void computeSubEvents(const std::map<std::string, agent_state_packet>& state_other_agents);
 // 		~encoderDet();
 		
@@ -35,7 +35,7 @@ private:
 	std::vector<const agent_state_packet*> ref_other_agents;
 	std::map<int,exprtk::expression<double> > lambda_expressions;
 	std::map<int,exprtk::expression<double> > topology_expressions;
-	exprtk::symbol_table<double> symbol_table;
+	exprtk::symbol_table<double>& symbol_table;
 	std::string agent_name;
 };
 

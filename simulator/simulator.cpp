@@ -14,6 +14,12 @@ void simulator::create_communicator(int communicator_type)
     }
 }
 
+simulator::simulator():topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT)
+{
+
+}
+
+
 void simulator::initialize(const Parsed_World& wo)
 {
     initialize_agents(wo.agents);
@@ -148,7 +154,7 @@ void simulator::main_loop()
             if (loop>MAXLOOPS)
                 break;
         }
-		router.set_run(false);
+		graph_router.set_run(false);
     }
     catch (const char* e)
     {
@@ -160,7 +166,7 @@ void simulator::main_loop()
 
 simulator::~simulator()
 {
-	router.join_thread();
+	graph_router.join_thread();
     delete communicator;
 
     for (unsigned int i=0; i< map_bonus_variables.size();i++)
@@ -176,7 +182,7 @@ void simulator::start_sim()
 {
     time=0;
     //communicator->send_broadcast(time);
-	router.start_thread();
+	graph_router.start_thread();
     main_loop();
 }
 

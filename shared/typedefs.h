@@ -3,9 +3,13 @@
 
 #include <map>
 #include <string>
+#include <vector>
 #include <list>
 #include "boost/serialization/map.hpp" 
+#include "boost/serialization/vector.hpp"
 #include <exprtk.hpp>
+#include <iostream>
+#include <fstream>
 
 //if we are debugging we want a strong typedef, if we are releasing we want the code to be optimized
 //we are going to remove all strong_typedef during the code writing
@@ -23,6 +27,8 @@
 #define SIMULATOR_PORT 10000
 #define SIMULATOR_ROUTE_PORT 10050
 #define AGENT_ROUTE_PORT 10051
+#define SIMULATOR_GRAPH_PORT 10052
+#define AGENT_GRAPH_PORT 10053
 #define NUM_AGENTS 1
 #define T_CAMP 0.01
 
@@ -30,39 +36,8 @@
 typedef std::map<int,double> map_int_double;
 
 
-/**
- * Represents a state of an agent, where the key of the map is the index of the variable as indicated from an indexMap
- */
-// struct agent_state: map_int_double
-// {
-// 	template <typename Archive>
-// 	void serialize(Archive& ar, const unsigned int version)
-// 	{
-// 		ar& *this;
-// 	}
-// };
-
 typedef std::map<int,double> agent_state;
 typedef std::map<int,double> control_command;
-/**
- * Represents a control command, where the key of the map is the index of the variable as indicated from an indexMap
- */
-// struct control_command :map_int_double
-// {
-// 	
-// 	template <typename Archive>
-// 	void serialize(Archive& ar, const unsigned int version)
-// 	{
-// 		ar& *this;
-// // 		for (std::map<int,double>::const_iterator it= control_map.begin();it!=control_map.end();it++)
-// // 		{
-// // 			ar& it->first;
-// // 			ar& it->second;
-// // 		}
-// 			
-// 	}
-// };
-
 
 /** This map will be used to store informations about variables names and converting them to int
  * In this way we speed up the read access during simulations
@@ -101,18 +76,36 @@ struct graph_informations
 	int lockedNode;
 	int lockedArc;
 	std::string id;
-	
+	int64_t timestamp;
 	template <typename Archive>
 	void serialize(Archive& ar, const unsigned int /*version*/)
 	{
+		ar& timestamp;
 		ar& isLocked;
 		ar& lockedNode;
 		ar& lockedArc;
 		ar& id;
 	}
+	friend std::ostream& operator<< (std::ostream& os, const graph_informations& g)
+	{
+		os<<g.timestamp<<" "<<g.lockedNode<<" "<<g.lockedArc<<" "<<g.id<<std::endl;
+		return os;
+	}
 	
 };
 
+typedef std::map<std::string,graph_informations> graph_packet;
+
+// 
+// template < class Key, class T, class Compare = less<Key>,
+//            class Allocator = allocator<pair<const Key,T> > > class map;
+template< typename K,typename T>//,typename C, typename Alloc >
+std::ostream& operator<<( std::ostream& os, const std::map<K,T>& m )
+{
+    for (typename std::map<K,T>::const_iterator it=m.begin();it!=m.end();it++)
+		os<<it->first <<" "<<it->second <<" ";
+    return os;
+}
 
 
 struct agent_state_packet
