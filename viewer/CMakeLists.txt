@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 include_directories(gui communication)
+include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
 
 find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
 include(${QT_USE_FILE})
@@ -16,6 +17,7 @@ set(viewer_SOURCES gui/main.cpp gui/Agent.cpp gui/viewer.cpp communication/udp_w
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+
 add_executable(viewer
     ${viewer_SOURCES}
     ${viewer_MOC}
@@ -28,3 +30,5 @@ target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
  find_package(Boost REQUIRED system thread serialization)
  
 target_link_libraries(viewer ${Boost_LIBRARIES} pthread)
+target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
+configure_file(../shared/test2.gml.lgf test2.gml.lgf COPYONLY)

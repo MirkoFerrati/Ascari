@@ -3,6 +3,8 @@
 
 
 #include "Agent.h"
+#include <lemon/smart_graph.h>
+#include <lemon/path.h>
 #include <QtGui/QWidget>
 #include <QtGui/QKeyEvent>
 #include <boost/asio.hpp>
@@ -22,7 +24,7 @@ protected:
     void paintEvent(QPaintEvent *event);
     void timerEvent(QTimerEvent *event);
     void keyPressEvent(QKeyEvent *event);
-
+	void parse_graph();
     void pause();
    
 
@@ -45,7 +47,11 @@ protected:
 	double minX;
 	double maxY;
 	double minY;
-	
+	lemon::SmartDigraph graph;
+    lemon::SmartDigraph::Node source, target;  
+    lemon::SmartDigraph::Node next;
+    lemon::SmartDigraph::ArcMap<int> *length;
+    lemon::SmartDigraph::NodeMap<int> *coord_x, *coord_y;
    
 };
 

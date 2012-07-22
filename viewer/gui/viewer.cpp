@@ -5,6 +5,7 @@
 #include <QtCore/QLocale>
 #include <QtGui/QWidget>
 #include "typedefs.h"
+#include "debug_constants.h"
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -18,6 +19,7 @@
 #include <iomanip>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
+#include <lemon/lgf_reader.h>
 
 #define BORDER 0.3+0.2
 
@@ -34,7 +36,32 @@ Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_servi
     maxY=0;
     minX=0;
     minY=0;
-	this->view_type=view_type;
+    this->view_type=view_type;
+    if (view_type==2)
+    {
+        parse_graph();
+    }
+}
+
+
+void Viewer::parse_graph()
+{
+    coord_x= new lemon::SmartDigraph::NodeMap<int>(graph);
+    coord_y= new lemon::SmartDigraph::NodeMap<int>(graph);
+    length= new lemon::SmartDigraph::ArcMap<int>(graph);
+
+    try {
+        lemon::digraphReader(graph, GRAPHNAME). // read the directed graph into g
+        nodeMap("coordinates_x", *coord_x).	//read the coordinates of nodes
+        nodeMap("coordinates_y", *coord_y).	//read the coordinates of nodes
+        arcMap("length", *length).       // read the 'capacity' arc map into cap
+        run();
+    } catch (lemon::Exception& er) { // check if there was any error
+    }
+
+    std::cout << "A digraph is read from "<<GRAPHNAME << std::endl;
+    std::cout << "Number of nodes: " << lemon::countNodes(graph) << std::endl;
+    std::cout << "Number of arcs: " << lemon::countArcs(graph) << std::endl;
 }
 
 using namespace std;
@@ -83,7 +110,7 @@ Viewer::~Viewer() {
 
 }
 
-void Viewer::paintEvent(QPaintEvent *event)
+void Viewer::paintEvent(QPaintEvent */*event*/)
 {
     static const QPoint hourHand[3] = {
         QPoint(3, -3),
@@ -101,25 +128,53 @@ void Viewer::paintEvent(QPaintEvent *event)
     }
 
     painter.setRenderHint(QPainter::Antialiasing);
-if (view_type==1)
-{
-    painter.save();
-    painter.setBrush(QColor("lightgreen"));
-    painter.drawRect(0,0,sidex,sidey);
-    painter.restore();
+    if (view_type==1)
+    {
+        painter.save();
+        painter.setBrush(QColor("lightgreen"));
+        painter.drawRect(0,0,sidex,sidey);
+        painter.restore();
 
 
+        painter.save();
+        painter.setBrush(hourColor);
+        painter.translate(sidex/2,sidey/2);
+        painter.scale(sidex/scalingFactorX,-sidey/scalingFactorY);
+        painter.setBrush(QColor("green"));
+        painter.translate(-translateX,-translateY);
+        painter.rotate(45);
+        painter.drawRect(0,0,20,20);
+        painter.restore();
+    }
+
+    if (view_type==2)
+    {
+		painter.save();
+		painter.setBrush(QColor("lightgreen"));
+		painter.translate(sidex/2,sidey/2);
+        painter.scale(sidex/scalingFactorX,-sidey/scalingFactorY);
+        painter.translate(-translateX,-translateY);
+
+		for (lemon::SmartDigraph::NodeIt n(graph); n!=lemon::INVALID; ++n)
+		{
+			painter.save();
+			painter.translate((*coord_x)[n],(*coord_y)[n]);
+			painter.drawEllipse(QPoint(0,0),2,2);
+			painter.scale(painter.fontMetrics().height()/100.0,-painter.fontMetrics().height()/100.0);
+			painter.drawText(-1,-1,QString("").setNum(graph.id(n)));
+			painter.restore();
+		}
+		
+		painter.setBrush(QColor("black"));
+		for (lemon::SmartDigraph::ArcIt a(graph); a!=lemon::INVALID; ++a)
+		{
+			painter.drawLine((*coord_x)[graph.source(a)],(*coord_y)[graph.source(a)],(*coord_x)[graph.target(a)],(*coord_y)[graph.target(a)]);
+		}
+		
+		painter.restore();
+    }
+
     painter.save();
-	painter.setBrush(hourColor);
-    painter.translate(sidex/2,sidey/2);
-    painter.scale(sidex/scalingFactorX,-sidey/scalingFactorY);
-    painter.setBrush(QColor("green"));
-	painter.translate(-translateX,-translateY);
-	painter.rotate(45);
-    painter.drawRect(0,0,20,20);
-    painter.restore();
-}
-	painter.save();
     QFont f = painter.font();
     f.setPointSizeF(height()/25.0);
     painter.setFont(f);
@@ -133,48 +188,48 @@ if (view_type==1)
     painter.translate(sidex/2,sidey/2);
     painter.scale(sidex/scalingFactorX,-sidey/scalingFactorY);
     painter.translate(-translateX,-translateY);
-if (view_type==1)
-{
-    painter.save();
-    painter.translate(0,0);
-    painter.rotate(45);
-    painter.setBrush(QColor("white"));
-    painter.drawRect(-1,-1,2,2);
-    painter.restore();
+    if (view_type==1)
+    {
+        painter.save();
+        painter.translate(0,0);
+        painter.rotate(45);
+        painter.setBrush(QColor("white"));
+        painter.drawRect(-1,-1,2,2);
+        painter.restore();
 
-    painter.save();
-    painter.setBrush(Qt::GlobalColor::red);
-    painter.translate(0,5);
-    painter.rotate(180);
-    painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
-    painter.drawConvexPolygon(hourHand,3);
-    painter.restore();
+        painter.save();
+        painter.setBrush(Qt::GlobalColor::red);
+        painter.translate(0,5);
+        painter.rotate(180);
+        painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
+        painter.drawConvexPolygon(hourHand,3);
+        painter.restore();
 
-    painter.save();
-    painter.setBrush(Qt::GlobalColor::white);
-    painter.translate(10,10);
-    painter.rotate(45);
-    painter.scale((scalingFactorX*4.0/sidex),(scalingFactorY*4.0/sidey));
-    painter.drawRect(-2,-2,5,5);
-    painter.restore();
+        painter.save();
+        painter.setBrush(Qt::GlobalColor::white);
+        painter.translate(10,10);
+        painter.rotate(45);
+        painter.scale((scalingFactorX*4.0/sidex),(scalingFactorY*4.0/sidey));
+        painter.drawRect(-2,-2,5,5);
+        painter.restore();
 
-    painter.save();
-    painter.setBrush(Qt::GlobalColor::white);
-    painter.translate(-10,10);
-    painter.rotate(45);
-    painter.scale((scalingFactorX*4.0/sidex),(scalingFactorY*4.0/sidey));
-    painter.drawRect(-2,-2,5,5);
-    painter.restore();
+        painter.save();
+        painter.setBrush(Qt::GlobalColor::white);
+        painter.translate(-10,10);
+        painter.rotate(45);
+        painter.scale((scalingFactorX*4.0/sidex),(scalingFactorY*4.0/sidey));
+        painter.drawRect(-2,-2,5,5);
+        painter.restore();
 
-    painter.save();
-    painter.setBrush(Qt::GlobalColor::white);
-    painter.translate(0,20);
-    painter.rotate(45);
-    painter.scale((scalingFactorX*4.0/sidex),(scalingFactorY*4.0/sidey));
-    painter.drawRect(-2,-2,5,5);
-    painter.restore();
-}
-    
+        painter.save();
+        painter.setBrush(Qt::GlobalColor::white);
+        painter.translate(0,20);
+        painter.rotate(45);
+        painter.scale((scalingFactorX*4.0/sidex),(scalingFactorY*4.0/sidey));
+        painter.drawRect(-2,-2,5,5);
+        painter.restore();
+    }
+
     for (map<string,Agent>::const_iterator it=agents.begin();it!=agents.end();it++)
     {
         painter.save();
@@ -202,7 +257,7 @@ if (view_type==1)
 }
 
 
-void Viewer::timerEvent(QTimerEvent *event)
+void Viewer::timerEvent(QTimerEvent */*event*/)
 {
     try
     {
