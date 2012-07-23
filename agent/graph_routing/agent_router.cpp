@@ -83,7 +83,6 @@ void agent_router::run_plugin()
     tmp.lockedNode=getLockedNode();
     tmp.timestamp++;
     _mutex.unlock();
-    communicator.send();
 
 //         router_output<<fixed<<setprecision(1)<<setw(2)<<time<<" ";
 //         router->toFile(router_output);
@@ -100,6 +99,8 @@ void agent_router::run_plugin()
             setTargetStop(true);
         }
     }
+        communicator.send();
+
 
 }
 
@@ -139,7 +140,8 @@ bool agent_router::findPath()
     _mutex.lock();
     for (graph_packet::const_iterator it=info.begin();it!=info.end();it++)
     {
-		if (it->first.compare(identifier)==0) continue;
+		if (it->first.compare(identifier)==0) continue; //Ignoro me stesso
+		if (it->first.compare(identifier)>0) continue; //La priorità è l'ordine alfabetico
         bool isLocked = (*it).second.isLocked;
         int lockedNode =(*it).second.lockedNode;
         int lockedArc = (*it).second.lockedArc;
@@ -155,7 +157,7 @@ bool agent_router::findPath()
     _mutex.unlock();
     reached= dijkstra(filterArcs(graph,useArc),*length).path(p).dist(d).run(source,target);
 
-    if (d>real_distance+2) return false;
+//     if (d>real_distance+2) return false;
 
     if (!reached)
     {

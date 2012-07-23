@@ -41,6 +41,8 @@ Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_servi
     {
         parse_graph();
     }
+    
+		
 }
 
 

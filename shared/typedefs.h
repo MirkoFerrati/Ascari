@@ -88,7 +88,7 @@ struct graph_informations
 	}
 	friend std::ostream& operator<< (std::ostream& os, const graph_informations& g)
 	{
-		os<<g.timestamp<<" "<<g.lockedNode<<" "<<g.lockedArc<<" "<<g.id<<std::endl;
+		os<<g.timestamp<<" "<<g.lockedNode<<" "<<g.lockedArc<<" "<<g.id;
 		return os;
 	}
 	
@@ -104,6 +104,7 @@ std::ostream& operator<<( std::ostream& os, const std::map<K,T>& m )
 {
     for (typename std::map<K,T>::const_iterator it=m.begin();it!=m.end();it++)
 		os<<it->first <<" "<<it->second <<" ";
+	os<<std::endl;
     return os;
 }
 

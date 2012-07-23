@@ -8,27 +8,29 @@
     COMMUNICATION_AREA: =  circle(10)
     #MONITORING = 0
     #COLLABORATIVE = 1
-    states: [x,y,theta]
+    states: [x,y,theta,v_start]
     control_commands: [v,w]
     INITIAL:
     - &initial
-      x: '0'
-      y: '0'
+      x: '-99'
+      y: '120'
       theta: '0'
+      v_start: '5'
     STATE_START: GO
-    TARGET_LIST: [0,2,3,4,5,6,7,8]
+    TARGET_LIST: [0,1,2,3,4,5,6,7,8]
     DYNAMIC_MAP:
     - &dynamic
       x: 'v*cos(theta)'
       y: 'v*sin(theta)'
       theta: w
+      v_start: 0
     BEHAVIOR:
     - &machine
       name: machine 
       CONTROLLERS:
       - name: go
-        v: 5
-        w: sin(atan2(ytarget-y,xtarget-x)-theta)*5
+        v: v_start
+        w: sin(atan2(ytarget-y,xtarget-x)-theta)*10
       - name: wait
         v: 0
         w: 0
@@ -69,12 +71,15 @@
   - agent: Agente2
     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
+    states: [x,y,theta,v_start]
     control_commands: [v,w]
     INITIAL:
-    - *initial
+    - x: '30'
+      y: '30'
+      theta: '0'
+      v_start: '6'
     STATE_START: GO
-    TARGET_LIST: [3,4,3,5,6,7,8,0,1,2]
+    TARGET_LIST: [8,7,6,5,8,1]
     DYNAMIC_MAP:
     - *dynamic
     BEHAVIOR:
@@ -82,12 +87,15 @@
   - agent: Agente3
     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
+    states: [x,y,theta,v_start]
     control_commands: [v,w]
     INITIAL:
-    - *initial
+    - x: '135'
+      y: '-60'
+      theta: '0'
+      v_start: '7'
     STATE_START: GO
-    TARGET_LIST: [9,4,3,5,6,7,8,0,1,2]
+    TARGET_LIST: [4,5,6,7,0]
     DYNAMIC_MAP:
     - *dynamic
     BEHAVIOR:
@@ -95,38 +103,15 @@
   - agent: Agente4
     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
+    states: [x,y,theta,v_start]
     control_commands: [v,w]
     INITIAL:
-    - *initial
+    - x: '135'
+      y: '30'
+      theta: '0'
+      v_start: '8'
     STATE_START: GO
-    TARGET_LIST: [11,4,3,5,6,7,8,0,1,2]
-    DYNAMIC_MAP:
-    - *dynamic
-    BEHAVIOR:
-    - *machine
-  - agent: Agente5
-    VISIBLE_AREA: circle(9)
-    COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - *initial
-    STATE_START: GO
-    TARGET_LIST: [2,4,3,5,6,7,8,0,1,2]
-    DYNAMIC_MAP:
-    - *dynamic
-    BEHAVIOR:
-    - *machine
-  - agent: Agente6
-    VISIBLE_AREA: circle(9)
-    COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - *initial
-    STATE_START: GO
-    TARGET_LIST: [6,4,3,5,6,7,8,0,1,2]
+    TARGET_LIST: [3,2,1,8,5,6]
     DYNAMIC_MAP:
     - *dynamic
     BEHAVIOR:
