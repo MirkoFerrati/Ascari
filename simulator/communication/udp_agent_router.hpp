@@ -22,9 +22,8 @@ class Udp_agent_router
 	udp_sender<T> senderTop;
 	thread_ptr   t;
 	void service_thread(void) {
-    int i=0;
-	while (should_run || i++<20) {
-		senderTop.send(receiverTop.receive());
+	while (should_run) {
+		senderTop.send(receiverTop.receive(true));
     }
 }
 	bool should_run;

@@ -40,7 +40,7 @@ public:
 		inbound_data_.resize(MAX_PACKET_LENGTH);
     }
 
-    T receive()
+    T receive(bool print=false)
     {
         using namespace std;
         //unsigned int size=socket_.available();//TODO: what if we have more than one packet in the socket buffer?
@@ -49,10 +49,12 @@ public:
 
         unsigned int size=socket_.receive(boost::asio::buffer(inbound_data_));
 		
+		if (print)
+		{	
 		for (unsigned int i=0;i<size;i++)
 			cout<<inbound_data_[i];
 		cout<<endl;
-		
+		}
         try
         {
             std::string archive_data(&inbound_data_[header_length], inbound_data_.size()-header_length);

@@ -215,7 +215,7 @@ void agent::main_loop()
             {
                 state.at(it->first)=it->second;
             }
-            
+            sleep(0);
             encoder->computeSubEvents(state_other_agents);
             event_decoder.decode();
 			

@@ -2,7 +2,7 @@
 
 Udp_graph_communicator::Udp_graph_communicator(boost::signals2::mutex& mutex,graph_packet* tp,boost::asio::io_service& io_service)
         :mutex(mutex),tp(tp),socket_(io_service),sender(io_service,boost::asio::ip::address::from_string(MULTICAST_ADDRESS),SIMULATOR_GRAPH_PORT)
-        ,listen_endpoint_(boost::asio::ip::address::from_string("0.0.0.0"), AGENT_GRAPH_PORT)
+        ,listen_endpoint_(boost::asio::ip::address::from_string("0.0.0.0"), AGENT_GRAPH_PORT),_io_service(io_service)
 {
     mutex_is_mine=false;
     socket_.open(listen_endpoint_.protocol());
@@ -13,6 +13,23 @@ Udp_graph_communicator::Udp_graph_communicator(boost::signals2::mutex& mutex,gra
     socket_.set_option(
         boost::asio::ip::multicast::join_group(boost::asio::ip::address::from_string(MULTICAST_ADDRESS)));
 }
+
+
+	void Udp_graph_communicator::service_thread(void) {
+	while (should_run) {
+		_io_service.run();
+		usleep(10);
+		_io_service.reset();
+	}
+}
+
+Udp_graph_communicator::~Udp_graph_communicator()
+{
+	should_run=false;
+	if (t)
+		t->join();
+}
+
 
 /*!
  * Per chi avesse dubbi, usare map::operator= implica distruggere e ricreare ogni volta ogni elemento della mappa
@@ -32,6 +49,8 @@ void Udp_graph_communicator::send()
 
 void Udp_graph_communicator::startReceive()
 {
+	should_run=true;
+	t=thread_ptr(new boost::thread(boost::bind(&Udp_graph_communicator::service_thread,this)));
     socket_.async_receive_from(
         boost::asio::buffer(inbound_data_, MAX_PACKET_LENGTH), listen_endpoint_,
         boost::bind(&Udp_graph_communicator::handle_receive_from, this,

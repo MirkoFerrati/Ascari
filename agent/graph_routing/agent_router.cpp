@@ -42,6 +42,7 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
     arc_id=-1;
     info[identifier].timestamp=0;
     setTargetStop(false);
+	communicator.startReceive();
 }
 
 void agent_router::parseGraph()
@@ -74,7 +75,7 @@ void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_t
 
 void agent_router::run_plugin()
 {
-    _mutex.lock();
+	_mutex.lock();
     graph_informations& tmp = info.at(identifier);
     tmp.id=identifier;
     tmp.isLocked=routeLock;
