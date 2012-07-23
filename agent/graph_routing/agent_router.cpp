@@ -138,6 +138,7 @@ bool agent_router::findPath()
     _mutex.lock();
     for (graph_packet::const_iterator it=info.begin();it!=info.end();it++)
     {
+		if (it->first.compare(identifier)==0) continue;
         bool isLocked = (*it).second.isLocked;
         int lockedNode =(*it).second.lockedNode;
         int lockedArc = (*it).second.lockedArc;

@@ -11,7 +11,7 @@
 #include <string>
 #include "typedefs.h"
 #include <typedefs_topology.h>
-#include <../simulator/communication/udp_agent_router.h>
+#include <../simulator/communication/udp_agent_router.hpp>
 
 
 class testAgentUDPCommunicator: public testClass

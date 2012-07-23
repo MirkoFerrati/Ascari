@@ -3,7 +3,7 @@
 
 add_executable(test testrandom.hpp main.cpp ../agent/controller/controller.cpp ../agent/decoder/decoder.cpp 
 ../shared/dynamic.cpp ../agent/encoder/encoderDet.cpp ../agent/automaton/automatonFSM.cpp
-	../simulator/communication/udp_agent_router.cpp)
+	)
 
 add_executable(test_udp_agent fake_agent_for_udp_tester.cpp ../agent/communication/udp_agent_communicator.cpp)
  find_package(Boost REQUIRED system thread serialization)
