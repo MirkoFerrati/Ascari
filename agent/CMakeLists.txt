@@ -45,6 +45,8 @@ configure_file(../shared/esempio5.yaml esempio5.yaml COPYONLY)
 configure_file(../shared/esempio6.yaml esempio6.yaml COPYONLY)
 configure_file(../shared/esempio7.yaml esempio7.yaml COPYONLY)
 configure_file(../shared/esempio9.yaml esempio9.yaml COPYONLY)
+configure_file(../shared/esempio10.yaml esempio10.yaml COPYONLY)
+
 configure_file(../shared/test2.gml.lgf test2.gml.lgf COPYONLY)
 configure_file(../shared/baseball.yaml baseball.yaml COPYONLY)
 configure_file(../shared/giocopalla.yaml giocopalla.yaml COPYONLY)
