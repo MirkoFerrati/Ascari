@@ -41,8 +41,15 @@ Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_servi
     {
         parse_graph();
     }
-    
+    for (lemon::SmartDigraph::NodeIt n(graph);n!=lemon::INVALID;++n)
+	{
+		if (maxX<(*coord_x)[n]) maxX=(*coord_x)[n]*1.1;
+		if (maxY<(*coord_y)[n]) maxX=(*coord_y)[n]*1.1;
+		if (minX>(*coord_x)[n]) minX=(*coord_x)[n]*1.1;
+		if (minY<(*coord_y)[n]) minY=(*coord_y)[n]*1.1;
 		
+	}
+	setScalingAndTranslateFactor(0,0,0,0);	
 }
 
 
@@ -252,6 +259,13 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
         else
         {
             painter.drawConvexPolygon(hourHand, 3);
+			if (view_type==2)
+			{
+				painter.save();
+				painter.scale(painter.fontMetrics().height()/100.0,-painter.fontMetrics().height()/100.0);
+				painter.drawText(0,0,QString(it->first.c_str()));
+				painter.restore();
+			}
         }
         painter.restore();
     }
