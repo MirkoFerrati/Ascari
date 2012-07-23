@@ -20,8 +20,8 @@ public:
     std::pair<int,int> getTargetCoords();
     void run_plugin();
     void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
-	bool findPath(graph_packet& info);
-    bool setNextTarget(graph_packet& info);
+	bool findPath();
+    bool setNextTarget();
     void setSource(lemon::SmartDigraph::Node s);
     void setTarget(lemon::SmartDigraph::Node t);
     void setMapLength(lemon::SmartDigraph::ArcMap<int> m);

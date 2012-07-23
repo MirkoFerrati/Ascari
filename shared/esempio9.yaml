@@ -11,13 +11,15 @@
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
-    - x: '0'
+    - &initial
+      x: '0'
       y: '0'
       theta: '0'
     STATE_START: GO
-    TARGET_LIST: [1,2,3,4,5,6,7,8,9]
+    TARGET_LIST: [0,2,3,4,5,6,7,8]
     DYNAMIC_MAP:
-    - x: 'v*cos(theta)'
+    - &dynamic
+      x: 'v*cos(theta)'
       y: 'v*sin(theta)'
       theta: w
     BEHAVIOR:
@@ -26,7 +28,7 @@
       CONTROLLERS:
       - name: go
         v: 10
-        w: sin(atan2(ytarget-y,xtarget-x)-theta)
+        w: sin(atan2(ytarget-y,xtarget-x)-theta)*10
       - name: wait
         v: 0
         w: 0
@@ -60,3 +62,16 @@
           - GO: [started]
         WAIT_FOR_TARGET:
           - GO: [new_target]
+  - agent: Agente2
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - *initial
+    STATE_START: GO
+    TARGET_LIST: [3,4,3,5,6,7,8,0,1,2]
+    DYNAMIC_MAP:
+    - *dynamic
+    BEHAVIOR:
+    - *machine
