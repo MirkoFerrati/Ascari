@@ -14,3 +14,6 @@ target_link_libraries(test ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 target_link_libraries(test_udp_agent ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 
 #list( APPEND CMAKE_CXX_FLAGS "-std=c++0x -pedantic ${CMAKE_CXX_FLAGS}")
+
+include_directories(../shared/boost/geometry)
+include_directories(../shared/boost/geometry/*)

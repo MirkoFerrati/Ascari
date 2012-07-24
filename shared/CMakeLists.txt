@@ -5,6 +5,6 @@
 # 
 # add_subdirectory(parserYAML)
 # 
- add_subdirectory(lemon/lemon)
+#add_subdirectory(lemon/lemon)
 
 include_directories(../shared/lemon/lemon)
