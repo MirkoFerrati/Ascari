@@ -141,7 +141,6 @@ bool agent_router::findPath()
     for (graph_packet::const_iterator it=info.begin();it!=info.end();it++)
     {
 		if (it->first.compare(identifier)==0) continue; //Ignoro me stesso
-		if (it->first.compare(identifier)>0) continue; //La priorità è l'ordine alfabetico
         bool isLocked = (*it).second.isLocked;
         int lockedNode =(*it).second.lockedNode;
         int lockedArc = (*it).second.lockedArc;
