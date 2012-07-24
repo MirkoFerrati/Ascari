@@ -138,7 +138,7 @@ void simulator::main_loop()
                     }
                 }
             }
-            usleep(50000);
+            usleep(10000);
             vector<control_command_packet> temp=communicator->receive_control_commands();
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {

@@ -4,6 +4,7 @@
 #include <boost/signals2/mutex.hpp>
 #include <../shared/communication/udp_receiver.hpp>
 #include <boost/thread.hpp>
+#include "logog.hpp"
 class fake_agent_for_udp_tester
 {
 public:
@@ -69,6 +70,9 @@ void service_thread(void) {
 int main(int argc, char **argv) {
     srand(time(NULL));
     should_run=true;
+	 LOGOG_INITIALIZE();
+    {
+        logog::Cout out;
 	boost::asio::io_service io_service1;
     topology_packet data;
     if (argc<1)
@@ -104,6 +108,7 @@ int main(int argc, char **argv) {
 	should_run=false;
 	io_service.stop();
 	t.join();
+	}
 }
 
 	

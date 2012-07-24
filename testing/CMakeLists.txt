@@ -11,5 +11,6 @@ add_executable(test_udp_agent fake_agent_for_udp_tester.cpp ../agent/communicati
 target_link_libraries(test ${Boost_LIBRARIES} pthread)
 target_link_libraries(test_udp_agent ${Boost_LIBRARIES} pthread)
 target_link_libraries(test ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
+target_link_libraries(test_udp_agent ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 
 #list( APPEND CMAKE_CXX_FLAGS "-std=c++0x -pedantic ${CMAKE_CXX_FLAGS}")
