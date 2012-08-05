@@ -19,7 +19,7 @@
 #include "debug_constants.h"
 
 #define PRIMARYNODES 9
-#define MAXFLOORS 2
+#define MAXFLOORS 6
 #define XYOFFSET 80
 
 lemon::Random agent_router::generatorRandom;
@@ -56,38 +56,28 @@ void agent_router::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int>
 	lemon::SmartDigraph::ArcMap<int>& acolors,int startId)
 {
 	using namespace lemon;
-	
+	int floorNumber=startId/graph_node_size;
     //Aggiungo un livello al grafo
-    for (int i=startId;i<graph_node_size+startId;i++)
+    for (int i=0;i<graph_node_size;i++)
 	{
-		SmartDigraph::Node n = graph.addNode();
+		SmartDigraph::Node n = _3Dgraph.addNode();
 		//Controllo che tutti i nodi finiscano nella posizione giusta
-		assert(graph.id(n)==graph_node_size+i);
-		(*coord_x)[n]=(*coord_x)[graph.nodeFromId(i)];
-		(*coord_y)[n]=(*coord_y)[graph.nodeFromId(i)];
-		coords[n]=dim2::Point<int>((*coord_x)[n]+(*coord_y)[n]/3,(*coord_y)[n]/3+XYOFFSET*(startId/graph_node_size+1));
-		ncolors[n]=startId/graph_node_size+2;
-		if (i%graph_node_size>=PRIMARYNODES)
-		{
- 			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(i),n);
-// 			(*length)[a]=1;
- 			acolors[a]=7;
-		}
+		assert(_3Dgraph.id(n)==(i+floorNumber*graph_node_size));
+		(*_3Dcoord_x)[n]=(*coord_x)[graph.nodeFromId(i)];
+		(*_3Dcoord_y)[n]=(*coord_y)[graph.nodeFromId(i)];
+		coords[n]=dim2::Point<int>((*_3Dcoord_x)[n]+(*_3Dcoord_y)[n]/3,(*_3Dcoord_y)[n]/3+XYOFFSET*(floorNumber+1));
+		ncolors[n]=floorNumber+1;
 	}
+	if (floorNumber==0) return;
 	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
-	for (unsigned int i=0;i<PRIMARYNODES;i++)
+	for (unsigned int i=0;i<graph_node_size;i++)
 	{
+		vector<int> temp_ids;
 		for (SmartDigraph::OutArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
 		{
-			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(i+startId+graph_node_size),graph.nodeFromId(graph.id(graph.target(arcit))+startId+graph_node_size));
-			(*length)[a]=1;
-			acolors[a]=startId/graph_node_size+2;
-		}
-		for (SmartDigraph::InArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
-		{
-			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(graph.id(graph.source(arcit))+startId+graph_node_size),graph.nodeFromId(i+startId+graph_node_size));
-			(*length)[a]=1;
-			acolors[a]=startId/graph_node_size+2;
+			SmartDigraph::Arc a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-1)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
+			(*_3Dlength)[a]=1;
+			acolors[a]=floorNumber+1;
 		}
 		
 	}
@@ -100,6 +90,9 @@ void agent_router::parseGraph()
     coord_x= new SmartDigraph::NodeMap<int>(graph);
     coord_y= new SmartDigraph::NodeMap<int>(graph);
     length= new SmartDigraph::ArcMap<int>(graph);
+	_3Dcoord_x= new SmartDigraph::NodeMap<int>(_3Dgraph);
+    _3Dcoord_y= new SmartDigraph::NodeMap<int>(_3Dgraph);
+    _3Dlength= new SmartDigraph::ArcMap<int>(_3Dgraph);
 
     try {
         digraphReader(graph, GRAPHNAME). // read the directed graph into g
@@ -111,20 +104,20 @@ void agent_router::parseGraph()
         ERR("parsing exception %s",er.what());
     }
    	graph_node_size=graph.nodeNum();
-	SmartDigraph::NodeMap<dim2::Point<int> > coords(graph);
-	SmartDigraph::NodeMap<int> ncolors(graph,1);
-	SmartDigraph::ArcMap<int> acolors(graph,1);
-	for (SmartDigraph::NodeIt n(graph);n!=INVALID;++n)
-	{	
-		coords[n]=dim2::Point<int>((*coord_x)[n]+(*coord_y)[n]/3,(*coord_y)[n]/3);
-	}
+	SmartDigraph::NodeMap<dim2::Point<int> > coords(_3Dgraph);
+	SmartDigraph::NodeMap<int> ncolors(_3Dgraph,1);
+	SmartDigraph::ArcMap<int> acolors(_3Dgraph,1);
+// 	for (SmartDigraph::NodeIt n(graph);n!=INVALID;++n)
+// 	{	
+// 		coords[n]=dim2::Point<int>((*coord_x)[n]+(*coord_y)[n]/3,(*coord_y)[n]/3);
+// 	}
 	for (int i=0;i<MAXFLOORS;i++)
 	{
 		addFloor(coords,ncolors,acolors,graph_node_size*i);
 	}
-	IdMap<SmartDigraph,SmartDigraph::Node> id(graph);
-	Palette p;
-	lemon::graphToEps<lemon::SmartDigraph>(graph,"image.eps").
+	IdMap<SmartDigraph,SmartDigraph::Node> id(_3Dgraph);
+	Palette p(false,MAXFLOORS+1);	
+	lemon::graphToEps<lemon::SmartDigraph>(_3Dgraph,"image.eps").
 		coords(coords).
 		nodeColors(composeMap(p,ncolors)).
 		arcColors(composeMap(p,acolors)).

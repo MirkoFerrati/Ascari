@@ -40,6 +40,9 @@ private:
     bool setNextTarget();
 	int graph_node_size;
 	lemon::SmartDigraph graph;
+	lemon::SmartDigraph _3Dgraph;
+	lemon::SmartDigraph::ArcMap<int> *_3Dlength;
+    lemon::SmartDigraph::NodeMap<int> *_3Dcoord_x, *_3Dcoord_y;
     lemon::SmartDigraph::Node source, target;  
     lemon::SmartDigraph::Node next;
     lemon::SmartDigraph::ArcMap<int> *length;
