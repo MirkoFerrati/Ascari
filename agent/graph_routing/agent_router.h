@@ -38,6 +38,7 @@ public:
 private:
 	bool findPath();
     bool setNextTarget();
+	int graph_node_size;
 	lemon::SmartDigraph graph;
     lemon::SmartDigraph::Node source, target;  
     lemon::SmartDigraph::Node next;
@@ -55,7 +56,8 @@ private:
     static lemon::Random generatorRandom;
     std::vector<int> targets;
     unsigned int tarc;
-    int arc_id;
+    std::vector<int> arc_id;
+	std::vector<int> node_id;
 	const std::map<std::string,transition>& events_to_index;
     std::map< transition, bool >& events;
     std::string& identifier;
@@ -66,7 +68,8 @@ private:
 	void parseGraph();
 	void addFloor(lemon::SmartDigraph::NodeMap< lemon::dim2::Point< int > >& coords,
 					lemon::SmartDigraph::NodeMap< int >& ncolors, lemon::SmartDigraph::ArcMap< int >& acolors,
-					const int& graph_node_size, int startId);
+					int startId);
+	lemon::SmartDigraph::ArcMap<bool> oddArcs,evenArcs;
 };
 
 #endif // AGENT_ROUTER_H

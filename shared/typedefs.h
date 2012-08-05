@@ -70,11 +70,28 @@ BOOST_STRONG_TYPEDEF( int, transition)
 /** The time used by the simulator and sent to agents for synchronization */
 typedef double simulation_time;
 
+template< typename K,typename T>//,typename C, typename Alloc >
+std::ostream& operator<<( std::ostream& os, const std::map<K,T>& m )
+{
+    for (typename std::map<K,T>::const_iterator it=m.begin();it!=m.end();it++)
+		os<<it->first <<" "<<it->second <<" ";
+	os<<std::endl;
+    return os;
+}
+
+template< typename T>//,typename C, typename Alloc >
+std::ostream& operator<<( std::ostream& os, const std::vector<T>& m )
+{
+    for (typename std::vector<T>::const_iterator it=m.begin();it!=m.end();it++)
+		os<<(*it)<<" ";
+	return os;
+}
+
 struct graph_informations
 {
 	bool isLocked;
-	int lockedNode;
-	int lockedArc;
+	std::vector<int> lockedNode;
+	std::vector<int> lockedArc;
 	std::string id;
 	int64_t timestamp;
 	template <typename Archive>
@@ -96,17 +113,6 @@ struct graph_informations
 
 typedef std::map<std::string,graph_informations> graph_packet;
 
-// 
-// template < class Key, class T, class Compare = less<Key>,
-//            class Allocator = allocator<pair<const Key,T> > > class map;
-template< typename K,typename T>//,typename C, typename Alloc >
-std::ostream& operator<<( std::ostream& os, const std::map<K,T>& m )
-{
-    for (typename std::map<K,T>::const_iterator it=m.begin();it!=m.end();it++)
-		os<<it->first <<" "<<it->second <<" ";
-	os<<std::endl;
-    return os;
-}
 
 
 struct agent_state_packet

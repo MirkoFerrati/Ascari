@@ -19,13 +19,19 @@
 #include "debug_constants.h"
 
 #define PRIMARYNODES 9
+#define MAXFLOORS 2
+#define XYOFFSET 80
 
 lemon::Random agent_router::generatorRandom;
 
 using namespace std;
 
-agent_router::agent_router(std::vector< int > tarlist, std::map< transition, bool >& events, const std::map<std::string, transition>& events_to_index, string identifier)
-        :targets(tarlist),events(events),events_to_index(events_to_index),identifier(identifier),communicator(_mutex,&info,_io_service)
+agent_router::agent_router(std::vector< int > tarlist, std::map< transition, bool >& events, 
+						   const std::map<std::string, transition>& events_to_index, string identifier)
+        :targets(tarlist),events(events),
+        events_to_index(events_to_index),
+        identifier(identifier),communicator(_mutex,&info,_io_service),
+        evenArcs(graph),oddArcs(graph)
 {
     using namespace lemon;
     parseGraph();
@@ -40,7 +46,6 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
     next=source;
     xtarget=(*coord_x)[next];
     ytarget=(*coord_y)[next];
-    arc_id=-1;
     info[identifier].timestamp=0;
     setTargetStop(false);
 	communicator.startReceive();
@@ -48,7 +53,7 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 
 void agent_router::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
 	lemon::SmartDigraph::NodeMap<int>& ncolors,
-	lemon::SmartDigraph::ArcMap<int>& acolors,const int& graph_node_size, int startId)
+	lemon::SmartDigraph::ArcMap<int>& acolors,int startId)
 {
 	using namespace lemon;
 	
@@ -58,15 +63,15 @@ void agent_router::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int>
 		SmartDigraph::Node n = graph.addNode();
 		//Controllo che tutti i nodi finiscano nella posizione giusta
 		assert(graph.id(n)==graph_node_size+i);
-		(*coord_x)[n]=(*coord_x)[graph.nodeFromId(i)]+8;
-		(*coord_y)[n]=(*coord_y)[graph.nodeFromId(i)]+8;
-		coords[n]=dim2::Point<int>((*coord_x)[graph.nodeFromId(i)]+8,(*coord_y)[graph.nodeFromId(i)]+8);
+		(*coord_x)[n]=(*coord_x)[graph.nodeFromId(i)];
+		(*coord_y)[n]=(*coord_y)[graph.nodeFromId(i)];
+		coords[n]=dim2::Point<int>((*coord_x)[n]+(*coord_y)[n]/3,(*coord_y)[n]/3+XYOFFSET*(startId/graph_node_size+1));
 		ncolors[n]=startId/graph_node_size+2;
 		if (i%graph_node_size>=PRIMARYNODES)
 		{
-			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(i),n);
-			(*length)[a]=0;
-			acolors[a]=7;
+ 			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(i),n);
+// 			(*length)[a]=1;
+ 			acolors[a]=7;
 		}
 	}
 	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
@@ -105,34 +110,21 @@ void agent_router::parseGraph()
     } catch (Exception& er) { // check if there was any error
         ERR("parsing exception %s",er.what());
     }
-   	const int graph_node_size=graph.nodeNum();
+   	graph_node_size=graph.nodeNum();
 	SmartDigraph::NodeMap<dim2::Point<int> > coords(graph);
 	SmartDigraph::NodeMap<int> ncolors(graph,1);
 	SmartDigraph::ArcMap<int> acolors(graph,1);
 	for (SmartDigraph::NodeIt n(graph);n!=INVALID;++n)
 	{	
-		coords[n]=dim2::Point<int>((*coord_x)[n],(*coord_y)[n]);
+		coords[n]=dim2::Point<int>((*coord_x)[n]+(*coord_y)[n]/3,(*coord_y)[n]/3);
 	}
-
-	addFloor(coords,ncolors,acolors,graph_node_size,0);
+	for (int i=0;i<MAXFLOORS;i++)
+	{
+		addFloor(coords,ncolors,acolors,graph_node_size*i);
+	}
 	IdMap<SmartDigraph,SmartDigraph::Node> id(graph);
 	Palette p;
 	lemon::graphToEps<lemon::SmartDigraph>(graph,"image.eps").
-		coords(coords).
-		nodeColors(composeMap(p,ncolors)).
-		arcColors(composeMap(p,acolors)).
-		nodeTexts(id).
-		nodeTextSize(4).
-		nodeScale(0.008).
-		arcWidthScale(0.0008).
-		drawArrows(true).
-		arrowWidth(3).
-		arrowLength(5).
-		run();
-		addFloor(coords,ncolors,acolors,graph_node_size,graph_node_size);
-		addFloor(coords,ncolors,acolors,graph_node_size,graph_node_size*2);
-		addFloor(coords,ncolors,acolors,graph_node_size,graph_node_size*3);
-	lemon::graphToEps<lemon::SmartDigraph>(graph,"image1.eps").
 		coords(coords).
 		nodeColors(composeMap(p,ncolors)).
 		arcColors(composeMap(p,acolors)).
@@ -164,7 +156,7 @@ void agent_router::run_plugin()
     tmp.id=identifier;
     tmp.isLocked=routeLock;
     tmp.lockedArc=arc_id;
-    tmp.lockedNode=graph.id(next);
+    tmp.lockedNode=node_id;
     tmp.timestamp++;
     _mutex.unlock();
 
@@ -174,7 +166,7 @@ void agent_router::run_plugin()
 
     if (checkIfTargetReached())
     {//se riesco a raggiungere il prossimo target intermedio
-        if (setNextTarget())//TODO: settare i valori di xtarget e ytarget, e new_target a true
+        if (setNextTarget())
         {
             setTargetStop(false);
         }
@@ -226,15 +218,21 @@ bool agent_router::findPath()
     {
 		if (it->first.compare(identifier)==0) continue; //Ignoro me stesso
         bool isLocked = (*it).second.isLocked;
-        int lockedNode =(*it).second.lockedNode;
-        int lockedArc = (*it).second.lockedArc;
         if (!isLocked) continue;
-        for (SmartDigraph::OutArcIt arc1(graph, source);arc1!=INVALID;++arc1)
+// 		int lockedNode =(*it).second.lockedNode;
+//         int lockedArc = (*it).second.lockedArc;
+        for (SmartDigraph::ArcIt arc(graph);arc!=INVALID;++arc)
         {
-            if (lockedNode==graph.id(graph.target(arc1)))
-                useArc[arc1]=false;
-            if (lockedArc==graph.id(arc1))
-                useArc[arc1]=false;
+			for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
+			{
+				if ((*itt)==graph.id(graph.target(arc)))
+					useArc[arc]=false;
+			}
+			for (vector<int>::const_iterator itt=(*it).second.lockedArc.begin();itt!=(*it).second.lockedArc.end();itt++)
+			{
+				if ((*itt)==graph.id(arc))
+					useArc[arc]=false;
+			}
         }
     }
     _mutex.unlock();
@@ -249,11 +247,27 @@ bool agent_router::findPath()
     else
     {
         //std::cout<<"prossimo nodo:"<<graph->id(next);
-        Path<SmartDigraph>::ArcIt a(p);
-        arc_id=graph.id(a);
-        next=graph.target(a);
-        xtarget=(*coord_x)[next];
-        ytarget=(*coord_y)[next];
+        arc_id.clear();
+		int j=0;
+        for (Path<SmartDigraph>::ArcIt a(p);a!=INVALID;++a)
+		{
+			j++;
+			arc_id.push_back(graph.id(a));
+			if (j>MAXFLOORS-2)
+				break;
+		}
+		j=0;
+        for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
+		{
+			j++;
+			node_id.push_back(graph.id(i));
+			if (j>MAXFLOORS-2)
+				break;
+		}
+		next=graph.target(graph.arcFromId(arc_id[0]));
+		xtarget=(*coord_x)[next];
+		ytarget=(*coord_y)[next];
+
         std::cout<<"percorso calcolato:";
         for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
             std::cout<<graph.id(i)<<">>";
