@@ -51,14 +51,11 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 	communicator.startReceive();
 }
 
-void agent_router::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
-	lemon::SmartDigraph::NodeMap<int>& ncolors,
-	lemon::SmartDigraph::ArcMap<int>& acolors,int startId)
+void agent_router::addNodes(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
+	lemon::SmartDigraph::NodeMap<int>& ncolors,int floorNumber)
 {
 	using namespace lemon;
-	int floorNumber=startId/graph_node_size;
-    //Aggiungo un livello al grafo
-    for (int i=0;i<graph_node_size;i++)
+	for (int i=0;i<graph_node_size;i++)
 	{
 		SmartDigraph::Node n = _3Dgraph.addNode();
 		//Controllo che tutti i nodi finiscano nella posizione giusta
@@ -68,6 +65,16 @@ void agent_router::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int>
 		coords[n]=dim2::Point<int>((*_3Dcoord_x)[n]+(*_3Dcoord_y)[n]/3,(*_3Dcoord_y)[n]/3+XYOFFSET*(floorNumber+1));
 		ncolors[n]=floorNumber+1;
 	}
+}
+
+void agent_router::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
+	lemon::SmartDigraph::NodeMap<int>& ncolors,
+	lemon::SmartDigraph::ArcMap<int>& acolors,int startId)
+{
+	using namespace lemon;
+	int floorNumber=startId/graph_node_size;
+    //Aggiungo un livello al grafo
+    addNodes(coords,ncolors,floorNumber);
 	if (floorNumber==0) return;
 	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
 	for (unsigned int i=0;i<graph_node_size;i++)
@@ -82,6 +89,31 @@ void agent_router::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int>
 		
 	}
 	
+}
+
+void agent_router::finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
+	lemon::SmartDigraph::NodeMap<int>& ncolors,
+	lemon::SmartDigraph::ArcMap<int>& acolors,int startId)
+{
+	using namespace lemon;
+	int floorNumber=startId/graph_node_size;
+    //Aggiungo un livello al grafo
+    addNodes(coords,ncolors,floorNumber);
+	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
+	for (unsigned int i=0;i<graph_node_size;i++)
+	{
+		vector<int> temp_ids;
+		for (SmartDigraph::OutArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
+		{
+			SmartDigraph::Arc a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+floorNumber*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
+			(*_3Dlength)[a]=1;
+			acolors[a]=floorNumber+1;
+			a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-1)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
+			(*_3Dlength)[a]=1;
+			acolors[a]=floorNumber+1;
+		}
+		
+	}
 }
 
 void agent_router::parseGraph()
@@ -107,16 +139,14 @@ void agent_router::parseGraph()
 	SmartDigraph::NodeMap<dim2::Point<int> > coords(_3Dgraph);
 	SmartDigraph::NodeMap<int> ncolors(_3Dgraph,1);
 	SmartDigraph::ArcMap<int> acolors(_3Dgraph,1);
-// 	for (SmartDigraph::NodeIt n(graph);n!=INVALID;++n)
-// 	{	
-// 		coords[n]=dim2::Point<int>((*coord_x)[n]+(*coord_y)[n]/3,(*coord_y)[n]/3);
-// 	}
+
 	for (int i=0;i<MAXFLOORS;i++)
 	{
 		addFloor(coords,ncolors,acolors,graph_node_size*i);
 	}
+	finalizeFloor(coords,ncolors,acolors,graph_node_size*MAXFLOORS);
 	IdMap<SmartDigraph,SmartDigraph::Node> id(_3Dgraph);
-	Palette p(false,MAXFLOORS+1);	
+	Palette p;	
 	lemon::graphToEps<lemon::SmartDigraph>(_3Dgraph,"image.eps").
 		coords(coords).
 		nodeColors(composeMap(p,ncolors)).
@@ -131,8 +161,8 @@ void agent_router::parseGraph()
 		run();
 
 	std::cout << "A digraph is read from "<<GRAPHNAME << std::endl;
-    std::cout << "Number of nodes: " << lemon::countNodes(graph) << std::endl;
-    std::cout << "Number of arcs: " << lemon::countArcs(graph) << std::endl;
+    std::cout << "Number of nodes: " << lemon::countNodes(_3Dgraph) << std::endl;
+    std::cout << "Number of arcs: " << lemon::countArcs(_3Dgraph) << std::endl;
 }
 
 void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_table)

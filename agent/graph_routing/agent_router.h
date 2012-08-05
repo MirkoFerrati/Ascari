@@ -72,6 +72,11 @@ private:
 	void addFloor(lemon::SmartDigraph::NodeMap< lemon::dim2::Point< int > >& coords,
 					lemon::SmartDigraph::NodeMap< int >& ncolors, lemon::SmartDigraph::ArcMap< int >& acolors,
 					int startId);
+	void finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
+	lemon::SmartDigraph::NodeMap<int>& ncolors,
+	lemon::SmartDigraph::ArcMap<int>& acolors,int startId);
+	void addNodes(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
+	lemon::SmartDigraph::NodeMap<int>& ncolors,int floorNumber);
 	lemon::SmartDigraph::ArcMap<bool> oddArcs,evenArcs;
 };
 
