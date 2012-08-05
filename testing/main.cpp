@@ -9,7 +9,7 @@
 #include "testrandom.hpp"
 #include "time.h"
 #include "testagentudpcommunicator.hpp"
-#include "testgeometry.hpp"
+// #include "testgeometry.hpp"
 
 /**
  * @author MirkoF
@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 	tests.push_back(make_pair(new testAutomaton(),"automaton"));
 	tests.push_back(make_pair(new testDecoder(),"Decoder"));
 	//tests.push_back(make_pair(new testAgentUDPCommunicator(),"Agent Udp Communicator"));
-	tests.push_back(make_pair(new testGeometry(),"Geometry"));
+// 	tests.push_back(make_pair(new testGeometry(),"Geometry"));
 	
 // 	tests.push_back(make_pair(new testSimulator(),"Simulator"));
 	

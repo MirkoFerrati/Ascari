@@ -73,7 +73,6 @@ ostream &operator<<( ostream &out, const graph &g ){
   out<<"@attributes"<<endl;
   out<<"source\t"<<endl;
   out<<"target\t"<<endl;
-  cout<<"REMEMBER TO SET SOURCE AND TARGET IN THE FILE"<<endl;
 }
 
 graph::~graph()

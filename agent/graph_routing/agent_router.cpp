@@ -18,6 +18,7 @@
 #include <lemon/color.cc>
 #include "debug_constants.h"
 
+#define PRIMARYNODES 9
 
 lemon::Random agent_router::generatorRandom;
 
@@ -47,21 +48,75 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 
 void agent_router::parseGraph()
 {
-    coord_x= new lemon::SmartDigraph::NodeMap<int>(graph);
-    coord_y= new lemon::SmartDigraph::NodeMap<int>(graph);
-    length= new lemon::SmartDigraph::ArcMap<int>(graph);
+	using namespace lemon;
+    coord_x= new SmartDigraph::NodeMap<int>(graph);
+    coord_y= new SmartDigraph::NodeMap<int>(graph);
+    length= new SmartDigraph::ArcMap<int>(graph);
 
     try {
-        lemon::digraphReader(graph, GRAPHNAME). // read the directed graph into g
+        digraphReader(graph, GRAPHNAME). // read the directed graph into g
         nodeMap("coordinates_x", *coord_x).	//read the coordinates of nodes
         nodeMap("coordinates_y", *coord_y).	//read the coordinates of nodes
         arcMap("length", *length).       // read the 'capacity' arc map into cap
         run();
-    } catch (lemon::Exception& er) { // check if there was any error
+    } catch (Exception& er) { // check if there was any error
         ERR("parsing exception %s",er.what());
     }
+	const int graph_node_size=graph.nodeNum();
+    SmartDigraph::NodeMap<dim2::Point<int> > coords(graph);
+	SmartDigraph::NodeMap<int> ncolors(graph,1);
+	SmartDigraph::ArcMap<int> acolors(graph,1);
+	for (SmartDigraph::NodeIt n(graph);n!=INVALID;++n)
+	{	
+		coords[n]=dim2::Point<int>((*coord_x)[n],(*coord_y)[n]);
+	}
 
-    std::cout << "A digraph is read from "<<GRAPHNAME << std::endl;
+    //Aggiungo un livello al grafo
+    for (unsigned int i=0;i<graph_node_size;i++)
+	{
+		SmartDigraph::Node n = graph.addNode();
+		//Controllo che tutti i nodi finiscano nella posizione giusta
+		assert(graph.id(n)==graph_node_size+i);
+		coords[n]=dim2::Point<int>((*coord_x)[graph.nodeFromId(i)]+8,(*coord_y)[graph.nodeFromId(i)]+8);
+		ncolors[n]=2;
+		if (i%graph_node_size>=PRIMARYNODES)
+		{
+			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(i),n);
+			acolors[a]=3;
+		}
+	}
+	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
+	for (unsigned int i=0;i<PRIMARYNODES;i++)
+	{
+		for (SmartDigraph::OutArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
+		{
+			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(i+graph_node_size),graph.nodeFromId(graph.id(graph.target(arcit))+graph_node_size));
+			acolors[a]=2;
+		}
+		for (SmartDigraph::InArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
+		{
+			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(graph.id(graph.source(arcit))+graph_node_size),graph.nodeFromId(i+graph_node_size));
+			acolors[a]=2;
+		}
+		
+	}
+	
+	
+	IdMap<SmartDigraph,SmartDigraph::Node> id(graph);
+	Palette p;
+	lemon::graphToEps<lemon::SmartDigraph>(graph,"image.eps").
+		coords(coords).
+		nodeColors(composeMap(p,ncolors)).
+		arcColors(composeMap(p,acolors)).
+		nodeTexts(id).
+		nodeTextSize(4).
+		nodeScale(0.008).
+		arcWidthScale(0.0008).
+		drawArrows(true).
+		arrowWidth(3).
+		arrowLength(5).
+		run();
+	std::cout << "A digraph is read from "<<GRAPHNAME << std::endl;
     std::cout << "Number of nodes: " << lemon::countNodes(graph) << std::endl;
     std::cout << "Number of arcs: " << lemon::countArcs(graph) << std::endl;
 }
