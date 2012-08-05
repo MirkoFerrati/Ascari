@@ -17,8 +17,10 @@
 #include<lemon/graph_to_eps.h>
 #include "debug_constants.h"
 #include "graph_creator.h"
+#include <gml2lgf/arc.h>
 
-
+//TODO: probabilmente non serve mandarsi anche la lista dei nodi bloccati, basta la lista degli archi con questa configurazione
+//TODO: l'effetto sarebbe una riduzione dei dati da mandarsi e moltissimi cicli in meno per creare e parsare la mappa filtrante
 
 lemon::Random agent_router::generatorRandom;
 
@@ -32,7 +34,9 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 {
     using namespace lemon;
 	Graph_creator c(graph,length,coord_x,coord_y);
-    c.createGraph(MAXFLOORS);
+	graph_node_size=c.createGraph(MAXFLOORS);
+	if (!graph_node_size)
+		ERR("attenzione, impossibile creare il grafo",0);
     tarc=0;
     int id=targets[tarc];
     tarc++;
@@ -47,6 +51,7 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
     info[identifier].timestamp=0;
     setTargetStop(false);
 	communicator.startReceive();
+	speed=5;
 }
 
 
@@ -54,6 +59,7 @@ void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_t
 {
     symbol_table.add_variable("XTARGET",xtarget,false);
     symbol_table.add_variable("YTARGET",ytarget,false);
+	symbol_table.add_variable("v_router",speed,false);
 }
 
 
@@ -83,7 +89,7 @@ void agent_router::run_plugin()
             setTargetStop(true);
         }
     }
-        communicator.send();
+    communicator.send();
 
 
 }
@@ -127,8 +133,6 @@ bool agent_router::findPath()
 		if (it->first.compare(identifier)==0) continue; //Ignoro me stesso
         bool isLocked = (*it).second.isLocked;
         if (!isLocked) continue;
-// 		int lockedNode =(*it).second.lockedNode;
-//         int lockedArc = (*it).second.lockedArc;
         for (SmartDigraph::ArcIt arc(graph);arc!=INVALID;++arc)
         {
 			for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
@@ -145,36 +149,47 @@ bool agent_router::findPath()
     }
     _mutex.unlock();
     reached= dijkstra(filterArcs(graph,useArc),length).path(p).dist(d).run(source,target);
-
-//     if (d>real_distance+2) return false;
-
+	if (d>15000)//TODO: questo numero è fisso ma dovrebbe essere una variabile, comunque fa coppia con i 10000 del graph_creator
+		reached=false;
     if (!reached)
     {
+		arc_id.clear();
+		node_id.clear();
+		for (unsigned int i=0;i<MAXFLOORS-1;i++)
+			node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
         return false;
     }
     else
     {
-        //std::cout<<"prossimo nodo:"<<graph->id(next);
         arc_id.clear();
+		node_id.clear();
 		int j=0;
         for (Path<SmartDigraph>::ArcIt a(p);a!=INVALID;++a)
 		{
 			j++;
 			arc_id.push_back(graph.id(a));
-			if (j>MAXFLOORS-2)
+			if (j>MAXFLOORS)
 				break;
 		}
 		j=0;
         for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
 		{
 			j++;
-			node_id.push_back(graph.id(i));
-			if (j>MAXFLOORS-2)
+			if (j!=1) //Il nodo al piano zero (quello iniziale) non va incluso
+			{	
+				node_id.push_back(graph.id(i));
+			}
+			if (j>MAXFLOORS)
 				break;
+		}
+		if (node_id.back()<graph_node_size)//il nodo al piano zero (quello finale) non va incluso
+		{
+			node_id.pop_back();
 		}
 		next=graph.target(graph.arcFromId(arc_id[0]));
 		xtarget=(coord_x)[next];
 		ytarget=(coord_y)[next];
+		speed=5/(graph.id(graph.target(graph.arcFromId(arc_id[0])))%graph_node_size);//si parte sempre dal piano zero, mi basta sapere a che piano arrivare
 
         std::cout<<"percorso calcolato:";
         for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
@@ -190,16 +205,6 @@ std::pair< int, int > agent_router::getTargetCoords()
     return std::pair<int,int> ((coord_x)[next], (coord_y)[next]);
 }
 
-// //TODO: we will not expose this informations after communication is enabled
-// int agent_router::getLockedNode()
-// {
-//     return graph.id(next);
-// }
-// //TODO: we will not expose this informations after communication is enabled
-// int agent_router::getLockedArc()
-// {
-//     return arc_id;
-// }
 void agent_router::setGraph(lemon::SmartDigraph& g)
 {
     lemon::digraphCopy<lemon::SmartDigraph,lemon::SmartDigraph>(g,graph); //graph=g;
@@ -210,7 +215,7 @@ void agent_router::setGraph(lemon::SmartDigraph& g)
 bool agent_router::setNextTarget()
 {
 
-    if (graph.id(next)==graph.id(target))
+    if (graph.id(next)%graph_node_size==graph.id(target))
     {
         source=target;
         if (tarc==targets.size())
@@ -224,7 +229,7 @@ bool agent_router::setNextTarget()
     }
     else
     {
-        source=next;
+        source=graph.nodeFromId(graph.id(next)%graph_node_size);
     }
     return findPath();
 }

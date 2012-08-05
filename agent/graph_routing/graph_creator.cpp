@@ -13,18 +13,18 @@
 
 using namespace std;
 
-bool Graph_creator::createGraph(int floors)
+int Graph_creator::createGraph(int floors)
 {
 	this->floors=floors;
 	try
 	{
 		parseGraph();
-		return true;
+		return graph_node_size;
 	}
 	catch (lemon::Exception e)
 	{
 		ERR("Errore nella creazione del grafo: %s",e.what());
-		return false;
+		return 0;
 	}
 }
 
@@ -37,7 +37,7 @@ Graph_creator::Graph_creator(lemon::SmartDigraph &_3Dgraph,lemon::SmartDigraph::
 }
 
 void Graph_creator::addNodes(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
-	lemon::SmartDigraph::NodeMap<int>& ncolors,int floorNumber)
+							 lemon::SmartDigraph::NodeMap<int>& ncolors,lemon::SmartDigraph::ArcMap<int>& acolors,int floorNumber)
 {
 	using namespace lemon;
 	for (unsigned int i=0;i<graph_node_size;i++)
@@ -49,6 +49,9 @@ void Graph_creator::addNodes(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int
 		(_3Dcoord_y)[n]=(coord_y)[graph.nodeFromId(i)];
 		coords[n]=dim2::Point<int>((_3Dcoord_x)[n]+(_3Dcoord_y)[n]/3,(_3Dcoord_y)[n]/3+XYOFFSET*(floorNumber+1));
 		ncolors[n]=floorNumber+1;
+		SmartDigraph::Arc a=_3Dgraph.addArc(n,_3Dgraph.nodeFromId(i));
+		(_3Dlength)[a]=10000;
+		acolors[a]=floors+3;
 	}
 }
 
@@ -59,7 +62,7 @@ void Graph_creator::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int
 	using namespace lemon;
 	int floorNumber=startId/graph_node_size;
     //Aggiungo un livello al grafo
-    addNodes(coords,ncolors,floorNumber);
+    addNodes(coords,ncolors,acolors,floorNumber);
 	if (floorNumber==0) return;
 	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
 	for (unsigned int i=0;i<graph_node_size;i++)
@@ -70,6 +73,7 @@ void Graph_creator::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int
 			SmartDigraph::Arc a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-1)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
 			(_3Dlength)[a]=1;
 			acolors[a]=floorNumber+1;
+			
 		}
 		
 	}
@@ -83,7 +87,7 @@ void Graph_creator::finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Poin
 	using namespace lemon;
 	int floorNumber=startId/graph_node_size;
     //Aggiungo un livello al grafo
-    addNodes(coords,ncolors,floorNumber);
+    addNodes(coords,ncolors,acolors,floorNumber);
 	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
 	for (unsigned int i=0;i<graph_node_size;i++)
 	{
@@ -91,13 +95,12 @@ void Graph_creator::finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Poin
 		for (SmartDigraph::OutArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
 		{
 			SmartDigraph::Arc a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+floorNumber*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
-			(_3Dlength)[a]=1;
+			(_3Dlength)[a]=10; //TODO: ogni numero è fondamentale
 			acolors[a]=floorNumber+1;
 			a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-1)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
 			(_3Dlength)[a]=1;
 			acolors[a]=floorNumber+1;
 		}
-		
 	}
 }
 
@@ -137,6 +140,8 @@ void Graph_creator::parseGraph()
 		drawArrows(true).
 		arrowWidth(3).
 		arrowLength(5).
+		enableParallel(true).
+		distantColorNodeTexts().
 		run();
 
 	std::cout << "A digraph is read from "<<GRAPHNAME << std::endl;

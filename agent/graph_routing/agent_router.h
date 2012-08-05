@@ -45,6 +45,7 @@ private:
     bool sourceSet;
 	bool routeLock;
     int d;
+	double speed;
     boost::signals2::mutex _mutex;
 	boost::asio::io_service _io_service;
     lemon::Path<lemon::SmartDigraph> p;
@@ -62,6 +63,7 @@ private:
 	bool checkIfTargetReached();
 	lemon::SmartDigraph::Node source, target;
     lemon::SmartDigraph::Node next;
+    int graph_node_size;
 
 };
 

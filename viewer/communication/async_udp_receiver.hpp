@@ -39,7 +39,7 @@ public:
     }
 
     void handle_receive_from(const boost::system::error_code& error,
-                             size_t bytes_recvd)
+                             size_t /*bytes_recvd*/)
     {
         if (!error)
         {
