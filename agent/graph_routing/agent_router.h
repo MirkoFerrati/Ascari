@@ -20,13 +20,12 @@ public:
     std::pair<int,int> getTargetCoords();
     void run_plugin();
     void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
-	bool findPath();
-    bool setNextTarget();
+	
     void setSource(lemon::SmartDigraph::Node s);
     void setTarget(lemon::SmartDigraph::Node t);
-    void setMapLength(lemon::SmartDigraph::ArcMap<int> m);
-    int getLockedArc();
-    int getLockedNode();
+//     void setMapLength(lemon::SmartDigraph::ArcMap<int> m);
+//     int getLockedArc();
+//     int getLockedNode();
     ~agent_router();
     /*! 
      * Stampa su out la lista dei target provvisori e infine il target definitivo
@@ -37,6 +36,8 @@ public:
     bool routeLock;
 	
 private:
+	bool findPath();
+    bool setNextTarget();
 	lemon::SmartDigraph graph;
     lemon::SmartDigraph::Node source, target;  
     lemon::SmartDigraph::Node next;
@@ -63,6 +64,9 @@ private:
 	void setTargetStop(bool stop);
 	bool checkIfTargetReached();
 	void parseGraph();
+	void addFloor(lemon::SmartDigraph::NodeMap< lemon::dim2::Point< int > >& coords,
+					lemon::SmartDigraph::NodeMap< int >& ncolors, lemon::SmartDigraph::ArcMap< int >& acolors,
+					const int& graph_node_size, int startId);
 };
 
 #endif // AGENT_ROUTER_H

@@ -46,6 +46,49 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 	communicator.startReceive();
 }
 
+void agent_router::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
+	lemon::SmartDigraph::NodeMap<int>& ncolors,
+	lemon::SmartDigraph::ArcMap<int>& acolors,const int& graph_node_size, int startId)
+{
+	using namespace lemon;
+	
+    //Aggiungo un livello al grafo
+    for (int i=startId;i<graph_node_size+startId;i++)
+	{
+		SmartDigraph::Node n = graph.addNode();
+		//Controllo che tutti i nodi finiscano nella posizione giusta
+		assert(graph.id(n)==graph_node_size+i);
+		(*coord_x)[n]=(*coord_x)[graph.nodeFromId(i)]+8;
+		(*coord_y)[n]=(*coord_y)[graph.nodeFromId(i)]+8;
+		coords[n]=dim2::Point<int>((*coord_x)[graph.nodeFromId(i)]+8,(*coord_y)[graph.nodeFromId(i)]+8);
+		ncolors[n]=startId/graph_node_size+2;
+		if (i%graph_node_size>=PRIMARYNODES)
+		{
+			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(i),n);
+			(*length)[a]=0;
+			acolors[a]=7;
+		}
+	}
+	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
+	for (unsigned int i=0;i<PRIMARYNODES;i++)
+	{
+		for (SmartDigraph::OutArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
+		{
+			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(i+startId+graph_node_size),graph.nodeFromId(graph.id(graph.target(arcit))+startId+graph_node_size));
+			(*length)[a]=1;
+			acolors[a]=startId/graph_node_size+2;
+		}
+		for (SmartDigraph::InArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
+		{
+			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(graph.id(graph.source(arcit))+startId+graph_node_size),graph.nodeFromId(i+startId+graph_node_size));
+			(*length)[a]=1;
+			acolors[a]=startId/graph_node_size+2;
+		}
+		
+	}
+	
+}
+
 void agent_router::parseGraph()
 {
 	using namespace lemon;
@@ -62,8 +105,8 @@ void agent_router::parseGraph()
     } catch (Exception& er) { // check if there was any error
         ERR("parsing exception %s",er.what());
     }
-	const int graph_node_size=graph.nodeNum();
-    SmartDigraph::NodeMap<dim2::Point<int> > coords(graph);
+   	const int graph_node_size=graph.nodeNum();
+	SmartDigraph::NodeMap<dim2::Point<int> > coords(graph);
 	SmartDigraph::NodeMap<int> ncolors(graph,1);
 	SmartDigraph::ArcMap<int> acolors(graph,1);
 	for (SmartDigraph::NodeIt n(graph);n!=INVALID;++n)
@@ -71,37 +114,7 @@ void agent_router::parseGraph()
 		coords[n]=dim2::Point<int>((*coord_x)[n],(*coord_y)[n]);
 	}
 
-    //Aggiungo un livello al grafo
-    for (unsigned int i=0;i<graph_node_size;i++)
-	{
-		SmartDigraph::Node n = graph.addNode();
-		//Controllo che tutti i nodi finiscano nella posizione giusta
-		assert(graph.id(n)==graph_node_size+i);
-		coords[n]=dim2::Point<int>((*coord_x)[graph.nodeFromId(i)]+8,(*coord_y)[graph.nodeFromId(i)]+8);
-		ncolors[n]=2;
-		if (i%graph_node_size>=PRIMARYNODES)
-		{
-			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(i),n);
-			acolors[a]=3;
-		}
-	}
-	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
-	for (unsigned int i=0;i<PRIMARYNODES;i++)
-	{
-		for (SmartDigraph::OutArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
-		{
-			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(i+graph_node_size),graph.nodeFromId(graph.id(graph.target(arcit))+graph_node_size));
-			acolors[a]=2;
-		}
-		for (SmartDigraph::InArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
-		{
-			SmartDigraph::Arc a=graph.addArc(graph.nodeFromId(graph.id(graph.source(arcit))+graph_node_size),graph.nodeFromId(i+graph_node_size));
-			acolors[a]=2;
-		}
-		
-	}
-	
-	
+	addFloor(coords,ncolors,acolors,graph_node_size,0);
 	IdMap<SmartDigraph,SmartDigraph::Node> id(graph);
 	Palette p;
 	lemon::graphToEps<lemon::SmartDigraph>(graph,"image.eps").
@@ -116,6 +129,22 @@ void agent_router::parseGraph()
 		arrowWidth(3).
 		arrowLength(5).
 		run();
+		addFloor(coords,ncolors,acolors,graph_node_size,graph_node_size);
+		addFloor(coords,ncolors,acolors,graph_node_size,graph_node_size*2);
+		addFloor(coords,ncolors,acolors,graph_node_size,graph_node_size*3);
+	lemon::graphToEps<lemon::SmartDigraph>(graph,"image1.eps").
+		coords(coords).
+		nodeColors(composeMap(p,ncolors)).
+		arcColors(composeMap(p,acolors)).
+		nodeTexts(id).
+		nodeTextSize(4).
+		nodeScale(0.008).
+		arcWidthScale(0.0008).
+		drawArrows(true).
+		arrowWidth(3).
+		arrowLength(5).
+		run();
+
 	std::cout << "A digraph is read from "<<GRAPHNAME << std::endl;
     std::cout << "Number of nodes: " << lemon::countNodes(graph) << std::endl;
     std::cout << "Number of arcs: " << lemon::countArcs(graph) << std::endl;
@@ -134,8 +163,8 @@ void agent_router::run_plugin()
     graph_informations& tmp = info.at(identifier);
     tmp.id=identifier;
     tmp.isLocked=routeLock;
-    tmp.lockedArc=getLockedArc();
-    tmp.lockedNode=getLockedNode();
+    tmp.lockedArc=arc_id;
+    tmp.lockedNode=graph.id(next);
     tmp.timestamp++;
     _mutex.unlock();
 
@@ -239,16 +268,16 @@ std::pair< int, int > agent_router::getTargetCoords()
     return std::pair<int,int> ((*coord_x)[next], (*coord_y)[next]);
 }
 
-//TODO: we will not expose this informations after communication is enabled
-int agent_router::getLockedNode()
-{
-    return graph.id(next);
-}
-//TODO: we will not expose this informations after communication is enabled
-int agent_router::getLockedArc()
-{
-    return arc_id;
-}
+// //TODO: we will not expose this informations after communication is enabled
+// int agent_router::getLockedNode()
+// {
+//     return graph.id(next);
+// }
+// //TODO: we will not expose this informations after communication is enabled
+// int agent_router::getLockedArc()
+// {
+//     return arc_id;
+// }
 void agent_router::setGraph(lemon::SmartDigraph& g)
 {
     lemon::digraphCopy<lemon::SmartDigraph,lemon::SmartDigraph>(g,graph); //graph=g;
@@ -278,10 +307,10 @@ bool agent_router::setNextTarget()
     return findPath();
 }
 
-void agent_router::setMapLength(lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< int > m)
-{
-    lemon::mapCopy<lemon::SmartDigraph>(graph,m,*length);
-}
+// void agent_router::setMapLength(lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< int > m)
+// {
+//     lemon::mapCopy<lemon::SmartDigraph>(graph,m,*length);
+// }
 
 ostream& agent_router::toFile(ostream& out) const
 {
