@@ -17,7 +17,6 @@
 #include<lemon/graph_to_eps.h>
 #include "debug_constants.h"
 #include "graph_creator.h"
-#include <gml2lgf/arc.h>
 
 //TODO: probabilmente non serve mandarsi anche la lista dei nodi bloccati, basta la lista degli archi con questa configurazione
 //TODO: l'effetto sarebbe una riduzione dei dati da mandarsi e moltissimi cicli in meno per creare e parsare la mappa filtrante
@@ -189,7 +188,7 @@ bool agent_router::findPath()
 		next=graph.target(graph.arcFromId(arc_id[0]));
 		xtarget=(coord_x)[next];
 		ytarget=(coord_y)[next];
-		speed=5/(graph.id(graph.target(graph.arcFromId(arc_id[0])))%graph_node_size);//si parte sempre dal piano zero, mi basta sapere a che piano arrivare
+		speed=5.0/(length[graph.arcFromId(arc_id[0])]);//si parte sempre dal piano zero, mi basta sapere a che piano arrivare
 
         std::cout<<"percorso calcolato:";
         for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)

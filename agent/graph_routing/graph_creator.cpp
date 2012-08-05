@@ -70,10 +70,17 @@ void Graph_creator::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int
 		vector<int> temp_ids;
 		for (SmartDigraph::OutArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
 		{
+			//archi al piano inferiore
 			SmartDigraph::Arc a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-1)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
 			(_3Dlength)[a]=1;
 			acolors[a]=floorNumber+1;
-			
+			//archi a 2 piani inferiori
+			if (floorNumber>1)
+			{
+				a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-2)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
+				(_3Dlength)[a]=2;
+				acolors[a]=floorNumber+1;
+			}
 		}
 		
 	}
