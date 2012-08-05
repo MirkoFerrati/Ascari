@@ -11,6 +11,8 @@
 #include "udp_graph_communicator.h"
 #include <boost/thread.hpp>
 
+#define MAXFLOORS 6
+
 class agent_router: public Plugin_module
 {
 	
@@ -23,35 +25,25 @@ public:
 	
     void setSource(lemon::SmartDigraph::Node s);
     void setTarget(lemon::SmartDigraph::Node t);
-//     void setMapLength(lemon::SmartDigraph::ArcMap<int> m);
-//     int getLockedArc();
-//     int getLockedNode();
+
     ~agent_router();
     /*! 
      * Stampa su out la lista dei target provvisori e infine il target definitivo
      */
     std::ostream& toFile(std::ostream& out) const;
 	
-	//TODO: we will not expose this informations after communication is enabled
-    bool routeLock;
-	
 private:
+    lemon::SmartDigraph graph;
+    lemon::SmartDigraph::ArcMap<int> length;
+    lemon::SmartDigraph::NodeMap<int> coord_x, coord_y;
 	bool findPath();
     bool setNextTarget();
-	int graph_node_size;
-	lemon::SmartDigraph graph;
-	lemon::SmartDigraph _3Dgraph;
-	lemon::SmartDigraph::ArcMap<int> *_3Dlength;
-    lemon::SmartDigraph::NodeMap<int> *_3Dcoord_x, *_3Dcoord_y;
-    lemon::SmartDigraph::Node source, target;  
-    lemon::SmartDigraph::Node next;
-    lemon::SmartDigraph::ArcMap<int> *length;
-    lemon::SmartDigraph::NodeMap<int> *coord_x, *coord_y;
 	double xtarget, ytarget;
     bool pathFound;
     bool graphSet;
     bool targetSet;
     bool sourceSet;
+	bool routeLock;
     int d;
     boost::signals2::mutex _mutex;
 	boost::asio::io_service _io_service;
@@ -68,16 +60,10 @@ private:
 	Udp_graph_communicator communicator;
 	void setTargetStop(bool stop);
 	bool checkIfTargetReached();
-	void parseGraph();
-	void addFloor(lemon::SmartDigraph::NodeMap< lemon::dim2::Point< int > >& coords,
-					lemon::SmartDigraph::NodeMap< int >& ncolors, lemon::SmartDigraph::ArcMap< int >& acolors,
-					int startId);
-	void finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
-	lemon::SmartDigraph::NodeMap<int>& ncolors,
-	lemon::SmartDigraph::ArcMap<int>& acolors,int startId);
-	void addNodes(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
-	lemon::SmartDigraph::NodeMap<int>& ncolors,int floorNumber);
-	lemon::SmartDigraph::ArcMap<bool> oddArcs,evenArcs;
+	lemon::SmartDigraph::Node source, target;
+    lemon::SmartDigraph::Node next;
+
 };
 
 #endif // AGENT_ROUTER_H
+
