@@ -18,7 +18,7 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
         if (world.agents.at(i).name.compare(name)==0)
             myAgent=i;
 
-		
+	time=0;//TODO: initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
     int i=0;
     for (map<controller_name,controller_MapRules>::const_iterator it =world.agents[myAgent].controllers.begin();it !=world.agents[myAgent].controllers.end();it++)
     {
@@ -34,7 +34,7 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
 	
 	if (!world.agents.at(myAgent).target_list.empty())
 	{
-		plugins.push_back(new agent_router(world.agents.at(myAgent).target_list,events,events_to_index,identifier));
+		plugins.push_back(new agent_router(world.agents.at(myAgent).target_list,events,events_to_index,identifier,time));
 	}
 	  
 	/*!
@@ -203,7 +203,7 @@ void agent::main_loop()
 	// 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
 			world_sim_packet temp=world_comm->receive_agents_status();
 			state_other_agents.swap(temp.state_agents.internal_map);
-			
+			time=temp.time;
 			for (std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin();it!=temp.bonus_variables.end();it++)
 			{
 			bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
@@ -239,8 +239,8 @@ void agent::main_loop()
                     tmp=it->first;
             }
 
-            cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)
-			<<" "<<state_other_agents.at(identifier).state.at(2)<<endl;
+//             cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)
+// 			<<" "<<state_other_agents.at(identifier).state.at(2)<<endl;
 
 // 		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
 // 			break;

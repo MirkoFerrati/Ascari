@@ -119,7 +119,7 @@ void simulator::main_loop()
 {
     try {
         sim_packet.time=0;
-		simulation_time clock=0;
+		uint64_t clock=0;
         while (1) {
 			clock++;
 			if ((clock%10)!=0)
@@ -129,7 +129,7 @@ void simulator::main_loop()
 			}
 			else
 				cout<<endl<<sim_packet.time;
-			sim_packet.time=clock/10;
+			sim_packet.time=(simulation_time)clock/10.0;
 //             communicator->send_broadcast(time++);
             update_bonus_variables();
             //communicator->send_broadcast(sim_packet.state_agents);
@@ -147,7 +147,7 @@ void simulator::main_loop()
                     }
                 }
             }
-            usleep(100000);
+            usleep(30000);
             vector<control_command_packet> temp=communicator->receive_control_commands();
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {

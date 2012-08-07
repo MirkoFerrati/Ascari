@@ -12,12 +12,14 @@
 #include <boost/thread.hpp>
 
 #define MAXFLOORS 6
+#define TIME_SLOT_FOR_3DGRAPH 6.0
+
 
 class agent_router: public Plugin_module
 {
 	
 public:
-    agent_router(std::vector< int > tarlist, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index, std::string identifier);
+    agent_router(std::vector< int > tarlist, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index, std::string identifier,simulation_time& time);
     void setGraph(lemon::SmartDigraph& g);
     std::pair<int,int> getTargetCoords();
     void run_plugin();
@@ -64,7 +66,9 @@ private:
 	lemon::SmartDigraph::Node source, target;
     lemon::SmartDigraph::Node next;
     int graph_node_size;
-
+	simulation_time &time;
+	simulation_time last_time_updated;
+    bool stop;
 };
 
 #endif // AGENT_ROUTER_H

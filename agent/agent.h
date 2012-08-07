@@ -22,9 +22,12 @@ public:
 	
 protected:
 	/**
-	 * name of agent and it is used for univocal indentification
+	 * Name of agent and it is used for univocal indentification
 	 */
 	std::string identifier;
+	
+	/*! Simulation time */
+	simulation_time time;
 	
 	/**
 	 * The continuos state of the agent, used in the dynamic

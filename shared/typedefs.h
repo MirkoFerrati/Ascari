@@ -93,7 +93,7 @@ struct graph_informations
     std::vector<int> lockedNode;
     std::vector<int> lockedArc;
     std::string id;
-    int64_t timestamp; //Un giorno ci metteremo il tempo reale (dal 1970)
+    simulation_time timestamp; //Un giorno ci metteremo il tempo reale (dal 1970)
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int /*version*/)
     {
@@ -144,10 +144,11 @@ struct agents_name_to_states
 struct world_sim_packet {
     std::map<std::string,double> bonus_variables;
     agents_name_to_states state_agents;
-
+	simulation_time time;
     template <typename Archive>
     void serialize(Archive& ar,const unsigned int /*version*/)
     {
+		ar& time;
         ar& bonus_variables;
         ar& state_agents;
     }

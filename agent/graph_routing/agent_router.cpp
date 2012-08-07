@@ -26,10 +26,12 @@ lemon::Random agent_router::generatorRandom;
 using namespace std;
 
 agent_router::agent_router(std::vector< int > tarlist, std::map< transition, bool >& events, 
-						   const std::map<std::string, transition>& events_to_index, string identifier)
+						   const std::map<std::string, transition>& events_to_index, string identifier,
+						   simulation_time& time
+  						)
         :targets(tarlist),events(events),
         events_to_index(events_to_index),
-        identifier(identifier),communicator(_mutex,&info,_io_service),length(graph),coord_x(graph),coord_y(graph)
+        identifier(identifier),communicator(_mutex,&info,_io_service),length(graph),coord_x(graph),coord_y(graph),time(time)
 {
     using namespace lemon;
 	Graph_creator c(graph,length,coord_x,coord_y);
@@ -51,6 +53,8 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
     setTargetStop(false);
 	communicator.startReceive();
 	speed=5;
+	last_time_updated=time;
+	stop=false;
 }
 
 
@@ -64,21 +68,9 @@ void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_t
 
 void agent_router::run_plugin()
 {
-	_mutex.lock();
-    graph_informations& tmp = info.at(identifier);
-    tmp.id=identifier;
-    tmp.isLocked=routeLock;
-    tmp.lockedArc=arc_id;
-    tmp.lockedNode=node_id;
-    tmp.timestamp++;
-    _mutex.unlock();
-
-//         router_output<<fixed<<setprecision(1)<<setw(2)<<time<<" ";
-//         router->toFile(router_output);
-    //se ho raggiunto il target intermedio attuale
-
+	if (stop) return;
     if (checkIfTargetReached())
-    {//se riesco a raggiungere il prossimo target intermedio
+    {
         if (setNextTarget())
         {
             setTargetStop(false);
@@ -87,9 +79,19 @@ void agent_router::run_plugin()
         {
             setTargetStop(true);
         }
+        _mutex.lock();
+		graph_informations& tmp = info.at(identifier);
+		tmp.id=identifier;
+		tmp.isLocked=routeLock;
+		tmp.lockedArc=arc_id;
+		tmp.lockedNode=node_id;
+		tmp.timestamp=last_time_updated;
+		_mutex.unlock();
+		
+		communicator.send(); //TODO: invio le informazioni solo quando sono sopra un nodo
+		cout<<"inviate le informazioni"<<endl;
     }
-    communicator.send();
-
+  
 
 }
 
@@ -132,19 +134,43 @@ bool agent_router::findPath()
 		if (it->first.compare(identifier)==0) continue; //Ignoro me stesso
         bool isLocked = (*it).second.isLocked;
         if (!isLocked) continue;
-        for (SmartDigraph::ArcIt arc(graph);arc!=INVALID;++arc)
-        {
-			for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
+		//TODO: tutto questo codice si può ripensare e ottimizzare pesantemente...un sacco di if inutili ma ora non ho tempo
+		if ((time-(*it).second.timestamp>TIME_SLOT_FOR_3DGRAPH)) //Se l'informazione è vecchia scalo tutto
+		{
+			int age=(time-(*it).second.timestamp)/TIME_SLOT_FOR_3DGRAPH;
+			cout<<" "<<age<<" ";
+			for (SmartDigraph::ArcIt arc(graph);arc!=INVALID;++arc)
 			{
-				if ((*itt)==graph.id(graph.target(arc)))
-					useArc[arc]=false;
+				for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
+				{
+					if ((*itt)-age*graph_node_size<0) //Se il nodo è finito nel passato lo ignoro
+						continue;
+					if ((*itt)-age*graph_node_size==graph.id(graph.target(arc)))//TODO: questa riga è talmente fondamentale che ho paura a scriverla
+						useArc[arc]=false;
+				}
+				for (vector<int>::const_iterator itt=(*it).second.lockedArc.begin();itt!=(*it).second.lockedArc.end();itt++)
+				{
+					if ((*itt)==graph.id(arc))
+						;//useArc[arc]=false; //TODO: aiuto, non so cosa scrivere qui
+				}
 			}
-			for (vector<int>::const_iterator itt=(*it).second.lockedArc.begin();itt!=(*it).second.lockedArc.end();itt++)
+		}
+		else //Codice normale
+		{
+			for (SmartDigraph::ArcIt arc(graph);arc!=INVALID;++arc)
 			{
-				if ((*itt)==graph.id(arc))
-					useArc[arc]=false;
+				for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
+				{
+					if ((*itt)==graph.id(graph.target(arc)))
+						useArc[arc]=false;
+				}
+				for (vector<int>::const_iterator itt=(*it).second.lockedArc.begin();itt!=(*it).second.lockedArc.end();itt++)
+				{
+					if ((*itt)==graph.id(arc))
+						useArc[arc]=false;
+				}
 			}
-        }
+		}
     }
     _mutex.unlock();
     reached= dijkstra(filterArcs(graph,useArc),length).path(p).dist(d).run(source,target);
@@ -188,13 +214,19 @@ bool agent_router::findPath()
 		next=graph.target(graph.arcFromId(arc_id[0]));
 		xtarget=(coord_x)[next];
 		ytarget=(coord_y)[next];
-		speed=(double)length[graph.arcFromId(arc_id[0])]/3.0;//si parte sempre dal piano zero, mi basta sapere a che piano arrivare
-
-        std::cout<<"percorso calcolato:";
+		simulation_time delta=time-trunc(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH; //delta dovrebbe essere tra 0 e 1
+		if (delta>TIME_SLOT_FOR_3DGRAPH/2.0)
+			delta=delta-TIME_SLOT_FOR_3DGRAPH; //Se sono così tanto in ritardo allora salto il turno, se sono in anticipo aspetto
+		if ((graph.id(next)/graph_node_size)==0)
+			speed=0;
+		else
+			speed=((double)length[graph.arcFromId(arc_id[0])])/(TIME_SLOT_FOR_3DGRAPH-delta+TIME_SLOT_FOR_3DGRAPH*(double)((graph.id(next)/graph_node_size)-1));
+        std::cout<<"velocità: "<<speed <<" percorso calcolato:";
         for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
             std::cout<<graph.id(i)<<">>";
         std::cout<<" fine"<< std::endl;
         routeLock=true;
+		last_time_updated=time;
         return true;
     }
 }
@@ -219,8 +251,11 @@ bool agent_router::setNextTarget()
         source=target;
         if (tarc==targets.size())
         {
+			cout<<" TARGET FINALE raggiunto, mi fermo"<<endl;
+			stop=true;
             return false;
         }
+		//usleep(generatorRandom.integer(0,200)*1000);
         int id=targets[tarc];
         tarc++;
         target=graph.nodeFromId(id);
@@ -229,6 +264,8 @@ bool agent_router::setNextTarget()
     else
     {
         source=graph.nodeFromId(graph.id(next)%graph_node_size);
+// 		cout<<"sleeping "<<identifier.c_str()[identifier.size()-1]<<endl;
+// 		usleep(identifier.c_str()[identifier.size()-1]*100000);
     }
     return findPath();
 }
