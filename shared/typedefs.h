@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <list>
-#include "boost/serialization/map.hpp" 
+#include "boost/serialization/map.hpp"
 #include "boost/serialization/vector.hpp"
 #include <exprtk.hpp>
 #include <iostream>
@@ -46,11 +46,11 @@ typedef std::map<std::string, int> index_map;
 
 enum sub_event_value
 {
-	_TRUE,
-	_FALSE,
-	_UNDEFINED
+    _TRUE,
+    _FALSE,
+    _UNDEFINED
 };
-	
+
 
 
 /**
@@ -74,8 +74,8 @@ template< typename K,typename T>//,typename C, typename Alloc >
 std::ostream& operator<<( std::ostream& os, const std::map<K,T>& m )
 {
     for (typename std::map<K,T>::const_iterator it=m.begin();it!=m.end();it++)
-		os<<it->first <<" "<<it->second <<" ";
-	os<<std::endl;
+        os<<it->first <<" "<<it->second <<" ";
+    os<<std::endl;
     return os;
 }
 
@@ -83,32 +83,32 @@ template< typename T>//,typename C, typename Alloc >
 std::ostream& operator<<( std::ostream& os, const std::vector<T>& m )
 {
     for (typename std::vector<T>::const_iterator it=m.begin();it!=m.end();it++)
-		os<<(*it)<<" ";
-	return os;
+        os<<(*it)<<" ";
+    return os;
 }
 
 struct graph_informations
 {
-	bool isLocked;
-	std::vector<int> lockedNode;
-	std::vector<int> lockedArc;
-	std::string id;
-	int64_t timestamp;
-	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int /*version*/)
-	{
-		ar& timestamp;
-		ar& isLocked;
-		ar& lockedNode;
-		ar& lockedArc;
-		ar& id;
-	}
-	friend std::ostream& operator<< (std::ostream& os, const graph_informations& g)
-	{
-		os<<g.timestamp<<" "<<g.lockedNode<<" "<<g.lockedArc<<" "<<g.id;
-		return os;
-	}
-	
+    bool isLocked;
+    std::vector<int> lockedNode;
+    std::vector<int> lockedArc;
+    std::string id;
+    int64_t timestamp; //Un giorno ci metteremo il tempo reale (dal 1970)
+    template <typename Archive>
+    void serialize(Archive& ar, const unsigned int /*version*/)
+    {
+        ar& timestamp;
+        ar& isLocked;
+        ar& lockedNode;
+        ar& lockedArc;
+        ar& id;
+    }
+    friend std::ostream& operator<< (std::ostream& os, const graph_informations& g)
+    {
+        os<<g.timestamp<<" "<<g.lockedNode<<" "<<g.lockedArc<<" "<<g.id;
+        return os;
+    }
+
 };
 
 typedef std::map<std::string,graph_informations> graph_packet;
@@ -117,104 +117,106 @@ typedef std::map<std::string,graph_informations> graph_packet;
 
 struct agent_state_packet
 {
-	std::map<int,double> state;
-	std::string identifier;
-	
-	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int /*version*/)
-	{
-		ar& state;
-		ar& identifier;
-	}
+    std::map<int,double> state;
+    std::string identifier;
+
+    template <typename Archive>
+    void serialize(Archive& ar, const unsigned int /*version*/)
+    {
+        ar& state;
+        ar& identifier;
+    }
 };
 
 struct agents_name_to_states
 {
-	std::map<std::string,agent_state_packet> internal_map;
+    std::map<std::string,agent_state_packet> internal_map;
 
-	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int /*version*/)
-	{
-		ar& internal_map;
-		
-	}
+    template <typename Archive>
+    void serialize(Archive& ar, const unsigned int /*version*/)
+    {
+        ar& internal_map;
+
+    }
 };
 
 
-struct world_sim_packet{
-  std::map<std::string,double> bonus_variables;
-  agents_name_to_states state_agents;
+struct world_sim_packet {
+    std::map<std::string,double> bonus_variables;
+    agents_name_to_states state_agents;
 
-  template <typename Archive>
-  void serialize(Archive& ar,const unsigned int /*version*/)
-  {
-	ar& bonus_variables;
-	ar& state_agents;
-  }
-  
+    template <typename Archive>
+    void serialize(Archive& ar,const unsigned int /*version*/)
+    {
+        ar& bonus_variables;
+        ar& state_agents;
+    }
+
 };
 
 struct control_command_packet
 {
-	control_command command;
-	std::string identifier;
-	
-	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int /*version*/)
-	{
-		ar& command;
-		ar& identifier;
-	}
+    control_command command;
+    std::string identifier;
+
+    template <typename Archive>
+    void serialize(Archive& ar, const unsigned int /*version*/)
+    {
+        ar& command;
+        ar& identifier;
+    }
 };
 
 
 struct visibleArea
 {
-	virtual bool contains(agent_state me,agent_state other);
-	virtual ~visibleArea();
+    virtual bool contains(agent_state me,agent_state other);
+    virtual ~visibleArea();
 };
 
 struct circle:public visibleArea
 {
-	double radius;
-	int first_axis;
-	int second_axis;
-	
-	bool contains(agent_state me,agent_state other)
-	{
-		return pow(me.at(first_axis)-other.at(first_axis),2)+pow(me.at(second_axis)-other.at(second_axis),2)<pow(radius,2);		
-	}
+    double radius;
+    int first_axis;
+    int second_axis;
+
+    bool contains(agent_state me,agent_state other)
+    {
+        return pow(me.at(first_axis)-other.at(first_axis),2)+pow(me.at(second_axis)-other.at(second_axis),2)<pow(radius,2);
+    }
 };
 
 
 
 template <typename T>
 struct rndom : public exprtk::ifunction<T> {
-        rndom() : exprtk::ifunction<T>(2) {name="RNDOM";	}
+    rndom() : exprtk::ifunction<T>(2) {
+        name="RNDOM";
+    }
 
-        std::string name;
-        
-        // Returns random number. v1 is inclusive and v2 is inclusive too.
-        T operator()(const T& v1, const T& v2) {
+    std::string name;
 
-            // If v1 or v2 are smaller than 0 or v2 is smaller than v1 (v1 is min, v2 is max)
-            // or v2 is bigger than RAND_MAX, then return nan.
-            if (v2 < v1 || v2 > RAND_MAX) {
-                return std::numeric_limits<T>::quiet_NaN();
-            }
+    // Returns random number. v1 is inclusive and v2 is inclusive too.
+    T operator()(const T& v1, const T& v2) {
 
-            double min = v1;
-            double max = v2;
-
-            if (max < min) {
-                return T(min);
-            }
-
-            double result;
-            result = (rand()*(max-min)/RAND_MAX+min);
-			//% (max + 1 - min)) + min;
-            return T(result);
+        // If v1 or v2 are smaller than 0 or v2 is smaller than v1 (v1 is min, v2 is max)
+        // or v2 is bigger than RAND_MAX, then return nan.
+        if (v2 < v1 || v2 > RAND_MAX) {
+            return std::numeric_limits<T>::quiet_NaN();
         }
+
+        double min = v1;
+        double max = v2;
+
+        if (max < min) {
+            return T(min);
+        }
+
+        double result;
+        result = (rand()*(max-min)/RAND_MAX+min);
+        //% (max + 1 - min)) + min;
+        return T(result);
+    }
 };
 
 
