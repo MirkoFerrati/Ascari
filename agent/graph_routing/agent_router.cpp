@@ -188,7 +188,7 @@ bool agent_router::findPath()
 		next=graph.target(graph.arcFromId(arc_id[0]));
 		xtarget=(coord_x)[next];
 		ytarget=(coord_y)[next];
-		speed=5.0/(length[graph.arcFromId(arc_id[0])]);//si parte sempre dal piano zero, mi basta sapere a che piano arrivare
+		speed=(double)length[graph.arcFromId(arc_id[0])]/3.0;//si parte sempre dal piano zero, mi basta sapere a che piano arrivare
 
         std::cout<<"percorso calcolato:";
         for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)

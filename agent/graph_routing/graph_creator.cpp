@@ -11,6 +11,8 @@
 #include "debug_constants.h"
 #include "logog.hpp"
 
+#define sqr(a) (a)*(a)
+
 using namespace std;
 
 int Graph_creator::createGraph(int floors)
@@ -65,20 +67,23 @@ void Graph_creator::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int
     addNodes(coords,ncolors,acolors,floorNumber);
 	if (floorNumber==0) return;
 	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
+	SmartDigraph::Node source;
+	SmartDigraph::Node target;
 	for (unsigned int i=0;i<graph_node_size;i++)
 	{
-		vector<int> temp_ids;
 		for (SmartDigraph::OutArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
 		{
 			//archi al piano inferiore
-			SmartDigraph::Arc a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-1)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
-			(_3Dlength)[a]=1;
+			source=_3Dgraph.nodeFromId(i+(floorNumber-1)*graph_node_size);
+			target=_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size);
+			SmartDigraph::Arc a=_3Dgraph.addArc(source,target);
+			(_3Dlength)[a]=sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//1; prendo la distanza reale invece dell'unità
 			acolors[a]=floorNumber+1;
 			//archi a 2 piani inferiori
 			if (floorNumber>1)
 			{
 				a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-2)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
-				(_3Dlength)[a]=2;
+				(_3Dlength)[a]=1.0/2.0*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
 				acolors[a]=floorNumber+1;
 			}
 		}
