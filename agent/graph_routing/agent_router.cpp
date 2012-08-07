@@ -20,7 +20,7 @@
 
 //TODO: probabilmente non serve mandarsi anche la lista dei nodi bloccati, basta la lista degli archi con questa configurazione
 //TODO: l'effetto sarebbe una riduzione dei dati da mandarsi e moltissimi cicli in meno per creare e parsare la mappa filtrante
-
+//TODO: oppure ancora più facile mandarsi solo la lista dei nodi bloccati, tanto poi blocco tutti gli archi entranti...e gli uscenti?
 lemon::Random agent_router::generatorRandom;
 
 using namespace std;
@@ -127,11 +127,9 @@ bool agent_router::findPath()
     using namespace lemon;
     bool reached=false;
     if (target==INVALID) return false;
-
     SmartDigraph::ArcMap<bool> useArc(graph,true);
-
-    int real_distance;
-    dijkstra(graph,length).path(p).dist(real_distance).run(source,target);
+//     int real_distance;
+//     dijkstra(graph,length).path(p).dist(real_distance).run(source,target);
     _mutex.lock();
     for (graph_packet::const_iterator it=info.begin();it!=info.end();it++)
     {
@@ -192,28 +190,18 @@ bool agent_router::findPath()
     {
         arc_id.clear();
 		node_id.clear();
-		int j=0;
         for (Path<SmartDigraph>::ArcIt a(p);a!=INVALID;++a)
 		{
-			j++;
-			arc_id.push_back(graph.id(a));
-			if (j>MAXFLOORS)
+			if (graph.id(graph.source(a))/graph_node_size>MAXFLOORS)
 				break;
+			arc_id.push_back(graph.id(a));
 		}
-		j=0;
         for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
 		{
-			j++;
-			if (j!=1) //Il nodo al piano zero (quello iniziale) non va incluso
-			{	
-				node_id.push_back(graph.id(i));
-			}
-			if (j>MAXFLOORS)
-				break;
-		}
-		if (node_id.back()<graph_node_size)//il nodo al piano zero (quello finale) non va incluso
-		{
-			node_id.pop_back();
+			if (graph.id(i)/graph_node_size>MAXFLOORS || graph.id(i)<graph_node_size)
+				continue;
+			//Il nodo al piano zero (quello iniziale ) e quello al piano finale non vanno inclusi
+			node_id.push_back(graph.id(i));
 		}
 		next=graph.target(graph.arcFromId(arc_id[0]));
 		xtarget=(coord_x)[next];
@@ -224,7 +212,7 @@ bool agent_router::findPath()
 		if ((graph.id(next)/graph_node_size)==0)
 			speed=0;
 		else
-			speed=((double)length[graph.arcFromId(arc_id[0])])/(TIME_SLOT_FOR_3DGRAPH-delta+TIME_SLOT_FOR_3DGRAPH*(double)((graph.id(next)/graph_node_size)-1));
+			speed=((double)length[graph.arcFromId(arc_id[0])])/(-delta+TIME_SLOT_FOR_3DGRAPH*(double)(graph.id(next)/graph_node_size));
         std::cout<<"velocità: "<<speed <<" percorso calcolato:";
         for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
             std::cout<<graph.id(i)<<">>";
