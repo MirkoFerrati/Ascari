@@ -85,14 +85,7 @@ void agent_router::run_plugin()
         {
 			next_target_available=false;
         }
-        _mutex.lock();
-		graph_informations& tmp = info.at(identifier);
-		tmp.id=identifier;
-		tmp.isLocked=routeLock;
-		tmp.lockedArc=arc_id;
-		tmp.lockedNode=node_id;
-		tmp.timestamp=last_time_updated;
-		_mutex.unlock();
+       
 		
 		communicator.send(); //TODO: invio le informazioni solo quando sono sopra un nodo
     }
@@ -124,104 +117,145 @@ void agent_router::setTarget(lemon::SmartDigraphBase::Node t)
     target=t;
 }
 
+
+void agent_router::prepare_info_packet()
+{
+	using namespace lemon;
+	arc_id.clear();
+	node_id.clear();
+	int j=0;
+	for (Path<SmartDigraph>::ArcIt a(p);a!=INVALID;++a)
+	{
+		j++;
+		if (j>3)
+			break; //TODO: prenoto solo i prossimi 2 archi del mio percorso
+		if (graph.id(graph.source(a))/graph_node_size>MAXFLOORS)
+			break;
+		arc_id.push_back(graph.id(a));
+	}
+	j=0;
+	for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
+	{
+		//Il nodo al piano zero (quello iniziale ) e quello al piano finale non vanno inclusi
+		if (graph.id(i)/graph_node_size>MAXFLOORS || graph.id(i)<graph_node_size)
+			continue;
+		j++;
+		if (j>3)
+			break; //TODO: prenoto solo i prossimi 2 nodi del mio percorso
+		node_id.push_back(graph.id(i));
+	}
+	_mutex.lock();
+	graph_informations& tmp = info.at(identifier);
+	tmp.id=identifier;
+	tmp.isLocked=routeLock;
+	tmp.lockedArc=arc_id;
+	tmp.lockedNode=node_id;
+	tmp.timestamp=last_time_updated;
+	_mutex.unlock();
+}
+
+bool agent_router::merge_informations_collided(lemon::SmartDigraph::ArcMap<bool>& useArc)
+{
+	using namespace lemon;
+	bool collision=false;
+	_mutex.lock();
+	for (graph_packet::const_iterator it=info.begin();it!=info.end();it++)
+	{
+		if (it->first.compare(identifier)==0) continue; //Ignoro me stesso
+        bool isLocked = (*it).second.isLocked;
+		if (!isLocked) continue;
+		if (it->second.id.compare(identifier)>0) continue; //ignoro le prenotazioni di livello più basso
+		//TODO: qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
+		int age=round((round(time*1000.0)-round((*it).second.timestamp*1000.0))/1000.0/TIME_SLOT_FOR_3DGRAPH);
+		cout<<" "<<age<<" ";
+		for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
+		{
+			int id=(*itt)-age*graph_node_size;
+			if (id<graph_node_size) //Se il nodo è finito nel passato oppure al piano terra lo ignoro
+				continue;
+			//Calcolo le collisioni
+			for (unsigned int i=0;i<node_id.size();i++)
+			{
+				if (node_id[i]==id)
+				{
+					collision=true;
+					break;
+				}
+			}
+			//In ogni caso filtro gli archi, mi serviranno per calcolare un nuovo percorso senza collisioni
+			for (SmartDigraph::InArcIt arc(graph,graph.nodeFromId(id));arc!=INVALID;++arc)
+			{
+				useArc[arc]=false;
+			}
+		}
+	}
+	_mutex.unlock();
+	return collision;
+}
+
 bool agent_router::findPath()
 {
     using namespace lemon;
-    bool reached=false;
     if (target==INVALID) return false;
-    SmartDigraph::ArcMap<bool> useArc(graph,true);
-//     int real_distance;
-//     dijkstra(graph,length).path(p).dist(real_distance).run(source,target);
-    _mutex.lock();
-    for (graph_packet::const_iterator it=info.begin();it!=info.end();it++)
-    {
-		if (it->first.compare(identifier)==0) continue; //Ignoro me stesso
-        bool isLocked = (*it).second.isLocked;
-        if (!isLocked) continue;
-		//TODO: tutto questo codice si può ripensare e ottimizzare pesantemente...un sacco di if inutili ma ora non ho tempo
-		if ((time-(*it).second.timestamp>TIME_SLOT_FOR_3DGRAPH)) //Se l'informazione è vecchia scalo tutto
+    int real_distance;
+	bool reached=dijkstra(graph,length).path(p).dist(real_distance).run(source,target); //senza prenotazioni o con prenotazioni vecchie?
+	last_time_updated=round(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH; //even if i am late, i need to send the perfect time
+	prepare_info_packet();
+	communicator.send();
+	_io_service.poll();
+	_io_service.reset();
+	usleep(3000);//TODO: be sure that info are received, but how? _io_service.run?
+	while (reached)
+	{
+		SmartDigraph::ArcMap<bool> useArc(graph,true);
+		if (!merge_informations_collided(useArc))
+			break;
+		cout<<"collisione trovata,ricalcolo il percorso"<<endl;
+		reached= dijkstra(filterArcs(graph,useArc),length).path(p).dist(d).run(source,target);
+		if (d>15000)//TODO: questo numero è fisso ma dovrebbe essere una variabile, comunque fa coppia con i 10000 del graph_creator
+			reached=false;
+		
+		if (!reached)
 		{
-			int age=(time-(*it).second.timestamp)/TIME_SLOT_FOR_3DGRAPH;
-			cout<<" "<<age<<" ";
-			for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
-			{
-				if ((*itt)-age*graph_node_size<0) //Se il nodo è finito nel passato lo ignoro
-					continue;
-				for (SmartDigraph::InArcIt arc(graph,graph.nodeFromId((*itt)-age*graph_node_size<0));arc!=INVALID;++arc)
-				{
-					useArc[arc]=false;
-				}
-			}
-			for (vector<int>::const_iterator itt=(*it).second.lockedArc.begin();itt!=(*it).second.lockedArc.end();itt++)
-			{
-				//TODO: qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
-			}
+			arc_id.clear();
+			node_id.clear();
+			for (unsigned int i=0;i<MAXFLOORS-1;i++)
+				node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
+			
 		}
-		else //Codice normale
-		{
-			for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
-			{
-				for (SmartDigraph::InArcIt arc(graph,graph.nodeFromId(*itt));arc!=INVALID;++arc)
-				{
-					useArc[arc]=false;
-				}
-			}
-			for (vector<int>::const_iterator itt=(*it).second.lockedArc.begin();itt!=(*it).second.lockedArc.end();itt++)
-			{
-				//useArc[graph.arcFromId((*itt))]=false;
-			}
-		}
-    }
-    _mutex.unlock();
-     reached= dijkstra(filterArcs(graph,useArc),length).path(p).dist(d).run(source,target);
-	if (d>15000)//TODO: questo numero è fisso ma dovrebbe essere una variabile, comunque fa coppia con i 10000 del graph_creator
-		reached=false;
-    if (!reached)
-    {
-		arc_id.clear();
-		node_id.clear();
-		for (unsigned int i=0;i<MAXFLOORS-1;i++)
-			node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
-        return false;
-    }
-    else
-    {
-        arc_id.clear();
-		node_id.clear();
-        for (Path<SmartDigraph>::ArcIt a(p);a!=INVALID;++a)
-		{
-			if (graph.id(graph.source(a))/graph_node_size>MAXFLOORS)
-				break;
-			arc_id.push_back(graph.id(a));
-		}
-        for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
-		{
-			if (graph.id(i)/graph_node_size>MAXFLOORS || graph.id(i)<graph_node_size)
-				continue;
-			//Il nodo al piano zero (quello iniziale ) e quello al piano finale non vanno inclusi
-			node_id.push_back(graph.id(i));
-		}
-		next=graph.target(graph.arcFromId(arc_id[0]));
-		xtarget=(coord_x)[next];
-		ytarget=(coord_y)[next];
-		simulation_time delta=time-trunc(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH; //delta dovrebbe essere tra 0 e 1
-		if (delta>TIME_SLOT_FOR_3DGRAPH/2.0)
-			delta=delta-TIME_SLOT_FOR_3DGRAPH; //Se sono così tanto in ritardo allora salto il turno, se sono in anticipo aspetto
-		if ((graph.id(next)/graph_node_size)==0)
-			speed=0;
-		else
-		{
-			cout<<"calcolo velocità. time="<<time<<" delta="<<delta<<" piani="<<(double)(graph.id(next)/graph_node_size)<<" lunghezza="<<length[graph.arcFromId(arc_id[0])];
-			speed=((double)length[graph.arcFromId(arc_id[0])])/(-delta+TIME_SLOT_FOR_3DGRAPH*(double)(graph.id(next)/graph_node_size));
-		}
-		std::cout<<"velocità: "<<speed <<" percorso calcolato:";
-        for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
-            std::cout<<graph.id(i)<<">>";
-        std::cout<<" fine"<< std::endl;
-        routeLock=true;
-		last_time_updated=time;
-        return true;
-    }
+		last_time_updated+=0.0001;
+		prepare_info_packet();
+		communicator.send();
+		_io_service.poll();
+		_io_service.reset();
+		usleep(3000);
+	}
+	if (!reached)
+		return false;
+	next=graph.target(graph.arcFromId(arc_id[0]));
+	xtarget=(coord_x)[next];
+	ytarget=(coord_y)[next];
+	simulation_time delta=time-trunc(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH; //delta dovrebbe essere tra 0 e 1
+	if (delta>TIME_SLOT_FOR_3DGRAPH/2.0)
+	{
+		delta=delta-TIME_SLOT_FOR_3DGRAPH; //Se sono così tanto in ritardo allora salto il turno, se sono in anticipo aspetto
+	}
+	double floor=graph.id(next)/graph_node_size;
+	if (floor<0.000001) //floor==0 nei double
+		speed=0;
+	else
+	{
+		cout<<"calcolo velocità. time="<<time<<" delta="<<delta<<" piani="<<floor<<" lunghezza="<<length[graph.arcFromId(arc_id[0])];
+		speed=(1.0/floor*(double)length[graph.arcFromId(arc_id[0])])/(-delta+TIME_SLOT_FOR_3DGRAPH*floor);
+	}
+	std::cout<<"velocità: "<<speed <<" percorso calcolato:";
+	for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
+		std::cout<<graph.id(i)<<">>";
+	std::cout<<" fine"<< std::endl;
+	routeLock=true;
+	last_time_updated=time;
+	return true;
+    
 }
 
 std::pair< int, int > agent_router::getTargetCoords()

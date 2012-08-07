@@ -63,6 +63,8 @@ private:
 	Udp_graph_communicator communicator;
 	void setTargetStop(bool stop);
 	bool checkIfTargetReached();
+    void prepare_info_packet();
+    bool merge_informations_collided(lemon::SmartDigraph::ArcMap< bool >& useArc);
 	lemon::SmartDigraph::Node source, target;
     lemon::SmartDigraph::Node next;
     int graph_node_size;

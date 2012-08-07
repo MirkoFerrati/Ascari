@@ -18,8 +18,8 @@ Udp_graph_communicator::Udp_graph_communicator(boost::signals2::mutex& mutex,gra
 	void Udp_graph_communicator::service_thread(void) {
 	while (should_run) {
 		_io_service.run();
-		usleep(10);
 		_io_service.reset();
+		usleep(10);
 	}
 }
 

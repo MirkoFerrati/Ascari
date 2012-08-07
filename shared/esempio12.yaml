@@ -28,7 +28,7 @@
       CONTROLLERS:
       - name: go
         v: v_router
-        w: sin(atan2(ytarget-y,xtarget-x)-theta)*5
+        w: sin(atan2(ytarget-y,xtarget-x)-theta)*7
       - name: wait
         v: 0
         w: 0

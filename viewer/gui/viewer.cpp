@@ -122,9 +122,9 @@ Viewer::~Viewer() {
 void Viewer::paintEvent(QPaintEvent */*event*/)
 {
     static const QPoint hourHand[3] = {
-        QPoint(3, -3),
-        QPoint(-3, -3),
-        QPoint(0, 4)
+        QPoint(2, -2),
+        QPoint(-2, -2),
+        QPoint(0, 2)
     };
     QColor hourColor(127, 0, 127);
 
