@@ -69,6 +69,7 @@ private:
 	simulation_time &time;
 	simulation_time last_time_updated;
     bool stop;
+    bool next_target_available;
 };
 
 #endif // AGENT_ROUTER_H

@@ -55,6 +55,8 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 	speed=5;
 	last_time_updated=time;
 	stop=false;
+	next_target_available=false;
+	
 }
 
 
@@ -77,11 +79,11 @@ void agent_router::run_plugin()
     {
         if (setNextTarget())
         {
-            setTargetStop(false);
+            next_target_available=true;
         }
         else
         {
-            setTargetStop(true);
+			next_target_available=false;
         }
         _mutex.lock();
 		graph_informations& tmp = info.at(identifier);
@@ -93,9 +95,9 @@ void agent_router::run_plugin()
 		_mutex.unlock();
 		
 		communicator.send(); //TODO: invio le informazioni solo quando sono sopra un nodo
-		cout<<"inviate le informazioni"<<endl;
     }
-  
+    setTargetStop(!next_target_available);
+	
 
 }
 
@@ -141,41 +143,37 @@ bool agent_router::findPath()
 		{
 			int age=(time-(*it).second.timestamp)/TIME_SLOT_FOR_3DGRAPH;
 			cout<<" "<<age<<" ";
-			for (SmartDigraph::ArcIt arc(graph);arc!=INVALID;++arc)
+			for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
 			{
-				for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
+				if ((*itt)-age*graph_node_size<0) //Se il nodo è finito nel passato lo ignoro
+					continue;
+				for (SmartDigraph::InArcIt arc(graph,graph.nodeFromId((*itt)-age*graph_node_size<0));arc!=INVALID;++arc)
 				{
-					if ((*itt)-age*graph_node_size<0) //Se il nodo è finito nel passato lo ignoro
-						continue;
-					if ((*itt)-age*graph_node_size==graph.id(graph.target(arc)))//TODO: questa riga è talmente fondamentale che ho paura a scriverla
-						useArc[arc]=false;
+					useArc[arc]=false;
 				}
-				for (vector<int>::const_iterator itt=(*it).second.lockedArc.begin();itt!=(*it).second.lockedArc.end();itt++)
-				{
-					if ((*itt)==graph.id(arc))
-						;//useArc[arc]=false; //TODO: aiuto, non so cosa scrivere qui
-				}
+			}
+			for (vector<int>::const_iterator itt=(*it).second.lockedArc.begin();itt!=(*it).second.lockedArc.end();itt++)
+			{
+				//TODO: qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
 			}
 		}
 		else //Codice normale
 		{
-			for (SmartDigraph::ArcIt arc(graph);arc!=INVALID;++arc)
+			for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
 			{
-				for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
+				for (SmartDigraph::InArcIt arc(graph,graph.nodeFromId(*itt));arc!=INVALID;++arc)
 				{
-					if ((*itt)==graph.id(graph.target(arc)))
-						useArc[arc]=false;
+					useArc[arc]=false;
 				}
-				for (vector<int>::const_iterator itt=(*it).second.lockedArc.begin();itt!=(*it).second.lockedArc.end();itt++)
-				{
-					if ((*itt)==graph.id(arc))
-						useArc[arc]=false;
-				}
+			}
+			for (vector<int>::const_iterator itt=(*it).second.lockedArc.begin();itt!=(*it).second.lockedArc.end();itt++)
+			{
+				//useArc[graph.arcFromId((*itt))]=false;
 			}
 		}
     }
     _mutex.unlock();
-    reached= dijkstra(filterArcs(graph,useArc),length).path(p).dist(d).run(source,target);
+     reached= dijkstra(filterArcs(graph,useArc),length).path(p).dist(d).run(source,target);
 	if (d>15000)//TODO: questo numero è fisso ma dovrebbe essere una variabile, comunque fa coppia con i 10000 del graph_creator
 		reached=false;
     if (!reached)
@@ -212,8 +210,11 @@ bool agent_router::findPath()
 		if ((graph.id(next)/graph_node_size)==0)
 			speed=0;
 		else
+		{
+			cout<<"calcolo velocità. time="<<time<<" delta="<<delta<<" piani="<<(double)(graph.id(next)/graph_node_size)<<" lunghezza="<<length[graph.arcFromId(arc_id[0])];
 			speed=((double)length[graph.arcFromId(arc_id[0])])/(-delta+TIME_SLOT_FOR_3DGRAPH*(double)(graph.id(next)/graph_node_size));
-        std::cout<<"velocità: "<<speed <<" percorso calcolato:";
+		}
+		std::cout<<"velocità: "<<speed <<" percorso calcolato:";
         for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
             std::cout<<graph.id(i)<<">>";
         std::cout<<" fine"<< std::endl;
