@@ -51,9 +51,12 @@ void Graph_creator::addNodes(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int
 		(_3Dcoord_y)[n]=(coord_y)[graph.nodeFromId(i)];
 		coords[n]=dim2::Point<int>((_3Dcoord_x)[n]+(_3Dcoord_y)[n]/3,(_3Dcoord_y)[n]/3+XYOFFSET*(floorNumber+1));
 		ncolors[n]=floorNumber+1;
-		SmartDigraph::Arc a=_3Dgraph.addArc(n,_3Dgraph.nodeFromId(i));
-		(_3Dlength)[a]=10000;
-		acolors[a]=floors+3;
+		if (floorNumber>0)
+		{
+			SmartDigraph::Arc a=_3Dgraph.addArc(n,_3Dgraph.nodeFromId(i));
+			(_3Dlength)[a]=10000;
+			acolors[a]=floors+3;
+		}
 	}
 }
 
@@ -103,14 +106,16 @@ void Graph_creator::finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Poin
 	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
 	for (unsigned int i=0;i<graph_node_size;i++)
 	{
-		vector<int> temp_ids;
 		for (SmartDigraph::OutArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
 		{
 			SmartDigraph::Arc a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+floorNumber*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
-			(_3Dlength)[a]=10; //TODO: ogni numero è fondamentale
+			(_3Dlength)[a]=1000; //TODO: ogni numero è fondamentale
 			acolors[a]=floorNumber+1;
 			a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-1)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
-			(_3Dlength)[a]=1;
+			(_3Dlength)[a]=sqrt((double)sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+(double)sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//1; prendo la distanza reale invece dell'unità;
+			acolors[a]=floorNumber+1;
+			a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-2)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
+			(_3Dlength)[a]=2.0*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
 			acolors[a]=floorNumber+1;
 		}
 	}

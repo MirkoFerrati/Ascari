@@ -68,7 +68,11 @@ void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_t
 
 void agent_router::run_plugin()
 {
-	if (stop) return;
+	if (stop) 
+	{
+		setTargetStop(true);
+		return;
+	}
     if (checkIfTargetReached())
     {
         if (setNextTarget())
