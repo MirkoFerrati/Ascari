@@ -85,7 +85,7 @@ void Graph_creator::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int
 			//archi a 2 piani inferiori
 			if (floorNumber>1)
 			{
-				a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-2)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
+				a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-2)*graph_node_size),target);
 				(_3Dlength)[a]=2.0*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
 				acolors[a]=floorNumber+1;
 			}
@@ -104,6 +104,8 @@ void Graph_creator::finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Poin
     //Aggiungo un livello al grafo
     addNodes(coords,ncolors,acolors,floorNumber);
 	//TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
+	SmartDigraph::Node source;
+	SmartDigraph::Node target;
 	for (unsigned int i=0;i<graph_node_size;i++)
 	{
 		for (SmartDigraph::OutArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
@@ -111,10 +113,12 @@ void Graph_creator::finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Poin
 			SmartDigraph::Arc a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+floorNumber*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
 			(_3Dlength)[a]=1000; //TODO: ogni numero è fondamentale
 			acolors[a]=floorNumber+1;
-			a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-1)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
+			source=_3Dgraph.nodeFromId(i+(floorNumber-1)*graph_node_size);
+			target=_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size);
+			a=_3Dgraph.addArc(source,target);
 			(_3Dlength)[a]=sqrt((double)sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+(double)sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//1; prendo la distanza reale invece dell'unità;
 			acolors[a]=floorNumber+1;
-			a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-2)*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
+			a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-2)*graph_node_size),target);
 			(_3Dlength)[a]=2.0*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
 			acolors[a]=floorNumber+1;
 		}

@@ -18,7 +18,7 @@
  * che derivano da quella, e un vettore con i test aggiunti manualmente.
  */
 
-int main(int /*argc*/, char /***argv*/) {
+int main(int /*argc*/, char** /*argv*/) {
 	srand(time(NULL));
 	vector<pair<testClass*,string> > tests;
 	tests.push_back(make_pair(new testRandom(),"random"));
