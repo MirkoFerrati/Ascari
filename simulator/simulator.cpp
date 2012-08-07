@@ -119,7 +119,7 @@ void simulator::main_loop()
 {
     try {
         sim_packet.time=0;
-		uint64_t clock=0;
+		int clock=0;
         while (1) {
 			clock++;
 			if ((clock%10)!=0)
@@ -129,7 +129,7 @@ void simulator::main_loop()
 			}
 			else
 				cout<<endl<<sim_packet.time;
-			sim_packet.time=(simulation_time)clock/10.0;
+			sim_packet.time=((simulation_time)clock)/10.0;
 //             communicator->send_broadcast(time++);
             update_bonus_variables();
             //communicator->send_broadcast(sim_packet.state_agents);

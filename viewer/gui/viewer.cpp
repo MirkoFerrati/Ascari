@@ -301,7 +301,7 @@ void Viewer::timerEvent(QTimerEvent */*event*/)
         setScalingAndTranslateFactor(agents[it->first].getMaxX(),agents[it->first].getMinX(),agents[it->first].getMaxY(),agents[it->first].getMinY());
     }
     repaint();
-    time++;
+    time=infos.time;
 }
 
 void Viewer::keyPressEvent(QKeyEvent *event)
