@@ -1,15 +1,13 @@
 #Agente che va dritto e dopo 10 metri sterza
 - AGENTS:
   - agent: Agente1
-    #VISIBLE AREA: ./battle/exp_t_visuale.txt
-    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
-    #MONITORING = 0
-    #COLLABORATIVE = 1
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: circle(10)
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
-    - x: '1'
-      y: '1'
+    - x: '0'
+      y: '0'
       theta: '0'
     STATE_START: FAST
     DYNAMIC_MAP:
@@ -20,7 +18,7 @@
     - name: esempio2 
       CONTROLLERS:
       - name: fast
-        v: 3
+        v: 2
         w: 0
       - name: left
         v: 3
