@@ -118,9 +118,18 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
 void simulator::main_loop()
 {
     try {
-        int loop=0;
+        sim_packet.time=0;
+		simulation_time clock=0;
         while (1) {
-            loop++;
+			clock++;
+			if ((clock%10)!=0)
+			{
+				cout<<".";
+				flush(cout);
+			}
+			else
+				cout<<endl<<sim_packet.time;
+			sim_packet.time=clock/10;
 //             communicator->send_broadcast(time++);
             update_bonus_variables();
             //communicator->send_broadcast(sim_packet.state_agents);
@@ -138,21 +147,20 @@ void simulator::main_loop()
                     }
                 }
             }
-            usleep(10000);
+            usleep(100000);
             vector<control_command_packet> temp=communicator->receive_control_commands();
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {
 
-                for (map<int,double>::iterator it=commands.at(temp.at(i).identifier).command.begin(); it!=commands.at(temp.at(i).identifier).command.end();it++) {
-
+                for (map<int,double>::iterator it=commands.at(temp.at(i).identifier).command.begin(); it!=commands.at(temp.at(i).identifier).command.end();it++) 
+				{
                     it->second=temp.at(i).command.at(it->first);
-
                 }
 
             }
 // 		if (abs(states_index.internal_map.at("AGENTE1").state.at(0))>30)
 // 				break;
-            if (loop>MAXLOOPS)
+			if (sim_packet.time>MAXLOOPS)
                 break;
         }
 		graph_router.set_run(false);
