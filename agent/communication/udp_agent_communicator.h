@@ -19,8 +19,8 @@ public:
 	 * viene avviata
 	 */ 
     udp_agent_communicator(boost::signals2::mutex& mutex, topology_packet* tp, boost::asio::io_service& io_service);
-    void send();
-    void startReceive();
+    void send(bool printDebug=false);
+    void startReceive(bool printDebug = false);
 
 private:
     void handle_receive_from(const boost::system::error_code& error,size_t bytes_recvd);
@@ -34,7 +34,7 @@ private:
 
     topology_packet input_map_tp;
     topology_packet output_map_tp;
-	
+	bool printDebug;
     bool mutex_is_mine;
 };
 

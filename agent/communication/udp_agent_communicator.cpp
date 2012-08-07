@@ -19,11 +19,12 @@ udp_agent_communicator::udp_agent_communicator(boost::signals2::mutex& mutex,top
  * Invece impostare i valori con un ciclo for crea solo i nuovi elementi, sovrascrive solo i valori di quelli
  * già esistenti, non distrugge i vecchi
  */
-void udp_agent_communicator::send()
+void udp_agent_communicator::send(bool printDebug)
 {
 //TODO in teoria un sender asincrono dovrebbe andare, ma devo costruire la struttura dati pulita
     mutex.lock();
-	std::cout<<"sto inviando una comunicazione"<<std::endl;
+	if (printDebug)
+		std::cout<<"sto inviando una comunicazione"<<std::endl;
     for (std::map<agent_name,behavior_topology>::iterator it=tp->data.begin();it!=tp->data.end();it++)
     {
         for (behavior_topology::iterator itt=it->second.begin();itt!=it->second.end();itt++)
@@ -32,18 +33,21 @@ void udp_agent_communicator::send()
             {
                 if (ittt->second!=-1)
                     output_map_tp.data[it->first][itt->first][ittt->first]=ittt->second;
-				std::cout<<"["<<it->first<<" "<<itt->first<<" "<<ittt->first<<"="<<ittt->second<<"]";
+				if (printDebug)
+					std::cout<<"["<<it->first<<" "<<itt->first<<" "<<ittt->first<<"="<<ittt->second<<"]";
             }
         }
     }
-    std::cout<<std::endl;
+    if (printDebug)
+		std::cout<<std::endl;
     mutex.unlock();
 	sender.send(output_map_tp);
 // 	sleep(1);
 }
 
-void udp_agent_communicator::startReceive()
+void udp_agent_communicator::startReceive(bool printDebug)
 {
+	this->printDebug=printDebug;
     socket_.async_receive_from(
         boost::asio::buffer(inbound_data_, MAX_PACKET_LENGTH), listen_endpoint_,
         boost::bind(&udp_agent_communicator::handle_receive_from, this,
@@ -57,7 +61,8 @@ void udp_agent_communicator::handle_receive_from(const boost::system::error_code
     {
         try
         {
-            std::cout<<"ricezione: "<<std::endl;
+			if (printDebug) 
+				std::cout<<"ricezione: "<<std::endl;
 
 			std::string archive_data(&inbound_data_[header_length], MAX_PACKET_LENGTH-header_length);
             std::istringstream archive_stream(archive_data);
@@ -74,17 +79,20 @@ void udp_agent_communicator::handle_receive_from(const boost::system::error_code
             throw "Problema nella ricezione di un pacchetto";
         }
 
-        for (std::map<agent_name,behavior_topology>::iterator it=input_map_tp.data.begin();it!=input_map_tp.data.end();it++)
-        {
-            for (behavior_topology::iterator itt=it->second.begin();itt!=it->second.end();itt++)
-            {
-                for (topology_values::iterator ittt=itt->second.begin();ittt!=itt->second.end();ittt++)
-                {
-                    std::cout<<"-->"<<it->first<<" "<<itt->first<<" "<<ittt->first<<" "<<ittt->second<<",";
-                }
-            }
-        }
-        std::cout<<std::endl;
+        if (printDebug)
+		{
+			for (std::map<agent_name,behavior_topology>::iterator it=input_map_tp.data.begin();it!=input_map_tp.data.end();it++)
+			{
+				for (behavior_topology::iterator itt=it->second.begin();itt!=it->second.end();itt++)
+				{
+					for (topology_values::iterator ittt=itt->second.begin();ittt!=itt->second.end();ittt++)
+					{
+						std::cout<<"-->"<<it->first<<" "<<itt->first<<" "<<ittt->first<<" "<<ittt->second<<",";
+					}
+				}
+			}
+			std::cout<<std::endl;
+		}
 //         if (!mutex_is_mine)
 // 		{
         mutex.lock();

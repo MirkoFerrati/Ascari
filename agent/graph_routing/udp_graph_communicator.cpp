@@ -36,20 +36,23 @@ Udp_graph_communicator::~Udp_graph_communicator()
  * Invece impostare i valori con un ciclo for crea solo i nuovi elementi, sovrascrive solo i valori di quelli
  * già esistenti, non distrugge i vecchi
  */
-void Udp_graph_communicator::send()
+void Udp_graph_communicator::send(bool printDebug)
 {
     mutex.lock();
-    std::cout<<"sto inviando una comunicazione"<<std::endl;
+	if (printDebug)
+		std::cout<<"sto inviando una comunicazione"<<std::endl;
     output_map_tp=*tp;
     mutex.unlock();
-    std::cout<<output_map_tp<<std::endl;
+	if (printDebug)
+		std::cout<<output_map_tp<<std::endl;
     sender.send(output_map_tp);
 //     sleep(1);
 }
 
-void Udp_graph_communicator::startReceive()
+void Udp_graph_communicator::startReceive(bool printDebug)
 {
 	should_run=true;
+	this->printDebug=printDebug;
 	t=thread_ptr(new boost::thread(boost::bind(&Udp_graph_communicator::service_thread,this)));
     socket_.async_receive_from(
         boost::asio::buffer(inbound_data_, MAX_PACKET_LENGTH), listen_endpoint_,
@@ -64,7 +67,8 @@ void Udp_graph_communicator::handle_receive_from(const boost::system::error_code
     {
         try
         {
-            std::cout<<"ricezione: "<<std::endl;
+            if (printDebug) 
+				std::cout<<"ricezione: "<<std::endl;
 
             std::string archive_data(&inbound_data_[header_length], MAX_PACKET_LENGTH-header_length);
             std::istringstream archive_stream(archive_data);
@@ -80,8 +84,8 @@ void Udp_graph_communicator::handle_receive_from(const boost::system::error_code
 // 			ERR("pacchetto sbagliato: %s",inbound_data_);
             throw "Problema nella ricezione di un pacchetto";
         }
-
-        std::cout<<input_map_tp<<std::endl;
+        if (printDebug) 
+			std::cout<<input_map_tp<<std::endl;
 //         if (!mutex_is_mine)
 // 		{
         mutex.lock();

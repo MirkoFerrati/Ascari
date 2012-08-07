@@ -7,8 +7,8 @@
 class agent_communicator_abstract
 {
 public:
-	virtual void send()=0;
-	virtual void startReceive()=0;
+	virtual void send(bool)=0;
+	virtual void startReceive(bool)=0;
 	virtual ~agent_communicator_abstract(){};
 
 };

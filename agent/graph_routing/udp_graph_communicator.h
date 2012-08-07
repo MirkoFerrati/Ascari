@@ -22,8 +22,8 @@ public:
 	 * viene avviata
 	 */ 
     Udp_graph_communicator(boost::signals2::mutex& mutex, graph_packet* gi, boost::asio::io_service& io_service);
-    void send();
-    void startReceive();
+    void send(bool printDebug = false);
+    void startReceive(bool printDebug = false);
     ~Udp_graph_communicator();
 
 private:
@@ -41,7 +41,7 @@ private:
 	boost::asio::io_service& _io_service;
     graph_packet input_map_tp;
     graph_packet output_map_tp;
-	
+	bool printDebug;
     bool mutex_is_mine;
 };
 
