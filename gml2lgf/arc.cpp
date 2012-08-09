@@ -18,7 +18,6 @@ void arc::readLabelGraphics(fstream* f)
   f->getline(s,256);
   string tmp;
   tmp=s;
-  int par=1;
   tmp.erase(remove(tmp.begin(), tmp.end(), ' '),tmp.end());
   tmp.erase(remove(tmp.begin(), tmp.end(), '\t'),tmp.end());
   if (tmp.compare("[")==0) //deve esserci subito una quadra
@@ -61,7 +60,6 @@ void arc::readArc(fstream* f)
   f->getline(s,256);
   string tmp;
   tmp=s;
-  int par=1;
   tmp.erase(remove(tmp.begin(), tmp.end(), ' '),tmp.end());
   tmp.erase(remove(tmp.begin(), tmp.end(), '\t'),tmp.end());
   if (tmp.compare("[")==0) //deve esserci subito una quadra
@@ -114,6 +112,7 @@ void arc::readArc(fstream* f)
 ostream &operator<<( ostream &out, const arc &a )
 {
   out<<a.first<<"\t"<<a.second<<"\t"<<a.name<<"\t"<<a.len;
+  return out;
 }
 
 

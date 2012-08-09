@@ -64,15 +64,13 @@ void graph::readGraph(fstream* f)
 ostream &operator<<( ostream &out, const graph &g ){
   out<<"@nodes"<<endl;
   out<<"label\tcoordinates_x\tcoordinates_y"<<endl;
-  for (int i=0;i<g.nodes.size();i++)
+  for (unsigned int i=0;i<g.nodes.size();i++)
     out<<g.nodes[i]<<endl;
   out<<"@arcs"<<endl;
   out<<"\t\tlabel\tlength"<<endl;
-  for (int i=0;i<g.arcs.size();i++)
+  for (unsigned int i=0;i<g.arcs.size();i++)
     out<<g.arcs[i]<<endl;
-  out<<"@attributes"<<endl;
-  out<<"source\t"<<endl;
-  out<<"target\t"<<endl;
+  return out;
 }
 
 graph::~graph()

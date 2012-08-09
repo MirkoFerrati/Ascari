@@ -65,7 +65,6 @@ void node::readNode(fstream* f)
   char s[256];
   f->getline(s,256);
   string tmp=s;
-  int par=1;
   tmp.erase(remove(tmp.begin(), tmp.end(), ' '),tmp.end());
   tmp.erase(remove(tmp.begin(), tmp.end(), '\t'),tmp.end());
   if (tmp.compare("[")==0) //deve esserci subito una quadra
@@ -83,6 +82,15 @@ void node::readNode(fstream* f)
 // 	cout<<"identificativo del nodo: "<<name<<endl;
 	continue;
       }
+      if (tmp.find("label")==0)
+	  {
+		  label=tmp.substr(6,tmp.length()-7);
+			if (name.compare(label)!=0)
+			{
+					cout<<"ATTENZIONE, rilevato un nodo con id diverso dal label, potrebbero succedere danni: "<<name<<label;
+			}
+		  continue;
+	  }
       if (tmp.compare("graphics")==0)
       {
 	readGraphics(f);
@@ -106,7 +114,8 @@ void node::readNode(fstream* f)
 
 
 ostream &operator<<( ostream &out, const node &n ){
-  out<<n.name<<"\t"<<n.x/2<<"\t"<<n.y/2;
+  out<<n.name<<"\t"<<n.x<<"\t"<<n.y;
+  return out;
 }
 
 node::~node()

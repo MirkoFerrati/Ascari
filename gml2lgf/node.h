@@ -10,7 +10,7 @@ class node
   
 int x,y;
 string name;
-
+string label;
     void readGraphics(fstream* arg1);
     void readTextGraphics(fstream* arg1);
 
