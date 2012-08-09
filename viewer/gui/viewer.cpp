@@ -250,7 +250,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
             tmp=tmp-2*M_PI;
         painter.rotate((tmp*180/M_PI)-90);
 
-        painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
+//         painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
         if (it->first.compare("BALL")==0)
         {
             painter.setBrush(QColor("white"));
@@ -262,8 +262,9 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
 			if (view_type==2)
 			{
 				painter.save();
+				painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
 				painter.scale(painter.fontMetrics().height()/100.0,-painter.fontMetrics().height()/100.0);
-				painter.drawText(0,0,QString(it->first.c_str()));
+				painter.drawText(0,0,QString(it->first.substr(6).c_str()));
 				painter.restore();
 			}
         }
