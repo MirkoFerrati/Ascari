@@ -12,7 +12,7 @@
 #include <boost/thread.hpp>
 
 #define MAXFLOORS 6
-#define TIME_SLOT_FOR_3DGRAPH 6.0
+#define TIME_SLOT_FOR_3DGRAPH 10.0
 
 
 class agent_router: public Plugin_module
@@ -35,10 +35,9 @@ public:
     std::ostream& toFile(std::ostream& out) const;
 	
 private:
+	std::vector<int> targets;
     lemon::SmartDigraph graph;
-    lemon::SmartDigraph::ArcMap<int> length;
-    lemon::SmartDigraph::NodeMap<int> coord_x, coord_y;
-	bool findPath();
+    bool findPath();
     bool setNextTarget();
 	double xtarget, ytarget;
     bool pathFound;
@@ -52,13 +51,15 @@ private:
 	boost::asio::io_service _io_service;
     lemon::Path<lemon::SmartDigraph> p;
     static lemon::Random generatorRandom;
-    std::vector<int> targets;
     unsigned int tarc;
     std::vector<int> arc_id;
 	std::vector<int> node_id;
+	std::map< transition, bool >& events;
+	
 	const std::map<std::string,transition>& events_to_index;
-    std::map< transition, bool >& events;
-    std::string& identifier;
+	lemon::SmartDigraph::ArcMap<int> length;
+	lemon::SmartDigraph::NodeMap<int> coord_x, coord_y;
+	std::string& identifier;
 	graph_packet info;
 	Udp_graph_communicator communicator;
 	void setTargetStop(bool stop);

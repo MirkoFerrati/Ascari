@@ -29,9 +29,9 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 						   const std::map<std::string, transition>& events_to_index, string identifier,
 						   simulation_time& time
   						)
-        :targets(tarlist),events(events),
+:targets(tarlist),events(events),
         events_to_index(events_to_index),
-        identifier(identifier),communicator(_mutex,&info,_io_service),length(graph),coord_x(graph),coord_y(graph),time(time)
+        length(graph),coord_x(graph),coord_y(graph),identifier(identifier),communicator(_mutex,&info,_io_service),time(time)
 {
     using namespace lemon;
 	Graph_creator c(graph,length,coord_x,coord_y);
@@ -127,7 +127,7 @@ void agent_router::prepare_info_packet()
 	for (Path<SmartDigraph>::ArcIt a(p);a!=INVALID;++a)
 	{
 		j++;
-		if (j>3)
+		if (j>2)
 			break; //TODO: prenoto solo i prossimi 2 archi del mio percorso
 		if (graph.id(graph.source(a))/graph_node_size>MAXFLOORS)
 			break;
@@ -140,7 +140,7 @@ void agent_router::prepare_info_packet()
 		if (graph.id(i)/graph_node_size>MAXFLOORS || graph.id(i)<graph_node_size)
 			continue;
 		j++;
-		if (j>3)
+		if (j>2)
 			break; //TODO: prenoto solo i prossimi 2 nodi del mio percorso
 		node_id.push_back(graph.id(i));
 	}
@@ -204,7 +204,7 @@ bool agent_router::findPath()
 	communicator.send();
 	_io_service.poll();
 	_io_service.reset();
-	usleep(3000);//TODO: be sure that info are received, but how? _io_service.run?
+	usleep(10000);//TODO: be sure that info are received, but how? _io_service.run?
 	while (reached)
 	{
 		SmartDigraph::ArcMap<bool> useArc(graph,true);
@@ -228,7 +228,7 @@ bool agent_router::findPath()
 		communicator.send();
 		_io_service.poll();
 		_io_service.reset();
-		usleep(3000);
+		usleep(1000);
 	}
 	if (!reached)
 		return false;
@@ -236,7 +236,7 @@ bool agent_router::findPath()
 	xtarget=(coord_x)[next];
 	ytarget=(coord_y)[next];
 	simulation_time delta=time-trunc(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH; //delta dovrebbe essere tra 0 e 1
-	if (delta>TIME_SLOT_FOR_3DGRAPH/2.0)
+	if (delta>TIME_SLOT_FOR_3DGRAPH/3.0)
 	{
 		delta=delta-TIME_SLOT_FOR_3DGRAPH; //Se sono così tanto in ritardo allora salto il turno, se sono in anticipo aspetto
 	}
