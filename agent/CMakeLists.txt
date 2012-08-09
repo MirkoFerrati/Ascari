@@ -43,3 +43,4 @@ endforeach(${infileName})
 
 configure_file(../shared/graphs/test2.gml.lgf test2.gml.lgf COPYONLY)
 configure_file(../shared/graphs/test3.gml.lgf test3.gml.lgf COPYONLY)
+configure_file(test.sh test.sh COPYONLY)
