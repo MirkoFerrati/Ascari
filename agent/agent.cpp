@@ -204,6 +204,8 @@ void agent::main_loop()
 			world_sim_packet temp=world_comm->receive_agents_status();
 			state_other_agents.swap(temp.state_agents.internal_map);
 			time=temp.time;
+			if (time<-1)
+				break;
 			for (std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin();it!=temp.bonus_variables.end();it++)
 			{
 			bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
