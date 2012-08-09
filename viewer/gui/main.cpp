@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     QApplication app(argc,argv);
 	boost::asio::io_service io_service;
 	std::vector<char> buffer;
-	buffer.resize(1000);
+	buffer.resize(MAX_PACKET_LENGTH);
     Viewer window(buffer,io_service,NULL,atoi(argv[1]));
 	udp_world_sniffer sniffer(buffer,io_service);
    window.setWindowTitle("Visualizer");
