@@ -12,8 +12,8 @@
     control_commands: [v,w]
     INITIAL:
     - &initial
-      x: '-99'
-      y: '120'
+      x: '615'
+      y: '315'
       theta: '0'
       v_start: '5'
     STATE_START: GO
@@ -74,8 +74,8 @@
     states: [x,y,theta,v_start]
     control_commands: [v,w]
     INITIAL:
-    - x: '30'
-      y: '30'
+    - x: '715'
+      y: '515'
       theta: '0'
       v_start: '6'
     STATE_START: GO
@@ -90,8 +90,8 @@
     states: [x,y,theta,v_start]
     control_commands: [v,w]
     INITIAL:
-    - x: '30'
-      y: '-60'
+    - x: '1015'
+      y: '515'
       theta: '0'
       v_start: '7'
     STATE_START: GO
@@ -106,8 +106,8 @@
     states: [x,y,theta,v_start]
     control_commands: [v,w]
     INITIAL:
-    - x: '-99'
-      y: '30'
+    - x: '815'
+      y: '515'
       theta: '0'
       v_start: '8'
     STATE_START: GO
@@ -122,8 +122,8 @@
     states: [x,y,theta,v_start]
     control_commands: [v,w]
     INITIAL:
-    - x: '-99'
-      y: '-60'
+    - x: '915'
+      y: '515'
       theta: '0'
       v_start: '8'
     STATE_START: GO
@@ -138,8 +138,8 @@
     states: [x,y,theta,v_start]
     control_commands: [v,w]
     INITIAL:
-    - x: '135'
-      y: '120'
+    - x: '515'
+      y: '315'
       theta: '0'
       v_start: '8'
     STATE_START: GO

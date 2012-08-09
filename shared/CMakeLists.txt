@@ -8,3 +8,5 @@
 #add_subdirectory(lemon/lemon)
 
 include_directories(../shared/lemon/lemon)
+include_directories(yamls)
+include_directories(graphs)

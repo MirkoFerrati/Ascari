@@ -31,4 +31,5 @@ target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
  
 target_link_libraries(viewer ${Boost_LIBRARIES} pthread)
 target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
-configure_file(../shared/test2.gml.lgf test2.gml.lgf COPYONLY)
+configure_file(../shared/graphs/test2.gml.lgf test2.gml.lgf COPYONLY)
+configure_file(../shared/graphs/test3.gml.lgf test3.gml.lgf COPYONLY)
