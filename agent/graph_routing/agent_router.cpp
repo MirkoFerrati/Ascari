@@ -164,10 +164,10 @@ bool agent_router::merge_informations_collided(lemon::SmartDigraph::ArcMap<bool>
 		if (it->first.compare(identifier)==0) continue; //Ignoro me stesso
         bool isLocked = (*it).second.isLocked;
 		if (!isLocked) continue;
-		if (it->second.id.compare(identifier)>0) continue; //ignoro le prenotazioni di livello più basso
-		//TODO: qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
 		int age=round((round(time*1000.0)-round((*it).second.timestamp*1000.0))/1000.0/TIME_SLOT_FOR_3DGRAPH);
-		cout<<" "<<age<<" ";
+		if ((age==0)&&(it->second.id.compare(identifier)>0)) continue; //ignoro le prenotazioni di livello più basso della stessa età
+		//TODO: qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
+		//cout<<" "<<age<<" ";
 		for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
 		{
 			int id=(*itt)-age*graph_node_size;
@@ -200,8 +200,10 @@ bool agent_router::findPath()
     int real_distance;
 	bool reached=dijkstra(graph,length).path(p).dist(real_distance).run(source,target); //senza prenotazioni o con prenotazioni vecchie?
 	last_time_updated=round(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH; //even if i am late, i need to send the perfect time
+	routeLock=true;
 	prepare_info_packet();
 	communicator.send();
+	usleep(1000);
 	_io_service.poll();
 	_io_service.reset();
 	usleep(10000);//TODO: be sure that info are received, but how? _io_service.run?
@@ -210,7 +212,7 @@ bool agent_router::findPath()
 		SmartDigraph::ArcMap<bool> useArc(graph,true);
 		if (!merge_informations_collided(useArc))
 			break;
-		cout<<"collisione trovata,ricalcolo il percorso"<<endl;
+		cout<<time<<" :collisione trovata,ricalcolo il percorso"<<endl;
 		reached= dijkstra(filterArcs(graph,useArc),length).path(p).dist(d).run(source,target);
 		if (d>15000)//TODO: questo numero è fisso ma dovrebbe essere una variabile, comunque fa coppia con i 10000 del graph_creator
 			reached=false;
@@ -226,27 +228,32 @@ bool agent_router::findPath()
 		last_time_updated+=0.0001;
 		prepare_info_packet();
 		communicator.send();
+		usleep(1000);
 		_io_service.poll();
 		_io_service.reset();
-		usleep(1000);
+		usleep(10000);
 	}
 	if (!reached)
 		return false;
-	next=graph.target(graph.arcFromId(arc_id[0]));
-	xtarget=(coord_x)[next];
-	ytarget=(coord_y)[next];
 	simulation_time delta=time-trunc(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH; //delta dovrebbe essere tra 0 e 1
 	if (delta>TIME_SLOT_FOR_3DGRAPH/3.0)
 	{
-		delta=delta-TIME_SLOT_FOR_3DGRAPH; //Se sono così tanto in ritardo allora salto il turno, se sono in anticipo aspetto
+		cout<<"calcolo velocità. time="<<time<<" delta="<<delta<<endl;
+		return false;
+		//delta=delta-TIME_SLOT_FOR_3DGRAPH; //Se sono così tanto in ritardo allora salto il turno, se sono in anticipo aspetto
+		//TODO: purtroppo per saltare il turno non basta fare così, è un errore. Bisogna stare fermi e aspettare oppure prenotare i nodi ai piani giusti		
 	}
+	next=graph.target(graph.arcFromId(arc_id[0]));
+	xtarget=(coord_x)[next];
+	ytarget=(coord_y)[next];
+	
 	double floor=graph.id(next)/graph_node_size;
 	if (floor<0.000001) //floor==0 nei double
 		speed=0;
 	else
 	{
 		cout<<"calcolo velocità. time="<<time<<" delta="<<delta<<" piani="<<floor<<" lunghezza="<<length[graph.arcFromId(arc_id[0])];
-		speed=(1.0/floor*(double)length[graph.arcFromId(arc_id[0])])/(-delta+TIME_SLOT_FOR_3DGRAPH*floor);
+		speed=1.05*(1.0/floor*(double)length[graph.arcFromId(arc_id[0])])/(-delta+TIME_SLOT_FOR_3DGRAPH*floor);
 	}
 	std::cout<<"velocità: "<<speed <<" percorso calcolato:";
 	for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)

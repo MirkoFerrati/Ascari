@@ -263,7 +263,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
 			{
 				painter.save();
 				painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
-				painter.scale(painter.fontMetrics().height()/100.0,-painter.fontMetrics().height()/100.0);
+				painter.scale(painter.fontMetrics().height()/70.0,-painter.fontMetrics().height()/70.0);
 				painter.drawText(0,0,QString(it->first.substr(6).c_str()));
 				painter.restore();
 			}

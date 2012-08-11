@@ -129,6 +129,9 @@ void Graph_creator::finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Poin
 			a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-2)*graph_node_size),target);
 			(_3Dlength)[a]=2.0*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
 			acolors[a]=floorNumber+1;
+			a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-3)*graph_node_size),target);
+			(_3Dlength)[a]=3.0*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
+			acolors[a]=floorNumber+1;		
 		}
 	}
 }

@@ -1,5 +1,5 @@
-#define FILENAME "esempio12.yaml"
+#define FILENAME "esempio13.yaml"
 #define MAXLOOPS 10000
-#define GRAPHNAME "test3.gml.lgf"
+#define GRAPHNAME "test4.gml.lgf"
 
 

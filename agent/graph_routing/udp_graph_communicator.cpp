@@ -19,7 +19,8 @@ Udp_graph_communicator::Udp_graph_communicator(boost::signals2::mutex& mutex,gra
 	while (should_run) {
 		_io_service.run();
 		_io_service.reset();
-		usleep(10);
+		std::cout<<"ricevuti i pacchetti"<<std::endl;
+		usleep(10000);
 	}
 }
 
