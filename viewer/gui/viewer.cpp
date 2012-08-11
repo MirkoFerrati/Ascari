@@ -28,8 +28,8 @@ Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_servi
 {
     time=0;
     backImage="";
-    scalingFactorX=30;
-    scalingFactorY=30;
+    scalingFactorX=10;
+    scalingFactorY=10;
     translateX=0;
     translateY=0;
     maxX=0;
@@ -168,7 +168,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
 		{
 			painter.save();
 			painter.translate((*coord_x)[n],(*coord_y)[n]);
-			painter.drawEllipse(QPoint(0,0),2,2);
+			painter.drawEllipse(QPoint(0,0),1,1);
 			painter.scale(painter.fontMetrics().height()/70.0,-painter.fontMetrics().height()/70.0);
 			painter.drawText(-1,-1,QString("").setNum(graph.id(n)));
 			painter.restore();
