@@ -68,6 +68,19 @@ void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_t
 }
 
 
+void agent_router::compileExpressions(exprtk::symbol_table< double >& symbol_table)
+{
+    exprtk::parser<double> parser;
+
+    distance_to_target.register_symbol_table(symbol_table);
+    if (!parser.compile("sqrt((XTARGET-X)^2+(YTARGET-Y)^2)",distance_to_target))
+    {
+        ERR("impossibile creare l'espressione: %s","sqrt(sqr(XTARGET)+sqr(YTARGET))");
+        throw "impossibile creare l'espressione";
+    }
+
+}
+
 void agent_router::run_plugin()
 {
 	if (stop) 

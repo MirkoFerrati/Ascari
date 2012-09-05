@@ -24,6 +24,7 @@ public:
     std::pair<int,int> getTargetCoords();
     void run_plugin();
     void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
+	void compileExpressions(exprtk::symbol_table< double >& symbol_table);
 	
     void setSource(lemon::SmartDigraph::Node s);
     void setTarget(lemon::SmartDigraph::Node t);
@@ -47,6 +48,7 @@ private:
 	bool routeLock;
     int d;
 	double speed;
+	exprtk::expression<double> distance_to_target;
     boost::signals2::mutex _mutex;
 	boost::asio::io_service _io_service;
     lemon::Path<lemon::SmartDigraph> p;
