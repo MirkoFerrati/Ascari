@@ -34,10 +34,10 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
         length(graph),coord_x(graph),coord_y(graph),identifier(identifier),communicator(_mutex,&info,_io_service),time(time)
 {
     using namespace lemon;
-	Graph_creator c(graph,length,coord_x,coord_y);
-	graph_node_size=c.createGraph(MAXFLOORS);
-	if (!graph_node_size)
-		ERR("attenzione, impossibile creare il grafo",0);
+    Graph_creator c(graph,length,coord_x,coord_y);
+    graph_node_size=c.createGraph(MAXFLOORS);
+    if (!graph_node_size)
+        ERR("attenzione, impossibile creare il grafo",0);
     tarc=0;
     int id=targets[tarc];
     tarc++;
@@ -51,12 +51,11 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
     ytarget=(coord_y)[next];
     info[identifier].timestamp=0;
     setTargetStop(false);
-	communicator.startReceive();
-	speed=5;
-	last_time_updated=time;
-	stop=false;
-	next_target_available=false;
-	
+    communicator.startReceive();
+    speed=5;
+    last_time_updated=time;
+    stop=false;
+    next_target_reachable=false;
 }
 
 
@@ -64,7 +63,7 @@ void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_t
 {
     symbol_table.add_variable("XTARGET",xtarget,false);
     symbol_table.add_variable("YTARGET",ytarget,false);
-	symbol_table.add_variable("v_router",speed,false);
+    symbol_table.add_variable("v_router",speed,false);
 }
 
 
@@ -298,11 +297,10 @@ bool agent_router::setNextTarget()
         source=target;
         if (tarc==targets.size())
         {
-			cout<<" TARGET FINALE raggiunto, mi fermo"<<endl;
-			stop=true;
+            cout<<" TARGET FINALE raggiunto, mi fermo"<<endl;
+            stop=true;
             return false;
         }
-		//usleep(generatorRandom.integer(0,200)*1000);
         int id=targets[tarc];
         tarc++;
         target=graph.nodeFromId(id);
@@ -311,8 +309,6 @@ bool agent_router::setNextTarget()
     else
     {
         source=graph.nodeFromId(graph.id(next)%graph_node_size);
-// 		cout<<"sleeping "<<identifier.c_str()[identifier.size()-1]<<endl;
-// 		usleep(identifier.c_str()[identifier.size()-1]*100000);
     }
     return findPath();
 }
