@@ -45,6 +45,9 @@ void start_thread()
 
 void join_thread()
 {
+	set_run(false);
+	service.stop();
+	t->interrupt();
 	if (t)
 		t->join();
 }
