@@ -45,7 +45,7 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
     id=targets[tarc];
     tarc++;
     target=graph.nodeFromId(id);
-    routeLock=false;
+    isNegotiating=true;
     next=source;
     xtarget=(coord_x)[next];
     ytarget=(coord_y)[next];

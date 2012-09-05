@@ -45,7 +45,7 @@ private:
     bool graphSet;
     bool targetSet;
     bool sourceSet;
-	bool routeLock;
+	bool isNegotiating;
     int d;
 	double speed;
 	exprtk::expression<double> distance_to_target;

@@ -89,7 +89,7 @@ std::ostream& operator<<( std::ostream& os, const std::vector<T>& m )
 
 struct graph_informations
 {
-    bool isLocked;
+    bool isNegotiating;
     std::vector<int> lockedNode;
     std::vector<int> lockedArc;
     std::string id;
@@ -98,7 +98,7 @@ struct graph_informations
     void serialize(Archive& ar, const unsigned int /*version*/)
     {
         ar& timestamp;
-        ar& isLocked;
+        ar& isNegotiating;
         ar& lockedNode;
         ar& lockedArc;
         ar& id;
