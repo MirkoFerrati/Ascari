@@ -21,10 +21,13 @@ target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cp
  find_package(Boost REQUIRED system thread serialization)
  
 target_link_libraries(simulator ${Boost_LIBRARIES} pthread)
+target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
+
 
 include_directories(../shared)
 include_directories(../shared/logog/include)
 include_directories(../shared/parserYAML/include)
+include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
 
 message("Configurazione di ${CMAKE_BUILD_TYPE}")
 file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/simulator" "../shared/yamls/*.yaml")
