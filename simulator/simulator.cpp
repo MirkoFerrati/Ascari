@@ -15,7 +15,8 @@ void simulator::create_communicator(int communicator_type)
     }
 }
 
-simulator::simulator():topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT)
+simulator::simulator():
+topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT)
 {
 
 }
@@ -160,7 +161,7 @@ void simulator::main_loop()
             }
 // 		if (abs(states_index.internal_map.at("AGENTE1").state.at(0))>30)
 // 				break;
-			if (sim_packet.time>MAXLOOPS)
+			if (sim_packet.time>max_loops)
                 break;
         }
 		graph_router.set_run(false);
@@ -190,8 +191,9 @@ simulator::~simulator()
     delete f_rndom;
 }
 
-void simulator::start_sim()
+void simulator::start_sim(int max_loops)
 {
+	this->max_loops=max_loops;
     time=0;
     //communicator->send_broadcast(time);
 	graph_router.start_thread();

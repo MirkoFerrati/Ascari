@@ -13,13 +13,15 @@ class simulator
 public:
 	simulator();
 	~simulator();
-	void start_sim();
+	void start_sim(int max_loops=10000);
 	void create_communicator(int communicator_type);
 	void initialize_agents(std::vector<Parsed_Agent> const&);
 	void initialize (Parsed_World const&);
 	void update_bonus_variables();
 
 private:
+	int max_loops;
+	
 	std::vector<dynamic*> dynamic_module;
 	agent_communicator_abstract* communicator;
 	world_sim_packet sim_packet;
