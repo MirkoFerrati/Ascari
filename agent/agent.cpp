@@ -19,6 +19,13 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
             myAgent=i;
 
 	time=0;//TODO: initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
+    
+    symbol_table.add_constants();
+	pi=exprtk::details::numeric::constant::pi;
+	symbol_table.add_variable("PI_GRECO",pi,true);
+	f_rndom = new rndom<double>();
+	symbol_table.add_function(f_rndom->name, *f_rndom);
+    
     int i=0;
     for (map<controller_name,controller_MapRules>::const_iterator it =world.agents[myAgent].controllers.begin();it !=world.agents[myAgent].controllers.end();it++)
     {
@@ -44,6 +51,7 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
 	{
 		plugins[i]->addReservedVariables(symbol_table);
 		plugins[i]->addReservedVariables(encoder_symbol_table);
+		plugins[i]->compileExpressions(symbol_table);
 	}
 		
 	createControllersFromParsedAgent(world.agents.at(myAgent));
@@ -72,40 +80,22 @@ void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression >
         map_bonus_variables_to_id.insert(make_pair(it->first,i));
 		i++;
     }
+    for (index_map::const_iterator it=map_bonus_variables_to_id.begin();it!=map_bonus_variables_to_id.end();it++)
+	{
+		symbol_table.add_variable(it->first,bonusVariables[it->second]);
+	}
+	
 }
 
 
 
 void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
 {
-    for (unsigned int i=0;i<state.size();i++)
-    {
-        symbol_table.add_variable(agent.state[i],state[i]);
-    }
-    for (unsigned int i=0;i<inputs.command.size();i++)
-    {
-        symbol_table.add_variable(agent.inputs[i],inputs.command[i]);
-    }
-    for (index_map::const_iterator it=map_bonus_variables_to_id.begin();it!=map_bonus_variables_to_id.end();it++)
-    {
-        symbol_table.add_variable(it->first,bonusVariables[it->second]);
-    }
-    symbol_table.add_constants();
-	pi=exprtk::details::numeric::constant::pi;
-	  symbol_table.add_variable("PI_GRECO",pi,true);
-
-	
-	
-	f_rndom = new rndom<double>();
-	symbol_table.add_function(f_rndom->name, *f_rndom);
-	
     for (map<controller_name,controller_MapRules>::const_iterator it =agent.controllers.begin();it !=agent.controllers.end();it++)
     {
         controller c(it->second,agent.inputs,symbol_table);
         controllers.push_back(c);
     }
-    
-
 }
 
 
@@ -180,12 +170,20 @@ void agent::createStateFromParsedAgent(const Parsed_Agent& agent)
         state[i]=0;
         map_statename_to_id.insert(std::pair<string,int>(agent.state.at(i),i));
     }
+    for (unsigned int i=0;i<state.size();i++)
+	{
+		symbol_table.add_variable(agent.state[i],state[i]);
+	}
+	
     for (unsigned int i=0;i<agent.inputs.size();i++)
     {
         inputs.command[i]=0;
         map_inputs_name_to_id.insert(make_pair(agent.inputs.at(i),i));
     }
-
+    for (unsigned int i=0;i<inputs.command.size();i++)
+	{
+		symbol_table.add_variable(agent.inputs[i],inputs.command[i]);
+	}
 }
 
 
