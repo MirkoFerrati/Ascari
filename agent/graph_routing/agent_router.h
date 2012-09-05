@@ -25,7 +25,6 @@ public:
     void run_plugin();
     void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
 	void compileExpressions(exprtk::symbol_table< double >& symbol_table);
-	
     void setSource(lemon::SmartDigraph::Node s);
     void setTarget(lemon::SmartDigraph::Node t);
 
@@ -38,7 +37,7 @@ public:
 private:
 	std::vector<int> targets;
     lemon::SmartDigraph graph;
-    bool findPath();
+    bool findPath(lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< bool >& useArc);
     bool setNextTarget();
 	double xtarget, ytarget;
     bool pathFound;
@@ -49,6 +48,7 @@ private:
     int d;
 	double speed;
 	exprtk::expression<double> distance_to_target;
+	simulation_time next_time;
     boost::signals2::mutex _mutex;
 	boost::asio::io_service _io_service;
     lemon::Path<lemon::SmartDigraph> p;
@@ -74,7 +74,8 @@ private:
 	simulation_time &time;
 	simulation_time last_time_updated;
     bool stop;
-    bool next_target_available;
+    bool next_target_reachable;
+	int isWaiting;
 };
 
 #endif // AGENT_ROUTER_H
