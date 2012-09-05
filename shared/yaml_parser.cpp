@@ -3,7 +3,14 @@
 
 using namespace std;
 
-    Parsed_World parse_file(const char * file_name) {
+Parsed_World parse_file(const char * file_name)
+	{
+		std::string temp(file_name);
+		return parse_file(temp);
+	}
+
+
+	Parsed_World parse_file(string file_name) {
     std::ifstream fin(file_name);
     std::ostringstream str;
     str<<fin.rdbuf();

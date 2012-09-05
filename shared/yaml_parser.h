@@ -90,7 +90,7 @@ class Parsed_World{
 
 
     Parsed_World parse_file(const char * file_name);
-    
+    Parsed_World parse_file(std::string file_name);
     void operator>>(const YAML::Node& node, Parsed_Agent& ag);
     void operator>>(const YAML::Node& node, Parsed_World& wo);
     
