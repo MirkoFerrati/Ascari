@@ -18,9 +18,13 @@ void simulator::create_communicator(int communicator_type)
 simulator::simulator():
 topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT)
 {
-
+secSleep=20000;
 }
 
+void simulator::setSleep(unsigned secSleep)
+{
+	this->secSleep=secSleep;
+}
 
 void simulator::initialize(const Parsed_World& wo)
 {
@@ -148,7 +152,7 @@ void simulator::main_loop()
                     }
                 }
             }
-            usleep(30000);
+            usleep(secSleep);
             vector<control_command_packet> temp=communicator->receive_control_commands();
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {

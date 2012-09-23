@@ -258,6 +258,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
         }
         else
         {
+			painter.scale(2,2);
             painter.drawConvexPolygon(hourHand, 3);
 			if (view_type==2)
 			{

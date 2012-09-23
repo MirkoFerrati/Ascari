@@ -18,10 +18,10 @@ public:
 	void initialize_agents(std::vector<Parsed_Agent> const&);
 	void initialize (Parsed_World const&);
 	void update_bonus_variables();
-
+	void setSleep(unsigned secSleep);
 private:
 	int max_loops;
-	
+	int secSleep;
 	std::vector<dynamic*> dynamic_module;
 	agent_communicator_abstract* communicator;
 	world_sim_packet sim_packet;

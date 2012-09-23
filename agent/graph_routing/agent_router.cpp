@@ -279,7 +279,7 @@ bool agent_router::findPath(lemon::SmartDigraph::ArcMap<bool>& useArc)
     bool reached=true;//dijkstra(graph,length).path(p).dist(real_distance).run(source,target); //senza prenotazioni o con prenotazioni vecchie?
     merge_informations_collided(useArc);
     reached= dijkstra(filterArcs(graph,useArc),length).path(p).dist(d).run(source,target);
-    if (d>15000)//TODO: questo numero è fisso ma dovrebbe essere una variabile, comunque fa coppia con i 10000 del graph_creator
+    if (d>200000)//TODO: questo numero è fisso ma dovrebbe essere una variabile, comunque fa coppia con i 10000 del graph_creator
         reached=false;
     if (!reached)
     {
@@ -289,7 +289,7 @@ bool agent_router::findPath(lemon::SmartDigraph::ArcMap<bool>& useArc)
             node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
         isNegotiating=false; //non negozio il nodo dove sono bloccato, non voglio incidenti da dietro
         last_time_updated=time;
-		cout<<"impossibile trovare un percorso valido per il nodo "<<graph.id(target)<<endl;
+		cout<<"impossibile trovare un percorso valido per il nodo "<<graph.id(target)<<",distanza minima: "<<d<<endl;
         communicator.send();
         return false;
     }

@@ -28,11 +28,13 @@ int main(int argc, char **argv) {
         simulator s;
 		Parsed_World World;
 		lemon::ArgParser ap(argc,argv);
-		int count;
+		int count,secSleep;
 		ap.refOption("n","Number of simulator cycle",count);
+		ap.refOption("s","Milliseconds sleep",secSleep);
 		std::string filename;
 		ap.refOption("f","Yaml filename",filename);
 		ap.synonym("filename","f");
+		ap.synonym("sleep","s");
 		ap.throwOnProblems();
 		try{
 			ap.parse();
@@ -52,6 +54,8 @@ int main(int argc, char **argv) {
  	cout<<World;
 	s.initialize(World);
 	initialize_communication(s);
+	if (ap.given("s"))
+		s.setSleep(secSleep);
 	if (ap.given("n"))
 		s.start_sim(count);
 	else

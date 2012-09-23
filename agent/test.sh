@@ -1,14 +1,14 @@
-./agent AGENTE1 esempio12.yaml &
-./agent AGENTE2 esempio12.yaml &
-./agent AGENTE3 esempio12.yaml &
-./agent AGENTE4 esempio12.yaml &
-./agent AGENTE5 esempio12.yaml &
-./agent AGENTE6 esempio12.yaml &
-./agent AGENTE7 esempio12.yaml &
-./agent AGENTE8 esempio12.yaml &
-./agent AGENTE9 esempio12.yaml &
-./agent AGENTE10 esempio12.yaml &
-./agent AGENTE11 esempio12.yaml &
-./agent AGENTE12 esempio12.yaml &
-./agent AGENTE13 esempio12.yaml &
+./agent AGENTE01  &
+./agent AGENTE02  &
+./agent AGENTE03  &
+./agent AGENTE14  &
+./agent AGENTE15  &
+./agent AGENTE16  &
+./agent AGENTE07  &
+./agent AGENTE08  &
+./agent AGENTE09  &
+./agent AGENTE10  &
+./agent AGENTE11  &
+./agent AGENTE12  &
+./agent AGENTE13  &
 
