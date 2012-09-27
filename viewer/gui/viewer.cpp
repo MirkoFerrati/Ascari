@@ -135,8 +135,8 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
     if (backImage.compare("")) {
         painter.drawPixmap(0,0,sidex,sidey,pixmap);
     }
-
-    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setBrush(Qt::white);
+	painter.drawRect(0,0,10000,10000);
     if (view_type==1)
     {
         painter.save();
