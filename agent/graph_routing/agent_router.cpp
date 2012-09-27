@@ -168,7 +168,7 @@ void agent_router::run_plugin()
         if (delta<=0)
 			speed=0;
 		else
-			speed=min(15.0,max((length)/(delta),1.0));
+			speed=min(1000.0,max((length)/(delta),0.0));
 		cout<<" velocità="<<speed<<endl;
     }
 }
