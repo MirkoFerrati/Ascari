@@ -1,0 +1,1 @@
+This is the git repository of the Ascari project
