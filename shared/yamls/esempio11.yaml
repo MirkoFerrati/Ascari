@@ -3,7 +3,7 @@
   - bonus_variables: [c]
     c: 1
   AGENTS:
-  - agent: A1
+  - agent: Agente1
     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
     #MONITORING = 0

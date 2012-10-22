@@ -11,7 +11,7 @@
 #include "udp_graph_communicator.h"
 #include <boost/thread.hpp>
 
-#define MAXFLOORS 6
+#define MAXFLOORS 4
 #define TIME_SLOT_FOR_3DGRAPH 10.0
 
 
