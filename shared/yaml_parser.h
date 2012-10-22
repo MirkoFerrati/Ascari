@@ -35,6 +35,9 @@ typedef std::string event_name;
 typedef std::string event_expression;
 typedef std::string visible_area;
 typedef std::string communication_area;
+typedef std::string graph_name;
+
+
 typedef int target_id;
 
 

@@ -298,6 +298,10 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
 				world_node[wo.bonus_variables[i]]>>bonus_exp;
 				wo.bonus_expressions.insert(make_pair(wo.bonus_variables.at(i),bonus_exp));
 			}
+			
+			const YAML::Node &world_node=node[0]["WORLD"][1];
+			world_node["GRAPH_NAME"]>> wo.graphName;
+			
 
 		}
 	}
