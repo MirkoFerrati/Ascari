@@ -299,9 +299,12 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
 				wo.bonus_expressions.insert(make_pair(wo.bonus_variables.at(i),bonus_exp));
 			}
 			
-			const YAML::Node &world_node=node[0]["WORLD"][1];
+
+			if (node[0].FindValue("GRAPH_NAME"))
+			{
+			  
 			world_node["GRAPH_NAME"]>> wo.graphName;
-			
+			}
 
 		}
 	}
