@@ -68,7 +68,6 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
     }
 
     event_decoder.create(world.agents[myAgent].events_expressions,sub_events_to_index,events_to_index);
-    main_loop();
 }
 
 void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression > bonus)
@@ -87,6 +86,10 @@ void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression >
 	
 }
 
+void agent::start()
+{
+	main_loop();
+}
 
 
 void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
