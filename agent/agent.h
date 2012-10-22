@@ -19,6 +19,7 @@ class agent
 public:
 	agent(std::string name, bool isDummy, const Parsed_World& agents);
 	~agent();
+    void start();
 	
 protected:
 	/**

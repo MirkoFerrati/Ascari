@@ -15,12 +15,12 @@
 
 using namespace std;
 
-int Graph_creator::createGraph(int floors)
+int Graph_creator::createGraph(int floors, string graphName)
 {
 	this->floors=floors;
 	try
 	{
-		parseGraph();
+		parseGraph(graphName);
 		return graph_node_size;
 	}
 	catch (lemon::Exception e)
@@ -136,12 +136,12 @@ void Graph_creator::finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Poin
 	}
 }
 
-void Graph_creator::parseGraph()
+void Graph_creator::parseGraph(string graphName)
 {
 	using namespace lemon;
 
     try {
-        digraphReader(graph, GRAPHNAME). // read the directed graph into g
+        digraphReader(graph, graphName). // read the directed graph into g
         nodeMap("coordinates_x", coord_x).	//read the coordinates of nodes
         nodeMap("coordinates_y", coord_y).	//read the coordinates of nodes
         arcMap("length", length).       // read the 'capacity' arc map into cap
@@ -176,7 +176,7 @@ void Graph_creator::parseGraph()
 		distantColorNodeTexts().
 		run();
 
-	std::cout << "A digraph is read from "<<GRAPHNAME << std::endl;
+	std::cout << "A digraph is read from "<<graphName << std::endl;
     std::cout << "Number of nodes: " << lemon::countNodes(_3Dgraph) << std::endl;
     std::cout << "Number of arcs: " << lemon::countArcs(_3Dgraph) << std::endl;
 }

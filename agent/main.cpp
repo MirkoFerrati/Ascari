@@ -4,6 +4,7 @@
 #include "typedefs.h"
 #include "debug_constants.h"
 #include <time.h>
+#include "lemon/arg_parser.h"
 
 
 
@@ -11,24 +12,37 @@ int main(int argc, char **argv) {
     srand(time(NULL));
     LOGOG_INITIALIZE();
     {
+		logog::Cout out;
 		Parsed_World World;
-        logog::Cout out;
-		if (argc<2)
-		{
-			ERR("%s","please insert the name of the agent");
-			return 1;
+		lemon::ArgParser ap(argc,argv);
+		int count;
+		string agent_name;
+		std::string filename;
+		ap.refOption("n","Number of simulator cycle",count);
+		ap.refOption("a","Agent name",agent_name);		
+		ap.refOption("f","Yaml filename",filename);
+		ap.synonym("filename","f");
+		ap.synonym("agent","a");
+		ap.throwOnProblems();
+		try{
+			ap.parse();
 		}
-		if (argc>2)
-		{
-			World=parse_file(argv[2]);
+		catch (lemon::ArgParserException ex){
+			ERR("errore nella lettura dei parametri %s",ex.reason());
+			return 0;
 		}
+/*		if (ap.given("s"))
+			s.setSleep(secSleep);
+		if (ap.given("n"))
+			s.start_sim(count);
 		else
-		{
-			World=parse_file(FILENAME);
-		}
-        std::string name=argv[1];
-        agent a1(name,false,World);
+			s.start_sim();
+*/		
+		World = parse_file(filename); 
+        agent a1(agent_name,false,World);
+		a1.start();
         std::cout << "Hello, world! agent" << std::endl;
-    }
-    return 0;
+	}
+	LOGOG_SHUTDOWN();
+	return 0;
 }

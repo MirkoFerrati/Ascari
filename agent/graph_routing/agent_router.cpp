@@ -27,7 +27,7 @@ using namespace std;
 
 agent_router::agent_router(std::vector< int > tarlist, std::map< transition, bool >& events,
                            const std::map<std::string, transition>& events_to_index, string identifier,
-                           simulation_time& time
+                           simulation_time& time,std::string graphName
                           )
         :targets(tarlist),events(events),
         events_to_index(events_to_index),
@@ -35,7 +35,7 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 {
     using namespace lemon;
     Graph_creator c(graph,length,coord_x,coord_y);
-    graph_node_size=c.createGraph(MAXFLOORS);
+    graph_node_size=c.createGraph(MAXFLOORS,graphName);
     if (!graph_node_size)
         ERR("attenzione, impossibile creare il grafo",0);
     tarc=0;

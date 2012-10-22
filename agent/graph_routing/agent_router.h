@@ -19,7 +19,9 @@ class agent_router: public Plugin_module
 {
 	
 public:
-    agent_router(std::vector< int > tarlist, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index, std::string identifier,simulation_time& time);
+    agent_router(std::vector< int > tarlist, std::map< transition, bool >& events,
+				 const std::map<std::string,transition>& events_to_index, std::string identifier,
+				 simulation_time& time,std::string graphName);
     void setGraph(lemon::SmartDigraph& g);
     std::pair<int,int> getTargetCoords();
     void run_plugin();

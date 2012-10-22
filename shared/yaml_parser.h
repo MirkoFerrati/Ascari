@@ -81,7 +81,7 @@ class Parsed_World{
   std::vector<bonusVariable> bonus_variables;
   std::map<bonusVariable, bonus_expression> bonus_expressions;
   std::vector<Parsed_Agent> agents;
-  
+  std::string graphName;
 
 //   Parsed_World(int num_agents):agents(num_agents){}
    

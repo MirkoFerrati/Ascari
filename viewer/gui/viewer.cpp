@@ -23,7 +23,7 @@
 
 #define BORDER 0.3+0.2
 
-Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_service, QWidget* parent,int view_type)
+Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_service, QWidget* parent,int view_type,std::string graphName)
         : QWidget(parent),buffer(buffer),io_service(io_service)
 {
     time=0;
@@ -39,7 +39,7 @@ Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_servi
     this->view_type=view_type;
     if (view_type==2)
     {
-        parse_graph();
+        parse_graph(graphName);
     }
     for (lemon::SmartDigraph::NodeIt n(graph);n!=lemon::INVALID;++n)
 	{
@@ -53,14 +53,14 @@ Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_servi
 }
 
 
-void Viewer::parse_graph()
+void Viewer::parse_graph(std::string graphName)
 {
     coord_x= new lemon::SmartDigraph::NodeMap<int>(graph);
     coord_y= new lemon::SmartDigraph::NodeMap<int>(graph);
     length= new lemon::SmartDigraph::ArcMap<int>(graph);
 
     try {
-        lemon::digraphReader(graph, GRAPHNAME). // read the directed graph into g
+        lemon::digraphReader(graph, graphName). // read the directed graph into g
         nodeMap("coordinates_x", *coord_x).	//read the coordinates of nodes
         nodeMap("coordinates_y", *coord_y).	//read the coordinates of nodes
         arcMap("length", *length).       // read the 'capacity' arc map into cap
@@ -68,7 +68,7 @@ void Viewer::parse_graph()
     } catch (lemon::Exception& er) { // check if there was any error
     }
 
-    std::cout << "A digraph is read from "<<GRAPHNAME << std::endl;
+    std::cout << "A digraph is read from "<<graphName << std::endl;
     std::cout << "Number of nodes: " << lemon::countNodes(graph) << std::endl;
     std::cout << "Number of arcs: " << lemon::countArcs(graph) << std::endl;
 }

@@ -41,7 +41,7 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
 	
 	if (!world.agents.at(myAgent).target_list.empty())
 	{
-		plugins.push_back(new agent_router(world.agents.at(myAgent).target_list,events,events_to_index,identifier,time));
+		plugins.push_back(new agent_router(world.agents.at(myAgent).target_list,events,events_to_index,identifier,time,world.graphName));
 	}
 	  
 	/*!
@@ -244,10 +244,12 @@ void agent::main_loop()
 
 // 		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
 // 			break;
+#ifdef MAXLOOPS
             if (cicli > MAXLOOPS)
 			{
                 break;
 			}
+#endif			
             //sleep(1);
         }
 

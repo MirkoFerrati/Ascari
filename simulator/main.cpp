@@ -43,14 +43,7 @@ int main(int argc, char **argv) {
 			ERR("errore nella lettura dei parametri %s",ex.reason());
 			return 0;
 		}
-		if (ap.given("f"))
-		{
-			World=parse_file(filename);
-		}
-		else
-		{
-			World=parse_file(FILENAME);
-		}
+		World=parse_file(filename);
  	cout<<World;
 	s.initialize(World);
 	initialize_communication(s);

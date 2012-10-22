@@ -15,7 +15,7 @@ class Graph_creator
 public:	
 	Graph_creator(lemon::SmartDigraph &graph,lemon::SmartDigraph::ArcMap<int> &length,
     lemon::SmartDigraph::NodeMap<int> &coord_x,lemon::SmartDigraph::NodeMap<int> &coord_y);
-	int createGraph(int floors);
+	int createGraph(int floors, std::string graphName);
 private:
 	unsigned int graph_node_size;
 	unsigned int floors;
@@ -27,7 +27,7 @@ private:
     lemon::SmartDigraph::ArcMap<int> length;
     lemon::SmartDigraph::NodeMap<int> coord_x, coord_y;
 	
-	void parseGraph();
+	void parseGraph(std::string graphName);
 	void addFloor(lemon::SmartDigraph::NodeMap< lemon::dim2::Point< int > >& coords,
 					lemon::SmartDigraph::NodeMap< int >& ncolors, lemon::SmartDigraph::ArcMap< int >& acolors,
 					int startId);

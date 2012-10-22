@@ -12,7 +12,7 @@ class Viewer : public QWidget
 {
 
   public:
-    Viewer(const std::vector< char >& buffer, boost::asio::io_service& io_service, QWidget* parent = 0, int view_type=0);
+    Viewer(const std::vector< char >& buffer, boost::asio::io_service& io_service, QWidget* parent = 0, int view_type=0, std::string graphName="");
     ~Viewer();
     void setScalingFactor(double scalingFactorX, double scalingFactorY);
     void setTranslateFactor(double tx=0,double ty=0);
@@ -24,7 +24,7 @@ protected:
     void paintEvent(QPaintEvent *event);
     void timerEvent(QTimerEvent *event);
     void keyPressEvent(QKeyEvent *event);
-	void parse_graph();
+	void parse_graph(std::string graphName);
     void pause();
    
 
