@@ -1,9 +1,9 @@
 
 # 
-# add_subdirectory(logog)
+ add_subdirectory(logog)
 # 
 # 
-# add_subdirectory(parserYAML)
+ add_subdirectory(parserYAML)
 # 
 #add_subdirectory(lemon/lemon)
 

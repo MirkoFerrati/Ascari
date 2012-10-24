@@ -11,7 +11,7 @@ Parsed_World parse_file(const char * file_name)
 
 
 	Parsed_World parse_file(string file_name) {
-    std::ifstream fin(file_name);
+    std::ifstream fin(file_name.c_str());
     std::ostringstream str;
     str<<fin.rdbuf();
     std::string new_str=str.str();

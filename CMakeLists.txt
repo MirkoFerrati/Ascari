@@ -6,7 +6,7 @@ add_subdirectory(agent)
 add_subdirectory(simulator)
 add_subdirectory(gml2lgf)
 add_subdirectory(shared)
-
+add_subdirectory(launcher)
 include_directories(shared)
 include_directories(shared/logog/include)
 
