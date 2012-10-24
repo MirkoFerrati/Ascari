@@ -190,6 +190,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
     node["STATE_START"]>> ag.state_start;
     
+    ag.target_list="UNSET";
     if (node.FindValue("TARGET_LIST")){
     node["TARGET_LIST"]>> ag.target_list;
     }
@@ -300,6 +301,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
 			}
 			
 
+			wo.graphName="UNSET";
 			if (node[0].FindValue("GRAPH_NAME"))
 			{
 			  
@@ -314,8 +316,13 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
 	wo.agents.resize(agent_nodes.size());
 	
     for (unsigned int i=0;i<agent_nodes.size();i++) {
-		;
+		
         agent_nodes[i] >> wo.agents[i];
+	if ((wo.agents[i].target_list.size()==0 && wo.graphName.compare("UNSET")!=0)|| (wo.agents[i].target_list.size()>0 && wo.graphName.compare("UNSET")==0) ){
+	
+	  ERR("GRAPH NAME OR TARGET LIST UNDEFINED");
+          throw "GRAPH NAME OR TARGET LIST UNDEFINED";
+	}
 
     }
     
