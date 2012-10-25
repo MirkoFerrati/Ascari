@@ -207,7 +207,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
         painter.restore();
 
         painter.save();
-        painter.setBrush(Qt::GlobalColor::red);
+        painter.setBrush(QColor("red"));
         painter.translate(0,5);
         painter.rotate(180);
         painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
@@ -215,7 +215,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
         painter.restore();
 
         painter.save();
-        painter.setBrush(Qt::GlobalColor::white);
+        painter.setBrush(QColor("white"));
         painter.translate(10,10);
         painter.rotate(45);
         painter.scale((scalingFactorX*4.0/sidex),(scalingFactorY*4.0/sidey));
@@ -223,7 +223,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
         painter.restore();
 
         painter.save();
-        painter.setBrush(Qt::GlobalColor::white);
+        painter.setBrush(QColor("white"));
         painter.translate(-10,10);
         painter.rotate(45);
         painter.scale((scalingFactorX*4.0/sidex),(scalingFactorY*4.0/sidey));
@@ -231,7 +231,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
         painter.restore();
 
         painter.save();
-        painter.setBrush(Qt::GlobalColor::white);
+        painter.setBrush(QColor("white"));
         painter.translate(0,20);
         painter.rotate(45);
         painter.scale((scalingFactorX*4.0/sidex),(scalingFactorY*4.0/sidey));
@@ -242,7 +242,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
     for (map<string,Agent>::const_iterator it=agents.begin();it!=agents.end();it++)
     {
         painter.save();
-        painter.setBrush(Qt::GlobalColor::red);
+        painter.setBrush(QColor("red"));
         painter.translate(it->second.x,it->second.y);
         //TODO: Pessimo: lo zero degli angoli parte dall'asse y invece che da x
         double tmp=it->second.angle;
