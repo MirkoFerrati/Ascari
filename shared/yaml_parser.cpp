@@ -190,7 +190,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
     node["STATE_START"]>> ag.state_start;
     
-    ag.target_list="UNSET";
+    
     if (node.FindValue("TARGET_LIST")){
     node["TARGET_LIST"]>> ag.target_list;
     }
