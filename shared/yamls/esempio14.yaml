@@ -2,7 +2,7 @@
 - WORLD:
   - bonus_variables: [c]
     c: 1
-  - GRAPH_NAME: 'test5.gml.lgf'
+    GRAPH_NAME: 'test5.gml.lgf'
   AGENTS:
   - agent: Agente15
     VISIBLE_AREA: circle(9)

@@ -6,6 +6,8 @@
 #include <lemon/concepts/maps.h>
 #include <sstream>
 #include <iomanip>
+#include <boost/algorithm/string.hpp>
+
 #include<lemon/graph_to_eps.h>
 #include <lemon/color.cc>
 #include "debug_constants.h"
@@ -139,6 +141,7 @@ void Graph_creator::finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Poin
 void Graph_creator::parseGraph(string graphName)
 {
 	using namespace lemon;
+	boost::algorithm::to_lower(graphName);
 
     try {
         digraphReader(graph, graphName). // read the directed graph into g

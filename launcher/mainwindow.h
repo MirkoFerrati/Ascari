@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "yaml_parser.h"
+#include <QProcess>
 namespace Ui {
     class MainWindow;
 }
@@ -31,6 +32,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 	Parsed_World world;
+	std::vector<QProcess*> agents;
     QString fileName,simulatorPath,agentPath,viewerPath;
 };
 

@@ -4,13 +4,13 @@
 using namespace std;
 
 Parsed_World parse_file(const char * file_name)
-	{
-		std::string temp(file_name);
-		return parse_file(temp);
-	}
+{
+    std::string temp(file_name);
+    return parse_file(temp);
+}
 
 
-	Parsed_World parse_file(string file_name) {
+Parsed_World parse_file(string file_name) {
     std::ifstream fin(file_name.c_str());
     std::ostringstream str;
     str<<fin.rdbuf();
@@ -23,13 +23,13 @@ Parsed_World parse_file(const char * file_name)
     YAML::Parser parser(new_new_str);
     YAML::Node doc;
     parser.GetNextDocument(doc);
-    
-    
+
+
     Parsed_World World;//(doc[1]["AGENTS"].size());
-    
+
     doc>>World;
-   
-    
+
+
     return World;
 
 }
@@ -103,18 +103,18 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
 
         }
     }
-    
+
     os<< "Target List: ";
     for (std::vector<target_id>::const_iterator iter=ag.target_list.begin(); iter!=ag.target_list.end();iter++)
     {
         os<< " "<<*iter;
-      }
-       os<<endl; 
-       
-     os<< "Visibility:"<<ag.visibility<<endl;
-     os<< "Communication:"<<ag.communication<<endl;
-    
-	return os;
+    }
+    os<<endl;
+
+    os<< "Visibility:"<<ag.visibility<<endl;
+    os<< "Communication:"<<ag.communication<<endl;
+
+    return os;
 }
 
 
@@ -133,30 +133,31 @@ ostream& operator<< (ostream& os, const std::vector<Parsed_Agent>& ag) {
 
 ostream& operator<<(std::ostream& os, const Parsed_World& wo)
 {
-os<<wo.agents;
-return os;
+    os<<wo.agents;
+    return os;
 }
 
-  
+
 
 void operator>> (const YAML::Node& node, Parsed_Agent& ag)
-{	
-  
+{
+
     node["VISIBLE_AREA"]>>ag.visibility;
     node["COMMUNICATION_AREA"]>>ag.communication;
     node["AGENT"]>>ag.name;
     node["STATES"]>>ag.state;
     node["CONTROL_COMMANDS"]>>ag.inputs;
 
-    
+
     for (unsigned int i=0;i<ag.state.size();i++)
-    {	dynamic_expression tmp_exp;
+    {
+        dynamic_expression tmp_exp;
         node["DYNAMIC_MAP"][0][ag.state[i]]>>tmp_exp;
         ag.expressions.insert(std::pair<stateVariable,dynamic_expression>(ag.state[i],tmp_exp));
-	
+
 
         initial_state_value tmp_initial;
-	node["INITIAL"][0][ag.state[i]]>>tmp_initial;
+        node["INITIAL"][0][ag.state[i]]>>tmp_initial;
         ag.initial_states.insert(pair<stateVariable,initial_state_value>(ag.state[i],tmp_initial));
     }
 
@@ -189,21 +190,20 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     }
 
     node["STATE_START"]>> ag.state_start;
-    
-    ag.target_list="UNSET";
-    if (node.FindValue("TARGET_LIST")){
-    node["TARGET_LIST"]>> ag.target_list;
+
+    if (node.FindValue("TARGET_LIST")) {
+        node["TARGET_LIST"]>> ag.target_list;
     }
-    
+
     if (!ag.discrete_states.count(ag.state_start))
-                            {
-                                ERR("UNDEFINED START DISCRETE STATE %s", ag.state_start.c_str());
-                                throw "UNDEFINED DISCRETE START STATE";
-                            }
-    
-    
-    
-    
+    {
+        ERR("UNDEFINED START DISCRETE STATE %s", ag.state_start.c_str());
+        throw "UNDEFINED DISCRETE START STATE";
+    }
+
+
+
+
     const YAML::Node& encoder = behavior["ENCODER"][0];
     const YAML::Node& topology=encoder["TOPOLOGY"][0];
     topology["TOPOLOGY"]>> ag.topology;
@@ -243,7 +243,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
 
     const YAML::Node& automaton = behavior["AUTOMATON"];
-	automaton[0]["NAME"]>>ag.automaton_name;
+    automaton[0]["NAME"]>>ag.automaton_name;
 
 
     for (unsigned int i=0;i<automaton.size();i++) {
@@ -288,43 +288,47 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
 void operator>>(const YAML::Node& node, Parsed_World& wo)
 {
-	if (node[0].FindValue("WORLD"))
-	{
-		if (node[0]["WORLD"].size()>0)
-		{
-			const YAML::Node &world_node=node[0]["WORLD"][0];
-			world_node["BONUS_VARIABLES"]>> wo.bonus_variables;
-			for (unsigned int i=0;i<wo.bonus_variables.size();i++) {
-				string bonus_exp;
-				world_node[wo.bonus_variables[i]]>>bonus_exp;
-				wo.bonus_expressions.insert(make_pair(wo.bonus_variables.at(i),bonus_exp));
-			}
+    if (node[0].FindValue("WORLD"))
+    {
+        if (node[0]["WORLD"].size()>0)
+        {
 			
+            if (node[0]["WORLD"][0].FindValue("BONUS_VARIABLES"))
+            {
+                const YAML::Node &world_node=node[0]["WORLD"][0];
+                world_node["BONUS_VARIABLES"]>> wo.bonus_variables;
+                for (unsigned int i=0;i<wo.bonus_variables.size();i++) {
+                    string bonus_exp;
+                    world_node[wo.bonus_variables[i]]>>bonus_exp;
+                    wo.bonus_expressions.insert(make_pair(wo.bonus_variables.at(i),bonus_exp));
+                }
+            }
 
-			wo.graphName="UNSET";
-			if (node[0].FindValue("GRAPH_NAME"))
-			{
-			  
-			world_node["GRAPH_NAME"]>> wo.graphName;
-			}
+            wo.graphName="UNSET";
+            if (node[0]["WORLD"][0].FindValue("GRAPH_NAME"))
+            {
+                const YAML::Node &world_node=node[0]["WORLD"][0];
 
-		}
-	}
-	
-	const YAML::Node &agent_nodes=node[0]["AGENTS"];
+                world_node["GRAPH_NAME"]>> wo.graphName;
+            }
 
-	wo.agents.resize(agent_nodes.size());
-	
+        }
+    }
+
+    const YAML::Node &agent_nodes=node[0]["AGENTS"];
+
+    wo.agents.resize(agent_nodes.size());
+
     for (unsigned int i=0;i<agent_nodes.size();i++) {
-		
+
         agent_nodes[i] >> wo.agents[i];
-	if ((wo.agents[i].target_list.size()==0 && wo.graphName.compare("UNSET")!=0)|| (wo.agents[i].target_list.size()>0 && wo.graphName.compare("UNSET")==0) ){
-	
-	  ERR("GRAPH NAME OR TARGET LIST UNDEFINED");
-          throw "GRAPH NAME OR TARGET LIST UNDEFINED";
-	}
+        if ((wo.agents[i].target_list.size()==0 && wo.graphName.compare("UNSET")!=0)|| (wo.agents[i].target_list.size()>0 && wo.graphName.compare("UNSET")==0) ) {
+
+            ERR("GRAPH NAME OR TARGET LIST UNDEFINED");
+            throw "GRAPH NAME OR TARGET LIST UNDEFINED";
+        }
 
     }
-    
-  
+
+
 }

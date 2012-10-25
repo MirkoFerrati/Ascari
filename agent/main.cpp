@@ -19,8 +19,8 @@ int main(int argc, char **argv) {
 		string agent_name;
 		std::string filename;
 		ap.refOption("n","Number of simulator cycle",count);
-		ap.refOption("a","Agent name",agent_name);		
-		ap.refOption("f","Yaml filename",filename);
+		ap.refOption("a","Agent name",agent_name,true);		
+		ap.refOption("f","Yaml filename",filename,true);
 		ap.synonym("filename","f");
 		ap.synonym("agent","a");
 		ap.throwOnProblems();
@@ -31,6 +31,9 @@ int main(int argc, char **argv) {
 			ERR("errore nella lettura dei parametri %s",ex.reason());
 			return 0;
 		}
+		std::cout << "Parameters of '" << ap.commandName() << "':\n";
+		std::cout << "  Value of -a: " << agent_name << std::endl;
+		std::cout << "  Value of -f: " << filename << std::endl;
 /*		if (ap.given("s"))
 			s.setSleep(secSleep);
 		if (ap.given("n"))

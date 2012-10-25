@@ -82,4 +82,16 @@ void MainWindow::on_actionViewer_triggered()
 void MainWindow::on_StartAgents_clicked()
 {
 
+	for (int i=0;i<world.agents.size();i++)
+	{
+        QProcess *agent;
+        QStringList arguments;
+	arguments<< "-a " << QString::fromStdString(world.agents[i].name);
+	arguments<< " -f "<< QString::fromStdString(world.graphName);
+        agent=new QProcess();
+        agents.push_back(agent);
+	agents[i]->start(simulatorPath,arguments);
+		
+	}
+	
 }
