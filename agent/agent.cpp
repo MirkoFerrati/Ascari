@@ -17,7 +17,7 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
     for (unsigned int i =0;i<world.agents.size();i++)
         if (world.agents.at(i).name.compare(name)==0)
             myAgent=i;
-
+	string temp=name;
 	time=0;//TODO: initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
     
     symbol_table.add_constants();
@@ -41,7 +41,8 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
 	
 	if (!world.agents.at(myAgent).target_list.empty())
 	{
-		plugins.push_back(new agent_router(world.agents.at(myAgent).target_list,events,events_to_index,identifier,time,world.graphName));
+		Plugin_module *plugin=new agent_router(world.agents.at(myAgent).target_list,events,events_to_index,temp,time,world.graphName);;
+		plugins.push_back(plugin);
 	}
 	  
 	/*!

@@ -56,8 +56,8 @@ public:
 
     void receive()
     {
-         socket_.receive_from(
-             boost::asio::buffer(inbound_data_, MAX_PACKET_LENGTH), sender_endpoint_);
+        // socket_.receive_from(
+        //     boost::asio::buffer(inbound_data_, MAX_PACKET_LENGTH), sender_endpoint_);
 		socket_.async_receive_from(
                 boost::asio::buffer(inbound_data_, MAX_PACKET_LENGTH), sender_endpoint_,
                 boost::bind(&async_udp_receiver::handle_receive_from, this,

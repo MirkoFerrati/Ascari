@@ -23,7 +23,7 @@ public:
 	
 protected:
 	/**
-	 * Name of agent and it is used for univocal indentification
+	 * Name of agent and it is used for unique indentification
 	 */
 	std::string identifier;
 	

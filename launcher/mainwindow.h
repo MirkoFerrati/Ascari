@@ -4,6 +4,9 @@
 #include <QMainWindow>
 #include "yaml_parser.h"
 #include <QProcess>
+#include <boost/asio.hpp>
+#include <viewer.h>
+#include <udp_world_sniffer.h>
 namespace Ui {
     class MainWindow;
 }
@@ -29,9 +32,22 @@ private slots:
 
     void on_StartAgents_clicked();
 
+    void on_StartSimulator_clicked();
+
+    void on_Updateshell_clicked();
+
+    void on_StartViewer_clicked();
+
 private:
     Ui::MainWindow *ui;
+    QProcess *simulator;
+    QProcess *viewer;
+    boost::asio::io_service io_service;
+    std::vector<char> buffer;
+
 	Parsed_World world;
+        Viewer * insideViewer;
+        udp_world_sniffer *sniffer;
 	std::vector<QProcess*> agents;
     QString fileName,simulatorPath,agentPath,viewerPath;
 };

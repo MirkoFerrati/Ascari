@@ -12,6 +12,7 @@ int main(int argc, char **argv) {
     srand(time(NULL));
     LOGOG_INITIALIZE();
     {
+		cout<<argc<<argv[0]<<argv[1]<<argv[2]<<endl;
 		logog::Cout out;
 		Parsed_World World;
 		lemon::ArgParser ap(argc,argv);

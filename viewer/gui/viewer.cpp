@@ -277,10 +277,11 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
 
 void Viewer::timerEvent(QTimerEvent */*event*/)
 {
+    cout<<"timer event"<<endl;
     try
     {
         io_service.poll();
-        if (buffer.size()>0)
+        if (buffer.size()>0 )
         {
             std::string archive_data(&buffer[header_length], buffer.size()-header_length);
             std::istringstream archive_stream(archive_data);
@@ -292,7 +293,7 @@ void Viewer::timerEvent(QTimerEvent */*event*/)
     {
         // Unable to decode data.
         boost::system::error_code error(boost::asio::error::invalid_argument);
-        throw "Problema nella decodifica di un pacchetto";
+        //throw "Problema nella decodifica di un pacchetto";
     }
 
     for (map<string, agent_state_packet>::const_iterator it=infos.state_agents.internal_map.begin();it!=infos.state_agents.internal_map.end();it++)
@@ -334,6 +335,8 @@ void Viewer::start()
 {
 
     timerId = startTimer(10);
+    cout<<"timer started"<<endl;
+    repaint();
 
 }
 
