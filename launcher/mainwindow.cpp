@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     insideViewer=0;
     sniffer=0;
+    simulator=0;
     QCoreApplication::setOrganizationName("TODO");
     QCoreApplication::setOrganizationDomain("TODO");
     QCoreApplication::setApplicationName("Launcher");
@@ -24,6 +25,11 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         openFile();
     }
+    QList<int> sizes;
+    sizes.push_back(500);
+    sizes.push_back(500);
+    ui->splitter->setSizes(sizes);
+
 }
 
 MainWindow::~MainWindow()
@@ -113,8 +119,17 @@ void MainWindow::on_actionViewer_triggered()
     }
 }
 
-void MainWindow::on_StartAgents_clicked()
+void MainWindow::startAgents()
 {
+    if (agents.size()!=0)
+    {
+        for (unsigned int i=0;i<agents.size();i++)
+        {
+            agents[i]->kill();
+            delete(agents[i]);
+        }
+        agents.clear();
+    }
     for (unsigned int i=0;i<world.agents.size();i++)
     {
         QProcess *agent;
@@ -124,7 +139,6 @@ void MainWindow::on_StartAgents_clicked()
         agent=new QProcess(this);
         QFile file(fileName);
         QDir d = QFileInfo(file).absoluteDir();
-
         agent->setWorkingDirectory(d.absolutePath());
         agents.push_back(agent);
         agents[i]->setProcessChannelMode(QProcess::MergedChannels);
@@ -133,10 +147,15 @@ void MainWindow::on_StartAgents_clicked()
 
 }
 
-void MainWindow::on_StartSimulator_clicked()
+void MainWindow::startSimulator()
 {
     QStringList arguments;
     arguments<< "-f"<< fileName;
+    if (simulator)
+    {
+        simulator->kill();
+        delete(simulator);
+    }
     simulator=new QProcess(this);
     QFile file(fileName);
     QDir d = QFileInfo(file).absoluteDir();
@@ -157,10 +176,13 @@ void MainWindow::on_Updateshell_clicked()
 
 }
 
-void MainWindow::on_StartViewer_clicked()
+bool MainWindow::startViewer()
 {
     int viewerType=-1;
     QStringList arguments;
+
+    if (ui->selectViewType->selectedItems().size()<1)
+        return false;
 
     if (ui->selectViewType->selectedItems().first()->text().compare("Baseball")==0)
     {
@@ -205,7 +227,33 @@ void MainWindow::on_StartViewer_clicked()
         ui->asdf->addWidget(insideViewer);
         insideViewer->start();
 
-
+        return true;
     }
+    return false;
 
+}
+
+void MainWindow::on_playall_clicked()
+{
+    if (startViewer())
+    {
+        startAgents();
+        sleep(1);
+        startSimulator();
+    }
+}
+
+void MainWindow::on_StartAgents_clicked()
+{
+    startAgents();
+}
+
+void MainWindow::on_StartSimulator_clicked()
+{
+    startSimulator();
+}
+
+void MainWindow::on_StartViewer_clicked()
+{
+    startViewer();
 }

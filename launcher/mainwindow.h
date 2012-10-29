@@ -39,6 +39,12 @@ private slots:
 
     void on_StartViewer_clicked();
 
+    void on_playall_clicked();
+
+    bool startViewer();
+    void startAgents();
+    void startSimulator();
+
 private:
     Ui::MainWindow *ui;
     QProcess *simulator;
