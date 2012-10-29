@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1092</width>
-    <height>646</height>
+    <width>1150</width>
+    <height>631</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
      <height>100</height>
     </size>
    </property>
-   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0" rowminimumheight="0,0">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0" rowminimumheight="0">
     <item row="0" column="0">
      <widget class="QSplitter" name="splitter">
       <property name="sizePolicy">
@@ -50,7 +50,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="maximumSize">
         <size>
          <width>500</width>
@@ -182,17 +182,11 @@
          <height>50</height>
         </size>
        </property>
-       <widget class="QWidget" name="verticalLayoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>9</x>
-          <y>9</y>
-          <width>541</width>
-          <height>551</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="asdf"/>
-       </widget>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="asdf"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -203,7 +197,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1092</width>
+     <width>1150</width>
      <height>25</height>
     </rect>
    </property>

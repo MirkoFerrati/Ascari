@@ -154,16 +154,16 @@ void MainWindow::on_StartViewer_clicked()
     {
         QString a;
         arguments <<"-t"<< a.setNum(viewerType);
-        viewer=new QProcess(this);
+        //viewer=new QProcess(this);
         std::string graphname="";
         if (viewerType==2)
         {
             QFile file(fileName);
             QDir d = QFileInfo(file).absoluteDir();
-            viewer->setWorkingDirectory(d.absolutePath());
+            //viewer->setWorkingDirectory(d.absolutePath());
             graphname=(d.absolutePath().append("/").append(QString::fromStdString(world.graphName).toLower())).toStdString();
         }
-        viewer->setProcessChannelMode(QProcess::MergedChannels);
+        //viewer->setProcessChannelMode(QProcess::MergedChannels);
         //viewer->start(viewerPath,arguments);
 
         buffer.resize(MAX_PACKET_LENGTH);
