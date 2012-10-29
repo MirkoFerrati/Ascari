@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSettings>
 #include "yaml_parser.h"
 #include <QProcess>
 #include <boost/asio.hpp>
@@ -44,7 +45,8 @@ private:
     QProcess *viewer;
     boost::asio::io_service io_service;
     std::vector<char> buffer;
-
+    void openFile();
+    QSettings *settings;
 	Parsed_World world;
         Viewer * insideViewer;
         udp_world_sniffer *sniffer;

@@ -12,6 +12,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     insideViewer=0;
     sniffer=0;
+    QCoreApplication::setOrganizationName("TODO");
+    QCoreApplication::setOrganizationDomain("TODO");
+    QCoreApplication::setApplicationName("Launcher");
+    settings=new QSettings();
+    agentPath=settings->value("paths/agent","").toString();
+    simulatorPath=settings->value("paths/simulator","").toString();
+    viewerPath=settings->value("paths/viewer","").toString();
+    fileName = settings->value("paths/lastopen","").toString();
+    if (fileName.compare("")!=0)
+    {
+        openFile();
+    }
 }
 
 MainWindow::~MainWindow()
@@ -19,13 +31,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_actionOpen_triggered()
+void MainWindow::openFile()
 {
-
-    fileName = QFileDialog::getOpenFileName(this,"","","*.yaml");
     QFile file(fileName);
     QDir d = QFileInfo(file).absoluteDir();
-    std::cout<<d.absolutePath().toStdString()<<"ciao mirko"<<std::endl;
+
     if (!file.open(QIODevice::ReadOnly)) {
         QMessageBox::information(0, "error", file.errorString());
         return;
@@ -45,6 +55,15 @@ void MainWindow::on_actionOpen_triggered()
     num.setNum(world.agents.size());
     ui->StartAgents->setText(temp.append(num));
     ui->ShowFile->setText(line);
+    settings->setValue("paths/lastopen",fileName);
+}
+
+void MainWindow::on_actionOpen_triggered()
+{
+
+    fileName = QFileDialog::getOpenFileName(this,"","","*.yaml");
+    if (fileName.compare("")!=0)
+        openFile();
 }
 
 void MainWindow::on_actionSimulator_triggered()
@@ -55,7 +74,10 @@ void MainWindow::on_actionSimulator_triggered()
     openApp.setFilter(QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot);
     openApp.setNameFilter("simulator");
     if (openApp.exec())
+    {
         simulatorPath=openApp.selectedFiles().first();
+        settings->setValue("paths/simulator",simulatorPath);
+    }
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -71,7 +93,10 @@ void MainWindow::on_actionAgent_triggered()
     openApp.setFilter(QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot);
     openApp.setNameFilter("agent");
     if (openApp.exec())
+    {
         agentPath=openApp.selectedFiles().first();
+        settings->setValue("paths/agent",agentPath);
+    }
 }
 
 void MainWindow::on_actionViewer_triggered()
@@ -82,7 +107,10 @@ void MainWindow::on_actionViewer_triggered()
     openApp.setFilter(QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot);
     openApp.setNameFilter("viewer");
     if (openApp.exec())
+    {
         viewerPath=openApp.selectedFiles().first();
+        settings->setValue("paths/viewer",viewerPath);
+    }
 }
 
 void MainWindow::on_StartAgents_clicked()
@@ -126,10 +154,7 @@ void MainWindow::on_Updateshell_clicked()
         strout= agents[i]->readAllStandardError();
         std::cout<<strout.toStdString()<<std::endl;
     }
-//     QString strout= viewer->readAllStandardOutput();
-//     std::cout<<strout.toStdString()<<std::endl;
-//     strout= viewer->readAllStandardError();
-//     std::cout<<strout.toStdString()<<std::endl;
+
 }
 
 void MainWindow::on_StartViewer_clicked()
@@ -154,20 +179,16 @@ void MainWindow::on_StartViewer_clicked()
     {
         QString a;
         arguments <<"-t"<< a.setNum(viewerType);
-        //viewer=new QProcess(this);
         std::string graphname="";
         if (viewerType==2)
         {
             QFile file(fileName);
             QDir d = QFileInfo(file).absoluteDir();
-            //viewer->setWorkingDirectory(d.absolutePath());
             graphname=(d.absolutePath().append("/").append(QString::fromStdString(world.graphName).toLower())).toStdString();
         }
-        //viewer->setProcessChannelMode(QProcess::MergedChannels);
-        //viewer->start(viewerPath,arguments);
+
 
         buffer.resize(MAX_PACKET_LENGTH);
-        //TODO: sistemare il path qui usando QDir
         if (!sniffer)
         {
             sniffer=new udp_world_sniffer(buffer,io_service);
@@ -180,15 +201,7 @@ void MainWindow::on_StartViewer_clicked()
         }
         insideViewer=new Viewer(buffer,io_service,0,viewerType,graphname);
 
-//        QWidget *test=new QWidget();
 
-//        QFormLayout *layout = new QFormLayout;
-
-//        layout->addRow("test",insideViewer);
-//        layout->addRow("ciao",new QPushButton("test"));
-//        test->setLayout(layout);
-//        ui->asdf->addWidget(test);
-        //ui->asdf->
         ui->asdf->addWidget(insideViewer);
         insideViewer->start();
 

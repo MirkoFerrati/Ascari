@@ -277,7 +277,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
 
 void Viewer::timerEvent(QTimerEvent */*event*/)
 {
-    cout<<"timer event"<<endl;
+    //cout<<"timer event"<<endl;
     try
     {
         io_service.poll();
