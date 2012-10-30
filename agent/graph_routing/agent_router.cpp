@@ -130,11 +130,68 @@ void agent_router::run_plugin()
         }
         else if (isWaiting==10) //finito di negoziare, o parto oppure salto il turno
         {
-            isNegotiating=false;
-			prepare_info_packet();
+			_io_service.poll();
+			_io_service.reset();
+			merge_informations_collided(useArc);
+			if (findPath(useArc))
+			{
+				next_target_reachable=true;
+			}
+			else
+			{
+				next_target_reachable=false;
+				arc_id.clear();
+				node_id.clear();
+				for (unsigned int i=0;i<6;i++)//prenoto qualche nodo sopra di me per sicurezza
+					node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
+				cout<<"ho esaurito il tempo per la negoziazione per il target "<<graph.id(target)<<",mi fermo nel nodo"<<graph.id(source)%graph_node_size
+				<<"e prenoto i nodi "<<graph.id(source)%graph_node_size+graph_node_size<<graph.id(source)%graph_node_size+2*graph_node_size<<endl;
+				isWaiting=19;
+			}
+			isNegotiating=false; //non negozio il nodo dove sono bloccato, non voglio incidenti da dietro
+			last_time_updated=time;
+			_mutex.lock();
+			graph_informations& tmp = info.at(identifier);
+			tmp.id=identifier;
+			tmp.isNegotiating=isNegotiating;
+			tmp.lockedArc=arc_id;
+			tmp.lockedNode=node_id;
+			tmp.timestamp=last_time_updated;
+			_mutex.unlock();
+			communicator.send();
+            isWaiting++;
+        }
+        else if (isWaiting<15)
+		{
+			_io_service.poll();
+			_io_service.reset();
+			merge_informations_collided(useArc);
+			if (findPath(useArc))
+			{
+				next_target_reachable=true;
+			}
+			else
+			{
+				next_target_reachable=false;
+				arc_id.clear();
+				node_id.clear();
+				for (unsigned int i=0;i<6;i++)//prenoto qualche nodo sopra di me per sicurezza
+					node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
+				cout<<"ero contento di poter arrivare a "<<graph.id(target)<<",ma ho ricevuto qualcosa che mi fa fermare in "<<graph.id(source)%graph_node_size<<endl;
+			}
+			isNegotiating=false; //non negozio il nodo dove sono bloccato, non voglio incidenti da dietro
+			last_time_updated=time;
+			_mutex.lock();
+			graph_informations& tmp = info.at(identifier);
+			tmp.id=identifier;
+			tmp.isNegotiating=isNegotiating;
+			tmp.lockedArc=arc_id;
+			tmp.lockedNode=node_id;
+			tmp.timestamp=last_time_updated;
+			_mutex.unlock();
 			communicator.send();
 			isWaiting++;
-        }
+		}
         else //o sono partito, e quindi target è reachable, oppure sono fermo, e allora salto il turno ma continuo a controllare il percorso
 		{
 			if (!next_target_reachable)
@@ -206,8 +263,10 @@ void agent_router::prepare_info_packet()
     for (Path<SmartDigraph>::ArcIt a(p);a!=INVALID;++a)
     {
         j++;
-        if (j>2)
-            break; //TODO: prenoto solo i prossimi 2 archi del mio percorso
+		if (j>3)
+			break; //TODO: prenoto solo i prossimi 3 archi del mio percorso
+        if (graph.id(graph.source(a))/graph_node_size>6)
+            break; 
         if (graph.id(graph.source(a))/graph_node_size>MAXFLOORS)
             break;
         arc_id.push_back(graph.id(a));
@@ -219,8 +278,10 @@ void agent_router::prepare_info_packet()
         if (graph.id(i)/graph_node_size>MAXFLOORS || graph.id(i)<graph_node_size)
             continue;
         j++;
-        if (j>2)
+        if (j>3)
             break; //TODO: prenoto solo i prossimi 2 nodi del mio percorso
+        if (graph.id(i)/graph_node_size>6)
+			break;
         node_id.push_back(graph.id(i));
     }
     _mutex.lock();
@@ -285,11 +346,19 @@ bool agent_router::findPath(lemon::SmartDigraph::ArcMap<bool>& useArc)
     {
         arc_id.clear();
         node_id.clear();
-        for (unsigned int i=0;i<3;i++)//prenoto qualche nodo sopra di me per sicurezza
+        for (unsigned int i=0;i<6;i++)//prenoto qualche nodo sopra di me per sicurezza
             node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
         isNegotiating=false; //non negozio il nodo dove sono bloccato, non voglio incidenti da dietro
         last_time_updated=time;
 		cout<<"impossibile trovare un percorso valido per il nodo "<<graph.id(target)<<",distanza minima: "<<d<<endl;
+		_mutex.lock();
+		graph_informations& tmp = info.at(identifier);
+		tmp.id=identifier;
+		tmp.isNegotiating=isNegotiating;
+		tmp.lockedArc=arc_id;
+		tmp.lockedNode=node_id;
+		tmp.timestamp=last_time_updated;
+		_mutex.unlock();
         communicator.send();
         return false;
     }

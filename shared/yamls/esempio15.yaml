@@ -137,7 +137,7 @@
     - *dynamic
     BEHAVIOR:
     - *machine
-  - agent: Agente09
+  - agent: Agente17
     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
     states: [x,y,theta]

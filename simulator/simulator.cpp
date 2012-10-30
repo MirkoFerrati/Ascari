@@ -18,7 +18,7 @@ void simulator::create_communicator(int communicator_type)
 simulator::simulator():
 topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT)
 {
-secSleep=20000;
+secSleep=5000;
 }
 
 void simulator::setSleep(unsigned secSleep)
