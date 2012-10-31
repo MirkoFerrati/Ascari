@@ -18,6 +18,10 @@
 #include "debug_constants.h"
 #include "graph_creator.h"
 
+#define FLOORS_SENT 6
+#define MAX_LENGTH 2*VERTICAL_LENGTH //TODO: questo numero è fisso ma dovrebbe essere una variabile
+
+
 //TODO: probabilmente non serve mandarsi anche la lista dei nodi bloccati, basta la lista degli archi con questa configurazione
 //TODO: l'effetto sarebbe una riduzione dei dati da mandarsi e moltissimi cicli in meno per creare e parsare la mappa filtrante
 //TODO: oppure ancora più facile mandarsi solo la lista dei nodi bloccati, tanto poi blocco tutti gli archi entranti...e gli uscenti?
@@ -142,7 +146,7 @@ void agent_router::run_plugin()
 				next_target_reachable=false;
 				arc_id.clear();
 				node_id.clear();
-				for (unsigned int i=0;i<6;i++)//prenoto qualche nodo sopra di me per sicurezza
+				for (unsigned int i=0;i<MAXFLOORS;i++)//prenoto qualche nodo sopra di me per sicurezza
 					node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
 				cout<<"ho esaurito il tempo per la negoziazione per il target "<<graph.id(target)<<",mi fermo nel nodo"<<graph.id(source)%graph_node_size
 				<<"e prenoto i nodi "<<graph.id(source)%graph_node_size+graph_node_size<<graph.id(source)%graph_node_size+2*graph_node_size<<endl;
@@ -175,7 +179,7 @@ void agent_router::run_plugin()
 				next_target_reachable=false;
 				arc_id.clear();
 				node_id.clear();
-				for (unsigned int i=0;i<6;i++)//prenoto qualche nodo sopra di me per sicurezza
+				for (unsigned int i=0;i<MAXFLOORS;i++)//prenoto qualche nodo sopra di me per sicurezza
 					node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
 				cout<<"ero contento di poter arrivare a "<<graph.id(target)<<",ma ho ricevuto qualcosa che mi fa fermare in "<<graph.id(source)%graph_node_size<<endl;
 			}
@@ -263,10 +267,8 @@ void agent_router::prepare_info_packet()
     for (Path<SmartDigraph>::ArcIt a(p);a!=INVALID;++a)
     {
         j++;
-		if (j>3)
+		if (j>FLOORS_SENT)
 			break; //TODO: prenoto solo i prossimi 3 archi del mio percorso
-        if (graph.id(graph.source(a))/graph_node_size>6)
-            break; 
         if (graph.id(graph.source(a))/graph_node_size>MAXFLOORS)
             break;
         arc_id.push_back(graph.id(a));
@@ -278,10 +280,9 @@ void agent_router::prepare_info_packet()
         if (graph.id(i)/graph_node_size>MAXFLOORS || graph.id(i)<graph_node_size)
             continue;
         j++;
-        if (j>3)
+        if (j>FLOORS_SENT)
             break; //TODO: prenoto solo i prossimi 2 nodi del mio percorso
-        if (graph.id(i)/graph_node_size>6)
-			break;
+       
         node_id.push_back(graph.id(i));
     }
     _mutex.lock();
@@ -340,13 +341,13 @@ bool agent_router::findPath(lemon::SmartDigraph::ArcMap<bool>& useArc)
     bool reached=true;//dijkstra(graph,length).path(p).dist(real_distance).run(source,target); //senza prenotazioni o con prenotazioni vecchie?
     merge_informations_collided(useArc);
     reached= dijkstra(filterArcs(graph,useArc),length).path(p).dist(d).run(source,target);
-    if (d>200000)//TODO: questo numero è fisso ma dovrebbe essere una variabile, comunque fa coppia con i 10000 del graph_creator
+    if (d>MAX_LENGTH)
         reached=false;
     if (!reached)
     {
         arc_id.clear();
         node_id.clear();
-        for (unsigned int i=0;i<6;i++)//prenoto qualche nodo sopra di me per sicurezza
+        for (unsigned int i=0;i<MAXFLOORS;i++)//prenoto qualche nodo sopra di me per sicurezza
             node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
         isNegotiating=false; //non negozio il nodo dove sono bloccato, non voglio incidenti da dietro
         last_time_updated=time;

@@ -15,6 +15,7 @@
 
 #define sqr(a) (a)*(a)
 
+
 using namespace std;
 
 int Graph_creator::createGraph(int floors, string graphName)
@@ -56,7 +57,7 @@ void Graph_creator::addNodes(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int
 		if (floorNumber>0)
 		{
 			SmartDigraph::Arc a=_3Dgraph.addArc(n,_3Dgraph.nodeFromId(i));
-			(_3Dlength)[a]=100000;
+			(_3Dlength)[a]=VERTICAL_LENGTH;
 			acolors[a]=floors+3;
 		}
 	}
@@ -121,7 +122,7 @@ void Graph_creator::finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Poin
 		for (SmartDigraph::OutArcIt arcit(graph,graph.nodeFromId(i));arcit!=INVALID;++arcit)
 		{
 			SmartDigraph::Arc a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+floorNumber*graph_node_size),_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size));
-			(_3Dlength)[a]=500; //TODO: ogni numero è fondamentale
+			(_3Dlength)[a]=TOP_FLOOR_LENGTH; //TODO: ogni numero è fondamentale
 			acolors[a]=floorNumber+1;
 			source=_3Dgraph.nodeFromId(i+(floorNumber-1)*graph_node_size);
 			target=_3Dgraph.nodeFromId(graph.id(graph.target(arcit))+floorNumber*graph_node_size);

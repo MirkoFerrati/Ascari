@@ -7,8 +7,9 @@
 #include <lemon/random.h>
 #include <typedefs.h>
 
-#define PRIMARYNODES 9
 #define XYOFFSET 80
+#define VERTICAL_LENGTH 100000
+#define TOP_FLOOR_LENGTH 500
 
 class Graph_creator
 {
