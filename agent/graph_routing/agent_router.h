@@ -14,6 +14,8 @@
 #define MAXFLOORS 8
 #define TIME_SLOT_FOR_3DGRAPH 10.0
 
+#define FLOORS_SENT 6
+#define MAX_LENGTH 2*VERTICAL_LENGTH //TODO: questo numero è fisso ma dovrebbe essere una variabile
 
 class agent_router: public Plugin_module
 {
@@ -56,7 +58,6 @@ private:
     lemon::Path<lemon::SmartDigraph> p;
     static lemon::Random generatorRandom;
     unsigned int tarc;
-    std::vector<int> arc_id;
 	std::vector<int> node_id;
 	std::map< transition, bool >& events;
 	
@@ -70,6 +71,8 @@ private:
 	bool checkIfTargetReached();
     void prepare_info_packet();
     bool merge_informations_collided(lemon::SmartDigraph::ArcMap< bool >& useArc);
+	void copy_info_packet();
+	void prepare_stop_packet();
 	lemon::SmartDigraph::Node source, target;
     lemon::SmartDigraph::Node next;
     int graph_node_size;
