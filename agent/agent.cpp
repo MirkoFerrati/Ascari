@@ -1,11 +1,15 @@
 #include "agent.h"
+#include <agent_router.h>
+#include <string>
+#include <utility>
+#include <map>
 #include "communication/udp_world_communicator.h"
+
 #include "logog.hpp"
 #include "automaton/automatonFSM.h"
 #include "encoder/encoderDet.h"
-#include "debug_constants.h"
 #include "geometry.hpp"
-#include <agent_router.h>
+
 
 using namespace std;
 
@@ -18,7 +22,7 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
         if (world.agents.at(i).name.compare(name)==0)
             myAgent=i;
 	string temp=name;
-	time=0;//TODO: initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
+	time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
     
     symbol_table.add_constants();
 	pi=exprtk::details::numeric::constant::pi;
@@ -64,8 +68,9 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
                                map_bonus_variables_to_id, world.agents.at(myAgent).topology_expressions,
 							   sub_events_to_index,world.agents.at(myAgent).lambda_expressions,encoder_symbol_table);
     }
-    else {
-        //TODO: we will think about identifierModule later
+    else
+	{
+        //TODO(Mirko): we will think about identifierModule later
     }
 
     event_decoder.create(world.agents[myAgent].events_expressions,sub_events_to_index,events_to_index);
@@ -213,7 +218,7 @@ void agent::main_loop()
 			bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
 			}
            
-			//TODO: questo ciclo for copia informazioni che in teoria già abbiamo, forse non vale la pena di usare la variabile state
+			//TODO(Mirko): questo ciclo for copia informazioni che in teoria già abbiamo, forse non vale la pena di usare la variabile state
             for (map<int,double>::const_iterator it=state_other_agents.at(identifier).state.begin();
                     it!=state_other_agents.at(identifier).state.end();it++)
             {
@@ -236,7 +241,7 @@ void agent::main_loop()
 
             world_comm->send_control_command(inputs,NULL);
 
-            string tmp; //TODO non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
+            string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
             for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();it++)
             {
                 if (it->second==discreteState[0])
