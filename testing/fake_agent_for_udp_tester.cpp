@@ -33,11 +33,11 @@ private:
     void printMap()
     {
         mutex.lock();
-        for (std::map<agent_name,behavior_topology>::iterator it=data->data.begin();it!=data->data.end();it++)
+        for (std::map<agent_name,behavior_topology>::iterator it=data->data.begin();it!=data->data.end();++it)
         {
-            for (behavior_topology::iterator itt=it->second.begin();itt!=it->second.end();itt++)
+            for (behavior_topology::iterator itt=it->second.begin();itt!=it->second.end();++itt)
             {
-                for (topology_values::iterator ittt=itt->second.begin();ittt!=itt->second.end();ittt++)
+                for (topology_values::iterator ittt=itt->second.begin();ittt!=itt->second.end();++ittt)
                 {
                     std::cout<<it->first<<" "<<itt->first<<" "<<ittt->first<<" "<<ittt->second<<",";
                 }

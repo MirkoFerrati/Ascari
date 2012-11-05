@@ -239,7 +239,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
         painter.restore();
     }
 
-    for (map<string,Agent>::const_iterator it=agents.begin();it!=agents.end();it++)
+    for (map<string,Agent>::const_iterator it=agents.begin();it!=agents.end();++it)
     {
         painter.save();
         painter.setBrush(QColor("red"));
@@ -296,7 +296,7 @@ void Viewer::timerEvent(QTimerEvent */*event*/)
         //throw "Problema nella decodifica di un pacchetto";
     }
 
-    for (map<string, agent_state_packet>::const_iterator it=infos.state_agents.internal_map.begin();it!=infos.state_agents.internal_map.end();it++)
+    for (map<string, agent_state_packet>::const_iterator it=infos.state_agents.internal_map.begin();it!=infos.state_agents.internal_map.end();++it)
     {
         agents[it->first].translate(it->second);
         //setScalingFactor(agents[it->first].getMaxX()-agents[it->first].getMinX(),agents[it->first].getMaxY()-agents[it->first].getMinY());

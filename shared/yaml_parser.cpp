@@ -173,7 +173,6 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
         for (unsigned int j=0;j<ag.inputs.size();j++)
         {
-            string temp1;
             controllers[i][ag.inputs[j]]>> ag.controllers[temp][j];
         }
     }

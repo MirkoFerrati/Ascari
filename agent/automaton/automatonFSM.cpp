@@ -7,7 +7,7 @@ vector<automaton_state> automatonFSM::getNextAutomatonState(const vector<automat
 {
 	vector<automaton_state> result;
 	result.push_back(oldState.at(0));
-	for (map<transition,bool>::const_iterator it=event.begin(); it!=event.end(); it++)
+	for (map<transition,bool>::const_iterator it=event.begin(); it!=event.end(); ++it)
 	{ 
 		if (it->second) { 
 			if (table.internalTable.at(oldState.at(0)).count(it->first)) {

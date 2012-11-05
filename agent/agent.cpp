@@ -31,7 +31,7 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
 	symbol_table.add_function(f_rndom->name, *f_rndom);
     
     int i=0;
-    for (map<controller_name,controller_MapRules>::const_iterator it =world.agents[myAgent].controllers.begin();it !=world.agents[myAgent].controllers.end();it++)
+    for (map<controller_name,controller_MapRules>::const_iterator it =world.agents[myAgent].controllers.begin();it !=world.agents[myAgent].controllers.end();++it)
     {
         map_controllername_to_id.insert(make_pair(it->first,i++));
     }
@@ -41,7 +41,6 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
     createSubEventsFromParsedAgent(world.agents.at(myAgent));
     createEventsFromParsedAgent(world.agents.at(myAgent));
     world_comm=new udp_world_communicator();
-    
 	
 	if (!world.agents.at(myAgent).target_list.empty())
 	{
@@ -79,13 +78,13 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
 void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression > bonus)
 {
 	int i=0;
-	for (map<bonusVariable,bonus_expression>::const_iterator it=bonus.begin();it!=bonus.end();it++)
+	for (map<bonusVariable,bonus_expression>::const_iterator it=bonus.begin();it!=bonus.end();++it)
     {
 		bonusVariables[i]=0;
         map_bonus_variables_to_id.insert(make_pair(it->first,i));
 		i++;
     }
-    for (index_map::const_iterator it=map_bonus_variables_to_id.begin();it!=map_bonus_variables_to_id.end();it++)
+    for (index_map::const_iterator it=map_bonus_variables_to_id.begin();it!=map_bonus_variables_to_id.end();++it)
 	{
 		symbol_table.add_variable(it->first,bonusVariables[it->second]);
 	}
@@ -100,7 +99,7 @@ void agent::start()
 
 void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
 {
-    for (map<controller_name,controller_MapRules>::const_iterator it =agent.controllers.begin();it !=agent.controllers.end();it++)
+    for (map<controller_name,controller_MapRules>::const_iterator it =agent.controllers.begin();it !=agent.controllers.end();++it)
     {
         controller c(it->second,agent.inputs,symbol_table);
         controllers.push_back(c);
@@ -114,10 +113,10 @@ transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& a
     automaton_table_tmp.name = agent.automaton_name;
     automaton_state s1, s2;
     transition e;
-    for (map<string,map<string,string> >::const_iterator it=agent.automaton.begin(); it!=agent.automaton.end();it++)
+    for (map<string,map<string,string> >::const_iterator it=agent.automaton.begin(); it!=agent.automaton.end();++it)
     {
         s1 = (automaton_state) map_discreteStateName_to_id.at(it->first);
-        for (map<string,string>::const_iterator iit=it->second.begin();iit!=it->second.end();iit++) {
+        for (map<string,string>::const_iterator iit=it->second.begin();iit!=it->second.end();++iit) {
 
             e= (transition) events_to_index.at(iit->first);
             s2 = (automaton_state) map_discreteStateName_to_id.at(iit->second);
@@ -132,7 +131,7 @@ void agent::createDiscreteStateFromParsedAgent(const Parsed_Agent& agent)
 {
     automaton_state s = (automaton_state) 0;
     unsigned int i = 0;
-    for (map<string,string>::const_iterator it=agent.discrete_states.begin(); it!=agent.discrete_states.end(); it++)
+    for (map<string,string>::const_iterator it=agent.discrete_states.begin(); it!=agent.discrete_states.end(); ++it)
     {
         map_discreteStateName_to_id.insert(make_pair(it->first,i));
         map_discreteStateId_to_controllerId.insert(make_pair(s,map_controllername_to_id.at(it->second)));
@@ -146,13 +145,13 @@ void agent::createDiscreteStateFromParsedAgent(const Parsed_Agent& agent)
 void agent::createSubEventsFromParsedAgent(const Parsed_Agent& agent) {
 
     unsigned i=0;
-    for (map<string,string>::const_iterator it=agent.lambda_expressions.begin();it!=agent.lambda_expressions.end();it++) {
+    for (map<string,string>::const_iterator it=agent.lambda_expressions.begin();it!=agent.lambda_expressions.end();++it) {
         sub_events_to_index.insert(make_pair(it->first,i));
         sub_events.insert(make_pair(i,_FALSE));
         i++;
     }
 
-    for (map<string,string>::const_iterator it=agent.topology_expressions.begin();it!=agent.topology_expressions.end();it++) {
+    for (map<string,string>::const_iterator it=agent.topology_expressions.begin();it!=agent.topology_expressions.end();++it) {
         sub_events_to_index.insert(make_pair(it->first,i));
         sub_events.insert(make_pair(i,_FALSE));
 		i++;
@@ -163,7 +162,7 @@ void agent::createSubEventsFromParsedAgent(const Parsed_Agent& agent) {
 void agent::createEventsFromParsedAgent(const Parsed_Agent& agent)
 {
     transition i=(transition)0;
-    for (map<string,string>::const_iterator it=agent.events_expressions.begin();it!=agent.events_expressions.end();it++)
+    for (map<string,string>::const_iterator it=agent.events_expressions.begin();it!=agent.events_expressions.end();++it)
     {
         events_to_index.insert(make_pair(it->first,i));
         events.insert(make_pair(i,false));
@@ -213,14 +212,14 @@ void agent::main_loop()
 			time=temp.time;
 			if (time<-1)
 				break;
-			for (std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin();it!=temp.bonus_variables.end();it++)
+			for (std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin();it!=temp.bonus_variables.end();++it)
 			{
 			bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
 			}
            
 			//TODO(Mirko): questo ciclo for copia informazioni che in teoria già abbiamo, forse non vale la pena di usare la variabile state
             for (map<int,double>::const_iterator it=state_other_agents.at(identifier).state.begin();
-                    it!=state_other_agents.at(identifier).state.end();it++)
+                    it!=state_other_agents.at(identifier).state.end();++it)
             {
                 state.at(it->first)=it->second;
             }
@@ -241,12 +240,12 @@ void agent::main_loop()
 
             world_comm->send_control_command(inputs,NULL);
 
-            string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
-            for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();it++)
-            {
-                if (it->second==discreteState[0])
-                    tmp=it->first;
-            }
+            //string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
+            //for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();++it)
+            //{
+            //    if (it->second==discreteState[0])
+            //        tmp=it->first;
+            //}
 
 //             cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)
 // 			<<" "<<state_other_agents.at(identifier).state.at(2)<<endl;

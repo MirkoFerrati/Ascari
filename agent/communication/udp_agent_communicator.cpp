@@ -4,11 +4,12 @@ udp_agent_communicator::udp_agent_communicator(boost::signals2::mutex& mutex,top
 :mutex(mutex),tp(tp),socket_(io_service),sender(io_service,boost::asio::ip::address::from_string(MULTICAST_ADDRESS),SIMULATOR_ROUTE_PORT)
 ,listen_endpoint_(boost::asio::ip::address::from_string("0.0.0.0"), AGENT_ROUTE_PORT)
 {
-    mutex_is_mine=false;
+	std::fill_n(inbound_data_,MAX_PACKET_LENGTH,0);
+	mutex_is_mine=false;
     socket_.open(listen_endpoint_.protocol());
     socket_.set_option(boost::asio::ip::udp::socket::reuse_address(true));
     socket_.bind(listen_endpoint_);
-
+	printDebug=false;
     // Join the multicast group.
     socket_.set_option(
         boost::asio::ip::multicast::join_group(boost::asio::ip::address::from_string(MULTICAST_ADDRESS)));
@@ -25,11 +26,11 @@ void udp_agent_communicator::send(bool printDebug)
     mutex.lock();
 	if (printDebug)
 		std::cout<<"sto inviando una comunicazione"<<std::endl;
-    for (std::map<agent_name,behavior_topology>::iterator it=tp->data.begin();it!=tp->data.end();it++)
+    for (std::map<agent_name,behavior_topology>::iterator it=tp->data.begin();it!=tp->data.end();++it)
     {
-        for (behavior_topology::iterator itt=it->second.begin();itt!=it->second.end();itt++)
+        for (behavior_topology::iterator itt=it->second.begin();itt!=it->second.end();++itt)
         {
-            for (topology_values::iterator ittt=itt->second.begin();ittt!=itt->second.end();ittt++)
+            for (topology_values::iterator ittt=itt->second.begin();ittt!=itt->second.end();++ittt)
             {
                 if (ittt->second!=-1)
                     output_map_tp.data[it->first][itt->first][ittt->first]=ittt->second;
@@ -81,11 +82,11 @@ void udp_agent_communicator::handle_receive_from(const boost::system::error_code
 
         if (printDebug)
 		{
-			for (std::map<agent_name,behavior_topology>::iterator it=input_map_tp.data.begin();it!=input_map_tp.data.end();it++)
+			for (std::map<agent_name,behavior_topology>::iterator it=input_map_tp.data.begin();it!=input_map_tp.data.end();++it)
 			{
-				for (behavior_topology::iterator itt=it->second.begin();itt!=it->second.end();itt++)
+				for (behavior_topology::iterator itt=it->second.begin();itt!=it->second.end();++itt)
 				{
-					for (topology_values::iterator ittt=itt->second.begin();ittt!=itt->second.end();ittt++)
+					for (topology_values::iterator ittt=itt->second.begin();ittt!=itt->second.end();++ittt)
 					{
 						std::cout<<"-->"<<it->first<<" "<<itt->first<<" "<<ittt->first<<" "<<ittt->second<<",";
 					}
@@ -100,11 +101,11 @@ void udp_agent_communicator::handle_receive_from(const boost::system::error_code
 // 		}
 
         //Copiamo tutto, sarà compito del sender assicurarsi di non mandare robaccia
-        for (std::map<agent_name,behavior_topology>::iterator it=input_map_tp.data.begin();it!=input_map_tp.data.end();it++)
+        for (std::map<agent_name,behavior_topology>::iterator it=input_map_tp.data.begin();it!=input_map_tp.data.end();++it)
         {
-            for (behavior_topology::iterator itt=it->second.begin();itt!=it->second.end();itt++)
+            for (behavior_topology::iterator itt=it->second.begin();itt!=it->second.end();++itt)
             {
-                for (topology_values::iterator ittt=itt->second.begin();ittt!=itt->second.end();ittt++)
+                for (topology_values::iterator ittt=itt->second.begin();ittt!=itt->second.end();++ittt)
                 {
                     tp->data[it->first][itt->first][ittt->first]=ittt->second;
                 }

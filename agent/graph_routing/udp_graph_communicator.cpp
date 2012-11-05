@@ -5,6 +5,9 @@ Udp_graph_communicator::Udp_graph_communicator(boost::signals2::mutex& mutex,gra
         ,listen_endpoint_(boost::asio::ip::address::from_string("0.0.0.0"), AGENT_GRAPH_PORT),_io_service(io_service)
 {
     mutex_is_mine=false;
+	printDebug=false;
+	should_run=false;
+	std::fill_n(inbound_data_,MAX_PACKET_LENGTH,0);
     socket_.open(listen_endpoint_.protocol());
     socket_.set_option(boost::asio::ip::udp::socket::reuse_address(true));
     socket_.bind(listen_endpoint_);
@@ -94,7 +97,7 @@ void Udp_graph_communicator::handle_receive_from(const boost::system::error_code
 // 		}
 
         //Copiamo tutto, sarà compito del sender assicurarsi di non mandare robaccia
-        for (graph_packet::iterator it=input_map_tp.begin();it!=input_map_tp.end();it++)
+        for (graph_packet::iterator it=input_map_tp.begin();it!=input_map_tp.end();++it)
         {
 			//se non ho l'informazione oppure ce l'ho ma è vecchia la cambio
             if (!tp->count(it->first) || tp->at(it->first).timestamp<it->second.timestamp) 

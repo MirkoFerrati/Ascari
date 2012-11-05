@@ -32,7 +32,7 @@ encoderDet::encoderDet(std::map< int, sub_event_value >& sub_events, const strin
 	
     exprtk::parser<double> parser;
 
-    for (map<string,string>::const_iterator it=lambda_expres.begin();it!=lambda_expres.end();it++) {
+    for (map<string,string>::const_iterator it=lambda_expres.begin();it!=lambda_expres.end();++it) {
 
         exprtk::expression<double> tmp_expression;
         tmp_expression.register_symbol_table(symbol_table);
@@ -42,7 +42,7 @@ encoderDet::encoderDet(std::map< int, sub_event_value >& sub_events, const strin
     }
 
 
-    for (map<string,string>::const_iterator it=topology_expres.begin();it!=topology_expres.end();it++) {
+    for (map<string,string>::const_iterator it=topology_expres.begin();it!=topology_expres.end();++it) {
 
         exprtk::expression<double> tmp_expression;
         tmp_expression.register_symbol_table(symbol_table);
@@ -62,11 +62,11 @@ encoderDet::encoderDet(std::map< int, sub_event_value >& sub_events, const strin
 
 void encoderDet::computeSubEvents(const map< string, agent_state_packet >& state_other_agents)
 {
-    for (map<int,sub_event_value>::iterator it=ref_sub_events.begin();it!=ref_sub_events.end();it++) {
+    for (map<int,sub_event_value>::iterator it=ref_sub_events.begin();it!=ref_sub_events.end();++it) {
         it->second=_FALSE;
     }
 
-    for (map<int,exprtk::expression<double> >::const_iterator it=lambda_expressions.begin();it!=lambda_expressions.end();it++)
+    for (map<int,exprtk::expression<double> >::const_iterator it=lambda_expressions.begin();it!=lambda_expressions.end();++it)
     {
         if (it->second.value()==1)
             ref_sub_events.at(it->first)=_TRUE;
@@ -74,16 +74,16 @@ void encoderDet::computeSubEvents(const map< string, agent_state_packet >& state
             ref_sub_events.at(it->first)=_FALSE;
     }
 
-    for (map< string, agent_state_packet >::const_iterator it=state_other_agents.begin();it!=state_other_agents.end();it++) {
+    for (map< string, agent_state_packet >::const_iterator it=state_other_agents.begin();it!=state_other_agents.end();++it) {
 
         if (it->first!=agent_name)
         {
-            for (map_int_double::const_iterator iit=(*it).second.state.begin();iit!=(*it).second.state.end();iit++)
+            for (map_int_double::const_iterator iit=(*it).second.state.begin();iit!=(*it).second.state.end();++iit)
             {
                 state_target.at(iit->first)=iit->second;
             }
 
-            for (map<int,exprtk::expression<double> >::const_iterator iit=topology_expressions.begin();iit!=topology_expressions.end();iit++)
+            for (map<int,exprtk::expression<double> >::const_iterator iit=topology_expressions.begin();iit!=topology_expressions.end();++iit)
             {
                 if (ref_sub_events.at(iit->first)==_FALSE) {
                     if (iit->second.value()==1)

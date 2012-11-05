@@ -14,12 +14,12 @@ graph::graph()
 
 void graph::readGraph(fstream* f)
 {
-  int numArc=0;
   char s[256];
   f->getline(s,256);
   string tmp=s;
   if (tmp.compare("[")==0) //deve esserci subito una quadra
   {
+	int numArc=0;
     while(!f->eof()) //leggiamo i nodi e gli archi
     {
       f->getline(s,256);

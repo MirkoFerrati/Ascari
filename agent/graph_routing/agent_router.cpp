@@ -183,7 +183,7 @@ bool agent_router::detect_collision(lemon::SmartDigraph::ArcMap<bool>& useArc)
         int age=round((round(time*1000.0)-round((*it).second.timestamp*1000.0))/1000.0/TIME_SLOT_FOR_3DGRAPH);
         if ((isNegotiable)&&(it->second.id.compare(identifier)>0)) continue; //ignoro le prenotazioni di livello più basso negoziabili
         //qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
-        for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
+        for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();++itt)
         {
             int id=(*itt)-age*graph_node_size;
             if (id<graph_node_size) //Se il nodo è finito nel passato oppure al piano terra lo ignoro

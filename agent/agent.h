@@ -90,13 +90,15 @@ protected:
 	
 	//in dummy we will not use this, since it is used for inter-agent communication
 	//Note that we need two versions, one for net and one for shared memory
-	agent_communicator_abstract* agent_comm;
+	//Communications for now are only used by plugins, so agent_comm is useless here
+	//agent_communicator_abstract* agent_comm;
 	
 	//in dummy this will be a way to access identifier informations, in agent this will communicate with simulator (tcp or shared memory)
 	world_communicator_abstract* world_comm;
 	
 	//in dummy agent this will not be initialized
-	identifier_module* idModule;
+	//The identifier_module has become a plugin, so idModule is useless here
+	//identifier_module* idModule;
 	
 	/*!
 	 * Moduli aggiuntivi utilizzabili stile plugin (ma quanto sarebbe bello farlo in modo sistematico!)

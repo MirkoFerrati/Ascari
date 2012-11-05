@@ -17,8 +17,8 @@ public:
     void test() {
 		
 		transitionTable trans_table;
-		string name;
-		name = "RH";
+// 		string name;
+// 		name = "RH";
 		
 		automaton_state fast = (automaton_state) 0;
 		automaton_state slow = (automaton_state) 1;
@@ -48,7 +48,7 @@ public:
 		automatonFSM test_automaton(trans_table);
 		vector<automaton_state> new_state;
 		vector<automaton_state> old_state;
-		vector<transition> trans;
+		//vector<transition> trans;
 		
 		old_state.push_back(fast);
 		//trans.push_back(e1);

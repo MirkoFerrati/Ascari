@@ -18,7 +18,12 @@ void simulator::create_communicator(int communicator_type)
 simulator::simulator():
 topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT)
 {
-secSleep=5000;
+	max_loops=0;
+	communicator=0;
+	num_agents=0;
+	pi=exprtk::details::numeric::constant::pi;
+	f_rndom=0;
+	secSleep=5000;
 }
 
 void simulator::setSleep(unsigned secSleep)
@@ -31,13 +36,13 @@ void simulator::initialize(const Parsed_World& wo)
     initialize_agents(wo.agents);
     bonus_symbol_table.add_constants();
     int i=0;
-    for (map<bonusVariable,bonus_expression>::const_iterator it=wo.bonus_expressions.begin();it!=wo.bonus_expressions.end();it++)
+    for (map<bonusVariable,bonus_expression>::const_iterator it=wo.bonus_expressions.begin();it!=wo.bonus_expressions.end();++it)
     {
         bonusVariables[i]=0;
         map_bonus_variables_to_id.insert(make_pair(it->first,i));
         i++;
     }
-    for (index_map::const_iterator it=map_bonus_variables_to_id.begin();it!=map_bonus_variables_to_id.end();it++)
+    for (index_map::const_iterator it=map_bonus_variables_to_id.begin();it!=map_bonus_variables_to_id.end();++it)
     {
         bonus_symbol_table.add_variable(it->first,bonusVariables[it->second]);
     }
@@ -144,9 +149,9 @@ void simulator::main_loop()
             agent_state state_tmp;
             for (int i=1;i<10;i++)//TODO: this is 1 second/(sampling time of dynamic)
             {
-                for (index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end();iter++) {
+                for (index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end();++iter) {
                     state_tmp=dynamic_module.at(iter->second)->getNextState();
-                    for (agent_state::const_iterator iiter=state_tmp.begin();iiter!=state_tmp.end();iiter++) {
+                    for (agent_state::const_iterator iiter=state_tmp.begin();iiter!=state_tmp.end();++iiter) {
                         sim_packet.state_agents.internal_map.at(iter->first).state.at(iiter->first)=iiter->second; //metto il nuovo stato nel posto giusto senza copiare i vettori
 
                     }
@@ -157,7 +162,7 @@ void simulator::main_loop()
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {
 
-                for (map<int,double>::iterator it=commands.at(temp.at(i).identifier).command.begin(); it!=commands.at(temp.at(i).identifier).command.end();it++) 
+                for (map<int,double>::iterator it=commands.at(temp.at(i).identifier).command.begin(); it!=commands.at(temp.at(i).identifier).command.end();++it) 
 				{
                     it->second=temp.at(i).command.at(it->first);
                 }
@@ -207,11 +212,11 @@ void simulator::start_sim(int max_loops)
 
 void simulator::update_bonus_variables()
 {
-    for (map<std::string,double>::iterator it=sim_packet.bonus_variables.begin();it!=sim_packet.bonus_variables.end();it++) {
+    for (map<std::string,double>::iterator it=sim_packet.bonus_variables.begin();it!=sim_packet.bonus_variables.end();++it) {
         it->second=bonus_expressions.at(map_bonus_variables.at(it->first)).value();
     }
 //Copio i risultati alla fine per avere coerenza all'interno dello stesso clock
-    for (map<string,double>::iterator it=sim_packet.bonus_variables.begin();it!=sim_packet.bonus_variables.end();it++)
+    for (map<string,double>::iterator it=sim_packet.bonus_variables.begin();it!=sim_packet.bonus_variables.end();++it)
     {
         bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second;
     }

@@ -14,7 +14,7 @@ decoder::decoder(std::map< int, sub_event_value >& sub_events, std::map< transit
 void decoder::create(map< string, string > events, const index_map& sub_events_map, const std::map< string, transition >& events_map)
 {
     map<int,sub_event_value> temp_map;
-    for (map<string,transition>::const_iterator it=events_map.begin();it!=events_map.end();it++)
+    for (map<string,transition>::const_iterator it=events_map.begin();it!=events_map.end();++it)
     {
         temp_map.clear();
 
@@ -46,10 +46,10 @@ void decoder::create(map< string, string > events, const index_map& sub_events_m
 
 void decoder::decode()
 {
-    for (map<transition,bool>::iterator it=events.begin(); it!=events.end(); it++)
+    for (map<transition,bool>::iterator it=events.begin(); it!=events.end(); ++it)
     {
 		it->second=true;
-        for (map<int,sub_event_value>::const_iterator iit=internal_table.at(it->first).begin(); iit!=internal_table.at(it->first).end(); iit++)
+        for (map<int,sub_event_value>::const_iterator iit=internal_table.at(it->first).begin(); iit!=internal_table.at(it->first).end(); ++iit)
         {
 			if (sub_events.at(iit->first)==_UNDEFINED || iit->second==_UNDEFINED)
 				continue;

@@ -61,6 +61,7 @@ private:
     int angle_index;
     int x_index;
     int y_index;
+    void init();
 
 	
 };

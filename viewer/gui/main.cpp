@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 				return 0;
 			}
         }
-        catch (lemon::ArgParserException ex) {
+        catch (lemon::ArgParserException const& ex) {
             ERR("errore nella lettura dei parametri %s",ex.reason());
             return 0;
         }

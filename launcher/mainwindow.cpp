@@ -121,7 +121,7 @@ void MainWindow::on_actionViewer_triggered()
 
 void MainWindow::startAgents()
 {
-    if (agents.size()!=0)
+    if (!agents.empty())
     {
         for (unsigned int i=0;i<agents.size();i++)
         {

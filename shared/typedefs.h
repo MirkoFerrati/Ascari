@@ -73,7 +73,7 @@ typedef double simulation_time;
 template< typename K,typename T>//,typename C, typename Alloc >
 std::ostream& operator<<( std::ostream& os, const std::map<K,T>& m )
 {
-    for (typename std::map<K,T>::const_iterator it=m.begin();it!=m.end();it++)
+    for (typename std::map<K,T>::const_iterator it=m.begin();it!=m.end();++it)
         os<<it->first <<" "<<it->second <<" ";
     os<<std::endl;
     return os;
@@ -82,7 +82,7 @@ std::ostream& operator<<( std::ostream& os, const std::map<K,T>& m )
 template< typename T>//,typename C, typename Alloc >
 std::ostream& operator<<( std::ostream& os, const std::vector<T>& m )
 {
-    for (typename std::vector<T>::const_iterator it=m.begin();it!=m.end();it++)
+    for (typename std::vector<T>::const_iterator it=m.begin();it!=m.end();++it)
         os<<(*it)<<" ";
     return os;
 }
@@ -191,8 +191,7 @@ struct circle:public visibleArea
 
 template <typename T>
 struct rndom : public exprtk::ifunction<T> {
-    rndom() : exprtk::ifunction<T>(2) {
-        name="RNDOM";
+	rndom() : exprtk::ifunction<T>(2),name("RNDOM") {
     }
 
     std::string name;

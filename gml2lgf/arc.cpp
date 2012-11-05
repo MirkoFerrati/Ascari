@@ -9,7 +9,8 @@
 arc::arc()
 {
   len=1;
-  
+  first=0;
+  second=0;
 }
 
 void arc::readLabelGraphics(fstream* f)
