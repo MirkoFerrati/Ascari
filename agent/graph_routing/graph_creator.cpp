@@ -26,7 +26,7 @@ int Graph_creator::createGraph(int floors, string graphName)
 		parseGraph(graphName);
 		return graph_node_size;
 	}
-	catch (lemon::Exception e)
+	catch (lemon::Exception const& e)
 	{
 		ERR("Errore nella creazione del grafo: %s",e.what());
 		return 0;
@@ -38,7 +38,8 @@ Graph_creator::Graph_creator(lemon::SmartDigraph &_3Dgraph,lemon::SmartDigraph::
     _3Dgraph(_3Dgraph),_3Dlength(length),_3Dcoord_x(coord_x),_3Dcoord_y(coord_y),length(graph),coord_x(graph),
     coord_y(graph)
 {
-	
+	floors=0;
+	graph_node_size=0;
 }
 
 void Graph_creator::addNodes(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,

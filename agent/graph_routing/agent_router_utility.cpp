@@ -50,7 +50,7 @@ void agent_router::setTargetStop(bool stop)
 }
 
 
-bool agent_router::checkIfTargetReached()
+bool agent_router::target_reached()
 {
 	return events.at(events_to_index.at("REACHED"));
 }

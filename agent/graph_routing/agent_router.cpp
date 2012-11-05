@@ -40,13 +40,11 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
     graph_node_size=c.createGraph(MAXFLOORS,graphName);
     if (!graph_node_size)
         ERR("attenzione, impossibile creare il grafo",0);
-    tarc=0;
-    int id=targets[tarc];
-    tarc++;
-    source=graph.nodeFromId(id);
-    id=targets[tarc];
-    tarc++;
-    target=graph.nodeFromId(id);
+    if (targets.size()<2)
+		ERR("attenzione, la lista dei target è troppo corta",0);
+	source=graph.nodeFromId(targets[0]);
+    target=graph.nodeFromId(targets[1]);
+	tarc=2;
     isNegotiating=true;
     next=source;
     xtarget=(coord_x)[next];
@@ -54,15 +52,15 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
     info[identifier].timestamp=0;
     setTargetStop(false);
     communicator.startReceive();
-    speed=5;
     last_time_updated=time;
-    stop=false;
-    next_target_reachable=false;
-    isWaiting=0;
+    stop=next_target_reachable=false;
+    handshakeCounter=0;
 }
 
-
-
+bool agent_router::isTimeToCheckForPathFree()
+{
+    return time-trunc(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH<0.2;
+}
 
 void agent_router::run_plugin()
 {
@@ -73,77 +71,57 @@ void agent_router::run_plugin()
     }
 
     lemon::SmartDigraph::ArcMap<bool> useArc(graph,true);
-    if (checkIfTargetReached())
+	_io_service.poll();
+	_io_service.reset();
+	detect_collision(useArc);
+	
+	if (target_reached())
     {
-        if (setNextTarget())
-        {
-			isNegotiating=true;
-            next_target_reachable=findPath(useArc);
-			isWaiting=0;
-        }
+        setNextTarget();
+        isNegotiating=true;
+        handshakeCounter=0;
     }
-    else
+
+    handshakeCounter++;
+
+    if (handshakeCounter<15)
+        next_target_reachable=findPath(useArc);
+
+    if (!next_target_reachable)
     {
-		isWaiting++;
-		_io_service.poll();
-		_io_service.reset();
-		merge_informations_collided(useArc);
-		
-        if (isWaiting<10) //Sto ancora negoziando
+		prepare_stop_packet();
+        if (handshakeCounter<10) //Sto ancora negoziando
         {
-			next_target_reachable=findPath(useArc);
+            cout<<"impossibile trovare un percorso valido per il nodo "<<graph.id(target)<<",distanza minima: "<<d<<endl;
         }
-        else if (isWaiting==10) //finito di negoziare, o parto oppure salto il turno
+        if (handshakeCounter==10) //finito di negoziare, o parto oppure salto il turno
         {
-			if (findPath(useArc))
-			{
-				next_target_reachable=true;
-			}
-			else
-			{
-				prepare_stop_packet();
-				next_target_reachable=false;
-				cout<<"ho esaurito il tempo per la negoziazione per il target "<<graph.id(target)<<",mi fermo nel nodo"<<graph.id(source)%graph_node_size
-				<<"e prenoto i nodi "<<graph.id(source)%graph_node_size+graph_node_size<<graph.id(source)%graph_node_size+2*graph_node_size<<endl;
-				isWaiting=19;
-			}
-			isNegotiating=false; //non negozio il nodo dove sono bloccato, non voglio incidenti da dietro
-			last_time_updated=time;
-			copy_info_packet();
-			communicator.send();
+            cout<<"ho esaurito il tempo per la negoziazione per il target "<<graph.id(target)<<",mi fermo nel nodo"<<graph.id(source)%graph_node_size
+                <<"e prenoto i nodi "<<graph.id(source)%graph_node_size+graph_node_size<<graph.id(source)%graph_node_size+2*graph_node_size<<endl;
+            handshakeCounter=15;
         }
-        else if (isWaiting<15)
-		{
-			if (findPath(useArc))
-			{
-				next_target_reachable=true;
-			}
-			else
-			{
-				next_target_reachable=false;
-				prepare_stop_packet();
-				cout<<"ero contento di poter arrivare a "<<graph.id(target)<<",ma ho ricevuto qualcosa che mi fa fermare in "<<graph.id(source)%graph_node_size<<endl;
-			}
-			isNegotiating=false; //non negozio il nodo dove sono bloccato, non voglio incidenti da dietro
-			last_time_updated=time;
-			copy_info_packet();
-			communicator.send();
-		}
-        else //o sono partito, e quindi target è reachable, oppure sono fermo, e allora salto il turno ma continuo a controllare il percorso
-		{
-			if (!next_target_reachable)
-			{
-				if (time-trunc(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH<0.2)
-				{
-					isNegotiating=true;
-					next_target_reachable=findPath(useArc);
-					isWaiting=0;
-				}
-			}	
-		}
+        if (handshakeCounter>10 && handshakeCounter<15)//Ebbene può succedere, leggere il cout per capire quando
+        {
+            cout<<"ero contento di poter arrivare a "<<graph.id(target)<<",ma ho ricevuto qualcosa che mi fa fermare in "<<graph.id(source)%graph_node_size<<endl;
+        }
+        if (handshakeCounter>=10)
+        {
+            isNegotiating=false;
+        }
+        if (handshakeCounter<=15)
+        {
+            last_time_updated=time;
+            update_lock_packet();
+            communicator.send();
+        }
+        if (handshakeCounter>15 && isTimeToCheckForPathFree())
+        {
+            isNegotiating=true;
+            handshakeCounter=0;
+        }
     }
     setTargetStop(!next_target_reachable);
-	simulation_time delta= next_time+0.3-time;
+    simulation_time delta= next_time+0.3-time;
     double floor=graph.id(next)/graph_node_size;
     if (floor<0.000001) //floor==0 nei double
         speed=0;
@@ -152,27 +130,34 @@ void agent_router::run_plugin()
         double length = distance_to_target.value();
         cout<<"calcolo velocità. time="<<time<<" next_time="<<next_time<<" piani="<<floor<<" lunghezza="<<length;
         if (delta<=0)
-			speed=0;
-		else
-			speed=min(1000.0,max((length)/(delta),0.0));
-		cout<<" velocità="<<speed<<endl;
+            speed=0;
+        else
+            speed=min(1000.0,max((length)/(delta),0.0));
+        cout<<" velocità="<<speed<<endl;
     }
 }
 
-void agent_router::copy_info_packet()
+void agent_router::update_lock_packet()
 {
-	_mutex.lock();
-	graph_informations& tmp = info.at(identifier);
-	tmp.id=identifier;
-	tmp.isNegotiating=isNegotiating;
-	tmp.lockedNode=node_id;
-	tmp.timestamp=last_time_updated;
-	_mutex.unlock();
+    _mutex.lock();
+    graph_informations& tmp = info.at(identifier);
+    tmp.id=identifier;
+    tmp.isNegotiating=isNegotiating;
+    tmp.lockedNode=node_id;
+    tmp.timestamp=last_time_updated;
+    _mutex.unlock();
 }
 
+void agent_router::prepare_stop_packet()
+{
+    node_id.clear();
+    for (unsigned int i=0;i<MAXFLOORS;i++)//prenoto qualche nodo sopra di me per sicurezza
+        node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
+    isNegotiating=false; //non negozio il nodo dove sono bloccato, non voglio incidenti da dietro
+    last_time_updated=time;
+}
 
-
-void agent_router::prepare_info_packet()
+void agent_router::prepare_move_packet()
 {
     using namespace lemon;
     node_id.clear();
@@ -183,21 +168,21 @@ void agent_router::prepare_info_packet()
             continue;
         node_id.push_back(graph.id(i));
     }
-   copy_info_packet();
+    last_time_updated=time;
 }
 
-bool agent_router::merge_informations_collided(lemon::SmartDigraph::ArcMap<bool>& useArc)
+bool agent_router::detect_collision(lemon::SmartDigraph::ArcMap<bool>& useArc)
 {
     using namespace lemon;
     bool collision=false;
     _mutex.lock();
-    for (graph_packet::const_iterator it=info.begin();it!=info.end();it++)
+    for (graph_packet::const_iterator it=info.begin();it!=info.end();++it)
     {
         if (it->first.compare(identifier)==0) continue; //Ignoro me stesso
         bool isNegotiable = (*it).second.isNegotiating;
         int age=round((round(time*1000.0)-round((*it).second.timestamp*1000.0))/1000.0/TIME_SLOT_FOR_3DGRAPH);
         if ((isNegotiable)&&(it->second.id.compare(identifier)>0)) continue; //ignoro le prenotazioni di livello più basso negoziabili
-        //TODO: qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
+        //qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
         for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();itt++)
         {
             int id=(*itt)-age*graph_node_size;
@@ -223,14 +208,7 @@ bool agent_router::merge_informations_collided(lemon::SmartDigraph::ArcMap<bool>
     return collision;
 }
 
-void agent_router::prepare_stop_packet()
-{
-	node_id.clear();
-	for (unsigned int i=0;i<MAXFLOORS;i++)//prenoto qualche nodo sopra di me per sicurezza
-            node_id.push_back(graph.id(source)%graph_node_size+i*graph_node_size);
-	isNegotiating=false; //non negozio il nodo dove sono bloccato, non voglio incidenti da dietro
-	last_time_updated=time;
-}
+
 
 
 bool agent_router::findPath(lemon::SmartDigraph::ArcMap<bool>& useArc)
@@ -238,59 +216,47 @@ bool agent_router::findPath(lemon::SmartDigraph::ArcMap<bool>& useArc)
     using namespace lemon;
     if (target==INVALID) return false;
     bool reached;
-    merge_informations_collided(useArc);
+    detect_collision(useArc);
     reached= dijkstra(filterArcs(graph,useArc),length).path(p).dist(d).run(source,target);
     if (d>MAX_LENGTH)
         reached=false;
     if (!reached)
-    {
-		prepare_stop_packet();
-		cout<<"impossibile trovare un percorso valido per il nodo "<<graph.id(target)<<",distanza minima: "<<d<<endl;
-		copy_info_packet();
-        communicator.send();
         return false;
-    }
-    else
-	{
-    last_time_updated=time;
-	prepare_info_packet();
-	communicator.send();
+    prepare_move_packet();
+    update_lock_packet();
+    communicator.send();
     next=graph.target(p.front());
     xtarget=(coord_x)[next];
     ytarget=(coord_y)[next];
-	double floor=graph.id(next)/graph_node_size;
-	next_time= trunc(trunc(time+TIME_SLOT_FOR_3DGRAPH/3.0)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH+TIME_SLOT_FOR_3DGRAPH*floor;//TODO bruttissimo
+    double floor=graph.id(next)/graph_node_size;
+    next_time= trunc(trunc(time+TIME_SLOT_FOR_3DGRAPH/3.0)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH+TIME_SLOT_FOR_3DGRAPH*floor;//TODO bruttissimo
     std::cout<<" percorso calcolato:";
     for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
         std::cout<<graph.id(i)<<">>";
     std::cout<<" next_time="<<next_time<<" fine"<< std::endl;
     return true;
-	}
 }
 
 
 
 bool agent_router::setNextTarget()
 {
-
+    source=graph.nodeFromId(graph.id(next)%graph_node_size);
     if (graph.id(next)%graph_node_size==graph.id(target))
     {
-        source=target;
         if (tarc==targets.size())
         {
             cout<<" TARGET FINALE raggiunto, mi fermo"<<endl;
             stop=true;
             return false;
         }
-        int id=targets[tarc];
-        tarc++;
-        target=graph.nodeFromId(id);
-        cout<<" TARGET raggiunto, nuovo target: "<<id<<" "<<(coord_x)[target]<<" "<<(coord_y)[target]<<endl;
-    }
-    else
-    {
-        source=graph.nodeFromId(graph.id(next)%graph_node_size);
+        else
+        {
+            int id=targets[tarc];
+            tarc++;
+            target=graph.nodeFromId(id);
+            cout<<" TARGET raggiunto, nuovo target: "<<id<<" "<<(coord_x)[target]<<" "<<(coord_y)[target]<<endl;
+        }
     }
     return true;
 }
-

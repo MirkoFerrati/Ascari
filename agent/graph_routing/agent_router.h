@@ -44,10 +44,6 @@ private:
     bool findPath(lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< bool >& useArc);
     bool setNextTarget();
 	double xtarget, ytarget;
-    bool pathFound;
-    bool graphSet;
-    bool targetSet;
-    bool sourceSet;
 	bool isNegotiating;
     int d;
 	double speed;
@@ -68,19 +64,18 @@ private:
 	graph_packet info;
 	Udp_graph_communicator communicator;
 	void setTargetStop(bool stop);
-	bool checkIfTargetReached();
-    void prepare_info_packet();
-    bool merge_informations_collided(lemon::SmartDigraph::ArcMap< bool >& useArc);
-	void copy_info_packet();
+	bool target_reached();
+    void prepare_move_packet();
+    bool detect_collision(lemon::SmartDigraph::ArcMap< bool >& useArc);
+	void update_lock_packet();
 	void prepare_stop_packet();
-	lemon::SmartDigraph::Node source, target;
-    lemon::SmartDigraph::Node next;
+	bool isTimeToCheckForPathFree();
+	lemon::SmartDigraph::Node source, target, next;
     int graph_node_size;
 	simulation_time &time;
 	simulation_time last_time_updated;
-    bool stop;
-    bool next_target_reachable;
-	int isWaiting;
+    bool stop, next_target_reachable; 
+	int handshakeCounter;
 };
 
 #endif // AGENT_ROUTER_H
