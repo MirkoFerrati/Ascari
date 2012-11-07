@@ -136,6 +136,8 @@ protected:
 private:
 	rndom<double>* f_rndom;
 	double pi;
+	agent(const agent& a);
+	
 };
 
 #endif // AGENT_H

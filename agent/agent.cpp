@@ -252,13 +252,7 @@ void agent::main_loop()
 
 // 		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
 // 			break;
-#ifdef MAXLOOPS
-            if (cicli > MAXLOOPS)
-			{
-                break;
-			}
-#endif			
-            //sleep(1);
+
         }
 
     }

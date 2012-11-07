@@ -18,13 +18,13 @@ public:
     tmp=s;
     tmp.erase(remove(tmp.begin(), tmp.end(), ' '),tmp.end());
     tmp.erase(remove(tmp.begin(), tmp.end(), '\t'),tmp.end());
-    while(tmp.find("]")!=0) 
+    while(tmp.empty() || tmp.at(0)!=']') 
 	{
 	  f->getline(s,256);
 	  tmp=s;
 	  tmp.erase(remove(tmp.begin(), tmp.end(), ' '),tmp.end());
 	  tmp.erase(remove(tmp.begin(), tmp.end(), '\t'),tmp.end());
-	  if (tmp.find("[")==0)
+	  if (!tmp.empty() && tmp.at(0)=='[')
 	    skipSection(f);
 	}
   }

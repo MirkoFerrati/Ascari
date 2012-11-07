@@ -87,7 +87,7 @@ void node::readNode(fstream* f)
 		  label=tmp.substr(6,tmp.length()-7);
 			if (name.compare(label)!=0)
 			{
-					cout<<"ATTENZIONE, rilevato un nodo con id diverso dal label, potrebbero succedere danni: "<<name<<label;
+					cout<<"ATTENZIONE, rilevato un nodo con id diverso dal label, potrebbero succedere danni, nome:"<<name<<" label:"<<label<<endl;
 			}
 		  continue;
 	  }
