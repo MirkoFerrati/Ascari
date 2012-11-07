@@ -48,7 +48,7 @@ expressions.clear();
 agent_state dynamic::getNextState()
 {
   agent_state tmp;
-  for (map<string,int>::const_iterator iter=map_expressions.begin(); iter!=map_expressions.end();iter++)
+  for (map<string,int>::const_iterator iter=map_expressions.begin(); iter!=map_expressions.end();++iter)
   {
     tmp.insert(make_pair(iter->second,StateReferenceWARN.at(iter->second)+T_CAMP*expressions.at(iter->second).value()));
   }
