@@ -217,7 +217,7 @@ void agent::main_loop()
 			bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
 			}
            
-			//TODO(Mirko): questo ciclo for copia informazioni che in teoria già abbiamo, forse non vale la pena di usare la variabile state
+			//TODO(Mirko): questo ciclo for copia informazioni che in teoria gia' abbiamo, forse non vale la pena di usare la variabile state
             for (map<int,double>::const_iterator it=state_other_agents.at(identifier).state.begin();
                     it!=state_other_agents.at(identifier).state.end();++it)
             {
