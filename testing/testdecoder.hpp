@@ -26,7 +26,7 @@ class testDecoder: public testClass
 			sub_events[1]=_TRUE;
 			sub_events[2]=_TRUE;
 			sub_events[3]=_TRUE;
-			sub_events[4]=_TRUE;
+			sub_events[4]=_FALSE;
 			sub_events[5]=_TRUE;
 			
 			events[t1]=false;
