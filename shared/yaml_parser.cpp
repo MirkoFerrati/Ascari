@@ -47,7 +47,7 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
 
     os << "Controllers" << "\n";
     int i=0;
-    for (map< controller_name, controller_MapRules >::const_iterator iter=ag.controllers.begin(); iter!=ag.controllers.end();iter++)
+    for (map< controller_name, controller_MapRules >::const_iterator iter=ag.controllers.begin(); iter!=ag.controllers.end();++iter)
     {
         i++;
         os<< "Controller "<<i<<endl;
@@ -61,35 +61,35 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
         }
     }
     os<< "Discrete States: "<<endl;
-    for (map< discreteState_Name, controller_name >::const_iterator iter=ag.discrete_states.begin(); iter!=ag.discrete_states.end();iter++)
+    for (map< discreteState_Name, controller_name >::const_iterator iter=ag.discrete_states.begin(); iter!=ag.discrete_states.end();++iter)
     {
         os<< "Name:"<<((*iter).first)<<endl;
         os<< "Controller: "<<((*iter).second)<<endl;
     }
 
     os<< "Topologies: "<<endl;
-    for (map< topology_name, topology_expression >::const_iterator iter=ag.topology_expressions.begin(); iter!=ag.topology_expressions.end();iter++)
+    for (map< topology_name, topology_expression >::const_iterator iter=ag.topology_expressions.begin(); iter!=ag.topology_expressions.end();++iter)
     {
         os<< "Name:"<<((*iter).first)<<endl;
         os<< "Expression: "<<((*iter).second)<<endl;
     }
 
     os<< "Lambda: "<<endl;
-    for (map< lambda_name, lambda_expression >::const_iterator iter=ag.lambda_expressions.begin(); iter!=ag.lambda_expressions.end();iter++)
+    for (map< lambda_name, lambda_expression >::const_iterator iter=ag.lambda_expressions.begin(); iter!=ag.lambda_expressions.end();++iter)
     {
         os<< "Name:"<<((*iter).first)<<endl;
         os<< "Expression: "<<((*iter).second)<<endl;
     }
 
     os<< "Events: "<<endl;
-    for (map< event_name, event_expression >::const_iterator iter=ag.events_expressions.begin(); iter!=ag.events_expressions.end();iter++)
+    for (map< event_name, event_expression >::const_iterator iter=ag.events_expressions.begin(); iter!=ag.events_expressions.end();++iter)
     {
         os<< "Event:"<<((*iter).first)<<endl;
         os<< "Expression: "<<((*iter).second)<<endl;
     }
 
     os<< "Automaton: "<< ag.automaton_name<<endl;
-    for (map< discreteState_Name, map< event_name, discreteState_Name > >::const_iterator iter=ag.automaton.begin(); iter!=ag.automaton.end();iter++)
+    for (map< discreteState_Name, map< event_name, discreteState_Name > >::const_iterator iter=ag.automaton.begin(); iter!=ag.automaton.end();++iter)
     {
 
         string actual_state=((*iter).first);
@@ -97,7 +97,7 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
         os<< "Actual State:"<<actual_state<<endl;
 
 
-        for (map< event_name, discreteState_Name >::const_iterator iiter=ag.automaton.at(actual_state).begin(); iiter!=ag.automaton.at(actual_state).end();iiter++)
+        for (map< event_name, discreteState_Name >::const_iterator iiter=ag.automaton.at(actual_state).begin(); iiter!=ag.automaton.at(actual_state).end();++iiter)
         {
             os<< "Event:"<<((*iiter).first)<<"->"<<((*iiter).second)<<endl;
 
@@ -105,7 +105,7 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
     }
 
     os<< "Target List: ";
-    for (std::vector<target_id>::const_iterator iter=ag.target_list.begin(); iter!=ag.target_list.end();iter++)
+    for (std::vector<target_id>::const_iterator iter=ag.target_list.begin(); iter!=ag.target_list.end();++iter)
     {
         os<< " "<<*iter;
     }
@@ -246,7 +246,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
 
     for (unsigned int i=0;i<automaton.size();i++) {
-        for (map< discreteState_Name, controller_name >::const_iterator iter=ag.discrete_states.begin(); iter!=ag.discrete_states.end();iter++)
+        for (map< discreteState_Name, controller_name >::const_iterator iter=ag.discrete_states.begin(); iter!=ag.discrete_states.end();++iter)
         {
             string actual_state;
             actual_state=((*iter).first);
@@ -256,7 +256,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
                 const YAML::Node& transition = automaton[i][actual_state][0];
 
-                for (map< discreteState_Name, controller_name >::const_iterator iiter=ag.discrete_states.begin(); iiter!=ag.discrete_states.end();iiter++)
+                for (map< discreteState_Name, controller_name >::const_iterator iiter=ag.discrete_states.begin(); iiter!=ag.discrete_states.end();++iiter)
                 {
                     string new_state;
                     new_state=(*iiter).first;
