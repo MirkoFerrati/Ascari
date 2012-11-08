@@ -59,7 +59,7 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 
 bool agent_router::isTimeToCheckForPathFree()
 {
-    return time-trunc(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH<0.2;
+    return time-trunc(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH<0.1;
 }
 
 void agent_router::run_plugin()
@@ -85,24 +85,25 @@ void agent_router::run_plugin()
     handshakeCounter++;
 
     if (handshakeCounter<15)
+	{
         next_target_reachable=findPath(useArc);
-
+	}
     if (!next_target_reachable)
     {
 		prepare_stop_packet();
         if (handshakeCounter<10) //Sto ancora negoziando
         {
-            cout<<"impossibile trovare un percorso valido per il nodo "<<graph.id(target)<<",distanza minima: "<<d<<endl;
+            cout<<time<<": impossibile trovare un percorso valido per il nodo "<<graph.id(target)<<",distanza minima: "<<d<<endl;
         }
         if (handshakeCounter==10) //finito di negoziare, o parto oppure salto il turno
         {
-            cout<<"ho esaurito il tempo per la negoziazione per il target "<<graph.id(target)<<",mi fermo nel nodo"<<graph.id(source)%graph_node_size
+            cout<<time<<": ho esaurito il tempo per la negoziazione per il target "<<graph.id(target)<<",mi fermo nel nodo"<<graph.id(source)%graph_node_size
                 <<"e prenoto i nodi "<<graph.id(source)%graph_node_size+graph_node_size<<graph.id(source)%graph_node_size+2*graph_node_size<<endl;
             handshakeCounter=15;
         }
         if (handshakeCounter>10 && handshakeCounter<15)//Ebbene può succedere, leggere il cout per capire quando
         {
-            cout<<"ero contento di poter arrivare a "<<graph.id(target)<<",ma ho ricevuto qualcosa che mi fa fermare in "<<graph.id(source)%graph_node_size<<endl;
+            cout<<time<<": ero contento di poter arrivare a "<<graph.id(target)<<",ma ho ricevuto qualcosa che mi fa fermare in "<<graph.id(source)%graph_node_size<<endl;
         }
         if (handshakeCounter>=10)
         {
@@ -128,12 +129,12 @@ void agent_router::run_plugin()
     else
     {
         double length = distance_to_target.value();
-        cout<<"calcolo velocità. time="<<time<<" next_time="<<next_time<<" piani="<<floor<<" lunghezza="<<length;
+        //cout<<time<<": calcolo velocità "<<" next_time="<<next_time<<" piani="<<floor<<" lunghezza="<<length;
         if (delta<=0)
             speed=0;
         else
             speed=min(1000.0,max((length)/(delta),0.0));
-        cout<<" velocità="<<speed<<endl;
+        //cout<<" velocità="<<speed<<endl;
     }
 }
 
@@ -231,7 +232,7 @@ bool agent_router::findPath(lemon::SmartDigraph::ArcMap<bool>& useArc)
     ytarget=(coord_y)[next];
     double floor=graph.id(next)/graph_node_size;
     next_time= trunc(trunc(time+TIME_SLOT_FOR_3DGRAPH/3.0)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH+TIME_SLOT_FOR_3DGRAPH*floor;//TODO bruttissimo
-    std::cout<<" percorso calcolato:";
+    std::cout<<time<<": percorso calcolato:";
     for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
         std::cout<<graph.id(i)<<">>";
     std::cout<<" next_time="<<next_time<<" fine"<< std::endl;
@@ -256,7 +257,7 @@ bool agent_router::setNextTarget()
             int id=targets[tarc];
             tarc++;
             target=graph.nodeFromId(id);
-            cout<<" TARGET raggiunto, nuovo target: "<<id<<" "<<(coord_x)[target]<<" "<<(coord_y)[target]<<endl;
+            cout<<time<<": TARGET raggiunto, nuovo target: "<<id<<" "<<(coord_x)[target]<<" "<<(coord_y)[target]<<endl;
         }
     }
     return true;
