@@ -73,7 +73,8 @@ void agent_router::run_plugin()
     lemon::SmartDigraph::ArcMap<bool> useArc(graph,true);
 	_io_service.poll();
 	_io_service.reset();
-	detect_collision(useArc);
+	
+	
 	
 	if (target_reached())
     {
@@ -86,6 +87,7 @@ void agent_router::run_plugin()
 
     if (handshakeCounter<15)
 	{
+		detect_collision(useArc);	
         next_target_reachable=findPath(useArc);
 	}
     if (!next_target_reachable)
@@ -183,6 +185,35 @@ bool agent_router::detect_collision(lemon::SmartDigraph::ArcMap<bool>& useArc)
         bool isNegotiable = (*it).second.isNegotiating;
         int age=round((round(time*1000.0)-round((*it).second.timestamp*1000.0))/1000.0/TIME_SLOT_FOR_3DGRAPH);
         
+		//Qui controllo per evitare sorpassi, spero sia giusto
+		
+		for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();++itt)
+		{
+			int id=(*itt)-age*graph_node_size;
+			int id1=(*(++itt))-age*graph_node_size;
+			--itt;
+			
+			for (unsigned int i=0;i<node_id.size()-1;i++)
+			{
+				if (
+					(node_id[i]-id)%graph_node_size==0 &&
+					(node_id[i+1]-id1)%graph_node_size==0 &&
+					node_id[i]>id &&
+					node_id[i+1]<id1
+				)
+				{
+					collision=true;
+					std::cout<<time<<": sto rischiando di sorpassare l'agente "<<(*it).second.id<<" tra il nodo "<<id<<" e "<<id1<<std::endl;
+					for (SmartDigraph::InArcIt arc(graph,graph.nodeFromId(node_id[i+1]));arc!=INVALID;++arc)
+					{
+						useArc[arc]=false;
+					}
+					break;
+				}
+			}
+		}
+		
+		
 		if ((isNegotiable)&&(it->second.id.compare(identifier)>0)) continue; //ignoro le prenotazioni di livello più basso negoziabili
         //qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
         for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();++itt)
