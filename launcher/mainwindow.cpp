@@ -169,9 +169,13 @@ void MainWindow::on_Updateshell_clicked()
     for (unsigned int i=0;i<agents.size();i++)
     {
         QString strout= agents[i]->readAllStandardOutput();
-        std::cout<<strout.toStdString()<<std::endl;
+		QFile file(QString::fromStdString(world.agents[i].name).append(".log"));
+		file.open(QIODevice::WriteOnly);
+		QTextStream out(&file);
+		out<<strout<<"\n";
+        //std::cout<<strout.toStdString()<<std::endl;
         strout= agents[i]->readAllStandardError();
-        std::cout<<strout.toStdString()<<std::endl;
+        out<<strout<<"\n";
     }
 
 }

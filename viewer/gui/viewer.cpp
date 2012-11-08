@@ -169,7 +169,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
 			painter.save();
 			painter.translate((*coord_x)[n],(*coord_y)[n]);
 			painter.drawEllipse(QPoint(0,0),1,1);
-			painter.scale(painter.fontMetrics().height()/70.0,-painter.fontMetrics().height()/70.0);
+			painter.scale(painter.fontMetrics().height()/20.0,-painter.fontMetrics().height()/20.0);
 			painter.drawText(-1,-1,QString("").setNum(graph.id(n)));
 			painter.restore();
 		}
