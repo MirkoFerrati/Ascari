@@ -4,6 +4,7 @@
 #include "logog.hpp"
 #include "debug_constants.h"
 #include <udp_agent_router.hpp>
+#include "collisionchecker.h"
 
 using namespace std;
 
@@ -24,12 +25,29 @@ topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GR
 	pi=exprtk::details::numeric::constant::pi;
 	f_rndom=0;
 	secSleep=5000;
+	
 }
 
 void simulator::setSleep(unsigned secSleep)
 {
 	this->secSleep=secSleep;
 }
+
+void simulator::setCheckCollision(bool checkCollision)
+{
+	this->checkCollision=checkCollision;
+	if (collisionChecker)
+		delete collisionChecker;
+	if (checkCollision)
+	{	
+		collisionChecker = new CollisionChecker(sim_packet.state_agents,agent_states_to_index);
+	}
+	else
+	{
+		collisionChecker= new CollisionCheckerAbstract(sim_packet.state_agents,agent_states_to_index);
+	}
+}
+
 
 void simulator::initialize(const Parsed_World& wo)
 {
@@ -69,6 +87,7 @@ void simulator::initialize(const Parsed_World& wo)
 
         map_bonus_variables.insert(make_pair(wo.bonus_variables.at(i),i));
     }
+    setCheckCollision(false);
 }
 
 
@@ -157,6 +176,7 @@ void simulator::main_loop()
                     }
                 }
             }
+            collisionChecker->checkCollisions();
             usleep(secSleep);
             vector<control_command_packet> temp=communicator->receive_control_commands();
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;

@@ -29,10 +29,12 @@ int main(int argc, char **argv) {
 		Parsed_World World;
 		lemon::ArgParser ap(argc,argv);
 		int count,secSleep;
+		std::string filename;
+		bool checkCollision=false;
 		ap.refOption("n","Number of simulator cycle",count);
 		ap.refOption("s","Milliseconds sleep",secSleep);
-		std::string filename;
 		ap.refOption("f","Yaml filename",filename);
+		ap.refOption("check_collision","enables collision checking",checkCollision);
 		ap.synonym("filename","f");
 		ap.synonym("sleep","s");
 		ap.throwOnProblems();
@@ -49,6 +51,8 @@ int main(int argc, char **argv) {
 	initialize_communication(s);
 	if (ap.given("s"))
 		s.setSleep(secSleep);
+	if (ap.given("check_collision"))
+		s.setCheckCollision(checkCollision);
 	if (ap.given("n"))
 		s.start_sim(count);
 	else

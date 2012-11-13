@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <udp_agent_router.hpp>
+#include "collisioncheckerabstract.h"
 
 
 class simulator
@@ -19,9 +20,12 @@ public:
 	void initialize (Parsed_World const&);
 	void update_bonus_variables();
 	void setSleep(unsigned secSleep);
+    void setCheckCollision(bool checkCollision);
 private:
 	int max_loops;
 	int secSleep;
+	bool checkCollision;
+	CollisionCheckerAbstract *collisionChecker;
 	std::vector<dynamic*> dynamic_module;
 	agent_communicator_abstract* communicator;
 	world_sim_packet sim_packet;

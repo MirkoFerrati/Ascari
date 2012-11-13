@@ -1,6 +1,6 @@
 
 
-add_executable(simulator ../shared/dynamic.cpp 
+add_executable(simulator collisionchecker.cpp ../shared/dynamic.cpp 
 communication/udp_agent_communicator.cpp simulator.cpp main.cpp 
 communication/agent_communicator_abstract.h ../shared/yaml_parser.cpp)
 
