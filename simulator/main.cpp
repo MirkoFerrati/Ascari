@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 		World=parse_file(filename);
- 	cout<<World;
+ 	//cout<<World;
 	s.initialize(World);
 	initialize_communication(s);
 	if (ap.given("s"))

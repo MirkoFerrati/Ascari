@@ -147,7 +147,7 @@ void simulator::main_loop()
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 
             agent_state state_tmp;
-            for (int i=1;i<10;i++)//TODO: this is 1 second/(sampling time of dynamic)
+            for (int i=0;i<10;i++)//TODO(Mirko): this is 1 second/(sampling time of dynamic)
             {
                 for (index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end();++iter) {
                     state_tmp=dynamic_module.at(iter->second)->getNextState();

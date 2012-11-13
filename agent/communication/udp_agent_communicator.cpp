@@ -22,7 +22,7 @@ udp_agent_communicator::udp_agent_communicator(boost::signals2::mutex& mutex,top
  */
 void udp_agent_communicator::send(bool printDebug)
 {
-//TODO in teoria un sender asincrono dovrebbe andare, ma devo costruire la struttura dati pulita
+//TODO(Mirko): in teoria un sender asincrono dovrebbe andare, ma devo costruire la struttura dati pulita
     mutex.lock();
 	if (printDebug)
 		std::cout<<"sto inviando una comunicazione"<<std::endl;
