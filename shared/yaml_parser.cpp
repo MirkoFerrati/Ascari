@@ -287,6 +287,8 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
 void operator>>(const YAML::Node& node, Parsed_World& wo)
 {
+	wo.graphName="UNSET";
+	
     if (node[0].FindValue("WORLD"))
     {
         if (node[0]["WORLD"].size()>0)
@@ -303,7 +305,6 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
                 }
             }
 
-            wo.graphName="UNSET";
             if (node[0]["WORLD"][0].FindValue("GRAPH_NAME"))
             {
                 const YAML::Node &world_node=node[0]["WORLD"][0];

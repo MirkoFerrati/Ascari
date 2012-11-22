@@ -17,10 +17,15 @@ using namespace std;
 agent::agent(std::string name,bool isDummy,const Parsed_World& world)
         :identifier(name),event_decoder(sub_events,events)
 {
-    int myAgent;
+    int myAgent=-1;
     for (unsigned int i =0;i<world.agents.size();i++)
         if (world.agents.at(i).name.compare(name)==0)
             myAgent=i;
+	if (myAgent==-1)
+	{
+		ERR("agent %s not found in configuration file, please check for agent names",name.c_str());
+		throw "agent name not found in configuration file, please check for agent names";
+	}
 	string temp=name;
 	time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
     

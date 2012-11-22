@@ -1,4 +1,5 @@
 #include "encoderDet.h"
+#include <logog.hpp>
 
 
 using namespace std;
@@ -47,8 +48,13 @@ encoderDet::encoderDet(std::map< int, sub_event_value >& sub_events, const strin
         exprtk::expression<double> tmp_expression;
         tmp_expression.register_symbol_table(symbol_table);
         string string_tmp_expression=it->second;
-        parser.compile(string_tmp_expression,tmp_expression);
-        topology_expressions.insert(make_pair(sub_events_to_index.at(it->first),tmp_expression));
+        if (parser.compile(string_tmp_expression,tmp_expression))
+			topology_expressions.insert(make_pair(sub_events_to_index.at(it->first),tmp_expression));
+		else
+		{
+			ERR("Errore durante la creazione dell'espressione della topologia %s,:%s",string_tmp_expression.c_str(),parser.error().c_str());
+			throw "Errore durante la creazione dell'espressione della topologia";
+		}
     }
 
 }
