@@ -25,7 +25,8 @@ topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GR
 	pi=exprtk::details::numeric::constant::pi;
 	f_rndom=0;
 	secSleep=5000;
-	
+	collisionChecker=0;
+	checkCollision=false;
 }
 
 void simulator::setSleep(unsigned secSleep)
