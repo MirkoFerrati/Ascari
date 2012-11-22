@@ -1,12 +1,10 @@
 #include "encoderDet.h"
 #include <logog.hpp>
 
-
 using namespace std;
 
 
-encoderDet::encoderDet(std::map< int, sub_event_value >& sub_events, const string& agent_name, agent_state& state, const std::map< string,
-                       int >& stateVariablesName_to_Index,  std::map< int, double >& bonusVariables,
+encoderDet::encoderDet(std::map< int, sub_event_value >& sub_events, const string& agent_name, agent_state& state, const index_map& stateVariablesName_to_Index,  std::map< int, double >& bonusVariables,
                        const std::map< string, int >& bonusVariablesName_to_Index, const map< string, string >& topology_expres, const index_map& sub_events_to_index,
                        const map< string, string >& lambda_expres, exprtk::symbol_table<double>& symbol_table)
         :ref_sub_events(sub_events),symbol_table(symbol_table),agent_name(agent_name)
@@ -84,11 +82,21 @@ void encoderDet::computeSubEvents(const map< string, agent_state_packet >& state
 
         if (it->first!=agent_name)
         {
+			/*
             for (map_int_double::const_iterator iit=(*it).second.state.begin();iit!=(*it).second.state.end();++iit)
             {
                 state_target.at(iit->first)=iit->second;
             }
-
+			*/
+			//TODO(Mirko): sto assumendo che il simulatore mi mandi gli stati nell'ordine giusto oppure me li mandi per stringa
+			for (map_int_double::iterator iit=state_target.begin();iit!=state_target.end();++iit)
+			{
+				map_int_double::const_iterator temp=(*it).second.state.find(iit->first);
+				if (temp!=it->second.state.end())
+					iit->second=temp->second;
+			}
+			
+			
             for (map<int,exprtk::expression<double> >::const_iterator iit=topology_expressions.begin();iit!=topology_expressions.end();++iit)
             {
                 if (ref_sub_events.at(iit->first)==_FALSE) {

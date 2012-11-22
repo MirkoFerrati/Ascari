@@ -104,13 +104,13 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
         control_command_packet& command_packet=commands.at(ag.at(i).name);
         agent_packet.identifier=ag.at(i).name;
         command_packet.identifier=ag.at(i).name;
-        index_map states_to_index_tmp;
+        
         index_map commands_to_index_tmp;
 
         for (unsigned int j=0; j<ag.at(i).state.size();j++)
         {
             agent_packet.state.insert(make_pair(j,ag.at(i).initial_states.at(ag.at(i).state.at(j))));
-            states_to_index_tmp.insert(make_pair(ag.at(i).state.at(j),j));
+			agent_states_to_index.insert(make_pair(ag.at(i).state.at(j),j));
             bonus_symbol_table.add_variable(ag.at(i).state.at(j)+ag.at(i).name,agent_packet.state.at(j));
         }
 
@@ -120,7 +120,6 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
             commands_to_index_tmp.insert(make_pair(ag.at(i).inputs.at(j),j));
             bonus_symbol_table.add_variable(ag.at(i).inputs.at(j)+ag.at(i).name,command_packet.command.at(j));
         }
-        agent_states_to_index.push_back(states_to_index_tmp);
         agent_commands_to_index.push_back(commands_to_index_tmp);
 
         dynamic *d= new dynamic(sim_packet.state_agents.internal_map.at(ag.at(i).name).state, commands.at(ag.at(i).name).command,

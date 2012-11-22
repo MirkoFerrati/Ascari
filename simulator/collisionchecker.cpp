@@ -31,11 +31,12 @@ CollisionChecker::~CollisionChecker()
 
 }
 
-CollisionChecker::CollisionChecker(const agents_name_to_states& states, const std::vector< index_map >& states_to_index)
+CollisionChecker::CollisionChecker(const agents_name_to_states& states, const index_map& states_to_index)
         :CollisionCheckerAbstract(states,states_to_index),states(states.internal_map)
 {
-    if (states_to_index[0].count("X")) //TODO(Mirko): IssueID #50
-        indexes_to_check.push_back(states_to_index[0].at("X"));
-    if (states_to_index[0].count("Y"))
-        indexes_to_check.push_back(states_to_index[0].at("Y"));
+    if (!(states_to_index.count("X") && states_to_index.count("Y")))
+	{	
+		ERR("impossibile effettuare il controllo sugli stati x e y perche' nessun agente possiede quegli stati",NULL);
+		throw "impossibile effettuare il controllo sugli stati x e y perche' nessun agente possiede quegli stati";
+	}
 }

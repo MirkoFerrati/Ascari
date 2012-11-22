@@ -29,7 +29,7 @@ private:
 	std::vector<dynamic*> dynamic_module;
 	agent_communicator_abstract* communicator;
 	world_sim_packet sim_packet;
-	std::vector<index_map> agent_states_to_index;
+	index_map agent_states_to_index;
 	std::vector<index_map> agent_commands_to_index;
 	index_map agents_name_to_index;
 	std::map<int,double> bonusVariables;
