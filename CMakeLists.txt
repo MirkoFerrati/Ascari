@@ -10,7 +10,7 @@ add_subdirectory(launcher)
 include_directories(shared)
 include_directories(shared/logog/include)
 
-add_definitions(-Wall -pedantic)
+add_definitions(-std=c++0x -Wall -pedantic -Wmissing-field-initializers -W -Wunused -Wuninitialized -Wformat=2 -Wctor-dtor-privacy -Wnon-virtual-dtor -Wno-char-subscripts -Wwrite-strings -Wno-char-subscripts -Wreturn-type -Wcast-qual -Wcast-align -Wsign-promo -Woverloaded-virtual -fno-strict-aliasing -Wno-unknown-pragmas)
 
 
 add_subdirectory(viewer)
