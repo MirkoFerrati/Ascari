@@ -151,6 +151,7 @@ void MainWindow::startSimulator()
 {
     QStringList arguments;
     arguments<< "-f"<< fileName;
+	arguments<< "-check_collision";
     if (simulator)
     {
         simulator->kill();
@@ -177,6 +178,16 @@ void MainWindow::on_Updateshell_clicked()
         strout= agents[i]->readAllStandardError();
         out<<strout<<"\n";
     }
+    if (simulator)
+	{
+		QString strout=simulator->readAllStandardOutput();
+		QFile file("simulator.log");
+		file.open(QIODevice::WriteOnly);
+		QTextStream out(&file);
+		out<<strout<<"\n";
+		strout=simulator->readAllStandardError();
+		out<<strout<<"\n";
+	}
 
 }
 
