@@ -87,7 +87,7 @@ void agent_router::run_plugin()
 
     if (handshakeCounter<15)
 	{
-		detect_collision(useArc);	
+		detect_collision(useArc);
         next_target_reachable=findPath(useArc);
 	}
     if (!next_target_reachable)
@@ -175,6 +175,46 @@ void agent_router::prepare_move_packet()
     last_time_updated=time;
 }
 
+bool agent_router::check_for_overtaking(graph_packet::const_iterator &it,int age,lemon::SmartDigraph::ArcMap<bool>& useArc)
+{
+	using namespace lemon;
+	//Qui controllo per evitare sorpassi, spero sia giusto
+	bool collision=false;
+	for (unsigned int j=1;j<(*it).second.lockedNode.size();j++)
+	{
+		int id=(*it).second.lockedNode[j-1]-age*graph_node_size;
+		int id1=(*it).second.lockedNode[j]-age*graph_node_size;
+		
+		for (unsigned int i=1;i<node_id.size();i++)
+		{
+			if ((node_id[i-1]-id)%graph_node_size==0 &&
+				(node_id[i]-id1)%graph_node_size==0 &&
+				node_id[i-1]>=id &&
+				node_id[i]<=id1)
+			{
+				collision=true;
+				std::cout<<time<<": sto rischiando di sorpassare l'agente "<<(*it).second.id<<" tra il nodo "<<id<<" e "<<id1<<"passando da "<<node_id[i-1]<<" e "<<node_id[i]<<"\n";//<<std::endl;
+				int tempId=id1;
+				while (tempId>0)
+				{
+					for (SmartDigraph::InArcIt arc(graph,graph.nodeFromId(tempId));arc!=INVALID;++arc)
+					{
+						if ((graph.id(graph.source(arc))-id)%graph_node_size==0)
+						{
+							useArc[arc]=false;
+							std::cout<<" disattivo l'arco tra il nodo"<<graph.id(graph.source(arc))<<" e "<<graph.id(graph.target(arc))<<"\n";
+						}
+					}
+					
+					//break;
+					tempId-=graph_node_size;
+				}
+			}
+		}
+	}
+	return collision;
+}
+
 bool agent_router::detect_collision(lemon::SmartDigraph::ArcMap<bool>& useArc)
 {
     using namespace lemon;
@@ -185,43 +225,7 @@ bool agent_router::detect_collision(lemon::SmartDigraph::ArcMap<bool>& useArc)
         if (it->first.compare(identifier)==0) continue; //Ignoro me stesso
         bool isNegotiable = (*it).second.isNegotiating;
         int age=round((round(time*1000.0)-round((*it).second.timestamp*1000.0))/1000.0/TIME_SLOT_FOR_3DGRAPH);
-        
-		//Qui controllo per evitare sorpassi, spero sia giusto
-		
-		for (unsigned int j=1;j<(*it).second.lockedNode.size();j++)
-		{
-			int id=(*it).second.lockedNode[j-1]-age*graph_node_size;
-			int id1=(*it).second.lockedNode[j]-age*graph_node_size;
-			
-			for (unsigned int i=1;i<node_id.size();i++)
-			{
-				if ((node_id[i-1]-id)%graph_node_size==0 &&
-					(node_id[i]-id1)%graph_node_size==0 &&
-					node_id[i-1]>=id &&
-					node_id[i]<=id1)
-				{
-					collision=true;
-					std::cout<<time<<": sto rischiando di sorpassare l'agente "<<(*it).second.id<<" tra il nodo "<<id<<" e "<<id1<<"passando da "<<node_id[i-1]<<" e "<<node_id[i]<<"\n";//<<std::endl;
-					int tempId=id1;
-					while (tempId>0)
-					{
-					for (SmartDigraph::InArcIt arc(graph,graph.nodeFromId(tempId));arc!=INVALID;++arc)
-					{
-						if ((graph.id(graph.source(arc))-id)%graph_node_size==0)
-						{
-						useArc[arc]=false;
-						std::cout<<" disattivo l'arco tra il nodo"<<graph.id(graph.source(arc))<<" e "<<graph.id(graph.target(arc))<<"\n";
-						}
-					}
-					
-					//break;
-					tempId-=graph_node_size;
-					}
-				}
-			}
-		}
-		
-		
+		//collision=check_for_overtaking(it,age,useArc);
 		if ((isNegotiable)&&(it->second.id.compare(identifier)>0)) continue; //ignoro le prenotazioni di livello più basso negoziabili
         //qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
         for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();++itt)
