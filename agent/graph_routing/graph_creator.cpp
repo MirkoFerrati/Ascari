@@ -90,7 +90,7 @@ void Graph_creator::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int
 			if (floorNumber>1)
 			{
 				a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-2)*graph_node_size),target);
-				(_3Dlength)[a]=2.0*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
+				(_3Dlength)[a]=2.1*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
 				acolors[a]=floorNumber+1;
 			}
 			//archi a 3 piani
@@ -98,7 +98,7 @@ void Graph_creator::addFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int
 			if (floorNumber>2)
 			{
 				a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-3)*graph_node_size),target);
-				(_3Dlength)[a]=3.0*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
+				(_3Dlength)[a]=3.3*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
 				acolors[a]=floorNumber+1;
 			}
 		}
@@ -131,10 +131,10 @@ void Graph_creator::finalizeFloor(lemon::SmartDigraph::NodeMap<lemon::dim2::Poin
 			(_3Dlength)[a]=sqrt((double)sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+(double)sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//1; prendo la distanza reale invece dell'unità;
 			acolors[a]=floorNumber+1;
 			a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-2)*graph_node_size),target);
-			(_3Dlength)[a]=2.0*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
+			(_3Dlength)[a]=2.1*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
 			acolors[a]=floorNumber+1;
 			a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-3)*graph_node_size),target);
-			(_3Dlength)[a]=3.0*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
+			(_3Dlength)[a]=3.3*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
 			acolors[a]=floorNumber+1;		
 		}
 	}

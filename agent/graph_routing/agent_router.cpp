@@ -59,7 +59,7 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 
 bool agent_router::isTimeToCheckForPathFree()
 {
-    return time-trunc(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH<0.1;
+    return time-trunc(trunc(time)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH<=0.01;
 }
 
 void agent_router::run_plugin()
@@ -107,24 +107,25 @@ void agent_router::run_plugin()
         {
             cout<<time<<": ero contento di poter arrivare a "<<graph.id(target)<<",ma ho ricevuto qualcosa che mi fa fermare in "<<graph.id(source)%graph_node_size<<endl;
         }
-        if (handshakeCounter>=10)
-        {
-            isNegotiating=false;
-        }
-        if (handshakeCounter<=15)
-        {
-            last_time_updated=time;
-            update_lock_packet();
-            communicator.send();
-        }
-        if (handshakeCounter>15 && isTimeToCheckForPathFree())
-        {
-            isNegotiating=true;
-            handshakeCounter=0;
-        }
     }
+    if (handshakeCounter>=10)
+	{
+		isNegotiating=false;
+	}
+	if (handshakeCounter<=15)
+	{
+		last_time_updated=time;
+		update_lock_packet();
+		communicator.send();
+	}
+	if (handshakeCounter>15 && isTimeToCheckForPathFree())
+	{
+		isNegotiating=true;
+		handshakeCounter=0;
+	}
+	
     setTargetStop(!next_target_reachable);
-    simulation_time delta= next_time+0.3-time;
+    simulation_time delta= next_time+0.2-time;
     double floor=graph.id(next)/graph_node_size;
     if (floor<0.000001) //floor==0 nei double
         speed=0;
@@ -187,28 +188,35 @@ bool agent_router::detect_collision(lemon::SmartDigraph::ArcMap<bool>& useArc)
         
 		//Qui controllo per evitare sorpassi, spero sia giusto
 		
-		for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();++itt)
+		for (unsigned int j=1;j<(*it).second.lockedNode.size();j++)
 		{
-			int id=(*itt)-age*graph_node_size;
-			int id1=(*(++itt))-age*graph_node_size;
-			--itt;
+			int id=(*it).second.lockedNode[j-1]-age*graph_node_size;
+			int id1=(*it).second.lockedNode[j]-age*graph_node_size;
 			
-			for (unsigned int i=0;i<node_id.size()-1;i++)
+			for (unsigned int i=1;i<node_id.size();i++)
 			{
-				if (
-					(node_id[i]-id)%graph_node_size==0 &&
-					(node_id[i+1]-id1)%graph_node_size==0 &&
-					node_id[i]>id &&
-					node_id[i+1]<id1
-				)
+				if ((node_id[i-1]-id)%graph_node_size==0 &&
+					(node_id[i]-id1)%graph_node_size==0 &&
+					node_id[i-1]>=id &&
+					node_id[i]<=id1)
 				{
 					collision=true;
-					std::cout<<time<<": sto rischiando di sorpassare l'agente "<<(*it).second.id<<" tra il nodo "<<id<<" e "<<id1<<std::endl;
-					for (SmartDigraph::InArcIt arc(graph,graph.nodeFromId(node_id[i+1]));arc!=INVALID;++arc)
+					std::cout<<time<<": sto rischiando di sorpassare l'agente "<<(*it).second.id<<" tra il nodo "<<id<<" e "<<id1<<"passando da "<<node_id[i-1]<<" e "<<node_id[i]<<"\n";//<<std::endl;
+					int tempId=id1;
+					while (tempId>0)
 					{
+					for (SmartDigraph::InArcIt arc(graph,graph.nodeFromId(tempId));arc!=INVALID;++arc)
+					{
+						if ((graph.id(graph.source(arc))-id)%graph_node_size==0)
+						{
 						useArc[arc]=false;
+						std::cout<<" disattivo l'arco tra il nodo"<<graph.id(graph.source(arc))<<" e "<<graph.id(graph.target(arc))<<"\n";
+						}
 					}
-					break;
+					
+					//break;
+					tempId-=graph_node_size;
+					}
 				}
 			}
 		}
@@ -249,7 +257,7 @@ bool agent_router::findPath(lemon::SmartDigraph::ArcMap<bool>& useArc)
     using namespace lemon;
     if (target==INVALID) return false;
     bool reached;
-    detect_collision(useArc);
+    //detect_collision(useArc);
     reached= dijkstra(filterArcs(graph,useArc),length).path(p).dist(d).run(source,target);
     if (d>MAX_LENGTH)
         reached=false;
@@ -265,7 +273,7 @@ bool agent_router::findPath(lemon::SmartDigraph::ArcMap<bool>& useArc)
     next_time= trunc(trunc(time+TIME_SLOT_FOR_3DGRAPH/3.0)/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH+TIME_SLOT_FOR_3DGRAPH*floor;//TODO bruttissimo
     std::cout<<time<<": percorso calcolato:";
     for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
-        std::cout<<graph.id(i)<<">>";
+        std::cout<<graph.id(i)<<"("<<graph.id(i)%graph_node_size<<")"<<">>";
     std::cout<<" next_time="<<next_time<<" fine"<< std::endl;
     return true;
 }
