@@ -4,7 +4,6 @@
 
 udp_agent_communicator::udp_agent_communicator(int num_agents):
         agent_communicator_abstract(),num_agents(num_agents),
-        time_sender(service, boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT),
         state_sender(service, boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT),
         
         control_receiver(service, boost::asio::ip::address::from_string(SOCKET_BINDING),
@@ -21,10 +20,6 @@ std::vector< control_command_packet > udp_agent_communicator::receive_control_co
 	return results;
 }
 
-void udp_agent_communicator::send_broadcast(const simulation_time& time)
-{
-    time_sender.send(time);
-}
 
 void udp_agent_communicator::send_broadcast(const world_sim_packet& infos)
 {

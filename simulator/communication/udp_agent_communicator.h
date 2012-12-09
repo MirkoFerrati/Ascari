@@ -16,7 +16,6 @@ public:
 private:
 	unsigned int num_agents;
 	boost::asio::io_service service;//This must be written before any sender or receiver
-	udp_sender<simulation_time> time_sender;
 	udp_sender<world_sim_packet> state_sender;
 	udp_receiver<control_command_packet > control_receiver;
 	
