@@ -27,7 +27,7 @@ world_sim_packet udp_world_communicator::receive_agents_status()
 
 
 
-void udp_world_communicator::send_control_command(control_command_packet& command, const target_abstract* target)
+void udp_world_communicator::send_control_command(control_command_packet& command, const target_abstract* /*target*/)
 {
 	control_command_sender.send(command);
 }

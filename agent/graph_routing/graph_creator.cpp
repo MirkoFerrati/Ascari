@@ -69,7 +69,7 @@ void Graph_creator::addFloor ( lemon::SmartDigraph::NodeMap<lemon::dim2::Point<i
                                lemon::SmartDigraph::ArcMap<int>& acolors,int startId )
 {
     using namespace lemon;
-    int floorNumber=startId/graph_node_size;
+    unsigned int floorNumber=startId/graph_node_size;
     //Aggiungo un livello al grafo
     addNodes ( coords,ncolors,acolors,floorNumber );
     if ( floorNumber==0 ) return;
