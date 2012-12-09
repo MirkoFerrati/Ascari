@@ -2,10 +2,10 @@
 
 udp_world_communicator::udp_world_communicator(): 
  world_sim_receiver(io_service,
-    boost::asio::ip::address::from_string("0.0.0.0"),
+    boost::asio::ip::address::from_string(SOCKET_BINDING),
 	boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT),
 	time_receiver(io_service,
-    boost::asio::ip::address::from_string("0.0.0.0"),
+    boost::asio::ip::address::from_string(SOCKET_BINDING),
 	boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT),
 	control_command_sender(io_service,
 	boost::asio::ip::address::from_string(MULTICAST_ADDRESS),SIMULATOR_PORT)

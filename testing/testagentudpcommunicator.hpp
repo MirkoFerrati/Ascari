@@ -22,7 +22,7 @@ class testAgentUDPCommunicator: public testClass
 	string multicast_address=MULTICAST_ADDRESS;
 	int multicast_port=MULTICAST_PORT;
 	udp_sender<int> sender(service, boost::asio::ip::address::from_string(multicast_address),multicast_port);
-// 	udp_receiver<topology_packet> receiverTop(service,boost::asio::ip::address::from_string("0.0.0.0"), 
+// 	udp_receiver<topology_packet> receiverTop(service,boost::asio::ip::address::from_string(SOCKET_BINDING), 
 // 											  boost::asio::ip::address::from_string(multicast_address),SIMULATOR_ROUTE_PORT);
 // 	udp_sender<topology_packet> senderTop(service, boost::asio::ip::address::from_string(multicast_address),AGENT_ROUTE_PORT);
 	Udp_agent_router<topology_packet> r(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT);

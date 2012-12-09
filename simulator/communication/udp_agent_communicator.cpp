@@ -7,7 +7,7 @@ udp_agent_communicator::udp_agent_communicator(int num_agents):
         time_sender(service, boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT),
         state_sender(service, boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT),
         
-        control_receiver(service, boost::asio::ip::address::from_string("0.0.0.0"),
+        control_receiver(service, boost::asio::ip::address::from_string(SOCKET_BINDING),
 						 boost::asio::ip::address::from_string(MULTICAST_ADDRESS),SIMULATOR_PORT)
 {
 

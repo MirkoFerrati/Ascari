@@ -18,7 +18,7 @@ public:
 	  boost::asio::io_service service;
 	  
 	  
-	  udp_receiver<world_sim_packet> state_receiver(service,boost::asio::ip::address::from_string("0.0.0.0"),boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT);
+	  udp_receiver<world_sim_packet> state_receiver(service,boost::asio::ip::address::from_string(SOCKET_BINDING),boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT);
 	  udp_sender<control_command_packet> command_sender(service,boost::asio::ip::address::from_string(MULTICAST_ADDRESS),SIMULATOR_PORT);
 	  
 	  int i=0;

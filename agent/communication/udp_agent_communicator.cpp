@@ -2,7 +2,7 @@
 
 udp_agent_communicator::udp_agent_communicator(boost::signals2::mutex& mutex,topology_packet* tp,boost::asio::io_service& io_service)
 :mutex(mutex),tp(tp),socket_(io_service),sender(io_service,boost::asio::ip::address::from_string(MULTICAST_ADDRESS),SIMULATOR_ROUTE_PORT)
-,listen_endpoint_(boost::asio::ip::address::from_string("0.0.0.0"), AGENT_ROUTE_PORT)
+,listen_endpoint_(boost::asio::ip::address::from_string(SOCKET_BINDING), AGENT_ROUTE_PORT)
 {
 	std::fill_n(inbound_data_,MAX_PACKET_LENGTH,0);
 	mutex_is_mine=false;
