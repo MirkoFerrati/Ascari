@@ -6,7 +6,6 @@
 #include <typedefs.h>
 #include "automaton/automatonabstract.h"
 #include "controller/controller.h"
-#include "identifierModule/identifier_module.h"
 #include "communication/agent_communicator_abstract.h"
 #include "communication/world_communicator_abstract.h"
 #include "../shared/yaml_parser.h"

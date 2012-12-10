@@ -1,5 +1,6 @@
 #include "agent.h"
 #include <agent_router.h>
+#include "identifierModule/identifier_module.h"
 #include <string>
 #include <utility>
 #include <map>
