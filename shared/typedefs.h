@@ -129,6 +129,7 @@ struct agent_state_packet
 };
 
 struct agents_name_to_states
+//TODO(MIRKO): Controllare se questa struttura serve oppure può essere inclusa in World_sim_packet
 {
     std::map<std::string,agent_state_packet> internal_map;
 
@@ -190,7 +191,9 @@ struct circle:public visibleArea
 
 
 template <typename T>
-struct rndom : public exprtk::ifunction<T> {
+struct rndom : public exprtk::ifunction<T> 
+//TODO(MIRKO): Spostare in un file a parte con i Warning disabilitati
+{
 	rndom() : exprtk::ifunction<T>(2),name("RNDOM") {
     }
 

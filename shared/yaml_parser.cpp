@@ -324,7 +324,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
         agent_nodes[i] >> wo.agents[i];
         if ((wo.agents[i].target_list.size()==0 && wo.graphName.compare("UNSET")!=0)|| (wo.agents[i].target_list.size()>0 && wo.graphName.compare("UNSET")==0) ) {
 
-            ERR("GRAPH NAME OR TARGET LIST UNDEFINED");
+            ERR("GRAPH NAME OR TARGET LIST UNDEFINED", NULL);
             throw "GRAPH NAME OR TARGET LIST UNDEFINED";
         }
 
