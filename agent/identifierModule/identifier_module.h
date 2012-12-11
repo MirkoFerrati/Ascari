@@ -17,10 +17,11 @@ public:
     identifier_module (Parsed_World const& W, std::map<std::string, agent_state_packet> const& sensed_agents);
 
 private:
-    std::forward_list< agent > sim_agents;
+    std::map<std::string,std::forward_list< agent >> sim_agents;
     std::map <std::string,int> index_behaviors;
     std::map <std::string,std::vector< bool >> identifier_matrix;
     std::map<std::string,agent_state_packet> old_sensed_agents;
+    std::map<std::string,agent_state_packet> const & sensed_agents;
     std::vector<dynamic*> dynamics;
 };
 

@@ -77,6 +77,7 @@ public:
     std::vector<target_id> target_list;
     
     Parsed_Behavior behavior;
+    std::string behavior_name;
     
 };
 
