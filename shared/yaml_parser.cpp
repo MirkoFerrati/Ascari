@@ -234,7 +234,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
 	
       std::string tmp_beh_name;
       
-       if (behaviors_nodes[i].FindValue("NAME")){
+       if (!behaviors_nodes[i].FindValue("NAME")){
 	 
             ERR("BEHAVIOR NAME UNDEFINED: BEHAVIOR NUMBER %d", i);
             throw "BEHAVIOR NAME UNDEFINED";
@@ -254,7 +254,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
       std::string tmp_ag_name;
       agent_nodes[i]["AGENT"]>>tmp_ag_name;
     
-     if (agent_nodes[i].FindValue("BEHAVIOR"))
+     if (!agent_nodes[i].FindValue("BEHAVIOR"))
     {
         ERR("BEHAVIOR NAME UNSPECIFIED FOR AGENT %s", tmp_ag_name.c_str());
         throw "BEHAVIOR NAME UNSPECIFIED FOR AGENT";
@@ -268,7 +268,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
         ERR("UNDEFINED BEHAVIOR %s FOR AGENT %s", tmp_agent_behavior_name.c_str(), tmp_ag_name.c_str());
         throw "UNDEFINED BEHAVIOR %s FOR AGENT %s";
     }
-    
+	wo.agents[i].name=tmp_ag_name;
 	wo.agents[i].behavior=wo.behaviors[tmp_agent_behavior_name];
         agent_nodes[i] >> wo.agents[i];
         if ((wo.agents[i].target_list.size()==0 && wo.graphName.compare("UNSET")!=0)|| (wo.agents[i].target_list.size()>0 && wo.graphName.compare("UNSET")==0) ) {

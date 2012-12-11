@@ -23,7 +23,13 @@ MainWindow::MainWindow(QWidget *parent) :
     fileName = settings->value("paths/lastopen","").toString();
     if (fileName.compare("")!=0)
     {
+      try{
         openFile();
+      }
+      catch (...) 
+      {
+	
+      }
     }
     QList<int> sizes;
     sizes.push_back(500);
