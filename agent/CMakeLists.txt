@@ -18,6 +18,8 @@ include_directories(topology)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
+target_link_libraries(agent zmq)
+
 
 include_directories(../agent)
 include_directories(../shared)
