@@ -14,14 +14,16 @@ public:
     void addReservedVariables (exprtk::symbol_table< double >& arg1);
     void compileExpressions (exprtk::symbol_table< double >& arg1);
     void run_plugin();
-    identifier_module (Parsed_World const& W, std::map<std::string, agent_state_packet> const& sensed_agents);
+    identifier_module (Parsed_World const& W, world_sim_packet const& sensed_agents);
+    
 
 private:
-    std::map<std::string,std::forward_list< agent >> sim_agents;
+    void create_agents(string agent_name);
+    std::map<std::string,std::forward_list< agent* >> sim_agents;
     std::map <std::string,int> index_behaviors;
     std::map <std::string,std::vector< bool >> identifier_matrix;
-    std::map<std::string,agent_state_packet> old_sensed_agents;
-    std::map<std::string,agent_state_packet> const & sensed_agents;
+    world_sim_packet old_sensed_agents;
+    world_sim_packet const & sensed_agents;
     std::vector<dynamic*> dynamics;
 };
 
