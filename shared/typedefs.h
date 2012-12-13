@@ -23,6 +23,7 @@
 #define MULTICAST_PORT  30000
 #define SINGLECAST_PORT 20000
 #define MULTICAST_ADDRESS "239.255.0.1"
+#define SOCKET_BINDING "0.0.0.0"
 #define MAX_PACKET_LENGTH 1024*32
 #define SIMULATOR_PORT 10000
 #define SIMULATOR_ROUTE_PORT 10050
@@ -31,6 +32,7 @@
 #define AGENT_GRAPH_PORT 10053
 #define NUM_AGENTS 1
 #define T_CAMP 0.01
+#define SYNC_PROTOCOL "tcp://localhost:5761"
 
 //Used in the strong_typedef
 typedef std::map<int,double> map_int_double;

@@ -2,7 +2,7 @@
 
 add_executable(simulator collisionchecker.cpp ../shared/dynamic.cpp 
 communication/udp_agent_communicator.cpp simulator.cpp main.cpp 
-communication/agent_communicator_abstract.h ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp)
+communication/agent_communicator_abstract.h ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp communication/zmq_agent_communicator.cpp)
 
 add_subdirectory(parser)
 add_subdirectory(visibility)
@@ -17,6 +17,7 @@ target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cp
 
 #target_link_libraries(simulator libyaml-cpp.a)
 
+target_link_libraries(simulator zmq)
 
  find_package(Boost REQUIRED system thread serialization)
  
