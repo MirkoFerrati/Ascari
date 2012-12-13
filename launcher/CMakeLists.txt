@@ -5,7 +5,7 @@ find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
 include(${QT_USE_FILE})
 
 set(launcher_MOC_HEADERS mainwindow.h )
-set(launcher_SOURCES main.cpp mainwindow.cpp ../shared/yaml_parser.cpp ../viewer/gui/viewer.cpp ../viewer/communication/udp_world_sniffer.cpp ../viewer/gui/Agent.cpp)
+set(launcher_SOURCES main.cpp mainwindow.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../viewer/gui/viewer.cpp ../viewer/communication/udp_world_sniffer.cpp ../viewer/gui/Agent.cpp)
 SET(launcher_UIS mainwindow.ui)
 
 include_directories(../shared)

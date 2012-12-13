@@ -64,7 +64,7 @@ typedef int automaton_state;
  * A transition is an event used by the automaton to change his state (automatonState)
  * The map between names of transitions and int is an indexMap
  */
-BOOST_STRONG_TYPEDEF( int, transition)
+typedef int transition;
 
 
 /** The time used by the simulator and sent to agents for synchronization */

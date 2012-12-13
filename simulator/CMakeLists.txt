@@ -2,7 +2,7 @@
 
 add_executable(simulator collisionchecker.cpp ../shared/dynamic.cpp 
 communication/udp_agent_communicator.cpp simulator.cpp main.cpp 
-communication/agent_communicator_abstract.h ../shared/yaml_parser.cpp)
+communication/agent_communicator_abstract.h ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp)
 
 add_subdirectory(parser)
 add_subdirectory(visibility)
