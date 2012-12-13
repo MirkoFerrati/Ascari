@@ -4,4 +4,5 @@ build
 *.old
 *.png
 *.mpeg
-ascari/shared/lemon/lemon/lemon/config.h
+shared/lemon/lemon/lemon/config.h
+
