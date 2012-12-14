@@ -11,12 +11,12 @@ int main(int argc, char **argv) {
     srand(time(NULL));
     LOGOG_INITIALIZE();
     {
-		cout<<argc<<argv[0]<<argv[1]<<argv[2]<<endl;
+		std::cout<<argc<<argv[0]<<argv[1]<<argv[2]<<std::endl;
 		logog::Cout out;
 		Parsed_World World;
 		lemon::ArgParser ap(argc,argv);
 		int count;
-		string agent_name;
+		std::string agent_name;
 		std::string filename;
 		ap.refOption("n","Number of simulator cycle",count);
 		ap.refOption("a","Agent name",agent_name,true);		

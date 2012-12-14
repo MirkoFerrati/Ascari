@@ -5,12 +5,11 @@
 #include <string>
 #include <map>
 
-using namespace std;
 
 struct transitionTable
 {
-	string name;
-	map<automaton_state, map<transition, automaton_state> >  internalTable; //newstate=internalTable[oldstate][transition]
+	std::string name;
+	std::map<automaton_state, std::map<transition, automaton_state> >  internalTable; //newstate=internalTable[oldstate][transition]
 };
 
 class automatonAbstract
@@ -22,7 +21,7 @@ public:
 	 */
 	automatonAbstract(const transitionTable& table)
 	:table(table){}
-	virtual vector<automaton_state> getNextAutomatonState(vector<automaton_state>const& oldStates, map<transition,bool>const& event)=0; 
+	virtual std::vector<automaton_state> getNextAutomatonState(std::vector<automaton_state>const& oldStates, std::map<transition,bool>const& event)=0; 
 	virtual ~automatonAbstract(){};
 protected:
 	transitionTable table;
