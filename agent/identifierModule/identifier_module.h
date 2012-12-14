@@ -6,6 +6,15 @@
 #include "typedefs.h"
 #include <dynamic.h>
 #include <forward_list>
+#include "agent_to_dummy_communicator.hpp"
+
+struct dummy_agent
+{
+  agent dummy;
+  int behavior_identifier;
+  int identifier;
+};
+
 
 class identifier_module: public Plugin_module
 {
@@ -16,15 +25,19 @@ public:
     void run_plugin();
     identifier_module (Parsed_World const& W, world_sim_packet const& sensed_agents);
     
+    
 
 private:
-    void create_agents(string agent_name);
-    std::map<std::string,std::forward_list< agent* >> sim_agents;
+    void create_agents(std::string agent_name);
+    agent_to_dummy_communicator communicator;
+    std::map<std::string,std::forward_list<std::unique_ptr<dummy_agent>>> sim_agents;
     std::map <std::string,int> index_behaviors;
     std::map <std::string,std::vector< bool >> identifier_matrix;
     world_sim_packet old_sensed_agents;
     world_sim_packet const & sensed_agents;
     std::vector<dynamic*> dynamics;
+    agent_state old_temp_state;
+    
 };
 
 
