@@ -42,9 +42,9 @@ protected:
 	std::map<std::string,int> map_bonus_variables_to_id;
 	
 	
-	vector<automaton_state> discreteState;
+	std::vector<automaton_state> discreteState;
 	index_map map_discreteStateName_to_id;
-	map<automaton_state, int> map_discreteStateId_to_controllerId;
+	std::map<automaton_state, int> map_discreteStateId_to_controllerId;
 	
 	//in dummy agent, we will initialize a nautomaton, in agent an automaton
 	automatonAbstract* automaton;
@@ -69,7 +69,7 @@ protected:
 	/**
 	 * Mappa dei nomi degli eventi e dei relativi indici
 	 */
-	std::map<string,transition> events_to_index;
+	std::map<std::string,transition> events_to_index;
 	
 	/**
 	 * The value of control variables, update by controllers
@@ -102,7 +102,7 @@ protected:
 	/*!
 	 * Moduli aggiuntivi utilizzabili stile plugin (ma quanto sarebbe bello farlo in modo sistematico!)
 	 */
-	vector <Plugin_module*> plugins;
+	std::vector <Plugin_module*> plugins;
 	
 	void main_loop();
 	
@@ -130,7 +130,7 @@ protected:
 	 */
 	void createStateFromParsedAgent(const Parsed_Agent& agent);
 
-    void createBonusVariablesFromWorld(map< bonusVariable, bonus_expression > bonus);
+    void createBonusVariablesFromWorld(std::map< bonusVariable, bonus_expression > bonus);
 
 private:
 	rndom<double>* f_rndom;
