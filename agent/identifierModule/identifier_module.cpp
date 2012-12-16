@@ -2,13 +2,13 @@
 using namespace std;
 
 identifier_module::identifier_module (const Parsed_World& W, const  world_sim_packet& sensed_agents) :
-    sensed_agents (sensed_agents)
+    sensed_agents (sensed_agents),parsed_world(W)
 {
     std::map <std::string, int> index_behaviors;
     std::map <std::string, std::vector< bool >> identifier_matrix;
     int i = 0;
-for (auto behavior: W.behaviors) {
-        index_behaviors[behavior.second.name] = i;
+for (auto const& behavior: W.behaviors) {
+        index_behaviors[behavior.second->name] = i;
         i++;
     }
 
@@ -47,9 +47,11 @@ void identifier_module::create_agents (std::string agent_name)
      *
      */
 
-    
-    
-    
+	for (auto const& behavior:parsed_world.behaviors)
+	{
+		
+	}
+	
 }
 
 void identifier_module::run_plugin()

@@ -241,7 +241,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
         }
       
 	behaviors_nodes[i]["NAME"]>> tmp_beh_name;
-        behaviors_nodes[i] >> wo.behaviors[tmp_beh_name];
+        behaviors_nodes[i] >> (*wo.behaviors[tmp_beh_name]);
     }
 
     
@@ -269,7 +269,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
         throw "UNDEFINED BEHAVIOR %s FOR AGENT %s";
     }
 	wo.agents[i].name=tmp_ag_name;
-	wo.agents[i].behavior=wo.behaviors[tmp_agent_behavior_name];
+	wo.agents[i].behavior=(*wo.behaviors[tmp_agent_behavior_name]);//TODO(Mirko) perchè è una copia?
         agent_nodes[i] >> wo.agents[i];
         if ((wo.agents[i].target_list.size()==0 && wo.graphName.compare("UNSET")!=0)|| (wo.agents[i].target_list.size()>0 && wo.graphName.compare("UNSET")==0) ) {
 

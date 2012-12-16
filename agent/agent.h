@@ -16,7 +16,8 @@
 class agent
 {
 public:
-	agent(std::string name, bool isDummy, const Parsed_World& agents);
+	agent(std::string name, bool isDummy, const std::unique_ptr< Parsed_Behavior >& behavior);
+	agent(int agent_index, bool isDummy, const Parsed_World& world);
 	~agent();
     void start();
 	
@@ -109,26 +110,26 @@ protected:
 	/**
 	 * crea la tabella di transizione dell'automaton
 	 */
-	transitionTable createAutomatonTableFromParsedAgent(const Parsed_Agent& agent);
+	transitionTable createAutomatonTableFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 	
 	/**
 	 * crea i sottoeventi e gli eventi per il decoder
 	 */
-	void createEventsFromParsedAgent(const Parsed_Agent& agent);
+	void createEventsFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 	
 	/**
 	 * crea i sottoeventi e l'encoder
 	 */
-	void createSubEventsFromParsedAgent(const Parsed_Agent& agent);
+	void createSubEventsFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 	
-	void createControllersFromParsedAgent(const Parsed_Agent& agent);
+	void createControllersFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 	
-	void createDiscreteStateFromParsedAgent(const Parsed_Agent& agent);
+	void createDiscreteStateFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 	
 	/**
 	 * crea le strutture dati che rappresentano lo stato continuo, le variabili di controllo e lo stato discreto
 	 */
-	void createStateFromParsedAgent(const Parsed_Agent& agent);
+	void createStateFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 
     void createBonusVariablesFromWorld(std::map< bonusVariable, bonus_expression > bonus);
 

@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     {
 		std::cout<<argc<<argv[0]<<argv[1]<<argv[2]<<std::endl;
 		logog::Cout out;
-		Parsed_World World;
+		Parsed_World world;
 		lemon::ArgParser ap(argc,argv);
 		int count;
 		std::string agent_name;
@@ -41,8 +41,18 @@ int main(int argc, char **argv) {
 		else
 			s.start_sim();
 */		
-		World = parse_file(filename); 
-        agent a1(agent_name,false,World);
+		world = parse_file(filename); 
+		int myAgent=-1;
+		for (unsigned int i =0;i<world.agents.size();i++)
+			if (world.agents.at(i).name.compare(agent_name)==0)
+				myAgent=i;
+			if (myAgent==-1)
+			{
+				ERR("agent %s not found in configuration file, please check for agent names",name.c_str());
+				throw "agent name not found in configuration file, please check for agent names";
+			}
+			
+        agent a1(myAgent,false,world);
 		a1.start();
         std::cout << "Hello, world! agent" << std::endl;
 	}
