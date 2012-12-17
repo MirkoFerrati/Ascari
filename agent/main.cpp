@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 				myAgent=i;
 			if (myAgent==-1)
 			{
-				ERR("agent %s not found in configuration file, please check for agent names",name.c_str());
+				ERR("agent %s not found in configuration file, please check for agent names",agent_name.c_str());
 				throw "agent name not found in configuration file, please check for agent names";
 			}
 			
