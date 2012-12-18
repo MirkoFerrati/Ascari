@@ -1,5 +1,5 @@
 #include "agent.h"
-#include <agent_router.h>
+#include "graph_routing/agent_router.h"
 #include "identifierModule/identifier_module.h"
 #include <string>
 #include <utility>
@@ -102,7 +102,24 @@ void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression >
 
 void agent::start()
 {
+   try {
+        inputs.identifier=identifier;
+        int cicli=0;
+        while (1)
+	{
 	main_loop();
+	            cicli++;
+if (time<-1)
+				break;
+	}
+	
+	    }
+    catch (const char* e)
+    {
+        std::cerr<<e<<std::endl;
+
+    }
+	
 }
 
 
@@ -208,18 +225,13 @@ void agent::createStateFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavi
 void agent::main_loop()
 {
 
-    try {
-        inputs.identifier=identifier;
-        int cicli=0;
-        while (1)
+   
         {
-            cicli++;
 	// 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
 			world_sim_packet temp=world_comm->receive_agents_status();
-			state_other_agents.swap(temp.state_agents.internal_map);
+			state_other_agents.swap(temp.state_agents.internal_map);//TODO(Mirko): si possono evitare le copie e gli swap?
 			time=temp.time;
-			if (time<-1)
-				break;
+			
 			for (std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin();it!=temp.bonus_variables.end();++it)
 			{
 			bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
@@ -263,12 +275,7 @@ void agent::main_loop()
 
         }
 
-    }
-    catch (const char* e)
-    {
-        std::cerr<<e<<std::endl;
 
-    }
 
 }
 

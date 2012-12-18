@@ -20,8 +20,13 @@ public:
 	agent(int agent_index, bool isDummy, const Parsed_World& world);
 	~agent();
     void start();
+    void main_loop();
+    std::vector<automaton_state> & getDiscreteStates();
+    
+    
 	
 protected:
+    
 	/**
 	 * Name of agent and it is used for unique indentification
 	 */
@@ -105,8 +110,7 @@ protected:
 	 */
 	std::vector <Plugin_module*> plugins;
 	
-	void main_loop();
-	
+
 	/**
 	 * crea la tabella di transizione dell'automaton
 	 */

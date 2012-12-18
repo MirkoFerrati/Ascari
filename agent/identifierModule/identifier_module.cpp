@@ -91,6 +91,7 @@ for (auto agent=sim_agents.begin();agent!=sim_agents.end();++agent)
     ++old_dummy_ref;
     //Evolvo il singolo dummy
     communicator.send((*dummy_ref)->identifier,old_sensed_agents.state_agents);
+    (*dummy_ref)->dummy.main_loop();
     //riceve per forza sempre nella stessa locazione di memoria, che è quella con cui ho costruito le dinamiche
     communicator.receive((*dummy_ref)->identifier); 
     auto new_state=dynamics.at((*dummy_ref)->behavior_identifier)->getNextState();
