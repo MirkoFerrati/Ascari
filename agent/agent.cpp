@@ -210,12 +210,12 @@ void agent::createStateFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavi
 	
     for (unsigned int i=0;i<behavior->inputs.size();i++)
     {
-        inputs.command[i]=0;
+        inputs.default_command[i]=0;
         map_inputs_name_to_id.insert(make_pair(behavior->inputs.at(i),i));
     }
     for (unsigned int i=0;i<inputs.command.size();i++)
 	{
-		symbol_table.add_variable(behavior->inputs[i],inputs.command[i]);
+		symbol_table.add_variable(behavior->inputs[i],inputs.default_command[i]);
 	}
 }
 
@@ -256,8 +256,12 @@ void agent::main_loop()
 			}
 			
             discreteState= automaton->getNextAutomatonState(discreteState,events);
-            controllers.at(map_discreteStateId_to_controllerId.at(discreteState.at(0))).computeControl();
-
+	    
+	    for ( auto discrete :discreteState)
+	    {
+	      controllers.at(map_discreteStateId_to_controllerId.at(discrete)).computeControl();
+	      inputs.command.at(discrete)=inputs.default_command;
+	    }
             world_comm->send_control_command(inputs,NULL);
 
             //string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore

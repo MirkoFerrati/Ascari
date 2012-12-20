@@ -11,6 +11,7 @@
 #include "../shared/yaml_parser.h"
 #include "encoder/encoderAbstract.h"
 #include "decoder.h"
+#include "random.hpp"
 #include "plugin_module.h"
 
 class agent

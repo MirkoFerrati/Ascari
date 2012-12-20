@@ -22,17 +22,17 @@ public:
 	  udp_sender<control_command_packet> command_sender(service,boost::asio::ip::address::from_string(MULTICAST_ADDRESS),SIMULATOR_PORT);
 	  
 	  int i=0;
-	  control_command_packet command;
+	  control_command_packet command_packet;
 	    states=state_receiver.receive().state_agents;
 	  
 	    map<string,agent_state_packet>::iterator it=states.internal_map.begin();
 	    
 	    string id= (*it).first;
-	    command.identifier=id;
-	    command.command[0]=3;
+	    command_packet.identifier=id;
+	    command_packet.command[0][0]=3;
 	  while(i<10){
 	    i++;
-	    command_sender.send(command);
+	    command_sender.send(command_packet);
 
 	   states=state_receiver.receive().state_agents;
 

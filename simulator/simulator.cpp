@@ -115,15 +115,17 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
             bonus_symbol_table.add_variable(ag.at(i).behavior.state.at(j)+ag.at(i).name,agent_packet.state.at(j));
         }
 
+        //Al simulatore non deve mai arrivare piu' di un controllo per agente, percio' la mappa avra' un solo elemento
+        
         for (unsigned int j=0; j<ag.at(i).behavior.inputs.size();j++)
         {
-            command_packet.command.insert(make_pair(j,0));
+            command_packet.default_command.insert(make_pair(j,0));
             commands_to_index_tmp.insert(make_pair(ag.at(i).behavior.inputs.at(j),j));
-            bonus_symbol_table.add_variable(ag.at(i).behavior.inputs.at(j)+ag.at(i).name,command_packet.command.at(j));
+            bonus_symbol_table.add_variable(ag.at(i).behavior.inputs.at(j)+ag.at(i).name,command_packet.default_command.at(j));
         }
         agent_commands_to_index.push_back(commands_to_index_tmp);
 
-        dynamic *d= new dynamic(sim_packet.state_agents.internal_map.at(ag.at(i).name).state, commands.at(ag.at(i).name).command,
+        dynamic *d= new dynamic(sim_packet.state_agents.internal_map.at(ag.at(i).name).state, commands.at(ag.at(i).name).default_command,
                                 ag.at(i).behavior.expressions, ag.at(i).behavior.state,ag.at(i).behavior.inputs);
 
         dynamic_module.push_back(d);
@@ -182,9 +184,9 @@ void simulator::main_loop()
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {
 
-                for (map<int,double>::iterator it=commands.at(temp.at(i).identifier).command.begin(); it!=commands.at(temp.at(i).identifier).command.end();++it) 
+                for (map<int,double>::iterator it=commands.at(temp.at(i).identifier).default_command.begin(); it!=commands.at(temp.at(i).identifier).default_command.end();++it) 
 				{
-                    it->second=temp.at(i).command.at(it->first);
+                    it->second=(*temp.at(i).command.begin()).second.at(it->first);
                 }
 
             }
