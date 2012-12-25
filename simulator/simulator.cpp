@@ -186,7 +186,7 @@ void simulator::main_loop()
 
                 for (map<int,double>::iterator it=commands.at(temp.at(i).identifier).default_command.begin(); it!=commands.at(temp.at(i).identifier).default_command.end();++it) 
 				{
-                    it->second=(*temp.at(i).command.begin()).second.at(it->first);
+                    it->second=(*temp.at(i).commands.begin()).second.at(it->first);
                 }
 
             }

@@ -8,11 +8,11 @@ class agent_to_dummy_communicator
 {
 public:
   //Blocking call, for now...
-  void send(int dummy_identifier,agents_name_to_states const& infos)
+  void send(std::string dummy_identifier,agents_name_to_states const& infos)
   {
     
   }
-    control_command_packet receive (int dummy_identifier)
+    control_command_packet receive (std::string dummy_identifier)
     {
       
     }

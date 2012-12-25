@@ -3,15 +3,13 @@
 
 #include "automatonabstract.h"
 
-using namespace std;
-
 
 class automatonFSM:public automatonAbstract
 {
 	
 public:
   automatonFSM(const transitionTable& table);
-  vector<automaton_state> getNextAutomatonState(vector<automaton_state>const& oldStates, map<transition,bool>const& event);
+  std::forward_list<automaton_state> getNextAutomatonState(const std::forward_list< automaton_state >& oldState, const std::map< transition, bool >& event);
 
 private:
   //string name;

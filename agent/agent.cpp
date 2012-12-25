@@ -79,7 +79,7 @@ agent::agent(int agent_index,bool isDummy,const Parsed_World& world):
 	createBonusVariablesFromWorld(world.bonus_expressions);
 	if (!isDummy)
 	{
-	discreteState.push_back(map_discreteStateName_to_id.at(world.agents.at(agent_index).state_start));
+	discreteState.push_front(map_discreteStateName_to_id.at(world.agents.at(agent_index).state_start));
 	}
 }
 
@@ -213,7 +213,7 @@ void agent::createStateFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavi
         inputs.default_command[i]=0;
         map_inputs_name_to_id.insert(make_pair(behavior->inputs.at(i),i));
     }
-    for (unsigned int i=0;i<inputs.command.size();i++)
+    for (unsigned int i=0;i<inputs.commands.size();i++)
 	{
 		symbol_table.add_variable(behavior->inputs[i],inputs.default_command[i]);
 	}
@@ -260,7 +260,7 @@ void agent::main_loop()
 	    for ( auto discrete :discreteState)
 	    {
 	      controllers.at(map_discreteStateId_to_controllerId.at(discrete)).computeControl();
-	      inputs.command.at(discrete)=inputs.default_command;
+	      inputs.commands.at(discrete)=inputs.default_command;
 	    }
             world_comm->send_control_command(inputs,NULL);
 

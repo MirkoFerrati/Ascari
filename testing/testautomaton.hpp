@@ -46,29 +46,29 @@ public:
 		events_Status.insert(make_pair(e3,0));
 		
 		automatonFSM test_automaton(trans_table);
-		vector<automaton_state> new_state;
-		vector<automaton_state> old_state;
+		forward_list<automaton_state> new_state;
+		forward_list<automaton_state> old_state;
 		//vector<transition> trans;
 		
-		old_state.push_back(fast);
+		old_state.push_front(fast);
 		//trans.push_back(e1);
 		events_Status[e1] = 1;
 		new_state=test_automaton.getNextAutomatonState(old_state,events_Status);
-		assert(new_state.at(0)==fast);
+		assert(new_state.front()==fast);
 	
-		old_state[0]=slow;
+		old_state.front()=slow;
 		//trans[0]=e2;
 		events_Status[e1] = 0;
 		events_Status[e2] = 1;
 		new_state=test_automaton.getNextAutomatonState(old_state,events_Status);
-		assert(new_state.at(0)==slow);
+		assert(new_state.front()==slow);
 		
-		old_state[0]=left;
+		old_state.front()=left;
 		//trans[0]=e3;
 		events_Status[e2] = 0;
 		events_Status[e3] = 1;
 		new_state=test_automaton.getNextAutomatonState(old_state,events_Status);
-		assert(new_state.at(0)==slow);
+		assert(new_state.front()==slow);
 	}	
 };
 	

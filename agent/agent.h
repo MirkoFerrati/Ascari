@@ -3,6 +3,7 @@
 
 #include <list>
 #include <vector>
+#include <forward_list>
 #include <typedefs.h>
 #include "automaton/automatonabstract.h"
 #include "controller/controller.h"
@@ -22,7 +23,10 @@ public:
 	~agent();
     void start();
     void main_loop();
-    std::vector<automaton_state> & getDiscreteStates();
+    inline std::forward_list<automaton_state> & getDiscreteStates()
+    {
+      return discreteState;
+    }
     
     
 	
@@ -49,7 +53,7 @@ protected:
 	std::map<std::string,int> map_bonus_variables_to_id;
 	
 	
-	std::vector<automaton_state> discreteState;
+	std::forward_list<automaton_state> discreteState;
 	index_map map_discreteStateName_to_id;
 	std::map<automaton_state, int> map_discreteStateId_to_controllerId;
 	

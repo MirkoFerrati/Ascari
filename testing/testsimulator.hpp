@@ -29,7 +29,7 @@ public:
 	    
 	    string id= (*it).first;
 	    command_packet.identifier=id;
-	    command_packet.command[0][0]=3;
+	    command_packet.commands[0][0]=3;
 	  while(i<10){
 	    i++;
 	    command_sender.send(command_packet);

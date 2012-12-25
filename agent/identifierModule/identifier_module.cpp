@@ -2,12 +2,12 @@
 using namespace std;
 
 identifier_module::identifier_module (const Parsed_World& W, const  world_sim_packet& sensed_agents) :
-    sensed_agents (sensed_agents),parsed_world(W)
+    sensed_agents (sensed_agents), parsed_world (W)
 {
     std::map <std::string, int> index_behaviors;
     std::map <std::string, std::vector< bool >> identifier_matrix;
     int i = 0;
-for (auto const& behavior: W.behaviors) {
+for (auto const & behavior: W.behaviors) {
         index_behaviors[behavior.second->name] = i;
         i++;
     }
@@ -47,11 +47,11 @@ void identifier_module::create_agents (std::string agent_name)
      *
      */
 
-	for (auto const& behavior:parsed_world.behaviors)
-	{
-		
-	}
-	
+for (auto const& behavior: parsed_world.behaviors) {
+	std::unique_ptr<dummy_agent> ptr(new dummy_agent(agent_name,behavior,index_behaviors.at(behavior.first)));
+	sim_agents[agent_name].push_front(std::unique_ptr<dummy_agent>());
+    }
+
 }
 
 void identifier_module::run_plugin()
@@ -79,36 +79,36 @@ for (auto & agent_name: sim_agents) {
         }
     }
 
-    
+
     //Evolvo gli agenti
-for (auto agent=sim_agents.begin();agent!=sim_agents.end();++agent)
-{
-      old_temp_state=old_sensed_agents.state_agents.internal_map.at(agent->first).state;
-  //Evolvo i dummy di ogni agente
-      auto old_dummy_ref=agent->second.before_begin(); //uso una forward list, devo tenermi un puntatore di riserva
-  for (auto dummy_ref=agent->second.begin();dummy_ref!=agent->second.end();++dummy_ref)
-  {
-    ++old_dummy_ref;
-    //Evolvo il singolo dummy
-    communicator.send((*dummy_ref)->identifier,old_sensed_agents.state_agents);
-    (*dummy_ref)->dummy.main_loop();
-    //riceve per forza sempre nella stessa locazione di memoria, che è quella con cui ho costruito le dinamiche
-    communicator.receive((*dummy_ref)->identifier); 
-    auto new_state=dynamics.at((*dummy_ref)->behavior_identifier)->getNextState();
-    //controllo se l'evoluzione e' coerente
-if (new_state!=sensed_agents.state_agents.internal_map.at(agent->first).state)
-    {
-      //Elimino i dummy non coerenti
-      identifier_matrix.at(agent->first).at((*dummy_ref)->behavior_identifier)=false;
-      agent->second.erase_after(old_dummy_ref); 
+    for (auto agent = sim_agents.begin(); agent != sim_agents.end(); ++agent) {
+        old_temp_state = old_sensed_agents.state_agents.internal_map.at (agent->first).state;
+        //Evolvo i dummy di ogni agente
+        auto old_dummy_ref = agent->second.before_begin(); //uso una forward list, devo tenermi un puntatore di riserva
+        for (auto dummy_ref = agent->second.begin(); dummy_ref != agent->second.end(); ++dummy_ref) {
+            ++old_dummy_ref;
+            //Evolvo il singolo dummy
+            communicator.send ( (*dummy_ref)->identifier, old_sensed_agents.state_agents);
+            (*dummy_ref)->dummy.main_loop();
+            auto control_command_packet = communicator.receive ( (*dummy_ref)->identifier);
+            for (auto command = control_command_packet.commands.begin(); command != control_command_packet.commands.end(); ++command) {
+                //preparo il comando relativo allo stato discreto iesimo
+		temp_command = command->second;
+                auto new_state = dynamics.at ( (*dummy_ref)->behavior_identifier)->getNextState();
+                //controllo se l'evoluzione e' coerente
+                if (new_state != sensed_agents.state_agents.internal_map.at (agent->first).state) {
+                    //Elimino i dummy non coerenti
+                    (*dummy_ref)->dummy.getDiscreteStates().remove(command->first);
+		    if((*dummy_ref)->dummy.getDiscreteStates().empty()){ 
+                    identifier_matrix.at (agent->first).at ( (*dummy_ref)->behavior_identifier) = false;
+                    agent->second.erase_after (old_dummy_ref);
+		    dummy_ref=old_dummy_ref;
+		    }
+                }
+            }
+        }
+
     }
-  }
-  
-}
-
-
-
-
 
 
     //Creo i nuovi dummy per gli agenti appena entrati

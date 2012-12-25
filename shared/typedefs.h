@@ -157,7 +157,7 @@ struct world_sim_packet {
 
 struct control_command_packet
 {
-    std::map<automaton_state ,control_command> command;
+    std::map<automaton_state ,control_command> commands;
     control_command default_command;
     std::string identifier;
 

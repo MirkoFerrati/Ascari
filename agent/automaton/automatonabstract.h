@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <forward_list>
 
 
 struct transitionTable
@@ -21,7 +22,7 @@ public:
 	 */
 	automatonAbstract(const transitionTable& table)
 	:table(table){}
-	virtual std::vector<automaton_state> getNextAutomatonState(std::vector<automaton_state>const& oldStates, std::map<transition,bool>const& event)=0; 
+	virtual std::forward_list<automaton_state> getNextAutomatonState(std::forward_list<automaton_state>const& oldStates, std::map<transition,bool>const& event)=0; 
 	virtual ~automatonAbstract(){};
 protected:
 	transitionTable table;
