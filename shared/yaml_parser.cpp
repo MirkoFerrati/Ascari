@@ -241,7 +241,10 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
         }
       
 	behaviors_nodes[i]["NAME"]>> tmp_beh_name;
-        behaviors_nodes[i] >> (*wo.behaviors[tmp_beh_name]);
+	std::unique_ptr<Parsed_Behavior> tmp_ptr(new Parsed_Behavior());
+        behaviors_nodes[i] >> *tmp_ptr;
+	wo.behaviors[tmp_beh_name]=std::move(tmp_ptr);
+	
     }
 
     
@@ -270,6 +273,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
     }
 	wo.agents[i].name=tmp_ag_name;
 	wo.agents[i].behavior=(*wo.behaviors[tmp_agent_behavior_name]);//TODO(Mirko) perchè è una copia?
+	wo.agents[i].behavior_name=tmp_agent_behavior_name;
         agent_nodes[i] >> wo.agents[i];
         if ((wo.agents[i].target_list.size()==0 && wo.graphName.compare("UNSET")!=0)|| (wo.agents[i].target_list.size()>0 && wo.graphName.compare("UNSET")==0) ) {
 

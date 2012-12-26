@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
       }
       catch (...) 
       {
-	
+	std::cerr<<"impossibile aprire il file "<<fileName.toStdString()<<std::endl;
       }
     }
     QList<int> sizes;
@@ -61,6 +61,8 @@ void MainWindow::openFile()
     }
 
     file.close();
+    try
+    {
     world=parse_file(fileName.toStdString());
     QString temp="Agents: ";
     QString num;
@@ -68,6 +70,11 @@ void MainWindow::openFile()
     ui->StartAgents->setText(temp.append(num));
     ui->ShowFile->setText(line);
     settings->setValue("paths/lastopen",fileName);
+    }
+    catch (...)
+    {
+      ui->StartAgents->setText("impossibile parsare il file");    
+    }
 }
 
 void MainWindow::on_actionOpen_triggered()

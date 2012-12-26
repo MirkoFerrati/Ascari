@@ -48,8 +48,7 @@ void identifier_module::create_agents (std::string agent_name)
      */
 
 for (auto const& behavior: parsed_world.behaviors) {
-	std::unique_ptr<dummy_agent> ptr(new dummy_agent(agent_name,behavior,index_behaviors.at(behavior.first)));
-	sim_agents[agent_name].push_front(std::unique_ptr<dummy_agent>());
+	sim_agents[agent_name].push_front(std::unique_ptr<dummy_agent>(new dummy_agent(agent_name,behavior,index_behaviors.at(behavior.first))));
     }
 
 }
