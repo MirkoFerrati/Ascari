@@ -2,7 +2,7 @@
 using namespace std;
 
 identifier_module::identifier_module (const Parsed_World& W, const  world_sim_packet& sensed_agents) :
-     parsed_world (W), sensed_agents (sensed_agents)
+     parsed_world (W), sensed_agents (sensed_agents), communicator()
 {
     std::map <std::string, int> index_behaviors;
     std::map <std::string, std::vector< bool >> identifier_matrix;
@@ -45,7 +45,7 @@ void identifier_module::create_agents (std::string agent_name)
      * }
      *
      */
-
+    assert(sim_agents[agent_name].empty());
     if (identifier_matrix[agent_name].empty())
 	{
 	  identifier_matrix[agent_name].resize(index_behaviors.size(),true);
@@ -53,9 +53,12 @@ void identifier_module::create_agents (std::string agent_name)
     
 for (auto const& behavior: parsed_world.behaviors) {
     if (identifier_matrix[agent_name].at(index_behaviors.at(behavior.first)))
-	sim_agents[agent_name].push_front(std::unique_ptr<dummy_agent>(new dummy_agent(agent_name,behavior,index_behaviors.at(behavior.first))));
-	//Bisogna creare identifier_matrix partendo da index_behaviors
+    {
+	dummy_agent* tmp_agent=new dummy_agent(agent_name,behavior,index_behaviors.at(behavior.first));
 	
+	sim_agents[agent_name].push_front(std::unique_ptr<dummy_agent>(tmp_agent));
+	
+    }
     }
 
 }
@@ -94,9 +97,9 @@ for (auto & agent_name: sim_agents) {
         for (auto dummy_ref = agent->second.begin(); dummy_ref != agent->second.end(); ++dummy_ref) {
             ++old_dummy_ref;
             //Evolvo il singolo dummy
-            communicator.send ( (*dummy_ref)->identifier, old_sensed_agents.state_agents);
+            communicator.send ( (**dummy_ref), old_sensed_agents.state_agents);
             (*dummy_ref)->dummy.main_loop();
-            auto control_command_packet = communicator.receive ( (*dummy_ref)->identifier);
+            auto control_command_packet = communicator.receive ( (**dummy_ref));
             for (auto command = control_command_packet.commands.begin(); command != control_command_packet.commands.end(); ++command) {
                 //preparo il comando relativo allo stato discreto iesimo
 		temp_command = command->second;
@@ -113,7 +116,6 @@ for (auto & agent_name: sim_agents) {
                 }
             }
         }
-
     }
 
 

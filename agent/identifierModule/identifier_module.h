@@ -8,20 +8,7 @@
 #include <forward_list>
 #include "agent_to_dummy_communicator.hpp"
 
-struct dummy_agent
-{
-  dummy_agent(std::string agent_name,const std::pair<const std::string, std::unique_ptr<Parsed_Behavior>>& behavior,int behavior_id)
-  :dummy(agent_name,true,behavior.second),behavior_identifier(behavior_id),identifier(agent_name)
-  {
-    char temp[5];
-    snprintf(temp,5,"%d",behavior_id);
-    identifier.append(temp);
-  }
-  agent dummy;
-  int behavior_identifier;
-  std::string identifier;
-};
-
+#include "dummy_agent.hpp"
 
 class identifier_module: public Plugin_module
 {
@@ -47,6 +34,7 @@ private:
     std::vector<dynamic*> dynamics;
     agent_state old_temp_state;
     control_command temp_command;
+    std::map<std::string,std::mutex> mutexes;
 };
 
 
