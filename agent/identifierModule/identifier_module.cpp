@@ -2,7 +2,7 @@
 using namespace std;
 
 identifier_module::identifier_module (const Parsed_World& W, const  world_sim_packet& sensed_agents) :
-    sensed_agents (sensed_agents), parsed_world (W)
+     parsed_world (W), sensed_agents (sensed_agents)
 {
     std::map <std::string, int> index_behaviors;
     std::map <std::string, std::vector< bool >> identifier_matrix;
@@ -19,14 +19,14 @@ for (auto const & behavior: W.behaviors) {
 
 
 
-void identifier_module::addReservedVariables (exprtk::symbol_table< double >& arg1)
+void identifier_module::addReservedVariables (exprtk::symbol_table< double >& /*arg1*/)
 {
 
 }
 
 
 
-void identifier_module::compileExpressions (exprtk::symbol_table< double >& symbol_table)
+void identifier_module::compileExpressions (exprtk::symbol_table< double >& /*symbol_table*/)
 {
 
 }
@@ -36,19 +36,26 @@ void identifier_module::create_agents (std::string agent_name)
 {
     /**
      * Piu' o meno cosi':
-     * Parsed_World temp_world
-     * for (behavior: W.behaviors)
+     * Creo la colonna della matrice relativa all'agente appena creato, se non esisteva gia'
+     * Se esisteva, vuol dire che ho gia' fatto un po' di identificazione, quindi ho gia' escluso qualche behavior
+     * for (behavior: World.behaviors)
      * {
-     * temp_world.behaviors.push_back(behavior);
-     * temp_world.agents.push_back(agent_name);
-     * dummy=new agent(dummy_name,true,temp_world);
-     * sim_agents[agent_name].insert(dummy);
+     *  Se il behavior per l'agente appena creato non era gia' stato escluso, crea un nuovo dummy con quel behavior
+     *  Altrimenti vado al prossimo behavior
      * }
      *
      */
 
+    if (identifier_matrix[agent_name].empty())
+	{
+	  identifier_matrix[agent_name].resize(index_behaviors.size(),true);
+	}
+    
 for (auto const& behavior: parsed_world.behaviors) {
+    if (identifier_matrix[agent_name].at(index_behaviors.at(behavior.first)))
 	sim_agents[agent_name].push_front(std::unique_ptr<dummy_agent>(new dummy_agent(agent_name,behavior,index_behaviors.at(behavior.first))));
+	//Bisogna creare identifier_matrix partendo da index_behaviors
+	
     }
 
 }
