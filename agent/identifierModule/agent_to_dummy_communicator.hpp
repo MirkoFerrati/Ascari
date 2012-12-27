@@ -9,7 +9,7 @@ class agent_to_dummy_communicator
 
 {
 public:
-
+//TODO(Mirko): fare tutta questa classe
     agent_to_dummy_communicator (){
 
     }

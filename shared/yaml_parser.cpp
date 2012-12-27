@@ -3,6 +3,8 @@
 
 using namespace std;
 
+//TODO(Simone): ci sono bug e cose da sistemare a giro, via via che testi il file esempio20.yaml sistema gli errori qui
+
 Parsed_World parse_file(const char * file_name)
 {
     std::string temp(file_name);

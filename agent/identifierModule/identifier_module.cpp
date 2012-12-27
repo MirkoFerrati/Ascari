@@ -105,6 +105,7 @@ for (auto & agent_name: sim_agents) {
 		temp_command = command->second;
                 auto new_state = dynamics.at ( (*dummy_ref)->behavior_identifier)->getNextState();
                 //controllo se l'evoluzione e' coerente
+		//TODO(Simone): trovare una metrica migliore
                 if (new_state != sensed_agents.state_agents.internal_map.at (agent->first).state) {
                     //Elimino i dummy non coerenti
                     (*dummy_ref)->dummy.getDiscreteStates().remove(command->first);
