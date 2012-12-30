@@ -219,5 +219,22 @@ struct rndom : public exprtk::ifunction<T> {
     }
 };
 
+//written by Alessandro Settimi
+struct task
+{
+    int task_id;
+    double task_position[3];
+    int task_type;
+    double task_execution_time;
+    double task_deadline;
+};
+
+struct task_list
+{
+    std::vector<task> tasks;
+    int task_number;
+};
+//written by Alessandro Settimi
+
 
 #endif //TYPEDEFS_H

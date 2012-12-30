@@ -12,6 +12,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/strong_typedef.hpp>
 
+//written by Alessandro Settimi
+#include "typedefs.h"
+//written by Alessandro Settimi
+
 // using namespace std;
 
 typedef std::string bonusVariable;
@@ -71,7 +75,9 @@ public:
     
     std::vector<target_id> target_list;
     
-
+    //written by Alessandro Settimi
+    task_list tl;
+    //written by Alessandro Settimi
     
 };
 
@@ -96,6 +102,8 @@ class Parsed_World{
     Parsed_World parse_file(std::string file_name);
     void operator>>(const YAML::Node& node, Parsed_Agent& ag);
     void operator>>(const YAML::Node& node, Parsed_World& wo);
+    void operator>>(const YAML::Node& node, task_list& t);
+
     
     std::ostream& operator<< (std::ostream& , const std::vector<Parsed_Agent>& );
     
