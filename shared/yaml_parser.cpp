@@ -152,21 +152,23 @@ ostream& operator<<(std::ostream& os, const Parsed_World& wo)
 //written by Alessandro Settimi
 void operator >> (const YAML::Node& node, task_list& t)
 {
-    task app;
+    int j=0;
     
     for (int i=0;i<t.task_number*7;)
     {
-        node[i] >> app.task_id;
-	node[i+1] >> app.task_position[0];
-	node[i+2] >> app.task_position[1];
-	node[i+3] >> app.task_position[2];
-	node[i+4] >> app.task_type;
-	node[i+5] >> app.task_execution_time;
-	node[i+6] >> app.task_deadline;
-	
+        task app;
 	t.tasks.push_back(app);
+      
+        node[i] >> t.tasks[j].task_id;
+	node[i+1] >> t.tasks[j].task_position[0];
+	node[i+2] >> t.tasks[j].task_position[1];
+	node[i+3] >> t.tasks[j].task_position[2];
+	node[i+4] >> t.tasks[j].task_type;
+	node[i+5] >> t.tasks[j].task_execution_time;
+	node[i+6] >> t.tasks[j].task_deadline;
 	
 	i=i+7;
+	j++;
     }
 }
 //written by Alessandro Settimi
