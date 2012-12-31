@@ -63,7 +63,8 @@ public:
 class Parsed_Agent {
 
 public:
-    friend std::ostream& operator<<(std::ostream& os, const Parsed_Agent& ag );
+	
+	friend std::ostream& operator<<(std::ostream& os, const Parsed_Agent& ag );
     
     std::string name;
    

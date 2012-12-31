@@ -4,6 +4,7 @@
 #include "logog.hpp"
 #include "debug_constants.h"
 #include <udp_agent_router.hpp>
+#include <zmq_agent_communicator.h>
 #include "collisionchecker.h"
 
 using namespace std;
@@ -14,6 +15,10 @@ void simulator::create_communicator(int communicator_type)
     {
         communicator=new udp_agent_communicator(num_agents);
     }
+    else if (communicator_type==2)
+	{
+		communicator=new zmq_agent_communicator(num_agents);
+	}
 }
 
 simulator::simulator():

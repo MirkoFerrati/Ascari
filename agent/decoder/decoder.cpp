@@ -5,20 +5,30 @@
 using namespace std;
 
 
-decoder::decoder(std::map< int, sub_event_value >& sub_events, std::map< transition, bool >& events):sub_events(sub_events),events(events)
+decoder::decoder(std::map< int, sub_event_value >* sub_events, std::map< transition, bool >* events):sub_events(sub_events),events(events)
 {
 //Nothing to do here?
 }
 
-
-void decoder::create(map< string, string > events, const index_map& sub_events_map, const std::map< string, transition >& events_map)
+decoder::decoder()
 {
+
+}
+
+
+void decoder::create(map< string, string > events_string, const index_map& sub_events_map, const std::map< string, transition >& events_map)
+{
+	//Impongo il set di events e subevents prima della create, sperando basti
+	if (!events || !sub_events)
+	{
+		WARN("errore, prima di usare decoder::create si prega di settare events e sub_events",NULL);
+	}
     map<int,sub_event_value> temp_map;
     for (map<string,transition>::const_iterator it=events_map.begin();it!=events_map.end();++it)
     {
         temp_map.clear();
 
-        stringstream ss(events[it->first]);
+        stringstream ss(events_string[it->first]);
         string token;
         while (ss>>token)
         {
@@ -46,14 +56,14 @@ void decoder::create(map< string, string > events, const index_map& sub_events_m
 
 void decoder::decode()
 {
-    for (map<transition,bool>::iterator it=events.begin(); it!=events.end(); ++it)
+    for (map<transition,bool>::iterator it=events->begin(); it!=events->end(); ++it)
     {
 		it->second=true;
         for (map<int,sub_event_value>::const_iterator iit=internal_table.at(it->first).begin(); iit!=internal_table.at(it->first).end(); ++iit)
         {
-			if (sub_events.at(iit->first)==_UNDEFINED || iit->second==_UNDEFINED)
+			if (sub_events->at(iit->first)==_UNDEFINED || iit->second==_UNDEFINED)
 				continue;
-            if (iit->second!=sub_events.at(iit->first))
+            if (iit->second!=sub_events->at(iit->first))
             {
 				it->second=false;
             }

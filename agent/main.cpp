@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 				throw "agent name not found in configuration file, please check for agent names";
 			}
 			
-        agent a1(myAgent,false,world);
+        agent a1(myAgent,world);
 		a1.start();
         std::cout << "Hello, world! agent" << std::endl;
 	}

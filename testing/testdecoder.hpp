@@ -48,7 +48,7 @@ class testDecoder: public testClass
 			parsed_events.insert(make_pair("e1","t1 l2 l3"));
 			parsed_events.insert(make_pair("e2","t2 l1 !l2"));
 			
-			decoder d(sub_events, events);
+			decoder d(&sub_events, &events);
 			d.create(parsed_events,sub_events_map,events_map);
 			
 			sub_events[1]=_TRUE;

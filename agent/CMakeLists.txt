@@ -5,7 +5,10 @@ add_executable(agent graph_routing/graph_creator.cpp encoder/encoderDet.cpp auto
   communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp ../shared/dynamic.cpp
   communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
   ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp decoder/decoder.cpp 
-  graph_routing/agent_router.cpp graph_routing/agent_router_utility.cpp graph_routing/udp_graph_communicator.cpp)
+  graph_routing/agent_router.cpp graph_routing/agent_router_utility.cpp graph_routing/udp_graph_communicator.cpp
+	../shared/communication/zmq_full_communicator.hpp ../shared/communication/global.cpp
+	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp
+)
 
 #message(${CMAKE_CXX_FLAGS}) 
 

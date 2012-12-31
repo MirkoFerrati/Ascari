@@ -5,6 +5,7 @@
 #include <utility>
 #include <map>
 #include "communication/udp_world_communicator.h"
+#include "communication/zmq_world_communicator.h"
 
 #include "logog.hpp"
 #include "automaton/automatonFSM.h"
@@ -14,28 +15,23 @@
 
 using namespace std;
 
-agent::agent(std::string name,bool isDummy,const std::unique_ptr<Parsed_Behavior>& behavior)
-        :identifier(name),event_decoder(sub_events,events)
+agent::agent(std::string name,const std::unique_ptr<Parsed_Behavior>& behavior)
+        :identifier(name)
 {
-    
-	time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
-    
-    symbol_table.add_constants();
-	pi=exprtk::details::numeric::constant::pi;
-	symbol_table.add_variable("PI_GRECO",pi,true);
-	f_rndom = new rndom<double>();
-	symbol_table.add_function(f_rndom->name, *f_rndom);
-    
-    int i=0;
-    for (map<controller_name,controller_MapRules>::const_iterator it =behavior->controllers.begin();it !=behavior->controllers.end();++it)
-    {
-        map_controllername_to_id.insert(make_pair(it->first,i++));
-    }
-    createDiscreteStateFromParsedAgent(behavior);
-    createStateFromParsedAgent(behavior);
-    createSubEventsFromParsedAgent(behavior);
-    createEventsFromParsedAgent(behavior);
+//qui poi uno setta tutto quello che manca oppure lascia vuoto
+}
+
+
+agent::agent(int agent_index,const Parsed_World& world):
+	identifier(world.agents.at(agent_index).name)
+{
+	createBonusVariablesFromWorld(world.bonus_expressions);
 	
+	if (!world.agents.at(agent_index).target_list.empty())
+	{
+		Plugin_module *plugin=new agent_router(world.agents.at(agent_index).target_list,events,events_to_index,world.agents.at(agent_index).name,time,world.graphName);
+		plugins.push_back(plugin);
+	}
 	/*!
 	 * Aggiungo le variabili richieste dai plugin
 	 */
@@ -45,42 +41,56 @@ agent::agent(std::string name,bool isDummy,const std::unique_ptr<Parsed_Behavior
 		plugins[i]->addReservedVariables(encoder_symbol_table);
 		plugins[i]->compileExpressions(symbol_table);
 	}
-		
-	createControllersFromParsedAgent(behavior);
-
-    if (!isDummy)
-    {
-        automaton=new automatonFSM(createAutomatonTableFromParsedAgent(behavior));
-        encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id,bonusVariables,
-                               map_bonus_variables_to_id, behavior->topology_expressions,
-							   sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table);
-		world_comm=new udp_world_communicator();
-		
-    }
-    else
-	{
-        //TODO(Mirko): we will think about identifierModule later
-    }
-
-    event_decoder.create(behavior->events_expressions,sub_events_to_index,events_to_index);
+	
+	discreteState.push_front(map_discreteStateName_to_id.at(world.agents.at(agent_index).state_start));
+	
+//qui invece mi setto quello che manca a mano
 }
 
 
-agent::agent(int agent_index,bool isDummy,const Parsed_World& world):
-	agent(world.agents.at(agent_index).name,isDummy,world.behaviors.at(world.agents.at(agent_index).behavior_name))
+void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy)
 {
-		
+	time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
 	
-	if (!world.agents.at(agent_index).target_list.empty())
+	symbol_table.add_constants();
+	pi=exprtk::details::numeric::constant::pi;
+	symbol_table.add_variable("PI_GRECO",pi,true);
+	f_rndom = new rndom<double>();
+	symbol_table.add_function(f_rndom->name, *f_rndom);
+	
+	int i=0;
+	for (map<controller_name,controller_MapRules>::const_iterator it =behavior->controllers.begin();it !=behavior->controllers.end();++it)
 	{
-		Plugin_module *plugin=new agent_router(world.agents.at(agent_index).target_list,events,events_to_index,world.agents.at(agent_index).name,time,world.graphName);
-		plugins.push_back(plugin);
+		map_controllername_to_id.insert(make_pair(it->first,i++));
 	}
-	createBonusVariablesFromWorld(world.bonus_expressions);
+	event_decoder.setEventsAndSubEvents(&sub_events,&events);
+	
+	
+	createDiscreteStateFromParsedAgent(behavior);
+	createStateFromParsedAgent(behavior);
+	createSubEventsFromParsedAgent(behavior);
+	createEventsFromParsedAgent(behavior);
+
+	
+	createControllersFromParsedAgent(behavior);
+	
 	if (!isDummy)
 	{
-	discreteState.push_front(map_discreteStateName_to_id.at(world.agents.at(agent_index).state_start));
+		automaton=new automatonFSM(createAutomatonTableFromParsedAgent(behavior));
+		encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id,bonusVariables,
+							   map_bonus_variables_to_id, behavior->topology_expressions,
+						 sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table);
+		//world_comm=new udp_world_communicator();
+		world_comm=new zmq_world_communicator(identifier);
+		
 	}
+	else
+	{
+		//TODO(Mirko): we will think about identifierModule later
+	}
+	
+	event_decoder.create(behavior->events_expressions,sub_events_to_index,events_to_index);
+
 }
 
 

@@ -18,11 +18,13 @@
 class agent
 {
 public:
-	agent(std::string name, bool isDummy, const std::unique_ptr< Parsed_Behavior >& behavior);
-	agent(int agent_index, bool isDummy, const Parsed_World& world);
+	agent(std::string name,  const std::unique_ptr< Parsed_Behavior >& behavior);
+	agent(int agent_index, const Parsed_World& world);
 	~agent();
+	void init(const std::unique_ptr< Parsed_Behavior >& behavior, bool isDummy);
     void start();
     void main_loop();
+	
     inline std::forward_list<automaton_state> & getDiscreteStates()
     {
       return discreteState;
@@ -146,7 +148,6 @@ private:
 	rndom<double>* f_rndom;
 	double pi;
 	agent(const agent& a);
-	
 };
 
 #endif // AGENT_H
