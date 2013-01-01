@@ -24,7 +24,6 @@ int main(int argc, char **argv) {
     LOGOG_INITIALIZE();	
     {
         logog::Cout out;
-        WARN("Foo is over %d!  Current value is %d.", 3, 5 );
         simulator s;
 		Parsed_World World;
 		lemon::ArgParser ap(argc,argv);
@@ -33,7 +32,7 @@ int main(int argc, char **argv) {
 		bool checkCollision=false;
 		ap.refOption("n","Number of simulator cycle",count);
 		ap.refOption("s","Milliseconds sleep",secSleep);
-		ap.refOption("f","Yaml filename",filename);
+		ap.refOption("f","Yaml filename",filename,true);
 		ap.refOption("check_collision","enables collision checking",checkCollision);
 		ap.synonym("filename","f");
 		ap.synonym("sleep","s");
@@ -42,7 +41,7 @@ int main(int argc, char **argv) {
 			ap.parse();
 		}
 		catch (lemon::ArgParserException const& ex){
-			ERR("errore nella lettura dei parametri %s",ex.reason());
+			ERR("errore nella lettura dei parametri %s",ex.what());
 			return 0;
 		}
 		World=parse_file(filename);

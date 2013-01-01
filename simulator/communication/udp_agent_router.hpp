@@ -47,7 +47,8 @@ void join_thread()
 {
 	set_run(false);
 	service.stop();
-	t->interrupt();
+	if (t)
+	  t->interrupt();
 	if (t)
 		t->join();
 }
@@ -60,7 +61,8 @@ void set_run(bool running)
 ~Udp_agent_router()
 {
 	should_run=false;
-	t->interrupt();	
+	if (t)
+	  t->interrupt();	
 }
 
 

@@ -37,21 +37,21 @@ Parsed_World parse_file(string file_name) {
 }
 
 
-void operator>> (const YAML::Node& node, Parsed_Behavior& behavior)
+void operator>> (const YAML::Node& node, std::unique_ptr<Parsed_Behavior>& behavior)
 {
 
   
-    node["STATES"]>>behavior.state;
-    node["CONTROL_COMMANDS"]>>behavior.inputs;
-    node["NAME"]>>behavior.name;
+    node["STATES"]>>behavior->state;
+    node["CONTROL_COMMANDS"]>>behavior->inputs;
+    node["NAME"]>>behavior->name;
 
     
     
-  for (unsigned int i=0;i<behavior.state.size();i++)
+  for (unsigned int i=0;i<behavior->state.size();i++)
     {
         dynamic_expression tmp_exp;
-        node["DYNAMIC_MAP"][0][behavior.state[i]]>>tmp_exp;
-        behavior.expressions.insert(std::pair<stateVariable,dynamic_expression>(behavior.state[i],tmp_exp));
+        node["DYNAMIC_MAP"][0][behavior->state[i]]>>tmp_exp;
+        behavior->expressions.insert(std::pair<stateVariable,dynamic_expression>(behavior->state[i],tmp_exp));
     
       
     }
@@ -63,11 +63,11 @@ void operator>> (const YAML::Node& node, Parsed_Behavior& behavior)
         map<int,string> temp1;
         controllers[i]["NAME"]>>temp;
 
-        behavior.controllers.insert(pair<controller_name, map<int,controllerRule> >(temp,temp1));
+        behavior->controllers.insert(pair<controller_name, map<int,controllerRule> >(temp,temp1));
 
-        for (unsigned int j=0;j<behavior.inputs.size();j++)
+        for (unsigned int j=0;j<behavior->inputs.size();j++)
         {
-            controllers[i][behavior.inputs[j]]>> behavior.controllers[temp][j];
+            controllers[i][behavior->inputs[j]]>> behavior->controllers[temp][j];
         }
     }
 
@@ -78,45 +78,45 @@ void operator>> (const YAML::Node& node, Parsed_Behavior& behavior)
         disc_states[i]["NAME"]>>n_state;
         string c_name;
         disc_states[i]["CONTROLLER"]>>c_name;
-        behavior.discrete_states.insert(pair<string,string>(n_state,c_name));
+        behavior->discrete_states.insert(pair<string,string>(n_state,c_name));
 
     }
 
     
     const YAML::Node& encoder = node["ENCODER"][0];
     const YAML::Node& topology=encoder["TOPOLOGY"][0];
-    topology["TOPOLOGY"]>> behavior.topology;
+    topology["TOPOLOGY"]>> behavior->topology;
 
 
-    for (unsigned int i=0;i<behavior.topology.size();i++) {
+    for (unsigned int i=0;i<behavior->topology.size();i++) {
         string topology_exp;
-        topology[behavior.topology[i]]>>topology_exp;
-        behavior.topology_expressions.insert(pair<string,string>(behavior.topology[i],topology_exp));
+        topology[behavior->topology[i]]>>topology_exp;
+        behavior->topology_expressions.insert(pair<string,string>(behavior->topology[i],topology_exp));
 
     }
 
     const YAML::Node& lambda=encoder["LAMBDA"][0];
 
-    lambda["LAMBDA"]>> behavior.lambda;
+    lambda["LAMBDA"]>> behavior->lambda;
 
 
-    for (unsigned int i=0;i<behavior.lambda.size();i++) {
+    for (unsigned int i=0;i<behavior->lambda.size();i++) {
         string lambda_exp;
-        lambda[behavior.lambda[i]]>>lambda_exp;
-        behavior.lambda_expressions.insert(pair<string,string>(behavior.lambda[i],lambda_exp));
+        lambda[behavior->lambda[i]]>>lambda_exp;
+        behavior->lambda_expressions.insert(pair<string,string>(behavior->lambda[i],lambda_exp));
 
     }
 
 
     const YAML::Node& decoder = node["EVENTS"][0];
 
-    decoder["EVENTS"]>> behavior.events;
+    decoder["EVENTS"]>> behavior->events;
 
 
-    for (unsigned int i=0;i<behavior.events.size();i++) {
+    for (unsigned int i=0;i<behavior->events.size();i++) {
         string events_exp;
-        decoder[behavior.events[i]]>>events_exp;
-        behavior.events_expressions.insert(pair<string,string>(behavior.events[i],events_exp));
+        decoder[behavior->events[i]]>>events_exp;
+        behavior->events_expressions.insert(pair<string,string>(behavior->events[i],events_exp));
 
     }
 
@@ -126,17 +126,17 @@ void operator>> (const YAML::Node& node, Parsed_Behavior& behavior)
 
 
     for (unsigned int i=0;i<automaton.size();i++) {
-        for (map< discreteState_Name, controller_name >::const_iterator iter=behavior.discrete_states.begin(); iter!=behavior.discrete_states.end();++iter)
+        for (map< discreteState_Name, controller_name >::const_iterator iter=behavior->discrete_states.begin(); iter!=behavior->discrete_states.end();++iter)
         {
             string actual_state;
             actual_state=((*iter).first);
             if (automaton[i].FindValue(actual_state)) {
                 map<string,string> temp1;
-                behavior.automaton.insert(pair<string, map<string,string> >(actual_state,temp1));
+                behavior->automaton.insert(pair<string, map<string,string> >(actual_state,temp1));
 
                 const YAML::Node& transition = automaton[i][actual_state][0];
 
-                for (map< discreteState_Name, controller_name >::const_iterator iiter=behavior.discrete_states.begin(); iiter!=behavior.discrete_states.end();++iiter)
+                for (map< discreteState_Name, controller_name >::const_iterator iiter=behavior->discrete_states.begin(); iiter!=behavior->discrete_states.end();++iiter)
                 {
                     string new_state;
                     new_state=(*iiter).first;
@@ -148,12 +148,12 @@ void operator>> (const YAML::Node& node, Parsed_Behavior& behavior)
 
 
                         for (unsigned int j=0; j< tran_ev.size();j++) {
-                            if (behavior.automaton[actual_state].count(tran_ev[j]))
+                            if (behavior->automaton[actual_state].count(tran_ev[j]))
                             {
                                 ERR("DUPLICATED EVENT %s", tran_ev[j].c_str());
                                 throw "DUPLICATED EVENT";
                             }
-                            behavior.automaton[actual_state].insert(pair<event_name, discreteState_Name>(tran_ev[j],new_state));
+                            behavior->automaton[actual_state].insert(pair<event_name, discreteState_Name>(tran_ev[j],new_state));
                         }
                     }
                 }
@@ -243,10 +243,12 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
         }
       
 	behaviors_nodes[i]["NAME"]>> tmp_beh_name;
+	{
 	std::unique_ptr<Parsed_Behavior> tmp_ptr(new Parsed_Behavior());
-        behaviors_nodes[i] >> *tmp_ptr;
-	wo.behaviors[tmp_beh_name]=std::move(tmp_ptr);
-	
+	wo.behaviors.insert(std::make_pair(tmp_beh_name,std::move(tmp_ptr)));
+	}
+	wo.behaviors[tmp_beh_name]->name=tmp_beh_name;
+	behaviors_nodes[i]>>wo.behaviors[tmp_beh_name];
     }
 
     

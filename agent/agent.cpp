@@ -42,11 +42,12 @@ agent::agent(int agent_index,const Parsed_World& world):
 	{
 		plugins[i]->addReservedVariables(symbol_table);
 		plugins[i]->addReservedVariables(encoder_symbol_table);
-		plugins[i]->compileExpressions(symbol_table);
+		
 	}
 	
-	discreteState.push_front(map_discreteStateName_to_id.at(world.agents.at(agent_index).state_start));
 	init(world.agents.at(agent_index).behavior,false);
+	discreteState.push_front(map_discreteStateName_to_id.at(world.agents.at(agent_index).state_start));
+	
 //qui invece mi setto quello che manca a mano
 }
 
@@ -89,6 +90,10 @@ void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy
 	}
 	else
 	{
+	    for (unsigned int i=0;i<plugins.size();i++)
+	    {
+		plugins[i]->compileExpressions(symbol_table);
+	    }
 		//TODO(Mirko): we will think about identifierModule later
 	}
 	
@@ -228,7 +233,7 @@ void agent::createStateFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavi
         inputs.default_command[i]=0;
         map_inputs_name_to_id.insert(make_pair(behavior->inputs.at(i),i));
     }
-    for (unsigned int i=0;i<inputs.commands.size();i++)
+    for (unsigned int i=0;i<inputs.default_command.size();i++)
 	{
 		symbol_table.add_variable(behavior->inputs[i],inputs.default_command[i]);
 	}

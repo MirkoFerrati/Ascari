@@ -7,7 +7,7 @@
 #include <vector>
 #include <sstream>
 #include "logog.hpp"
-
+#include <map>
 #include "yaml-cpp/yaml.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/strong_typedef.hpp>
@@ -64,7 +64,7 @@ public:
 class Parsed_Agent {
 
 public:
-	Parsed_Agent(std::unique_ptr<Parsed_Behavior>&):behavior(behavior)
+	Parsed_Agent(const std::unique_ptr<Parsed_Behavior>& behavior):behavior(behavior)
 	{
 		
 	}
@@ -81,7 +81,7 @@ public:
     
     std::vector<target_id> target_list;
     
-    std::unique_ptr<Parsed_Behavior>& behavior;
+    const std::unique_ptr<Parsed_Behavior>& behavior;
     std::string behavior_name;
     
 };
@@ -106,7 +106,7 @@ class Parsed_World{
     
     Parsed_World parse_file(const char * file_name);
     Parsed_World parse_file(std::string file_name);
-    void operator>>(const YAML::Node& node, Parsed_Agent& ag);
+    void operator>>(const YAML::Node& node, std::unique_ptr< Parsed_Behavior >& behavior);
     void operator>>(const YAML::Node& node, Parsed_World& wo);
     void operator>>(const YAML::Node& node, Parsed_Behavior& beh);
     std::ostream& operator<< (std::ostream& , const std::vector<Parsed_Agent>& );

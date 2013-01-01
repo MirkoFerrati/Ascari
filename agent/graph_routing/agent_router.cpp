@@ -47,10 +47,10 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
 	tarc=2;
     isNegotiating=true;
     next=source;
-    xtarget=(coord_x)[next];
-    ytarget=(coord_y)[next];
+    xtarget=coord_x[next];
+    ytarget=coord_y[next];
     info[identifier].timestamp=0;
-    setTargetStop(false);
+//    setTargetStop(false);
     communicator.startReceive();
     last_time_updated=time;
     stop=next_target_reachable=false;

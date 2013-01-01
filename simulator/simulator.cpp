@@ -213,7 +213,8 @@ void simulator::main_loop()
 simulator::~simulator()
 {
 	sim_packet.time=-10;
-	communicator->send_broadcast(sim_packet);
+	if (communicator)
+	  communicator->send_broadcast(sim_packet);
 	
 	graph_router.join_thread();
     delete communicator;

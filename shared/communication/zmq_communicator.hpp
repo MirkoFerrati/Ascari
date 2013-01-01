@@ -60,29 +60,33 @@ protected:
 	bool init_full(std::string owner_name,std::string receiver_protocol,std::string sender_protocol,std::string sync_protocol="",unsigned int expected_senders=1) {
         this->expected_senders=expected_senders;
 		receiver_socket.connect(receiver_protocol.c_str());
+		if (sock_recv_type==ZMQ_SUB)
+		{
+		  receiver_socket.setsockopt(ZMQ_SUBSCRIBE,"",0);
+		}
 	sender_socket.bind(sender_protocol.c_str());
         results.resize (expected_senders);
         this->owner_name = owner_name;
         if (sync == WAIT_SYNC) {
-          sync_socket->bind (sync_protocol.compare("")?SYNC_PROTOCOL:sync_protocol.c_str());
+          sync_socket->bind (!sync_protocol.compare("")?SYNC_PROTOCOL:sync_protocol.c_str());
 
             std::cout << owner_name << " waiting for clients..." << std::endl;
             unsigned int subscribers = 0;
             while (subscribers < expected_senders) {
-
+            
                 //  - wait for synchronization request
                 zmq::message_t message_tmp;
                 sync_socket->recv (&message_tmp);
                 std::string name (static_cast<char*> (message_tmp.data()), message_tmp.size());
 
-                std::string string = "one more client connected to server: "; //non so chi si sia connesso, sono tutti uguali
+                std::string result = "one more client connected to server: "; //non so chi si sia connesso, sono tutti uguali
                 //  - send synchronization reply
-                string.append (name);
-                zmq::message_t message (string.size());
-                memcpy (message.data(), string.data(), string.size());
+                result.append (name);
+                zmq::message_t message (result.size());
+                memcpy (message.data(), result.data(), result.size());
 
                 bool rc = sync_socket->send (message); assert(rc);
-                std::cout << message.data() << std::endl;
+                std::cout << result << std::endl;
                 subscribers++;
             }
         } else if (sync == ASK_SYNC) {
@@ -93,7 +97,7 @@ protected:
                 Subscribers connect SUB socket and when they receive a Hello message they tell the publisher via a REQ/REP socket pair.
                 When the publisher has had all the necessary confirmations, it starts to send real data.
               */
-            sync_socket->connect (sync_protocol.compare("")?SYNC_PROTOCOL:sync_protocol.c_str());
+            sync_socket->connect (!sync_protocol.compare("")?SYNC_PROTOCOL:sync_protocol.c_str());
 
             std::cout << owner_name << " connecting to server..." << std::endl;
 
@@ -103,7 +107,7 @@ protected:
             message.rebuild (MAX_PACKET_LENGTH);
             sync_socket->recv (&message);
 
-            std::cout << message.data() << std::endl;
+            std::cout << static_cast<char*> (message.data()) << std::endl;
 
         }
         return true;
