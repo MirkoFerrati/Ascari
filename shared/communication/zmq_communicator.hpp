@@ -86,7 +86,7 @@ protected:
                 subscribers++;
             }
         } else if (sync == ASK_SYNC) {
-            /** TODO(Mirko): implementare il modello qui sotto, è più robusto
+            /** TODO(Mirko): implementare il modello qui sotto, e' più robusto
              * A more robust model could be:
 
                 Publisher opens PUB socket and starts sending "Hello" messages (not data).

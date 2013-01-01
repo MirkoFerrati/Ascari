@@ -275,7 +275,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
     }
     wo.agents.emplace_back(wo.behaviors[tmp_agent_behavior_name]);
 	wo.agents[i].name=tmp_ag_name;
-	//wo.agents[i].behavior=(*wo.behaviors[tmp_agent_behavior_name]);//TODO(Mirko) perchè è una copia?
+	//wo.agents[i].behavior=(*wo.behaviors[tmp_agent_behavior_name]);//TODO(Mirko) perche' e' una copia?
 	wo.agents[i].behavior_name=tmp_agent_behavior_name;
         agent_nodes[i] >> wo.agents[i];
         if ((wo.agents[i].target_list.size()==0 && wo.graphName.compare("UNSET")!=0)|| (wo.agents[i].target_list.size()>0 && wo.graphName.compare("UNSET")==0) ) {

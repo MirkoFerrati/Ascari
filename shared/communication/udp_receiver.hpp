@@ -42,7 +42,7 @@ public:
 		}
 		catch (boost::system::system_error e)
 		{
-			ERR("Attenzione, forse si è dimenticato di lanciare il comando route add -net 224.0.0.0/4 dev eth0, l'errore è %s",e.what());
+			ERR("Attenzione, forse si e' dimenticato di lanciare il comando route add -net 224.0.0.0/4 dev eth0, l'errore e' %s",e.what());
 		}
 		inbound_data_.resize(MAX_PACKET_LENGTH);
     }

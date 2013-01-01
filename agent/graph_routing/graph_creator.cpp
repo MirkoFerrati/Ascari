@@ -73,7 +73,7 @@ void Graph_creator::addFloor ( lemon::SmartDigraph::NodeMap<lemon::dim2::Point<i
     //Aggiungo un livello al grafo
     addNodes ( coords,ncolors,acolors,floorNumber );
     if ( floorNumber==0 ) return;
-    //TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
+    //TODO: attenzione, l'ipotesi e' che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
     SmartDigraph::Node source;
     SmartDigraph::Node target;
     for ( unsigned int i=0; i<graph_node_size; i++ )
@@ -122,7 +122,7 @@ void Graph_creator::finalizeFloor ( lemon::SmartDigraph::NodeMap<lemon::dim2::Po
     int floorNumber=startId/graph_node_size;
     //Aggiungo un livello al grafo
     addNodes ( coords,ncolors,acolors,floorNumber );
-    //TODO: attenzione, l'ipotesi è che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
+    //TODO: attenzione, l'ipotesi e' che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
     SmartDigraph::Node source;
     SmartDigraph::Node target;
     for ( unsigned int i=0; i<graph_node_size; i++ )
@@ -130,7 +130,7 @@ void Graph_creator::finalizeFloor ( lemon::SmartDigraph::NodeMap<lemon::dim2::Po
         for ( SmartDigraph::OutArcIt arcit ( graph,graph.nodeFromId ( i ) ); arcit!=INVALID; ++arcit )
         {
             SmartDigraph::Arc a=_3Dgraph.addArc ( _3Dgraph.nodeFromId ( i+floorNumber*graph_node_size ),_3Dgraph.nodeFromId ( graph.id ( graph.target ( arcit ) ) +floorNumber*graph_node_size ) );
-            ( _3Dlength ) [a]=TOP_FLOOR_LENGTH; //TODO: ogni numero è fondamentale
+            ( _3Dlength ) [a]=TOP_FLOOR_LENGTH; //TODO: ogni numero e' fondamentale
             acolors[a]=floorNumber+1;
             source=_3Dgraph.nodeFromId ( i+ ( floorNumber-1 ) *graph_node_size );
             target=_3Dgraph.nodeFromId ( graph.id ( graph.target ( arcit ) ) +floorNumber*graph_node_size );

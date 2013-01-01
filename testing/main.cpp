@@ -13,7 +13,7 @@
 
 /**
  * @author MirkoF
- * Questo progetto è ancora troppo piccolo per avere un vero framework di unit testing, per adesso 
+ * Questo progetto e' ancora troppo piccolo per avere un vero framework di unit testing, per adesso 
  * basta e avanza un sistema banale come quello qui sotto: una classe base di test e tutti i test
  * che derivano da quella, e un vettore con i test aggiunti manualmente.
  */
@@ -39,7 +39,7 @@ int main(int /*argc*/, char** /*argv*/) {
 		{
 			cout<<"inizio test "<<tests[i].second<<endl;
 			tests[i].first->test();
-			cout<<"il test "<<tests[i].second<<" è andato a buon fine"<<endl;
+			cout<<"il test "<<tests[i].second<<" e' andato a buon fine"<<endl;
 		}
 		catch(const char* e)
 		{
@@ -47,7 +47,7 @@ int main(int /*argc*/, char** /*argv*/) {
 		}
 		catch (...)
 		{
-			cout<<"il test "<<tests[i].second<<" è fallito"<<endl;
+			cout<<"il test "<<tests[i].second<<" e' fallito"<<endl;
 			throw;
 		}
 	}

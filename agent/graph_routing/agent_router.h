@@ -15,7 +15,7 @@
 #define TIME_SLOT_FOR_3DGRAPH 10.0
 
 #define FLOORS_SENT 4
-#define MAX_LENGTH 2*VERTICAL_LENGTH //TODO: questo numero è fisso ma dovrebbe essere una variabile
+#define MAX_LENGTH 2*VERTICAL_LENGTH //TODO: questo numero e' fisso ma dovrebbe essere una variabile
 
 class agent_router: public Plugin_module
 {

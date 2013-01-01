@@ -41,7 +41,7 @@ agent_router::agent_router(std::vector< int > tarlist, std::map< transition, boo
     if (!graph_node_size)
         ERR("attenzione, impossibile creare il grafo",0);
     if (targets.size()<2)
-		ERR("attenzione, la lista dei target è troppo corta",0);
+		ERR("attenzione, la lista dei target e' troppo corta",0);
 	source=graph.nodeFromId(targets[0]);
     target=graph.nodeFromId(targets[1]);
 	tarc=2;
@@ -231,7 +231,7 @@ bool agent_router::detect_collision(lemon::SmartDigraph::ArcMap<bool>& useArc)
         for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();++itt)
         {
             int id=(*itt)-age*graph_node_size;
-            if (id<graph_node_size) //Se il nodo è finito nel passato oppure al piano terra lo ignoro
+            if (id<graph_node_size) //Se il nodo e' finito nel passato oppure al piano terra lo ignoro
                 continue;
             //Calcolo le collisioni
             for (unsigned int i=0;i<node_id.size();i++)

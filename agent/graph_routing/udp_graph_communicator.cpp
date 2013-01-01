@@ -99,7 +99,7 @@ void Udp_graph_communicator::handle_receive_from(const boost::system::error_code
         //Copiamo tutto, sarà compito del sender assicurarsi di non mandare robaccia
         for (graph_packet::iterator it=input_map_tp.begin();it!=input_map_tp.end();++it)
         {
-			//se non ho l'informazione oppure ce l'ho ma è vecchia la cambio
+			//se non ho l'informazione oppure ce l'ho ma e' vecchia la cambio
             if (!tp->count(it->first) || tp->at(it->first).timestamp<it->second.timestamp) 
             {
                 (*tp)[it->first]=it->second;
