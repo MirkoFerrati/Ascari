@@ -10,6 +10,7 @@ class decoder
 public:
 	decoder(std::map< int, sub_event_value >* sub_events, std::map< transition, bool >* events);
 	decoder();
+
 	void setEventsAndSubEvents(std::map< int, sub_event_value >* sub_events, std::map< transition, bool >* events)
 	{
 		this->events=events;

@@ -113,25 +113,25 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
         
         index_map commands_to_index_tmp;
 
-        for (unsigned int j=0; j<ag.at(i).behavior.state.size();j++)
+        for (unsigned int j=0; j<ag.at(i).behavior->state.size();j++)
         {
-            agent_packet.state.insert(make_pair(j,ag.at(i).initial_states.at(ag.at(i).behavior.state.at(j))));
-			agent_states_to_index.insert(make_pair(ag.at(i).behavior.state.at(j),j));
-            bonus_symbol_table.add_variable(ag.at(i).behavior.state.at(j)+ag.at(i).name,agent_packet.state.at(j));
+            agent_packet.state.insert(make_pair(j,ag.at(i).initial_states.at(ag.at(i).behavior->state.at(j))));
+			agent_states_to_index.insert(make_pair(ag.at(i).behavior->state.at(j),j));
+            bonus_symbol_table.add_variable(ag.at(i).behavior->state.at(j)+ag.at(i).name,agent_packet.state.at(j));
         }
 
         //Al simulatore non deve mai arrivare piu' di un controllo per agente, percio' la mappa avra' un solo elemento
         
-        for (unsigned int j=0; j<ag.at(i).behavior.inputs.size();j++)
+        for (unsigned int j=0; j<ag.at(i).behavior->inputs.size();j++)
         {
             command_packet.default_command.insert(make_pair(j,0));
-            commands_to_index_tmp.insert(make_pair(ag.at(i).behavior.inputs.at(j),j));
-            bonus_symbol_table.add_variable(ag.at(i).behavior.inputs.at(j)+ag.at(i).name,command_packet.default_command.at(j));
+            commands_to_index_tmp.insert(make_pair(ag.at(i).behavior->inputs.at(j),j));
+            bonus_symbol_table.add_variable(ag.at(i).behavior->inputs.at(j)+ag.at(i).name,command_packet.default_command.at(j));
         }
         agent_commands_to_index.push_back(commands_to_index_tmp);
 
         dynamic *d= new dynamic(sim_packet.state_agents.internal_map.at(ag.at(i).name).state, commands.at(ag.at(i).name).default_command,
-                                ag.at(i).behavior.expressions, ag.at(i).behavior.state,ag.at(i).behavior.inputs);
+                                ag.at(i).behavior->expressions, ag.at(i).behavior->state,ag.at(i).behavior->inputs);
 
         dynamic_module.push_back(d);
 

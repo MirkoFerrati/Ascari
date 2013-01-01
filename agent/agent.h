@@ -34,6 +34,8 @@ public:
 	
 protected:
     
+	bool initialized;
+	
 	/**
 	 * Name of agent and it is used for unique indentification
 	 */

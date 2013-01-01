@@ -58,12 +58,16 @@ public:
 	std::vector<event_name> events;
     std::map<event_name, event_expression> events_expressions;
     std::map<discreteState_Name, std::map<event_name,discreteState_Name> > automaton;
+	
 };
 
 class Parsed_Agent {
 
 public:
-	
+	Parsed_Agent(std::unique_ptr<Parsed_Behavior>&):behavior(behavior)
+	{
+		
+	}
 	friend std::ostream& operator<<(std::ostream& os, const Parsed_Agent& ag );
     
     std::string name;
@@ -77,7 +81,7 @@ public:
     
     std::vector<target_id> target_list;
     
-    Parsed_Behavior behavior;
+    std::unique_ptr<Parsed_Behavior>& behavior;
     std::string behavior_name;
     
 };

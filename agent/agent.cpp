@@ -19,6 +19,9 @@ agent::agent(std::string name,const std::unique_ptr<Parsed_Behavior>& behavior)
         :identifier(name)
 {
 //qui poi uno setta tutto quello che manca oppure lascia vuoto
+initialized=false;
+encoder=0;
+init(behavior,true);
 }
 
 
@@ -43,7 +46,7 @@ agent::agent(int agent_index,const Parsed_World& world):
 	}
 	
 	discreteState.push_front(map_discreteStateName_to_id.at(world.agents.at(agent_index).state_start));
-	
+	init(world.agents.at(agent_index).behavior,false);
 //qui invece mi setto quello che manca a mano
 }
 
@@ -51,7 +54,7 @@ agent::agent(int agent_index,const Parsed_World& world):
 void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy)
 {
 	time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
-	
+	initialized=true;
 	symbol_table.add_constants();
 	pi=exprtk::details::numeric::constant::pi;
 	symbol_table.add_variable("PI_GRECO",pi,true);
@@ -112,6 +115,8 @@ void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression >
 
 void agent::start()
 {
+	if (!initialized)
+		throw "pls call init function before start";
    try {
         inputs.identifier=identifier;
         int cicli=0;

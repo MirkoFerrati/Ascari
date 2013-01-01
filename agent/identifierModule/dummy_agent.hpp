@@ -17,7 +17,7 @@ struct dummy_agent
   agent dummy;
   int behavior_identifier;
   std::string identifier;
-  std::mutex comm_mutex;;
+  std::mutex comm_mutex;
 };
 
 

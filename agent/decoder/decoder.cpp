@@ -12,7 +12,8 @@ decoder::decoder(std::map< int, sub_event_value >* sub_events, std::map< transit
 
 decoder::decoder()
 {
-
+	events=0;
+	sub_events=0;
 }
 
 

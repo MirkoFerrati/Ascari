@@ -174,11 +174,11 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     
     
     
-    for (unsigned int i=0;i<ag.behavior.state.size();i++)
+    for (unsigned int i=0;i<ag.behavior->state.size();i++)
     {
         initial_state_value tmp_initial;
-        node["INITIAL"][0][ag.behavior.state[i]]>>tmp_initial;
-        ag.initial_states.insert(pair<stateVariable,initial_state_value>(ag.behavior.state[i],tmp_initial));
+        node["INITIAL"][0][ag.behavior->state[i]]>>tmp_initial;
+        ag.initial_states.insert(pair<stateVariable,initial_state_value>(ag.behavior->state[i],tmp_initial));
     }
 
     
@@ -188,7 +188,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
         node["TARGET_LIST"]>> ag.target_list;
     }
 
-    if (!ag.behavior.discrete_states.count(ag.state_start))
+    if (!ag.behavior->discrete_states.count(ag.state_start))
     {
         ERR("UNDEFINED START DISCRETE STATE %s", ag.state_start.c_str());
         throw "UNDEFINED DISCRETE START STATE";
@@ -252,7 +252,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
     
     const YAML::Node &agent_nodes=node[0]["AGENTS"];
 
-    wo.agents.resize(agent_nodes.size());
+    wo.agents.reserve(agent_nodes.size());
 
     for (unsigned int i=0;i<agent_nodes.size();i++) {
       
@@ -266,15 +266,16 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
     }
     
     std::string tmp_agent_behavior_name;
-    agent_nodes[i]["BEHAVIOR"]>>tmp_agent_behavior_name;
+	agent_nodes[i]["BEHAVIOR"]>>tmp_agent_behavior_name;
     
      if (!wo.behaviors.count(tmp_agent_behavior_name))
     {
         ERR("UNDEFINED BEHAVIOR %s FOR AGENT %s", tmp_agent_behavior_name.c_str(), tmp_ag_name.c_str());
         throw "UNDEFINED BEHAVIOR %s FOR AGENT %s";
     }
+    wo.agents.emplace_back(wo.behaviors[tmp_agent_behavior_name]);
 	wo.agents[i].name=tmp_ag_name;
-	wo.agents[i].behavior=(*wo.behaviors[tmp_agent_behavior_name]);//TODO(Mirko) perchè è una copia?
+	//wo.agents[i].behavior=(*wo.behaviors[tmp_agent_behavior_name]);//TODO(Mirko) perchè è una copia?
 	wo.agents[i].behavior_name=tmp_agent_behavior_name;
         agent_nodes[i] >> wo.agents[i];
         if ((wo.agents[i].target_list.size()==0 && wo.graphName.compare("UNSET")!=0)|| (wo.agents[i].target_list.size()>0 && wo.graphName.compare("UNSET")==0) ) {
