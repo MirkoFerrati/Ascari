@@ -1,5 +1,6 @@
 #include "agent.h"
 #include <agent_router.h>
+#include "task_assignment/task_assignment.h" //written by Alessandro Settimi
 #include <string>
 #include <utility>
 #include <map>
@@ -47,7 +48,15 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
 		Plugin_module *plugin=new agent_router(world.agents.at(myAgent).target_list,events,events_to_index,temp,time,world.graphName);;
 		plugins.push_back(plugin);
 	}
-	  
+	
+	//written by Alessandro Settimi
+	if (!world.agents.at(myAgent).tl.tasks.empty())
+	{
+		Plugin_module *plugin=new task_assignment(world.agents.at(myAgent),events,events_to_index);
+		plugins.push_back(plugin);
+	} 
+	//written by Alessandro Settimi
+	
 	/*!
 	 * Aggiungo le variabili richieste dai plugin
 	 */
@@ -73,6 +82,7 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
     }
 
     event_decoder.create(world.agents[myAgent].events_expressions,sub_events_to_index,events_to_index);
+
 }
 
 void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression > bonus)
@@ -193,9 +203,6 @@ void agent::createStateFromParsedAgent(const Parsed_Agent& agent)
 		symbol_table.add_variable(agent.inputs[i],inputs.command[i]);
 	}
 }
-
-
-
 
 void agent::main_loop()
 {
