@@ -7,36 +7,36 @@ using namespace std;
 
 task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index):events(events),events_to_index(events_to_index)
 {
-    createTaskListFromParsedAgent(agent);
+    createTaskListFromParsedWorld(world);
     createTaskCostMatrixFromParsedWorld(world);
+    agent_id=agent.name;
     task_assigned=false;
     stop=false;
     speed=0;
 }
 
-void task_assignment::createTaskListFromParsedAgent(const Parsed_Agent& agent)
+void task_assignment::createTaskListFromParsedWorld(const Parsed_World& wo)
 {
-    agent_id=agent.name;
-    tasklist.task_number=agent.tl.task_number;
+    tasklist.task_number=wo.tl.task_number;
     
-    for (int i=0; i< tasklist.task_number;i++)
+    for (unsigned int i=0; i< tasklist.task_number;i++)
     {	
 	    task app;
 	    tasklist.tasks.push_back(app);
 	    
-	    tasklist.tasks[i].task_id=agent.tl.tasks[i].task_id;
-	    tasklist.tasks[i].task_position[0]=agent.tl.tasks[i].task_position[0];
-	    tasklist.tasks[i].task_position[1]=agent.tl.tasks[i].task_position[1];
-	    tasklist.tasks[i].task_position[2]=agent.tl.tasks[i].task_position[2];
-	    tasklist.tasks[i].task_type=agent.tl.tasks[i].task_type;
-	    tasklist.tasks[i].task_execution_time=agent.tl.tasks[i].task_execution_time;
-	    tasklist.tasks[i].task_deadline=agent.tl.tasks[i].task_deadline;
+	    tasklist.tasks[i].task_id=wo.tl.tasks[i].task_id;
+	    tasklist.tasks[i].task_position[0]=wo.tl.tasks[i].task_position[0];
+	    tasklist.tasks[i].task_position[1]=wo.tl.tasks[i].task_position[1];
+	    tasklist.tasks[i].task_position[2]=wo.tl.tasks[i].task_position[2];
+	    tasklist.tasks[i].task_type=wo.tl.tasks[i].task_type;
+	    tasklist.tasks[i].task_execution_time=wo.tl.tasks[i].task_execution_time;
+	    tasklist.tasks[i].task_deadline=wo.tl.tasks[i].task_deadline;
 	    
-	    std::cout << std::endl << "TASK " << agent.tl.tasks[i].task_id <<':'<< std::endl;
-	    std::cout << "- posizione: " << agent.tl.tasks[i].task_position[0] <<' '<< agent.tl.tasks[i].task_position[1]<<' '<< agent.tl.tasks[i].task_position[2] << std::endl;
-	    std::cout << "- tipo: " << agent.tl.tasks[i].task_type << std::endl;
-	    std::cout << "- execution time: " << agent.tl.tasks[i].task_execution_time << std::endl;
-	    std::cout << "- deadline: " << agent.tl.tasks[i].task_deadline << std::endl << std::endl;
+	    std::cout << std::endl << "TASK " << wo.tl.tasks[i].task_id <<':'<< std::endl;
+	    std::cout << "- posizione: " << wo.tl.tasks[i].task_position[0] <<' '<< wo.tl.tasks[i].task_position[1]<<' '<< wo.tl.tasks[i].task_position[2] << std::endl;
+	    std::cout << "- tipo: " << wo.tl.tasks[i].task_type << std::endl;
+	    std::cout << "- execution time: " << wo.tl.tasks[i].task_execution_time << std::endl;
+	    std::cout << "- deadline: " << wo.tl.tasks[i].task_deadline << std::endl << std::endl;
     }
 }
 
@@ -46,6 +46,7 @@ void task_assignment::createTaskCostMatrixFromParsedWorld(const Parsed_World& wo
     task_number=wo.task_number;
   
     std::cout<<std::endl<<"TASK COST MATRIX"<<std::endl;
+
     for(unsigned int i=0;i<agent_number;i++)
     {
 	std::vector <double> app;

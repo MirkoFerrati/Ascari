@@ -13,7 +13,7 @@ class task_assignment: public Plugin_module
 	
 public:
     task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index);
-    void createTaskListFromParsedAgent(const Parsed_Agent& agent);
+    void createTaskListFromParsedWorld(const Parsed_World& wo);
     void createTaskCostMatrixFromParsedWorld(const Parsed_World& wo);
     void run_plugin();
     void addReservedVariables(exprtk::symbol_table< double >& symbol_table);

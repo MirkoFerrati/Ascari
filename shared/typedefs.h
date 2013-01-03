@@ -232,7 +232,7 @@ struct task
 struct task_list
 {
     std::vector<task> tasks;
-    int task_number;
+    unsigned int task_number;
 };
 //written by Alessandro Settimi
 

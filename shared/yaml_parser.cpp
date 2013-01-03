@@ -114,18 +114,6 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
     os<< "Visibility:"<<ag.visibility<<endl;
     os<< "Communication:"<<ag.communication<<endl;
         
-    //written by Alessandro Settimi
-    os<<endl<<"Task List:"<<endl<<endl;
-    for (int i=0; i< ag.tl.task_number;i++)
-    {	
-	    os << endl << "TASK: " << ag.tl.tasks[i].task_id << endl;
-	    os << "- posizione: " << ag.tl.tasks[i].task_position[0] <<' '<< ag.tl.tasks[i].task_position[1]<<' '<< ag.tl.tasks[i].task_position[2] << endl;
-	    os << "- tipo: " << ag.tl.tasks[i].task_type << endl;
-	    os << "- execution time: " << ag.tl.tasks[i].task_execution_time << endl;
-	    os << "- deadline: " << ag.tl.tasks[i].task_deadline << endl << endl;
-    }
-    //written by Alessandro Settimi
-
     return os;
 }
 
@@ -144,16 +132,16 @@ ostream& operator<< (ostream& os, const std::vector<Parsed_Agent>& ag) {
 ostream& operator<<(std::ostream& os, const Parsed_World& wo)
 {
     os<<wo.agents;
-
+    
     return os;
 }
 
 //written by Alessandro Settimi
 void operator >> (const YAML::Node& node, task_list& t)
 {
-    int j=0;
+    unsigned int j=0;
     
-    for (int i=0;i<t.task_number*7;)
+    for (unsigned int i=0;i<t.task_number*7;)
     {
         task app;
 	t.tasks.push_back(app);
@@ -228,18 +216,6 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     if (node.FindValue("TARGET_LIST")) {
         node["TARGET_LIST"]>> ag.target_list;
     }
-    
-    //written by Alessandro Settimi
-    if (node.FindValue("TASK_NUMBER")) 
-    {
-	node["TASK_NUMBER"]>>ag.tl.task_number;
-    }
-	
-    if (node.FindValue("TASK_LIST")) 
-    {
-	node["TASK_LIST"]>>ag.tl;
-    }
-    //written by Alessandro Settimi
     
     if (!ag.discrete_states.count(ag.state_start))
     {
@@ -397,6 +373,11 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
 			co[i*wo.task_number+j] >> wo.task_cost_matrix[i][j];
 		    }
 		}
+	    }
+	
+	    if (node[0]["WORLD"][0].FindValue("TASK_LIST")) 
+	    {
+		node[0]["WORLD"][0]["TASK_LIST"]>>wo.tl;
 	    }
 	}
     }

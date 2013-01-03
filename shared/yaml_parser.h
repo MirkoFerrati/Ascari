@@ -76,12 +76,7 @@ public:
     visible_area visibility;
     communication_area communication;
     
-    std::vector<target_id> target_list;
-    
-    //written by Alessandro Settimi
-    task_list tl;
-    //written by Alessandro Settimi
-    
+    std::vector<target_id> target_list;    
 };
 
 class Parsed_World{
@@ -95,6 +90,7 @@ class Parsed_World{
   std::string graphName;
   
   //written by Alessandro Settimi
+  task_list tl;
   std::vector<task_cost_vector> task_cost_matrix;
   unsigned int task_number;
   unsigned int agent_number;
