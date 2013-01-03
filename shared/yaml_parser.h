@@ -40,7 +40,10 @@ typedef std::string event_expression;
 typedef std::string visible_area;
 typedef std::string communication_area;
 typedef std::string graph_name;
-
+//written by Alessandro Settimi
+typedef double task_cost;
+typedef std::vector<task_cost> task_cost_vector;
+//written by Alessandro Settimi
 
 typedef int target_id;
 
@@ -86,12 +89,18 @@ class Parsed_World{
   public:
   friend std::ostream& operator<<(std::ostream& os, const Parsed_World& wo );
   
-
   std::vector<bonusVariable> bonus_variables;
   std::map<bonusVariable, bonus_expression> bonus_expressions;
   std::vector<Parsed_Agent> agents;
   std::string graphName;
-
+  
+  //written by Alessandro Settimi
+  void stamp_task_cost(const Parsed_World& wo);
+  std::vector<task_cost_vector> task_cost_matrix;
+  unsigned int task_number;
+  unsigned int agent_number;
+  //written by Alessandro Settimi
+  
 //   Parsed_World(int num_agents):agents(num_agents){}
    
 };

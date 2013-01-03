@@ -141,11 +141,23 @@ ostream& operator<< (ostream& os, const std::vector<Parsed_Agent>& ag) {
     return os;
 }
 
-
+void stamp_task_cost(const Parsed_World& wo)
+{
+    std::cout<<std::endl<<"TASK COST MATRIX"<<std::endl;
+    for(unsigned int i=0;i<wo.agent_number;i++)
+    {
+	for(unsigned int j=0;j<wo.task_number;j++)
+	{
+	    std::cout<<wo.task_cost_matrix[i][j]<<' ';
+	}
+	std::cout<<std::endl;
+    }
+}
 
 ostream& operator<<(std::ostream& os, const Parsed_World& wo)
 {
     os<<wo.agents;
+
     return os;
 }
 
@@ -357,8 +369,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
                 const YAML::Node &world_node=node[0]["WORLD"][0];
 
                 world_node["GRAPH_NAME"]>> wo.graphName;
-            }
-
+	    }
         }
     }
 
@@ -376,6 +387,28 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
         }
 
     }
-
+    
+    //written by Alessandro Settimi
+    if (node[0].FindValue("WORLD"))
+    {
+        if (node[0]["WORLD"].size()>0)
+        { 
+            if (node[0]["WORLD"][0].FindValue("TASK_COST_MATRIX") && node[0]["WORLD"][0].FindValue("TASK_NUMBER"))
+	    {
+		node[0]["WORLD"][0]["TASK_NUMBER"]>>wo.task_number;
+		wo.agent_number=wo.agents.size();
+		
+		for (unsigned int i=0;i<wo.agent_number;i++)
+		{
+		    for (unsigned int j=0;j<wo.task_number;j++)
+		    {
+			node[0]["WORLD"][0]["TASK_COST_MATRIX"][i*wo.task_number+j] >> wo.task_cost_matrix[i][j];
+		    }
+		}
+		stamp_task_cost(wo);
+	    }
+	}
+    }
+    //written by Alessandro Settimi
 
 }
