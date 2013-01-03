@@ -141,19 +141,6 @@ ostream& operator<< (ostream& os, const std::vector<Parsed_Agent>& ag) {
     return os;
 }
 
-void stamp_task_cost(const Parsed_World& wo)
-{
-    std::cout<<std::endl<<"TASK COST MATRIX"<<std::endl;
-    for(unsigned int i=0;i<wo.agent_number;i++)
-    {
-	for(unsigned int j=0;j<wo.task_number;j++)
-	{
-	    std::cout<<wo.task_cost_matrix[i][j]<<' ';
-	}
-	std::cout<<std::endl;
-    }
-}
-
 ostream& operator<<(std::ostream& os, const Parsed_World& wo)
 {
     os<<wo.agents;
@@ -397,15 +384,19 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
 	    {
 		node[0]["WORLD"][0]["TASK_NUMBER"]>>wo.task_number;
 		wo.agent_number=wo.agents.size();
+
+		const YAML::Node& co=node[0]["WORLD"][0]["TASK_COST_MATRIX"];
 		
 		for (unsigned int i=0;i<wo.agent_number;i++)
 		{
+		    std::vector <double> app;
+		    wo.task_cost_matrix.push_back(app);
 		    for (unsigned int j=0;j<wo.task_number;j++)
 		    {
-			node[0]["WORLD"][0]["TASK_COST_MATRIX"][i*wo.task_number+j] >> wo.task_cost_matrix[i][j];
+			wo.task_cost_matrix[i].push_back(0);
+			co[i*wo.task_number+j] >> wo.task_cost_matrix[i][j];
 		    }
 		}
-		stamp_task_cost(wo);
 	    }
 	}
     }

@@ -52,7 +52,7 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
 	//written by Alessandro Settimi
 	if (!world.agents.at(myAgent).tl.tasks.empty())
 	{
-		Plugin_module *plugin=new task_assignment(world.agents.at(myAgent),events,events_to_index);
+		Plugin_module *plugin=new task_assignment(world,world.agents.at(myAgent),events,events_to_index);
 		plugins.push_back(plugin);
 	} 
 	//written by Alessandro Settimi

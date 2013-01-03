@@ -95,7 +95,6 @@ class Parsed_World{
   std::string graphName;
   
   //written by Alessandro Settimi
-  void stamp_task_cost(const Parsed_World& wo);
   std::vector<task_cost_vector> task_cost_matrix;
   unsigned int task_number;
   unsigned int agent_number;
