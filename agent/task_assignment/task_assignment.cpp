@@ -9,10 +9,14 @@ task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& 
 {
     createTaskListFromParsedAgent(agent);
     createTaskCostMatrixFromParsedWorld(world);
+    task_assigned=false;
+    stop=false;
+    speed=0;
 }
 
 void task_assignment::createTaskListFromParsedAgent(const Parsed_Agent& agent)
 {
+    agent_id=agent.name;
     tasklist.task_number=agent.tl.task_number;
     
     for (int i=0; i< tasklist.task_number;i++)
@@ -58,10 +62,47 @@ void task_assignment::createTaskCostMatrixFromParsedWorld(const Parsed_World& wo
 
 bool task_assignment::task_assignment_algorithm()
 {
-     return false;
+     //si deve assegnare il current_task mediante ottimizzazione
+     int a=-1;
+     if (agent_id=="AGENTE1") a=0;
+     if (agent_id=="AGENTE2") a=1;
+     if (agent_id=="AGENTE3") a=2;
+     
+     if (a==-1) return false;
+     
+     current_task=tasklist.tasks[a];
+     return true;
 }
 
 void task_assignment::run_plugin()
 {
-     if(!task_assignment_algorithm()) ERR("attenzione, task assignment non riuscito");
+     if (stop)
+     {
+	setTaskStop(true);
+	return;
+     }
+  
+     if (task_assigned)
+     {
+	if(task_made())
+	{
+	    std::cout<<"TASK ESEGUITO"<<std::endl;
+	    task_assigned=false;
+	    speed=0;
+	    stop=true;
+	}
+     }
+     else
+     {
+	if(!task_assignment_algorithm())
+	{
+	    ERR("attenzione, task assignment non riuscito");
+	}
+	else
+	{
+	    std::cout<<"CURRENT TASK: "<<current_task.task_id<<" position: ["<<current_task.task_position[0]<<' '<<current_task.task_position[1]<<' '<<current_task.task_position[2]<<"]"<<std::endl;
+	    task_assigned=true;
+	    speed=1;
+	}
+     }
 }

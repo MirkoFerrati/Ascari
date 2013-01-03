@@ -22,11 +22,14 @@ public:
     ~task_assignment();
 	
 private:
+	std::string agent_id;
 	task_list tasklist;
 	task current_task;
 	std::vector<task_cost_vector> task_cost_matrix;
 	unsigned int task_number;
 	unsigned int agent_number;
+	bool task_assigned;
+	bool stop;
 	
 	double speed;
 	exprtk::expression<double> distance_to_target;

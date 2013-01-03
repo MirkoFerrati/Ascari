@@ -8,7 +8,7 @@ using namespace std;
 void task_assignment::addReservedVariables(exprtk::symbol_table< double >& symbol_table)
 {
 	symbol_table.add_variable("X_TASK",current_task.task_position[0],false);
-	symbol_table.add_variable("Y_TASK",current_task.task_position[0],false);
+	symbol_table.add_variable("Y_TASK",current_task.task_position[1],false);
 	symbol_table.add_variable("V_T",speed,false);
 }
 
