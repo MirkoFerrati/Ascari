@@ -52,20 +52,35 @@ public:
             sync_socket = new zmq::socket_t (static_zmq::context, ZMQ_REQ);
         }
     }
-    
+
 protected:
     /**
      * This function will block till the syncing phase is over, if the class was created with a syncing policy!
      * */
-	bool init_full(std::string owner_name,std::string receiver_protocol,std::string sender_protocol,std::string sync_protocol="",unsigned int expected_senders=1) {
+	bool init_full(std::string owner_name,std::string receiver_protocol, std::string sender_protocol,
+				   std::string sync_protocol="",unsigned int expected_senders=1,bool bind_receiver=false, bool bind_sender=true) {
         this->expected_senders=expected_senders;
-		receiver_socket.connect(receiver_protocol.c_str());
+		if (bind_receiver)
+		{
+			receiver_socket.bind(receiver_protocol.c_str());
+		}
+		else
+		{
+			receiver_socket.connect(receiver_protocol.c_str());
+		}
+		if (bind_sender)
+		{
+			sender_socket.bind(sender_protocol.c_str());
+		}
+		else
+		{
+			sender_socket.connect(sender_protocol.c_str());
+		}
 		if (sock_recv_type==ZMQ_SUB)
 		{
 		  receiver_socket.setsockopt(ZMQ_SUBSCRIBE,"",0);
 		}
-	sender_socket.bind(sender_protocol.c_str());
-        results.resize (expected_senders);
+		results.resize (expected_senders);
         this->owner_name = owner_name;
         if (sync == WAIT_SYNC) {
           sync_socket->bind (!sync_protocol.compare("")?SYNC_PROTOCOL:sync_protocol.c_str());
@@ -73,7 +88,6 @@ protected:
             std::cout << owner_name << " waiting for clients..." << std::endl;
             unsigned int subscribers = 0;
             while (subscribers < expected_senders) {
-            
                 //  - wait for synchronization request
                 zmq::message_t message_tmp;
                 sync_socket->recv (&message_tmp);
@@ -82,8 +96,8 @@ protected:
                 std::string result = "one more client connected to server: "; //non so chi si sia connesso, sono tutti uguali
                 //  - send synchronization reply
                 result.append (name);
-                zmq::message_t message (result.size());
-                memcpy (message.data(), result.data(), result.size());
+                zmq::message_t message (result.size()+1);
+                memcpy (message.data(), result.data(), result.size()+1);
 
                 bool rc = sync_socket->send (message); assert(rc);
                 std::cout << result << std::endl;
@@ -122,10 +136,16 @@ protected:
 	while (subscribers < expected_senders) {
 		
         receiver_socket.recv(&receive_buffer);
-		boost::iostreams::stream_buffer<boost::iostreams::basic_array_source<char> > buffer( (char*)receive_buffer.data(), receive_buffer.size());
-		boost::archive::binary_iarchive archive(buffer, boost::archive::no_header);
-        archive >> packet;
+	//boost::iostreams::stream_buffer<boost::iostreams::basic_array_source<char> > buffer( (char*)receive_buffer.data(), receive_buffer.size());
+	//boost::archive::binary_iarchive archive(buffer, boost::archive::no_header);
+        char* receive=reinterpret_cast<char*>(receive_buffer.data());
+	std::cout<<receive<<std::endl;
+	std::istringstream receive_stream(
+	std::string(receive,receive_buffer.size()));
+	boost::archive::text_iarchive archive(receive_stream);
+	archive >> packet;
         results.push_back(packet);
+	subscribers++;
     }
     return results;
     };
@@ -134,8 +154,9 @@ protected:
         std::ostringstream archive_stream;
 	boost::archive::text_oarchive archive(archive_stream);
 	archive << infos;
-	send_buffer.rebuild(archive_stream.str().length());
-	memcpy(send_buffer.data(), archive_stream.str().data(),archive_stream.str().length());
+	send_buffer.rebuild(archive_stream.str().length()+1);
+	const char* temp=reinterpret_cast<char*>( memcpy(send_buffer.data(), archive_stream.str().data(),archive_stream.str().length()+1));
+	std::cout<<temp<<std::endl;
 	sender_socket.send(send_buffer);
     };
 
