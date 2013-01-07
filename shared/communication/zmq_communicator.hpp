@@ -121,7 +121,7 @@ protected:
             message.rebuild (MAX_PACKET_LENGTH);
             sync_socket->recv (&message);
 
-            std::cout << static_cast<char*> (message.data()) << std::endl;
+           // std::cout << static_cast<char*> (message.data()) << std::endl;
 
         }
         return true;
@@ -139,7 +139,7 @@ protected:
 	//boost::iostreams::stream_buffer<boost::iostreams::basic_array_source<char> > buffer( (char*)receive_buffer.data(), receive_buffer.size());
 	//boost::archive::binary_iarchive archive(buffer, boost::archive::no_header);
         char* receive=reinterpret_cast<char*>(receive_buffer.data());
-	std::cout<<receive<<std::endl;
+	//std::cout<<receive<<std::endl;
 	std::istringstream receive_stream(
 	std::string(receive,receive_buffer.size()));
 	boost::archive::text_iarchive archive(receive_stream);
@@ -155,8 +155,8 @@ protected:
 	boost::archive::text_oarchive archive(archive_stream);
 	archive << infos;
 	send_buffer.rebuild(archive_stream.str().length()+1);
-	const char* temp=reinterpret_cast<char*>( memcpy(send_buffer.data(), archive_stream.str().data(),archive_stream.str().length()+1));
-	std::cout<<temp<<std::endl;
+	reinterpret_cast<char*>( memcpy(send_buffer.data(), archive_stream.str().data(),archive_stream.str().length()+1));
+	//std::cout<<temp<<std::endl;
 	sender_socket.send(send_buffer);
     };
 

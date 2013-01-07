@@ -86,14 +86,14 @@ void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy
 						 sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table);
 		//world_comm=new udp_world_communicator();
 		world_comm=new zmq_world_communicator(identifier);
-		
-	}
-	else
-	{
-	    for (unsigned int i=0;i<plugins.size();i++)
+		 for (unsigned int i=0;i<plugins.size();i++)
 	    {
 		plugins[i]->compileExpressions(symbol_table);
 	    }
+	}
+	else
+	{
+	   
 		//TODO(Mirko): we will think about identifierModule later
 	}
 	
@@ -181,6 +181,7 @@ void agent::createDiscreteStateFromParsedAgent(const unique_ptr<Parsed_Behavior>
     {
         map_discreteStateName_to_id.insert(make_pair(it->first,i));
         map_discreteStateId_to_controllerId.insert(make_pair(s,map_controllername_to_id.at(it->second)));
+	inputs.commands[s];
         i++;
         s++;
     }
