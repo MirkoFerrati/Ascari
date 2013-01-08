@@ -3,6 +3,7 @@
 #include <QtGui>
 #include <viewer.h>
 #include <udp_world_sniffer.h>
+#include <zmq_world_sniffer.hpp>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -238,10 +239,22 @@ bool MainWindow::startViewer()
         }
 
 
-        buffer.resize(MAX_PACKET_LENGTH);
+        //buffer.resize(MAX_PACKET_LENGTH);
+        if (!mutex)
+	{
+	  std::shared_ptr<std::mutex> temp(new std::mutex);
+	  mutex.swap(temp);
+	}
+	else
+	{
+	 mutex->unlock();
+	 mutex->~mutex();
+	  std::shared_ptr<std::mutex> temp(new std::mutex);
+	  mutex.swap(temp);
+	}
         if (!sniffer)
         {
-            sniffer=new udp_world_sniffer(buffer,io_service);
+            sniffer=new zmq_world_sniffer<world_sim_packet>(buffer,mutex);
             sniffer->start_receiving();
         }
         if (insideViewer)
@@ -249,7 +262,7 @@ bool MainWindow::startViewer()
             ui->asdf->removeWidget(insideViewer);
             delete insideViewer;
         }
-        insideViewer=new Viewer(buffer,io_service,0,viewerType,graphname);
+        insideViewer=new Viewer(buffer,mutex,0,viewerType,graphname);
 
 
         ui->asdf->addWidget(insideViewer);

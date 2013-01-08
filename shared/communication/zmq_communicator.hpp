@@ -33,7 +33,7 @@ enum Synctypes {
  * Everything is copied in a buffer, sometimes more than once
  * TODO(Mirko): implement zero-copy
  */
-template <class receive_type, class send_type, int sock_send_type, int sock_recv_type, Synctypes sync = NO_SYNC>
+template <typename receive_type, typename send_type, int sock_send_type, int sock_recv_type, Synctypes sync = NO_SYNC>
 class zmq_communicator
 {
 
@@ -127,7 +127,7 @@ protected:
         return true;
     }
     
-    
+public: 
     std::vector<receive_type> receive()
     {
         unsigned int subscribers = 0;
@@ -166,5 +166,68 @@ private:
     zmq::message_t receive_buffer, send_buffer;
     std::vector <receive_type> results;
     std::string owner_name;
-	unsigned int expected_senders;
+    unsigned int expected_senders;
+};
+
+template <typename receive_type,int sock_recv_type>
+class zmq_receive_communicator
+{
+  
+  public:
+    zmq_receive_communicator() : receiver_socket (static_zmq::context, sock_recv_type) {
+        assert (sock_recv_type == ZMQ_SUB);
+        receive_buffer.rebuild (MAX_PACKET_LENGTH);
+    }
+
+protected:
+    /**
+     * This function will block till the syncing phase is over, if the class was created with a syncing policy!
+     * */
+	bool init_full(std::string owner_name,std::string receiver_protocol,unsigned int expected_senders=1,bool bind_receiver=false) {
+        	this->expected_senders=expected_senders;
+		if (bind_receiver)
+		{
+			receiver_socket.bind(receiver_protocol.c_str());
+		}
+		else
+		{
+			receiver_socket.connect(receiver_protocol.c_str());
+		}
+	
+		if (sock_recv_type==ZMQ_SUB)
+		{
+		  receiver_socket.setsockopt(ZMQ_SUBSCRIBE,"",0);
+		}
+		results.resize (expected_senders);
+        this->owner_name = owner_name;
+        return true;
+    }
+    
+public:
+    std::vector<receive_type> receive()
+    {
+        unsigned int subscribers = 0;
+	receive_type packet;
+	results.clear();
+	while (subscribers < expected_senders) {
+		
+        receiver_socket.recv(&receive_buffer);
+        char* receive=reinterpret_cast<char*>(receive_buffer.data());
+	std::istringstream receive_stream(
+	std::string(receive,receive_buffer.size()));
+	boost::archive::text_iarchive archive(receive_stream);
+	archive >> packet;
+        results.push_back(packet);
+	subscribers++;
+    }
+    return results;
+    };
+  
+  
+  private:
+    zmq::socket_t receiver_socket;
+    zmq::message_t receive_buffer;
+    std::vector <receive_type> results;
+    std::string owner_name;
+    unsigned int expected_senders;
 };

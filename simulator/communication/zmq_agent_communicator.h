@@ -5,7 +5,7 @@
 #include <zmq.hpp>
 
 class zmq_agent_communicator : public agent_communicator_abstract,
-zmq_simulator_to_agent_communicator<control_command_packet,world_sim_packet>
+public zmq_simulator_to_agent_communicator<control_command_packet,world_sim_packet>
 {
 public:
 zmq_agent_communicator(unsigned int expected_senders);

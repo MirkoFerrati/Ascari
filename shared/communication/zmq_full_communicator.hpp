@@ -25,3 +25,14 @@ public:
 		this->init_full("simulator","tcp://127.0.0.1:5556","tcp://127.0.0.1:5555","tcp://127.0.0.1:5557",expected_senders,true,true);
 	}
 };
+
+template <class receive_type>
+class zmq_sniffer_simulator_communicator : 
+public zmq_receive_communicator<receive_type,ZMQ_SUB>
+{
+public:
+	void init(std::string agent_name)
+	{
+		this->init_full(agent_name,"tcp://127.0.0.1:5555",1,false);
+	}
+};

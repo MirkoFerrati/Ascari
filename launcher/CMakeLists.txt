@@ -5,7 +5,8 @@ find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
 include(${QT_USE_FILE})
 
 set(launcher_MOC_HEADERS mainwindow.h )
-set(launcher_SOURCES main.cpp mainwindow.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../viewer/gui/viewer.cpp ../viewer/communication/udp_world_sniffer.cpp ../viewer/gui/Agent.cpp)
+set(launcher_SOURCES main.cpp mainwindow.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp
+../viewer/gui/viewer.cpp ../viewer/communication/udp_world_sniffer.cpp ../viewer/gui/Agent.cpp ../shared/communication/global.cpp)
 SET(launcher_UIS mainwindow.ui)
 
 include_directories(../shared)
@@ -26,12 +27,12 @@ add_executable(launcher
     ${launcher_SOURCES}
     ${launcher_MOC_SOURCES}
     ${launcher_UI_HEADERS}
-    ../viewer/communication/udp_world_sniffer.h ../viewer/gui/viewer.h ../viewer/gui/Agent.h
+    ../viewer/communication/udp_world_sniffer.h ../viewer/gui/viewer.h ../viewer/gui/Agent.h ../shared/communication/global.h
 #    ${viewer_RESOURCES_CPP}
 )
 find_package(Boost REQUIRED system thread serialization)
 
-target_link_libraries(launcher ${Boost_LIBRARIES} pthread)
+target_link_libraries(launcher ${Boost_LIBRARIES} pthread zmq)
 target_link_libraries(launcher ${QT_LIBRARIES})
 target_link_libraries(launcher ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 target_link_libraries(launcher ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
