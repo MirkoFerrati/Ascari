@@ -93,14 +93,18 @@ protected:
                 sync_socket->recv (&message_tmp);
                 std::string name (static_cast<char*> (message_tmp.data()), message_tmp.size());
 
-                std::string result = "one more client connected to server: "; //non so chi si sia connesso, sono tutti uguali
+                std::string result = "one more client connected to "; //non so chi si sia connesso, sono tutti uguali
+				std::cout << result << " server: " << name <<std::endl;
+				
                 //  - send synchronization reply
-                result.append (name);
+                result.append(owner_name);
+				result.append(" ");
+				result.append (name);
+				
                 zmq::message_t message (result.size()+1);
                 memcpy (message.data(), result.data(), result.size()+1);
 
                 bool rc = sync_socket->send (message); assert(rc);
-                std::cout << result << std::endl;
                 subscribers++;
             }
         } else if (sync == ASK_SYNC) {
@@ -121,7 +125,7 @@ protected:
             message.rebuild (MAX_PACKET_LENGTH);
             sync_socket->recv (&message);
 
-           // std::cout << static_cast<char*> (message.data()) << std::endl;
+            std::cout << static_cast<char*> (message.data()) << std::endl;
 
         }
         return true;

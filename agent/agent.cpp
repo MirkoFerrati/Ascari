@@ -264,6 +264,7 @@ void agent::main_loop()
             {
                 state.at(it->first)=it->second;
             }
+            cout<<"stato: "<<state.at(0)<<" "<<state.at(1)<<" "<<state.at(2)<<endl;
             sleep(0);
             encoder->computeSubEvents(state_other_agents);
             event_decoder.decode();

@@ -1,1 +1,90 @@
-TODO(Simone): scrivere un file di esempio funzionante per il plugin identifier
+#TODO(Simone): scrivere un file di esempio funzionante per il plugin identifier
+
+#due agenti che si vanno incontro e quando si vedono sterzano
+
+- BEHAVIORS:
+  - name: prova
+    states: [x,y,theta]
+    control_commands: [v,w]
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+    CONTROLLERS:
+    - name: fast
+      v: 0.3
+      w: 0
+    - name: left
+      v: 0.3
+      w: 0.2
+    DISCRETE_STATES:
+    - name: fast
+      controller: fast
+    - name: left
+      controller: left
+    ENCODER:
+    - TOPOLOGY:
+      - topology: [t1]
+        t1: '( abs(atan2(yi-y,xi-x)%(2*PI)-theta%(2*PI))<0.5 and  (x-xi)*(x-xi)+(y-yi)*(y-yi)<1600  )'
+      LAMBDA:
+      - lambda: 
+    EVENTS:
+    - events: [e1,e2]
+      e1: t1
+      e2: !t1
+    AUTOMATON:
+    - name: es20
+      FAST:
+      - FAST: [e2]
+        LEFT: [e1]
+      LEFT:
+      - LEFT: [e1]
+        FAST: [e2]
+
+  WORLD:
+
+  AGENTS:
+  - agent: Agente1
+    VISIBLE_AREA: "brutte cose qui"
+    COMMUNICATION_AREA: "anche qui"
+    MONITORING: 1
+    INITIAL:
+    - x: '0'
+      y: '0'
+      theta: '0'
+    STATE_START: FAST
+    BEHAVIOR: prova
+      
+  - agent: Agente2
+    VISIBLE_AREA: "brutte cose qui"
+    COMMUNICATION_AREA: "anche qui"
+    MONITORING: 1
+    INITIAL:
+    - x: '100'
+      y: '0'
+      theta: '3.14'
+    STATE_START: FAST
+    BEHAVIOR: prova
+      
+  - agent: Agente3
+    VISIBLE_AREA: "brutte cose qui"
+    COMMUNICATION_AREA: "anche qui"
+    MONITORING: 1
+    INITIAL:
+    - x: '100'
+      y: '100'
+      theta: '5'
+    STATE_START: FAST
+    BEHAVIOR: prova
+    
+  - agent: Agente4
+    VISIBLE_AREA: "brutte cose qui"
+    COMMUNICATION_AREA: "anche qui"
+    MONITORING: 1
+    INITIAL:
+    - x: '-100'
+      y: '-100'
+      theta: '1'
+    STATE_START: FAST
+    BEHAVIOR: prova
+    
