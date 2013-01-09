@@ -1,6 +1,4 @@
-#TODO(Simone): scrivere un file di esempio funzionante per il plugin identifier
-
-#due agenti che si vanno incontro e quando si vedono sterzano
+#(Mirko) due agenti che si vanno incontro e quando si vedono sterzano
 
 - BEHAVIORS:
   - name: prova
