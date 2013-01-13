@@ -25,7 +25,7 @@ void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_t
 {
 	symbol_table.add_variable("XTARGET",xtarget,false);
 	symbol_table.add_variable("YTARGET",ytarget,false);
-	symbol_table.add_variable("v_router",speed,false);
+	symbol_table.add_variable("V_ROUTER",speed,false);
 }
 
 

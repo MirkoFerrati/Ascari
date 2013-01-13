@@ -20,9 +20,13 @@ class Agent
 	  
 	inline void translate(const agent_state_packet& agent)
 	{
-		x=agent.state.at(x_index);
-		y=agent.state.at(y_index);
-		angle=agent.state.at(angle_index);
+		std::map<int,double>::const_iterator temp;
+		if ((temp=agent.state.find(x_index))!=agent.state.end())
+			x=temp->second;
+		if ((temp=agent.state.find(y_index))!=agent.state.end())
+			y=temp->second;
+		if ((temp=agent.state.find(angle_index))!=agent.state.end())
+			angle=temp->second;
 		if (this->maxX<x)
 		this->maxX=x;
 		if (this->maxY<y)

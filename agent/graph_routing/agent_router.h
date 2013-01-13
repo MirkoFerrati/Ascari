@@ -14,8 +14,8 @@
 #define MAXFLOORS 8
 #define TIME_SLOT_FOR_3DGRAPH 10.0
 
-#define FLOORS_SENT 6
-#define MAX_LENGTH 2*VERTICAL_LENGTH //TODO: questo numero è fisso ma dovrebbe essere una variabile
+#define FLOORS_SENT 4
+#define MAX_LENGTH 2*VERTICAL_LENGTH //TODO: questo numero e' fisso ma dovrebbe essere una variabile
 
 class agent_router: public Plugin_module
 {
@@ -67,9 +67,11 @@ private:
 	bool target_reached();
     void prepare_move_packet();
     bool detect_collision(lemon::SmartDigraph::ArcMap< bool >& useArc);
+	bool check_for_overtaking(graph_packet::const_iterator &it,int age,lemon::SmartDigraph::ArcMap<bool>& useArc);
 	void update_lock_packet();
 	void prepare_stop_packet();
 	bool isTimeToCheckForPathFree();
+	
 	lemon::SmartDigraph::Node source, target, next;
     int graph_node_size;
 	simulation_time &time;

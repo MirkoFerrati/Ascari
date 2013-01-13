@@ -23,7 +23,7 @@ public:
 	string multicast_address="239.255.0.1";
 	int multicast_port=10000;
 	udp_sender<agents_name_to_states> sender(service, boost::asio::ip::address::from_string(multicast_address),multicast_port);
-	udp_receiver<agents_name_to_states> receiver(service,boost::asio::ip::address::from_string("0.0.0.0"), boost::asio::ip::address::from_string(multicast_address),multicast_port);
+	udp_receiver<agents_name_to_states> receiver(service,boost::asio::ip::address::from_string(SOCKET_BINDING), boost::asio::ip::address::from_string(multicast_address),multicast_port);
 	
 		agents_name_to_states states_index;
 	    agent_state_packet agent_packet;

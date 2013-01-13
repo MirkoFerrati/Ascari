@@ -4,6 +4,8 @@
 #include "logog.hpp"
 #include "debug_constants.h"
 #include <udp_agent_router.hpp>
+#include <zmq_agent_communicator.h>
+#include "collisionchecker.h"
 
 using namespace std;
 
@@ -13,6 +15,10 @@ void simulator::create_communicator(int communicator_type)
     {
         communicator=new udp_agent_communicator(num_agents);
     }
+    else if (communicator_type==2)
+	{
+		communicator=new zmq_agent_communicator(num_agents);
+	}
 }
 
 simulator::simulator():
@@ -24,12 +30,30 @@ topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GR
 	pi=exprtk::details::numeric::constant::pi;
 	f_rndom=0;
 	secSleep=5000;
+	collisionChecker=0;
+	checkCollision=false;
 }
 
 void simulator::setSleep(unsigned secSleep)
 {
 	this->secSleep=secSleep;
 }
+
+void simulator::setCheckCollision(bool checkCollision)
+{
+	this->checkCollision=checkCollision;
+	if (collisionChecker)
+		delete collisionChecker;
+	if (checkCollision)
+	{	
+		collisionChecker = new CollisionChecker(sim_packet.state_agents,agent_states_to_index);
+	}
+	else
+	{
+		collisionChecker= new CollisionCheckerAbstract(sim_packet.state_agents,agent_states_to_index);
+	}
+}
+
 
 void simulator::initialize(const Parsed_World& wo)
 {
@@ -69,6 +93,7 @@ void simulator::initialize(const Parsed_World& wo)
 
         map_bonus_variables.insert(make_pair(wo.bonus_variables.at(i),i));
     }
+    setCheckCollision(false);
 }
 
 
@@ -85,27 +110,28 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
         control_command_packet& command_packet=commands.at(ag.at(i).name);
         agent_packet.identifier=ag.at(i).name;
         command_packet.identifier=ag.at(i).name;
-        index_map states_to_index_tmp;
+        
         index_map commands_to_index_tmp;
 
-        for (unsigned int j=0; j<ag.at(i).state.size();j++)
+        for (unsigned int j=0; j<ag.at(i).behavior->state.size();j++)
         {
-            agent_packet.state.insert(make_pair(j,ag.at(i).initial_states.at(ag.at(i).state.at(j))));
-            states_to_index_tmp.insert(make_pair(ag.at(i).state.at(j),j));
-            bonus_symbol_table.add_variable(ag.at(i).state.at(j)+ag.at(i).name,agent_packet.state.at(j));
+            agent_packet.state.insert(make_pair(j,ag.at(i).initial_states.at(ag.at(i).behavior->state.at(j))));
+			agent_states_to_index.insert(make_pair(ag.at(i).behavior->state.at(j),j));
+            bonus_symbol_table.add_variable(ag.at(i).behavior->state.at(j)+ag.at(i).name,agent_packet.state.at(j));
         }
 
-        for (unsigned int j=0; j<ag.at(i).inputs.size();j++)
+        //Al simulatore non deve mai arrivare piu' di un controllo per agente, percio' la mappa avra' un solo elemento
+        
+        for (unsigned int j=0; j<ag.at(i).behavior->inputs.size();j++)
         {
-            command_packet.command.insert(make_pair(j,0));
-            commands_to_index_tmp.insert(make_pair(ag.at(i).inputs.at(j),j));
-            bonus_symbol_table.add_variable(ag.at(i).inputs.at(j)+ag.at(i).name,command_packet.command.at(j));
+            command_packet.default_command.insert(make_pair(j,0));
+            commands_to_index_tmp.insert(make_pair(ag.at(i).behavior->inputs.at(j),j));
+            bonus_symbol_table.add_variable(ag.at(i).behavior->inputs.at(j)+ag.at(i).name,command_packet.default_command.at(j));
         }
-        agent_states_to_index.push_back(states_to_index_tmp);
         agent_commands_to_index.push_back(commands_to_index_tmp);
 
-        dynamic *d= new dynamic(sim_packet.state_agents.internal_map.at(ag.at(i).name).state, commands.at(ag.at(i).name).command,
-                                ag.at(i).expressions, ag.at(i).state,ag.at(i).inputs);
+        dynamic *d= new dynamic(sim_packet.state_agents.internal_map.at(ag.at(i).name).state, commands.at(ag.at(i).name).default_command,
+                                ag.at(i).behavior->expressions, ag.at(i).behavior->state,ag.at(i).behavior->inputs);
 
         dynamic_module.push_back(d);
 
@@ -147,7 +173,7 @@ void simulator::main_loop()
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 
             agent_state state_tmp;
-            for (int i=1;i<10;i++)//TODO: this is 1 second/(sampling time of dynamic)
+            for (int i=0;i<10;i++)//TODO(Mirko): this is 1 second/(sampling time of dynamic)
             {
                 for (index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end();++iter) {
                     state_tmp=dynamic_module.at(iter->second)->getNextState();
@@ -157,14 +183,15 @@ void simulator::main_loop()
                     }
                 }
             }
+            collisionChecker->checkCollisions();
             usleep(secSleep);
             vector<control_command_packet> temp=communicator->receive_control_commands();
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {
 
-                for (map<int,double>::iterator it=commands.at(temp.at(i).identifier).command.begin(); it!=commands.at(temp.at(i).identifier).command.end();++it) 
+                for (map<int,double>::iterator it=commands.at(temp.at(i).identifier).default_command.begin(); it!=commands.at(temp.at(i).identifier).default_command.end();++it) 
 				{
-                    it->second=temp.at(i).command.at(it->first);
+                    it->second=(*temp.at(i).commands.begin()).second.at(it->first);
                 }
 
             }
@@ -186,7 +213,8 @@ void simulator::main_loop()
 simulator::~simulator()
 {
 	sim_packet.time=-10;
-	communicator->send_broadcast(sim_packet);
+	if (communicator)
+	  communicator->send_broadcast(sim_packet);
 	
 	graph_router.join_thread();
     delete communicator;

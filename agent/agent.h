@@ -3,25 +3,39 @@
 
 #include <list>
 #include <vector>
+#include <forward_list>
 #include <typedefs.h>
 #include "automaton/automatonabstract.h"
 #include "controller/controller.h"
-#include "identifierModule/identifier_module.h"
 #include "communication/agent_communicator_abstract.h"
 #include "communication/world_communicator_abstract.h"
 #include "../shared/yaml_parser.h"
 #include "encoder/encoderAbstract.h"
 #include "decoder.h"
+#include "random.hpp"
 #include "plugin_module.h"
 
 class agent
 {
 public:
-	agent(std::string name, bool isDummy, const Parsed_World& agents);
+	agent(std::string name,  const std::unique_ptr< Parsed_Behavior >& behavior);
+	agent(int agent_index, const Parsed_World& world);
 	~agent();
+	void init(const std::unique_ptr< Parsed_Behavior >& behavior, bool isDummy);
     void start();
+    void main_loop();
+	
+    inline std::forward_list<automaton_state> & getDiscreteStates()
+    {
+      return discreteState;
+    }
+    
+    
 	
 protected:
+    
+	bool initialized;
+	
 	/**
 	 * Name of agent and it is used for unique indentification
 	 */
@@ -43,9 +57,9 @@ protected:
 	std::map<std::string,int> map_bonus_variables_to_id;
 	
 	
-	vector<automaton_state> discreteState;
+	std::forward_list<automaton_state> discreteState;
 	index_map map_discreteStateName_to_id;
-	map<automaton_state, int> map_discreteStateId_to_controllerId;
+	std::map<automaton_state, int> map_discreteStateId_to_controllerId;
 	
 	//in dummy agent, we will initialize a nautomaton, in agent an automaton
 	automatonAbstract* automaton;
@@ -70,7 +84,7 @@ protected:
 	/**
 	 * Mappa dei nomi degli eventi e dei relativi indici
 	 */
-	std::map<string,transition> events_to_index;
+	std::map<std::string,transition> events_to_index;
 	
 	/**
 	 * The value of control variables, update by controllers
@@ -103,41 +117,39 @@ protected:
 	/*!
 	 * Moduli aggiuntivi utilizzabili stile plugin (ma quanto sarebbe bello farlo in modo sistematico!)
 	 */
-	vector <Plugin_module*> plugins;
+	std::vector <Plugin_module*> plugins;
 	
-	void main_loop();
-	
+
 	/**
 	 * crea la tabella di transizione dell'automaton
 	 */
-	transitionTable createAutomatonTableFromParsedAgent(const Parsed_Agent& agent);
+	transitionTable createAutomatonTableFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 	
 	/**
 	 * crea i sottoeventi e gli eventi per il decoder
 	 */
-	void createEventsFromParsedAgent(const Parsed_Agent& agent);
+	void createEventsFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 	
 	/**
 	 * crea i sottoeventi e l'encoder
 	 */
-	void createSubEventsFromParsedAgent(const Parsed_Agent& agent);
+	void createSubEventsFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 	
-	void createControllersFromParsedAgent(const Parsed_Agent& agent);
+	void createControllersFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 	
-	void createDiscreteStateFromParsedAgent(const Parsed_Agent& agent);
+	void createDiscreteStateFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 	
 	/**
 	 * crea le strutture dati che rappresentano lo stato continuo, le variabili di controllo e lo stato discreto
 	 */
-	void createStateFromParsedAgent(const Parsed_Agent& agent);
+	void createStateFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 
-	void createBonusVariablesFromWorld(map< bonusVariable, bonus_expression > bonus);
-	
+    void createBonusVariablesFromWorld(std::map< bonusVariable, bonus_expression > bonus);
+
 private:
 	rndom<double>* f_rndom;
 	double pi;
 	agent(const agent& a);
-	
 };
 
 #endif // AGENT_H

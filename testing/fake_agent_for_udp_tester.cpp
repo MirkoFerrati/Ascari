@@ -9,7 +9,7 @@ class fake_agent_for_udp_tester
 {
 public:
     fake_agent_for_udp_tester(topology_packet* data,boost::asio::io_service& io_service1,boost::asio::io_service& io_service):data(data), communicator(mutex,data,io_service),
-            start_sync(io_service1,boost::asio::ip::address::from_string("0.0.0.0"),
+            start_sync(io_service1,boost::asio::ip::address::from_string(SOCKET_BINDING),
                        boost::asio::ip::address::from_string(MULTICAST_ADDRESS),MULTICAST_PORT)
     {
 		start_sync.receive();

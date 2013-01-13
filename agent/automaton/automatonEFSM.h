@@ -7,8 +7,7 @@ class automatonEFSM:public automatonAbstract
 {
 public:
     automatonEFSM(const transitionTable& table);
-	std::vector< automaton_state > getNextAutomatonState(const std::vector< automaton_state >& oldStates, const std::vector< transition >& transitions);
-	
+    std::forward_list< automaton_state > getNextAutomatonState (const std::forward_list< automaton_state >& oldStates, const std::map< transition, bool >& event);	
 private:
 
 	

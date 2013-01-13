@@ -3,6 +3,8 @@
 
 using namespace std;
 
+//TODO(Simone): ci sono bug e cose da sistemare a giro, via via che testi il file esempio20.yaml sistema gli errori qui
+
 Parsed_World parse_file(const char * file_name)
 {
     std::string temp(file_name);
@@ -35,251 +37,106 @@ Parsed_World parse_file(string file_name) {
 }
 
 
-ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
-
-    os << ag.name << "\n";
-    for (unsigned int i =0 ;i<ag.state.size();i++)
-    {
-        os<< "State:"<<ag.state.at(i)<<endl;
-        os<< "Map: "<<ag.expressions.at(ag.state.at(i))<<endl;
-        os<< "initial value: "<<ag.initial_states.at(ag.state.at(i))<<endl;
-    }
-
-    os << "Controllers" << "\n";
-    int i=0;
-    for (map< controller_name, controller_MapRules >::const_iterator iter=ag.controllers.begin(); iter!=ag.controllers.end();++iter)
-    {
-        i++;
-        os<< "Controller "<<i<<endl;
-        os<< "Name:"<<((*iter).first)<<endl;
-        os<< "Values for Command: "<<endl;
-
-        for (unsigned int j=0; j<(*iter).second.size();j++)
-        {
-            os<< ag.inputs[j]<<": "<<((*iter).second.at(j))<<endl;
-
-        }
-    }
-    os<< "Discrete States: "<<endl;
-    for (map< discreteState_Name, controller_name >::const_iterator iter=ag.discrete_states.begin(); iter!=ag.discrete_states.end();++iter)
-    {
-        os<< "Name:"<<((*iter).first)<<endl;
-        os<< "Controller: "<<((*iter).second)<<endl;
-    }
-
-    os<< "Topologies: "<<endl;
-    for (map< topology_name, topology_expression >::const_iterator iter=ag.topology_expressions.begin(); iter!=ag.topology_expressions.end();++iter)
-    {
-        os<< "Name:"<<((*iter).first)<<endl;
-        os<< "Expression: "<<((*iter).second)<<endl;
-    }
-
-    os<< "Lambda: "<<endl;
-    for (map< lambda_name, lambda_expression >::const_iterator iter=ag.lambda_expressions.begin(); iter!=ag.lambda_expressions.end();++iter)
-    {
-        os<< "Name:"<<((*iter).first)<<endl;
-        os<< "Expression: "<<((*iter).second)<<endl;
-    }
-
-    os<< "Events: "<<endl;
-    for (map< event_name, event_expression >::const_iterator iter=ag.events_expressions.begin(); iter!=ag.events_expressions.end();++iter)
-    {
-        os<< "Event:"<<((*iter).first)<<endl;
-        os<< "Expression: "<<((*iter).second)<<endl;
-    }
-
-    os<< "Automaton: "<< ag.automaton_name<<endl;
-    for (map< discreteState_Name, map< event_name, discreteState_Name > >::const_iterator iter=ag.automaton.begin(); iter!=ag.automaton.end();++iter)
-    {
-
-        string actual_state=((*iter).first);
-
-        os<< "Actual State:"<<actual_state<<endl;
-
-
-        for (map< event_name, discreteState_Name >::const_iterator iiter=ag.automaton.at(actual_state).begin(); iiter!=ag.automaton.at(actual_state).end();++iiter)
-        {
-            os<< "Event:"<<((*iiter).first)<<"->"<<((*iiter).second)<<endl;
-
-        }
-    }
-
-    os<< "Target List: ";
-    for (std::vector<target_id>::const_iterator iter=ag.target_list.begin(); iter!=ag.target_list.end();++iter)
-    {
-        os<< " "<<*iter;
-    }
-    os<<endl;
-
-    os<< "Visibility:"<<ag.visibility<<endl;
-    os<< "Communication:"<<ag.communication<<endl;
-        
-    return os;
-}
-
-
-
-
-ostream& operator<< (ostream& os, const std::vector<Parsed_Agent>& ag) {
-    for (unsigned int i=0; i<ag.size();i++)
-    {
-        os<<ag.at(i);
-        os<<endl;
-    }
-    return os;
-}
-
-ostream& operator<<(std::ostream& os, const Parsed_World& wo)
+void operator>> (const YAML::Node& node, std::unique_ptr<Parsed_Behavior>& behavior)
 {
-    os<<wo.agents;
+
+  
+    node["STATES"]>>behavior->state;
+    node["CONTROL_COMMANDS"]>>behavior->inputs;
+    node["NAME"]>>behavior->name;
+
     
-    return os;
-}
-
-//written by Alessandro Settimi
-void operator >> (const YAML::Node& node, task_list& t)
-{
-    unsigned int j=0;
     
-    for (unsigned int i=0;i<t.task_number*7;)
-    {
-        task app;
-	t.tasks.push_back(app);
-      
-        node[i] >> t.tasks[j].task_id;
-	node[i+1] >> t.tasks[j].task_position[0];
-	node[i+2] >> t.tasks[j].task_position[1];
-	node[i+3] >> t.tasks[j].task_position[2];
-	node[i+4] >> t.tasks[j].task_type;
-	node[i+5] >> t.tasks[j].task_execution_time;
-	node[i+6] >> t.tasks[j].task_deadline;
-	
-	i=i+7;
-	j++;
-    }
-}
-//written by Alessandro Settimi
-
-
-
-void operator>> (const YAML::Node& node, Parsed_Agent& ag)
-{
-
-    node["VISIBLE_AREA"]>>ag.visibility;
-    node["COMMUNICATION_AREA"]>>ag.communication;
-    node["AGENT"]>>ag.name;
-    node["STATES"]>>ag.state;
-    node["CONTROL_COMMANDS"]>>ag.inputs;
-
-
-    for (unsigned int i=0;i<ag.state.size();i++)
+  for (unsigned int i=0;i<behavior->state.size();i++)
     {
         dynamic_expression tmp_exp;
-        node["DYNAMIC_MAP"][0][ag.state[i]]>>tmp_exp;
-        ag.expressions.insert(std::pair<stateVariable,dynamic_expression>(ag.state[i],tmp_exp));
-
-
-        initial_state_value tmp_initial;
-        node["INITIAL"][0][ag.state[i]]>>tmp_initial;
-        ag.initial_states.insert(pair<stateVariable,initial_state_value>(ag.state[i],tmp_initial));
+        node["DYNAMIC_MAP"][0][behavior->state[i]]>>tmp_exp;
+        behavior->expressions.insert(std::pair<stateVariable,dynamic_expression>(behavior->state[i],tmp_exp));
+    
+      
     }
 
-    const YAML::Node& behavior= node["BEHAVIOR"][0];
-    const YAML::Node& controllers = behavior["CONTROLLERS"];
+    const YAML::Node& controllers = node["CONTROLLERS"];
 
     string temp;
     for (unsigned int i=0;i<controllers.size();i++) {
         map<int,string> temp1;
         controllers[i]["NAME"]>>temp;
 
-        ag.controllers.insert(pair<controller_name, map<int,controllerRule> >(temp,temp1));
+        behavior->controllers.insert(pair<controller_name, map<int,controllerRule> >(temp,temp1));
 
-        for (unsigned int j=0;j<ag.inputs.size();j++)
+        for (unsigned int j=0;j<behavior->inputs.size();j++)
         {
-            controllers[i][ag.inputs[j]]>> ag.controllers[temp][j];
+            controllers[i][behavior->inputs[j]]>> behavior->controllers[temp][j];
         }
     }
 
-    const YAML::Node& disc_states = behavior["DISCRETE_STATES"];
+    const YAML::Node& disc_states = node["DISCRETE_STATES"];
 
     for (unsigned int i=0;i<disc_states.size();i++) {
         string n_state;
         disc_states[i]["NAME"]>>n_state;
         string c_name;
         disc_states[i]["CONTROLLER"]>>c_name;
-        ag.discrete_states.insert(pair<string,string>(n_state,c_name));
+        behavior->discrete_states.insert(pair<string,string>(n_state,c_name));
 
     }
 
-    node["STATE_START"]>> ag.state_start;
-
-    if (node.FindValue("TARGET_LIST")) {
-        node["TARGET_LIST"]>> ag.target_list;
-    }
     
-    if (!ag.discrete_states.count(ag.state_start))
-    {
-        ERR("UNDEFINED START DISCRETE STATE %s", ag.state_start.c_str());
-        throw "UNDEFINED DISCRETE START STATE";
-    }
-
-
-
-
-    const YAML::Node& encoder = behavior["ENCODER"][0];
+    const YAML::Node& encoder = node["ENCODER"][0];
     const YAML::Node& topology=encoder["TOPOLOGY"][0];
-    topology["TOPOLOGY"]>> ag.topology;
+    topology["TOPOLOGY"]>> behavior->topology;
 
 
-    for (unsigned int i=0;i<ag.topology.size();i++) {
+    for (unsigned int i=0;i<behavior->topology.size();i++) {
         string topology_exp;
-        topology[ag.topology[i]]>>topology_exp;
-        ag.topology_expressions.insert(pair<string,string>(ag.topology[i],topology_exp));
+        topology[behavior->topology[i]]>>topology_exp;
+        behavior->topology_expressions.insert(pair<string,string>(behavior->topology[i],topology_exp));
 
     }
 
     const YAML::Node& lambda=encoder["LAMBDA"][0];
 
-    lambda["LAMBDA"]>> ag.lambda;
+    lambda["LAMBDA"]>> behavior->lambda;
 
 
-    for (unsigned int i=0;i<ag.lambda.size();i++) {
+    for (unsigned int i=0;i<behavior->lambda.size();i++) {
         string lambda_exp;
-        lambda[ag.lambda[i]]>>lambda_exp;
-        ag.lambda_expressions.insert(pair<string,string>(ag.lambda[i],lambda_exp));
+        lambda[behavior->lambda[i]]>>lambda_exp;
+        behavior->lambda_expressions.insert(pair<string,string>(behavior->lambda[i],lambda_exp));
 
     }
 
 
-    const YAML::Node& decoder = behavior["EVENTS"][0];
+    const YAML::Node& decoder = node["EVENTS"][0];
 
-    decoder["EVENTS"]>> ag.events;
+    decoder["EVENTS"]>> behavior->events;
 
 
-    for (unsigned int i=0;i<ag.events.size();i++) {
+    for (unsigned int i=0;i<behavior->events.size();i++) {
         string events_exp;
-        decoder[ag.events[i]]>>events_exp;
-        ag.events_expressions.insert(pair<string,string>(ag.events[i],events_exp));
+        decoder[behavior->events[i]]>>events_exp;
+        behavior->events_expressions.insert(pair<string,string>(behavior->events[i],events_exp));
 
     }
 
 
-    const YAML::Node& automaton = behavior["AUTOMATON"];
-    automaton[0]["NAME"]>>ag.automaton_name;
+    const YAML::Node& automaton = node["AUTOMATON"];
+    //automaton[0]["NAME"]>>behavior.name;
 
 
     for (unsigned int i=0;i<automaton.size();i++) {
-        for (map< discreteState_Name, controller_name >::const_iterator iter=ag.discrete_states.begin(); iter!=ag.discrete_states.end();++iter)
+        for (map< discreteState_Name, controller_name >::const_iterator iter=behavior->discrete_states.begin(); iter!=behavior->discrete_states.end();++iter)
         {
             string actual_state;
             actual_state=((*iter).first);
             if (automaton[i].FindValue(actual_state)) {
                 map<string,string> temp1;
-                ag.automaton.insert(pair<string, map<string,string> >(actual_state,temp1));
+                behavior->automaton.insert(pair<string, map<string,string> >(actual_state,temp1));
 
                 const YAML::Node& transition = automaton[i][actual_state][0];
 
-                for (map< discreteState_Name, controller_name >::const_iterator iiter=ag.discrete_states.begin(); iiter!=ag.discrete_states.end();++iiter)
+                for (map< discreteState_Name, controller_name >::const_iterator iiter=behavior->discrete_states.begin(); iiter!=behavior->discrete_states.end();++iiter)
                 {
                     string new_state;
                     new_state=(*iiter).first;
@@ -291,12 +148,12 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 
 
                         for (unsigned int j=0; j< tran_ev.size();j++) {
-                            if (ag.automaton[actual_state].count(tran_ev[j]))
+                            if (behavior->automaton[actual_state].count(tran_ev[j]))
                             {
                                 ERR("DUPLICATED EVENT %s", tran_ev[j].c_str());
                                 throw "DUPLICATED EVENT";
                             }
-                            ag.automaton[actual_state].insert(pair<event_name, discreteState_Name>(tran_ev[j],new_state));
+                            behavior->automaton[actual_state].insert(pair<event_name, discreteState_Name>(tran_ev[j],new_state));
                         }
                     }
                 }
@@ -304,12 +161,71 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
         }
     }
 
+  
+}
+
+//written by Alessandro Settimi
+void createTaskList(const YAML::Node& node, task_list& t,unsigned int task_number)
+{
+    unsigned int j=0;
+    
+    for (unsigned int i=0;i<task_number*7;)
+    {
+        task app;
+	t.push_back(app);
+      
+        node[i] >> t[j].task_id;
+	node[i+1] >> t[j].task_position[0];
+	node[i+2] >> t[j].task_position[1];
+	node[i+3] >> t[j].task_position[2];
+	node[i+4] >> t[j].task_type;
+	node[i+5] >> t[j].task_execution_time;
+	node[i+6] >> t[j].task_deadline;
+	
+	i=i+7;
+	j++;
+    }
+}
+//written by Alessandro Settimi
+
+void operator>> (const YAML::Node& node, Parsed_Agent& ag)
+{
+
+    node["VISIBLE_AREA"]>>ag.visibility;
+    node["COMMUNICATION_AREA"]>>ag.communication;
+   
+    
+    
+    
+    for (unsigned int i=0;i<ag.behavior->state.size();i++)
+    {
+        initial_state_value tmp_initial;
+        node["INITIAL"][0][ag.behavior->state[i]]>>tmp_initial;
+        ag.initial_states.insert(pair<stateVariable,initial_state_value>(ag.behavior->state[i],tmp_initial));
+    }
+
+    
+    node["STATE_START"]>> ag.state_start;
+
+    if (node.FindValue("TARGET_LIST")) {
+        node["TARGET_LIST"]>> ag.target_list;
+    }
+
+    if (!ag.behavior->discrete_states.count(ag.state_start))
+    {
+        ERR("UNDEFINED START DISCRETE STATE %s", ag.state_start.c_str());
+        throw "UNDEFINED DISCRETE START STATE";
+    }
+
+
 }
 
 
 
 void operator>>(const YAML::Node& node, Parsed_World& wo)
 {
+	wo.graphName="UNSET";
+	
     if (node[0].FindValue("WORLD"))
     {
         if (node[0]["WORLD"].size()>0)
@@ -326,61 +242,116 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
                 }
             }
 
-            wo.graphName="UNSET";
             if (node[0]["WORLD"][0].FindValue("GRAPH_NAME"))
             {
                 const YAML::Node &world_node=node[0]["WORLD"][0];
 
                 world_node["GRAPH_NAME"]>> wo.graphName;
-	    }
+            }
+
         }
     }
 
+      const YAML::Node &behaviors_nodes=node[0]["BEHAVIORS"];
+
+   
+    for (unsigned int i=0;i<behaviors_nodes.size();i++) {
+	
+      std::string tmp_beh_name;
+      
+       if (!behaviors_nodes[i].FindValue("NAME")){
+	 
+            ERR("BEHAVIOR NAME UNDEFINED: BEHAVIOR NUMBER %d", i);
+            throw "BEHAVIOR NAME UNDEFINED";
+        }
+      
+	behaviors_nodes[i]["NAME"]>> tmp_beh_name;
+	{
+	std::unique_ptr<Parsed_Behavior> tmp_ptr(new Parsed_Behavior());
+	wo.behaviors.insert(std::make_pair(tmp_beh_name,std::move(tmp_ptr)));
+	}
+	wo.behaviors[tmp_beh_name]->name=tmp_beh_name;
+	behaviors_nodes[i]>>wo.behaviors[tmp_beh_name];
+    }
+
+    
     const YAML::Node &agent_nodes=node[0]["AGENTS"];
 
-    wo.agents.resize(agent_nodes.size());
+    wo.agents.reserve(agent_nodes.size());
 
     for (unsigned int i=0;i<agent_nodes.size();i++) {
-
+      
+      std::string tmp_ag_name;
+      agent_nodes[i]["AGENT"]>>tmp_ag_name;
+    
+     if (!agent_nodes[i].FindValue("BEHAVIOR"))
+    {
+        ERR("BEHAVIOR NAME UNSPECIFIED FOR AGENT %s", tmp_ag_name.c_str());
+        throw "BEHAVIOR NAME UNSPECIFIED FOR AGENT";
+    }
+    
+    std::string tmp_agent_behavior_name;
+	agent_nodes[i]["BEHAVIOR"]>>tmp_agent_behavior_name;
+    
+     if (!wo.behaviors.count(tmp_agent_behavior_name))
+    {
+        ERR("UNDEFINED BEHAVIOR %s FOR AGENT %s", tmp_agent_behavior_name.c_str(), tmp_ag_name.c_str());
+        throw "UNDEFINED BEHAVIOR %s FOR AGENT %s";
+    }
+    wo.agents.emplace_back(wo.behaviors[tmp_agent_behavior_name]);
+	wo.agents[i].name=tmp_ag_name;
+	//wo.agents[i].behavior=(*wo.behaviors[tmp_agent_behavior_name]);//TODO(Mirko) perche' e' una copia?
+	wo.agents[i].behavior_name=tmp_agent_behavior_name;
         agent_nodes[i] >> wo.agents[i];
         if ((wo.agents[i].target_list.size()==0 && wo.graphName.compare("UNSET")!=0)|| (wo.agents[i].target_list.size()>0 && wo.graphName.compare("UNSET")==0) ) {
 
-            ERR("GRAPH NAME OR TARGET LIST UNDEFINED");
+            ERR("GRAPH NAME OR TARGET LIST UNDEFINED", NULL);
             throw "GRAPH NAME OR TARGET LIST UNDEFINED";
         }
 
     }
-    
+
     //written by Alessandro Settimi
     if (node[0].FindValue("WORLD"))
     {
         if (node[0]["WORLD"].size()>0)
         { 
-            if (node[0]["WORLD"][0].FindValue("TASK_COST_MATRIX") && node[0]["WORLD"][0].FindValue("TASK_NUMBER"))
+	  
+            if (node[0]["WORLD"][0].FindValue("TASK_COST_MATRIX") && node[0]["WORLD"][0].FindValue("TASK_NUMBER") && node[0]["WORLD"][0].FindValue("TASK_LIST"))
 	    {
-		node[0]["WORLD"][0]["TASK_NUMBER"]>>wo.task_number;
-		wo.agent_number=wo.agents.size();
+		unsigned int task_number;
+		node[0]["WORLD"][0]["TASK_NUMBER"]>>task_number;
+		
+		createTaskList(node[0]["WORLD"][0]["TASK_LIST"],wo.tl,task_number);
 
 		const YAML::Node& co=node[0]["WORLD"][0]["TASK_COST_MATRIX"];
 		
-		for (unsigned int i=0;i<wo.agent_number;i++)
+		task_cost_vector app;
+		double cost;
+
+		for(unsigned int i=0;i<wo.agents.size();i++) //TODO: supposizione che matrice di costo sia ordinata per agenti e task, 
+							      //meglio fare un vettore per ogni agente che specifica task e costo
 		{
-		    std::vector <double> app;
-		    wo.task_cost_matrix.push_back(app);
-		    for (unsigned int j=0;j<wo.task_number;j++)
+		    for(unsigned int j=0;j<wo.tl.size();j++)
 		    {
-			wo.task_cost_matrix[i].push_back(0);
-			co[i*wo.task_number+j] >> wo.task_cost_matrix[i][j];
+			co[i*task_number+j] >> cost;
+			app.insert(make_pair(wo.tl[j].task_id,cost)); // SINTASSI MAP?
+		    }
+	
+		    wo.task_cost_matrix.insert(make_pair(wo.agents[i].name,app)); //SINTASSI MAP?
+		    
+		    for (task_cost_vector::iterator it=app.begin();it!=app.end();++it)
+		    {
+			app.erase(it);
 		    }
 		}
+
 	    }
 	
-	    if (node[0]["WORLD"][0].FindValue("TASK_LIST")) 
-	    {
-		node[0]["WORLD"][0]["TASK_LIST"]>>wo.tl;
-	    }
+
 	}
     }
     //written by Alessandro Settimi
+
 
 }

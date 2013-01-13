@@ -1,10 +1,14 @@
 #include "agent.h"
-#include <agent_router.h>
-#include "task_assignment/task_assignment.h" //written by Alessandro Settimi
+#include "graph_routing/agent_router.h"
+//written by Alessandro Settimi
+#include "task_assignment/task_assignment.h"
+//written by Alessandro Settimi
+#include "identifierModule/identifier_module.h"
 #include <string>
 #include <utility>
 #include <map>
 #include "communication/udp_world_communicator.h"
+#include "communication/zmq_world_communicator.h"
 
 #include "logog.hpp"
 #include "automaton/automatonFSM.h"
@@ -14,45 +18,31 @@
 
 using namespace std;
 
-
-agent::agent(std::string name,bool isDummy,const Parsed_World& world)
-        :identifier(name),event_decoder(sub_events,events)
+agent::agent(std::string name,const std::unique_ptr<Parsed_Behavior>& behavior)
+        :identifier(name)
 {
-    int myAgent;
-    for (unsigned int i =0;i<world.agents.size();i++)
-        if (world.agents.at(i).name.compare(name)==0)
-            myAgent=i;
-	string temp=name;
-	time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
-    
-    symbol_table.add_constants();
-	pi=exprtk::details::numeric::constant::pi;
-	symbol_table.add_variable("PI_GRECO",pi,true);
-	f_rndom = new rndom<double>();
-	symbol_table.add_function(f_rndom->name, *f_rndom);
-    
-    int i=0;
-    for (map<controller_name,controller_MapRules>::const_iterator it =world.agents[myAgent].controllers.begin();it !=world.agents[myAgent].controllers.end();++it)
-    {
-        map_controllername_to_id.insert(make_pair(it->first,i++));
-    }
-    createBonusVariablesFromWorld(world.bonus_expressions);
-    createDiscreteStateFromParsedAgent(world.agents.at(myAgent));
-    createStateFromParsedAgent(world.agents.at(myAgent));
-    createSubEventsFromParsedAgent(world.agents.at(myAgent));
-    createEventsFromParsedAgent(world.agents.at(myAgent));
-    world_comm=new udp_world_communicator();
+//qui poi uno setta tutto quello che manca oppure lascia vuoto
+initialized=false;
+encoder=0;
+init(behavior,true);
+}
+
+
+agent::agent(int agent_index,const Parsed_World& world):
+	identifier(world.agents.at(agent_index).name)
+{
+	createBonusVariablesFromWorld(world.bonus_expressions);
 	
-	if (!world.agents.at(myAgent).target_list.empty())
+	if (!world.agents.at(agent_index).target_list.empty())
 	{
-		Plugin_module *plugin=new agent_router(world.agents.at(myAgent).target_list,events,events_to_index,temp,time,world.graphName);;
+		Plugin_module *plugin=new agent_router(world.agents.at(agent_index).target_list,events,events_to_index,world.agents.at(agent_index).name,time,world.graphName);
 		plugins.push_back(plugin);
 	}
 	
 	//written by Alessandro Settimi
-	if (!world.tl.tasks.empty())
+	if (!world.tl.empty())
 	{
-		Plugin_module *plugin=new task_assignment(world,world.agents.at(myAgent),events,events_to_index);
+		Plugin_module *plugin=new task_assignment(world,world.agents.at(agent_index),events,events_to_index);
 		plugins.push_back(plugin);
 	} 
 	//written by Alessandro Settimi
@@ -64,26 +54,65 @@ agent::agent(std::string name,bool isDummy,const Parsed_World& world)
 	{
 		plugins[i]->addReservedVariables(symbol_table);
 		plugins[i]->addReservedVariables(encoder_symbol_table);
-		plugins[i]->compileExpressions(symbol_table);
-	}
 		
-	createControllersFromParsedAgent(world.agents.at(myAgent));
+	}
+	
+	init(world.agents.at(agent_index).behavior,false);
+	discreteState.push_front(map_discreteStateName_to_id.at(world.agents.at(agent_index).state_start));
+	
+//qui invece mi setto quello che manca a mano
+}
 
-    if (!isDummy)
-    {
-        automaton=new automatonFSM(createAutomatonTableFromParsedAgent(world.agents.at(myAgent)));
-        encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id,bonusVariables,
-                               map_bonus_variables_to_id, world.agents.at(myAgent).topology_expressions,
-							   sub_events_to_index,world.agents.at(myAgent).lambda_expressions,encoder_symbol_table);
-    }
-    else
+
+void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy)
+{
+	time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
+	initialized=true;
+	symbol_table.add_constants();
+	pi=exprtk::details::numeric::constant::pi;
+	symbol_table.add_variable("PI_GRECO",pi,true);
+	f_rndom = new rndom<double>();
+	symbol_table.add_function(f_rndom->name, *f_rndom);
+	
+	int i=0;
+	for (map<controller_name,controller_MapRules>::const_iterator it =behavior->controllers.begin();it !=behavior->controllers.end();++it)
 	{
-        //TODO(Mirko): we will think about identifierModule later
-    }
+		map_controllername_to_id.insert(make_pair(it->first,i++));
+	}
+	event_decoder.setEventsAndSubEvents(&sub_events,&events);
+	
+	
+	createDiscreteStateFromParsedAgent(behavior);
+	createStateFromParsedAgent(behavior);
+	createSubEventsFromParsedAgent(behavior);
+	createEventsFromParsedAgent(behavior);
 
-    event_decoder.create(world.agents[myAgent].events_expressions,sub_events_to_index,events_to_index);
+	
+	createControllersFromParsedAgent(behavior);
+	
+	if (!isDummy)
+	{
+		automaton=new automatonFSM(createAutomatonTableFromParsedAgent(behavior));
+		encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id,bonusVariables,
+							   map_bonus_variables_to_id, behavior->topology_expressions,
+						 sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table);
+		//world_comm=new udp_world_communicator();
+		world_comm=new zmq_world_communicator(identifier);
+		 for (unsigned int i=0;i<plugins.size();i++)
+	    {
+		plugins[i]->compileExpressions(symbol_table);
+	    }
+	}
+	else
+	{
+	   
+		//TODO(Mirko): we will think about identifierModule later
+	}
+	
+	event_decoder.create(behavior->events_expressions,sub_events_to_index,events_to_index);
 
 }
+
 
 void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression > bonus)
 {
@@ -103,27 +132,46 @@ void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression >
 
 void agent::start()
 {
+	if (!initialized)
+		throw "pls call init function before start";
+   try {
+        inputs.identifier=identifier;
+        int cicli=0;
+        while (1)
+	{
 	main_loop();
+	            cicli++;
+if (time<-1)
+				break;
+	}
+	
+	    }
+    catch (const char* e)
+    {
+        std::cerr<<e<<std::endl;
+
+    }
+	
 }
 
 
-void agent::createControllersFromParsedAgent(const Parsed_Agent& agent)
+void agent::createControllersFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavior)
 {
-    for (map<controller_name,controller_MapRules>::const_iterator it =agent.controllers.begin();it !=agent.controllers.end();++it)
+    for (map<controller_name,controller_MapRules>::const_iterator it =behavior->controllers.begin();it !=behavior->controllers.end();++it)
     {
-        controller c(it->second,agent.inputs,symbol_table);
+        controller c(it->second,behavior->inputs,symbol_table);
         controllers.push_back(c);
     }
 }
 
 
-transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& agent)
+transitionTable agent::createAutomatonTableFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavior)
 {
     transitionTable automaton_table_tmp;
-    automaton_table_tmp.name = agent.automaton_name;
+    automaton_table_tmp.name = behavior->name;
     automaton_state s1, s2;
     transition e;
-    for (map<string,map<string,string> >::const_iterator it=agent.automaton.begin(); it!=agent.automaton.end();++it)
+    for (map<string,map<string,string> >::const_iterator it=behavior->automaton.begin(); it!=behavior->automaton.end();++it)
     {
         s1 = (automaton_state) map_discreteStateName_to_id.at(it->first);
         for (map<string,string>::const_iterator iit=it->second.begin();iit!=it->second.end();++iit) {
@@ -137,31 +185,31 @@ transitionTable agent::createAutomatonTableFromParsedAgent(const Parsed_Agent& a
 }
 
 
-void agent::createDiscreteStateFromParsedAgent(const Parsed_Agent& agent)
+void agent::createDiscreteStateFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavior)
 {
-    automaton_state s = (automaton_state) 0;
+    automaton_state s =  0;
     unsigned int i = 0;
-    for (map<string,string>::const_iterator it=agent.discrete_states.begin(); it!=agent.discrete_states.end(); ++it)
+    for (map<string,string>::const_iterator it=behavior->discrete_states.begin(); it!=behavior->discrete_states.end(); ++it)
     {
         map_discreteStateName_to_id.insert(make_pair(it->first,i));
         map_discreteStateId_to_controllerId.insert(make_pair(s,map_controllername_to_id.at(it->second)));
+	inputs.commands[s];
         i++;
         s++;
     }
-    discreteState.push_back(map_discreteStateName_to_id.at(agent.state_start));
 }
 
 
-void agent::createSubEventsFromParsedAgent(const Parsed_Agent& agent) {
+void agent::createSubEventsFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavior) {
 
     unsigned i=0;
-    for (map<string,string>::const_iterator it=agent.lambda_expressions.begin();it!=agent.lambda_expressions.end();++it) {
+    for (map<string,string>::const_iterator it=behavior->lambda_expressions.begin();it!=behavior->lambda_expressions.end();++it) {
         sub_events_to_index.insert(make_pair(it->first,i));
         sub_events.insert(make_pair(i,_FALSE));
         i++;
     }
 
-    for (map<string,string>::const_iterator it=agent.topology_expressions.begin();it!=agent.topology_expressions.end();++it) {
+    for (map<string,string>::const_iterator it=behavior->topology_expressions.begin();it!=behavior->topology_expressions.end();++it) {
         sub_events_to_index.insert(make_pair(it->first,i));
         sub_events.insert(make_pair(i,_FALSE));
 		i++;
@@ -169,10 +217,10 @@ void agent::createSubEventsFromParsedAgent(const Parsed_Agent& agent) {
 }
 
 
-void agent::createEventsFromParsedAgent(const Parsed_Agent& agent)
+void agent::createEventsFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavior)
 {
-    transition i=(transition)0;
-    for (map<string,string>::const_iterator it=agent.events_expressions.begin();it!=agent.events_expressions.end();++it)
+    transition i=0;
+    for (map<string,string>::const_iterator it=behavior->events_expressions.begin();it!=behavior->events_expressions.end();++it)
     {
         events_to_index.insert(make_pair(it->first,i));
         events.insert(make_pair(i,false));
@@ -181,44 +229,42 @@ void agent::createEventsFromParsedAgent(const Parsed_Agent& agent)
 }
 
 
-void agent::createStateFromParsedAgent(const Parsed_Agent& agent)
+void agent::createStateFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavior)
 {
-    for (unsigned int i=0;i<agent.state.size();i++)
+    for (unsigned int i=0;i<behavior->state.size();i++)
     {
         state[i]=0;
-        map_statename_to_id.insert(std::pair<string,int>(agent.state.at(i),i));
+        map_statename_to_id.insert(std::pair<string,int>(behavior->state.at(i),i));
     }
     for (unsigned int i=0;i<state.size();i++)
 	{
-		symbol_table.add_variable(agent.state[i],state[i]);
+		symbol_table.add_variable(behavior->state[i],state[i]);
 	}
 	
-    for (unsigned int i=0;i<agent.inputs.size();i++)
+    for (unsigned int i=0;i<behavior->inputs.size();i++)
     {
-        inputs.command[i]=0;
-        map_inputs_name_to_id.insert(make_pair(agent.inputs.at(i),i));
+        inputs.default_command[i]=0;
+        map_inputs_name_to_id.insert(make_pair(behavior->inputs.at(i),i));
     }
-    for (unsigned int i=0;i<inputs.command.size();i++)
+    for (unsigned int i=0;i<inputs.default_command.size();i++)
 	{
-		symbol_table.add_variable(agent.inputs[i],inputs.command[i]);
+		symbol_table.add_variable(behavior->inputs[i],inputs.default_command[i]);
 	}
 }
+
+
+
 
 void agent::main_loop()
 {
 
-    try {
-        inputs.identifier=identifier;
-        int cicli=0;
-        while (1)
+   
         {
-            cicli++;
 	// 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
 			world_sim_packet temp=world_comm->receive_agents_status();
-			state_other_agents.swap(temp.state_agents.internal_map);
+			state_other_agents.swap(temp.state_agents.internal_map);//TODO(Mirko): si possono evitare le copie e gli swap?
 			time=temp.time;
-			if (time<-1)
-				break;
+			
 			for (std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin();it!=temp.bonus_variables.end();++it)
 			{
 			bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
@@ -230,6 +276,7 @@ void agent::main_loop()
             {
                 state.at(it->first)=it->second;
             }
+            //cout<<"stato: "<<state.at(0)<<" "<<state.at(1)<<" "<<state.at(2)<<endl;
             sleep(0);
             encoder->computeSubEvents(state_other_agents);
             event_decoder.decode();
@@ -243,8 +290,12 @@ void agent::main_loop()
 			}
 			
             discreteState= automaton->getNextAutomatonState(discreteState,events);
-            controllers.at(map_discreteStateId_to_controllerId.at(discreteState.at(0))).computeControl();
-
+	    
+	    for ( auto discrete :discreteState)
+	    {
+	      controllers.at(map_discreteStateId_to_controllerId.at(discrete)).computeControl();
+	      inputs.commands.at(discrete)=inputs.default_command;
+	    }
             world_comm->send_control_command(inputs,NULL);
 
             //string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
@@ -262,12 +313,7 @@ void agent::main_loop()
 
         }
 
-    }
-    catch (const char* e)
-    {
-        std::cerr<<e<<std::endl;
 
-    }
 
 }
 

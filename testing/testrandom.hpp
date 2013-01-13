@@ -20,7 +20,7 @@
 #include <cstdio>
 #include <string>
 #include "exprtk.hpp"
-
+#include "random.hpp"
 #include <vector>
 #include <map>
 #include <string>
@@ -30,18 +30,7 @@
 using namespace std;
 
 
-template<typename T>
-struct myfunc : public exprtk::ifunction<T>
-{
-   myfunc()
-   : exprtk::ifunction<T>(2)
-   {}
 
-   inline T operator()(const T& v1, const T& v2)
-   {
-      return T(1) + (v1 * v2) / T(3);
-   }
-};
 
 template<typename T>
 T custom_function()
@@ -50,12 +39,10 @@ T custom_function()
    std::string expression_string = "rndom(1.0,2.0)";
    T x = T(1.0);
    T y = T(2.0);
-   myfunc<T> mf;
-rndom<T> *rnd=new rndom<T>();
+  rndom<T> *rnd=new rndom<T>();
    exprtk::symbol_table<T> symbol_table;
    symbol_table.add_variable("x",x);
    symbol_table.add_variable("y",y);
-   symbol_table.add_function("myfunc",mf);
    symbol_table.add_function("rndom",*rnd);
    symbol_table.add_constants();
 

@@ -7,73 +7,156 @@ using namespace std;
 
 task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index):events(events),events_to_index(events_to_index)
 {
+    my_id=agent.name;
+    
+    createAgentIdAndTaskIdVectorFromParsedWorld(world);
     createTaskListFromParsedWorld(world);
     createTaskCostMatrixFromParsedWorld(world);
-    agent_id=agent.name;
+    inizializeTaskAssignmentMatrix();
+    
     task_assigned=false;
     stop=false;
     speed=0;
+    
+    printTaskAssignmentMatrix();
+    printTaskCostMatrix();
 }
+
+
+void task_assignment::createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo)
+{
+    for (unsigned int i=0;i<wo.agents.size();i++)
+	agents_id.push_back(wo.agents[i].name);  
+    
+    for (unsigned int i=0;i<wo.tl.size();i++)
+	tasks_id.push_back(wo.tl[i].task_id);
+}
+
 
 void task_assignment::createTaskListFromParsedWorld(const Parsed_World& wo)
 {
-    tasklist.task_number=wo.tl.task_number;
     
-    for (unsigned int i=0; i< tasklist.task_number;i++)
+    for (unsigned int i=0; i< wo.tl.size();i++)
     {	
 	    task app;
-	    tasklist.tasks.push_back(app);
+	    tasklist.push_back(app); //posso fare la push_back di tutto il task?
 	    
-	    tasklist.tasks[i].task_id=wo.tl.tasks[i].task_id;
-	    tasklist.tasks[i].task_position[0]=wo.tl.tasks[i].task_position[0];
-	    tasklist.tasks[i].task_position[1]=wo.tl.tasks[i].task_position[1];
-	    tasklist.tasks[i].task_position[2]=wo.tl.tasks[i].task_position[2];
-	    tasklist.tasks[i].task_type=wo.tl.tasks[i].task_type;
-	    tasklist.tasks[i].task_execution_time=wo.tl.tasks[i].task_execution_time;
-	    tasklist.tasks[i].task_deadline=wo.tl.tasks[i].task_deadline;
+	    tasklist[i].task_id=wo.tl[i].task_id;
+	    tasklist[i].task_position[0]=wo.tl[i].task_position[0];
+	    tasklist[i].task_position[1]=wo.tl[i].task_position[1];
+	    tasklist[i].task_position[2]=wo.tl[i].task_position[2];
+	    tasklist[i].task_type=wo.tl[i].task_type;
+	    tasklist[i].task_execution_time=wo.tl[i].task_execution_time;
+	    tasklist[i].task_deadline=wo.tl[i].task_deadline;
 	    
-	    std::cout << std::endl << "TASK " << wo.tl.tasks[i].task_id <<':'<< std::endl;
-	    std::cout << "- posizione: " << wo.tl.tasks[i].task_position[0] <<' '<< wo.tl.tasks[i].task_position[1]<<' '<< wo.tl.tasks[i].task_position[2] << std::endl;
-	    std::cout << "- tipo: " << wo.tl.tasks[i].task_type << std::endl;
-	    std::cout << "- execution time: " << wo.tl.tasks[i].task_execution_time << std::endl;
-	    std::cout << "- deadline: " << wo.tl.tasks[i].task_deadline << std::endl << std::endl;
+	    std::cout << std::endl << "TASK " <<tasklist[i].task_id <<':'<< std::endl;
+	    std::cout << "- posizione: " << tasklist[i].task_position[0] <<' '<< tasklist[i].task_position[1]<<' '<< tasklist[i].task_position[2] << std::endl;
+	    std::cout << "- tipo: " << tasklist[i].task_type << std::endl;
+	    std::cout << "- execution time: " << tasklist[i].task_execution_time << std::endl;
+	    std::cout << "- deadline: " << tasklist[i].task_deadline << std::endl << std::endl;
     }
 }
 
 void task_assignment::createTaskCostMatrixFromParsedWorld(const Parsed_World& wo)
-{
-    agent_number=wo.agent_number;
-    task_number=wo.task_number;
-  
-    std::cout<<std::endl<<"TASK COST MATRIX"<<std::endl;
-
-    for(unsigned int i=0;i<agent_number;i++)
-    {
-	std::vector <double> app;
-	task_cost_matrix.push_back(app);
-	for(unsigned int j=0;j<task_number;j++)
-	{
-	    task_cost_matrix[i].push_back(0);
-	    task_cost_matrix[i][j]=wo.task_cost_matrix[i][j];
-	    std::cout<<task_cost_matrix[i][j]<<' ';
-	}
-	std::cout<<std::endl;
-    }    
+{ 
+    task_cost_matrix=wo.task_cost_matrix; //SINTASSI MAP?
+    
+    agent_task_cost_vector=&task_cost_matrix.at(my_id);
 }
 
-bool task_assignment::task_assignment_algorithm()
+
+void task_assignment::inizializeTaskAssignmentMatrix()
 {
-     //si deve assegnare il current_task mediante ottimizzazione
+      
+    task_assignment_vector app;
+    
+    for(unsigned int i=0;i<agents_id.size();i++)
+    {
+
+	for(unsigned int j=0;j<tasks_id.size();j++)
+	{
+	    app.insert(make_pair(tasks_id[j],(i==j))); //X identità
+	}
+
+	task_assignment_matrix.insert(make_pair(agents_id[i],app));
+	
+	for (task_assignment_vector::iterator it=app.begin();it!=app.end();++it)
+	{
+	    app.erase(it);
+	}
+    }
+    
+    agent_task_assignment_vector=&task_assignment_matrix.at(my_id);
+}
+
+
+void task_assignment::printTaskAssignmentMatrix()
+{
+    std::cout<<std::endl<<"TASK ASSIGNMENT MATRIX"<<std::endl;
+    
+    for(unsigned int i=0;i<agents_id.size();i++)
+    {
+
+	for(unsigned int j=0;j<tasks_id.size();j++)
+	{
+	    std::cout<<task_assignment_matrix.at(agents_id[i]).at(tasks_id[j])<<' ';
+	}
+	
+	std::cout<<std::endl;
+    }
+}
+
+
+void task_assignment::printTaskCostMatrix()
+{
+    std::cout<<std::endl<<"TASK COST MATRIX"<<std::endl;
+    
+    for(unsigned int i=0;i<agents_id.size();i++)
+    {
+
+	for(unsigned int j=0;j<tasks_id.size();j++)
+	{
+	    std::cout<<task_cost_matrix.at(agents_id[i]).at(tasks_id[j])<<' ';
+	}
+	
+	std::cout<<std::endl;
+    }
+}
+
+
+int task_assignment::ta_1()
+{
+     //dummy per 3 agenti
      int a=-1;
-     if (agent_id=="AGENTE1") a=0;
-     if (agent_id=="AGENTE2") a=1;
-     if (agent_id=="AGENTE3") a=2;
+     
+     while(0)//non converge
+     {
+	  //OPTIMIZATION
+     
+	  //COMMUNICATION
+     }
+     
+     //una volta che si ha la convergenza
+     
+     for(unsigned int j=0;j<tasks_id.size();j++)
+     {
+	    if(agent_task_assignment_vector->at(tasks_id[j]) == true) a=j;
+     }
+     
+     return a;
+}
+
+
+bool task_assignment::task_assignment_algorithm()
+{     
+     int a=ta_1();
      
      if (a==-1) return false;
      
-     current_task=tasklist.tasks[a];
+     current_task=tasklist[a];
      return true;
 }
+
 
 void task_assignment::run_plugin()
 {

@@ -2,6 +2,7 @@
 #include "viewer.h"
 #include <QtGui/QDesktopWidget>
 #include "udp_world_sniffer.h"
+#include "../communication/zmq_world_sniffer.hpp"
 #include "lemon/arg_parser.h"
 #include "logog.hpp"
 
@@ -55,13 +56,16 @@ int main(int argc, char *argv[])
         QApplication app(argc,argv);
         boost::asio::io_service io_service;
         std::vector<char> buffer;
-        buffer.resize(MAX_PACKET_LENGTH);
-        Viewer window(buffer,io_service,NULL,viewerType,graphName);
+        world_sim_packet read;
+	std::shared_ptr<std::mutex> read_mutex(new std::mutex);
+	buffer.resize(MAX_PACKET_LENGTH);
+        Viewer window(read,read_mutex,NULL,viewerType,graphName);
         udp_world_sniffer sniffer(buffer,io_service);
+	zmq_world_sniffer<world_sim_packet> sniffer_test(read,read_mutex);
         window.setWindowTitle("Visualizer");
         window.show();
         center(window);
-        sniffer.start_receiving();
+        sniffer_test.start_receiving();
         window.start();
 
         return app.exec();

@@ -30,7 +30,7 @@ class Udp_agent_router
 
 public:
 
-Udp_agent_router(int sim_port,int agent_port):receiverTop(service,boost::asio::ip::address::from_string("0.0.0.0"), 
+Udp_agent_router(int sim_port,int agent_port):receiverTop(service,boost::asio::ip::address::from_string(SOCKET_BINDING), 
 											  boost::asio::ip::address::from_string(MULTICAST_ADDRESS),sim_port),
 											  senderTop(service, boost::asio::ip::address::from_string(MULTICAST_ADDRESS),agent_port)
 {
@@ -47,7 +47,8 @@ void join_thread()
 {
 	set_run(false);
 	service.stop();
-	t->interrupt();
+	if (t)
+	  t->interrupt();
 	if (t)
 		t->join();
 }
@@ -60,7 +61,8 @@ void set_run(bool running)
 ~Udp_agent_router()
 {
 	should_run=false;
-	t->interrupt();	
+	if (t)
+	  t->interrupt();	
 }
 
 

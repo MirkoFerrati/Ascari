@@ -3,6 +3,7 @@
 #include <QtGui>
 #include <viewer.h>
 #include <udp_world_sniffer.h>
+#include <zmq_world_sniffer.hpp>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -23,7 +24,13 @@ MainWindow::MainWindow(QWidget *parent) :
     fileName = settings->value("paths/lastopen","").toString();
     if (fileName.compare("")!=0)
     {
+      try{
         openFile();
+      }
+      catch (...) 
+      {
+	std::cerr<<"impossibile aprire il file "<<fileName.toStdString()<<std::endl;
+      }
     }
     QList<int> sizes;
     sizes.push_back(500);
@@ -55,6 +62,8 @@ void MainWindow::openFile()
     }
 
     file.close();
+    try
+    {
     world=parse_file(fileName.toStdString());
     QString temp="Agents: ";
     QString num;
@@ -62,6 +71,11 @@ void MainWindow::openFile()
     ui->StartAgents->setText(temp.append(num));
     ui->ShowFile->setText(line);
     settings->setValue("paths/lastopen",fileName);
+    }
+    catch (...)
+    {
+      ui->StartAgents->setText("impossibile parsare il file");    
+    }
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -151,6 +165,7 @@ void MainWindow::startSimulator()
 {
     QStringList arguments;
     arguments<< "-f"<< fileName;
+	arguments<< "-check_collision";
     if (simulator)
     {
         simulator->kill();
@@ -169,10 +184,24 @@ void MainWindow::on_Updateshell_clicked()
     for (unsigned int i=0;i<agents.size();i++)
     {
         QString strout= agents[i]->readAllStandardOutput();
-        std::cout<<strout.toStdString()<<std::endl;
+		QFile file(QString::fromStdString(world.agents[i].name).append(".log"));
+		file.open(QIODevice::WriteOnly);
+		QTextStream out(&file);
+		out<<strout<<"\n";
+        //std::cout<<strout.toStdString()<<std::endl;
         strout= agents[i]->readAllStandardError();
-        std::cout<<strout.toStdString()<<std::endl;
+        out<<strout<<"\n";
     }
+    if (simulator)
+	{
+		QString strout=simulator->readAllStandardOutput();
+		QFile file("simulator.log");
+		file.open(QIODevice::WriteOnly);
+		QTextStream out(&file);
+		out<<strout<<"\n";
+		strout=simulator->readAllStandardError();
+		out<<strout<<"\n";
+	}
 
 }
 
@@ -210,10 +239,22 @@ bool MainWindow::startViewer()
         }
 
 
-        buffer.resize(MAX_PACKET_LENGTH);
+        //buffer.resize(MAX_PACKET_LENGTH);
+        if (!mutex)
+	{
+	  std::shared_ptr<std::mutex> temp(new std::mutex);
+	  mutex.swap(temp);
+	}
+	else
+	{
+	 mutex->unlock();
+	 mutex->~mutex();
+	  std::shared_ptr<std::mutex> temp(new std::mutex);
+	  mutex.swap(temp);
+	}
         if (!sniffer)
         {
-            sniffer=new udp_world_sniffer(buffer,io_service);
+            sniffer=new zmq_world_sniffer<world_sim_packet>(buffer,mutex);
             sniffer->start_receiving();
         }
         if (insideViewer)
@@ -221,7 +262,7 @@ bool MainWindow::startViewer()
             ui->asdf->removeWidget(insideViewer);
             delete insideViewer;
         }
-        insideViewer=new Viewer(buffer,io_service,0,viewerType,graphname);
+        insideViewer=new Viewer(buffer,mutex,0,viewerType,graphname);
 
 
         ui->asdf->addWidget(insideViewer);
@@ -235,12 +276,9 @@ bool MainWindow::startViewer()
 
 void MainWindow::on_playall_clicked()
 {
-    if (startViewer())
-    {
-        startAgents();
-        sleep(1);
-        startSimulator();
-    }
+    startAgents();
+    startSimulator();
+    startViewer();
 }
 
 void MainWindow::on_StartAgents_clicked()

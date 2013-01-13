@@ -4,7 +4,7 @@
 
 using namespace std;
 
-dynamic::dynamic(agent_state& StateReferenceWARN, control_command& controlReferenceWARN, 
+dynamic::dynamic(agent_state& StateReferenceWARN,control_command& controlReferenceWARN, 
 		 std::map< std::string, std::string > expression_map, std::vector< std::string > state_variables_name, 
 		 std::vector< std::string > control_variables_name):StateReferenceWARN(StateReferenceWARN)
 {

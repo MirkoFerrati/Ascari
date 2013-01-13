@@ -23,8 +23,20 @@
 
 #define BORDER 0.3+0.2
 
-Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_service, QWidget* parent,int view_type,std::string graphName)
-        : QWidget(parent),buffer(buffer),io_service(io_service)
+// Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_service, QWidget* parent,int view_type,std::string graphName)
+//         : QWidget(parent)//,buffer(buffer)//,io_service(io_service)
+// {
+//   init(graphName);
+// }
+
+Viewer::Viewer (const world_sim_packet& read, std::shared_ptr<std::mutex> read_mutex, QWidget* parent, int view_type, std::string graphName) : 
+QWidget (parent),infos(read), mutex(read_mutex)
+{
+init(graphName);
+}
+
+
+void Viewer::init(std::string graphName)
 {
     time=0;
     backImage="";
@@ -51,7 +63,6 @@ Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_servi
 	}
 	setScalingAndTranslateFactor(0,0,0,0);	
 }
-
 
 void Viewer::parse_graph(std::string graphName)
 {
@@ -169,7 +180,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
 			painter.save();
 			painter.translate((*coord_x)[n],(*coord_y)[n]);
 			painter.drawEllipse(QPoint(0,0),1,1);
-			painter.scale(painter.fontMetrics().height()/70.0,-painter.fontMetrics().height()/70.0);
+			painter.scale(painter.fontMetrics().height()/20.0,-painter.fontMetrics().height()/20.0);
 			painter.drawText(-1,-1,QString("").setNum(graph.id(n)));
 			painter.restore();
 		}
@@ -278,8 +289,9 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
 void Viewer::timerEvent(QTimerEvent */*event*/)
 {
     //cout<<"timer event"<<endl;
-    try
+/*    try
     {
+      
         io_service.poll();
         if (buffer.size()>0 )
         {
@@ -295,7 +307,8 @@ void Viewer::timerEvent(QTimerEvent */*event*/)
         boost::system::error_code error(boost::asio::error::invalid_argument);
         //throw "Problema nella decodifica di un pacchetto";
     }
-
+*/
+mutex->lock();
     for (map<string, agent_state_packet>::const_iterator it=infos.state_agents.internal_map.begin();it!=infos.state_agents.internal_map.end();++it)
     {
         agents[it->first].translate(it->second);
@@ -303,8 +316,10 @@ void Viewer::timerEvent(QTimerEvent */*event*/)
         //setTranslateFactor((agents[it->first].getMaxX()+agents[it->first].getMinX())/2,(agents[it->first].getMaxY()+agents[it->first].getMinY())/2);
         setScalingAndTranslateFactor(agents[it->first].getMaxX(),agents[it->first].getMinX(),agents[it->first].getMaxY(),agents[it->first].getMinY());
     }
-    repaint();
     time=infos.time;
+    mutex->unlock();
+    repaint();
+
 }
 
 void Viewer::keyPressEvent(QKeyEvent *event)

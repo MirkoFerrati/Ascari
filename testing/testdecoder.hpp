@@ -42,13 +42,13 @@ class testDecoder: public testClass
 			sub_events_map.insert(make_pair("l2",4));
 			sub_events_map.insert(make_pair("l3",3));
 			
-			events_map.insert(make_pair("e1",1));
-			events_map.insert(make_pair("e2",5));
+			events_map.insert(make_pair("e1",(transition)1));
+			events_map.insert(make_pair("e2",(transition)5));
 			
 			parsed_events.insert(make_pair("e1","t1 l2 l3"));
 			parsed_events.insert(make_pair("e2","t2 l1 !l2"));
 			
-			decoder d(sub_events, events);
+			decoder d(&sub_events, &events);
 			d.create(parsed_events,sub_events_map,events_map);
 			
 			sub_events[1]=_TRUE;
