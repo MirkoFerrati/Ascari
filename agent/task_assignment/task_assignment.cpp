@@ -11,7 +11,7 @@ task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& 
     
     createAgentIdAndTaskIdVectorFromParsedWorld(world);
     createTaskListFromParsedWorld(world);
-    createTaskCostMatrixFromParsedWorld(world);
+    createTaskCostMatrixFromParsedWorld(agent);
     inizializeTaskAssignmentMatrix();
     
     task_assigned=false;
@@ -57,11 +57,33 @@ void task_assignment::createTaskListFromParsedWorld(const Parsed_World& wo)
     }
 }
 
-void task_assignment::createTaskCostMatrixFromParsedWorld(const Parsed_World& wo)
-{ 
-    task_cost_matrix=wo.task_cost_matrix; //SINTASSI MAP?
+void task_assignment::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a)
+{   
+    task_cost_matrix.insert(make_pair(my_id,a.agent_task_cost_vector));
+    
+    task_cost_vector app;
+    
+    for (unsigned int i=0;i<agents_id.size();i++)
+    {
+      
+	if(agents_id[i]!=my_id)
+	{
+	    for (unsigned int j=0;j<tasks_id.size();j++)
+	    {
+		app.insert(make_pair(tasks_id[j],0)); //i vettori di costo degli altri robot inizializzati come nulli
+	    }
+	    
+	    task_cost_matrix.insert(make_pair(agents_id[i],app));
+	    
+	    for (task_cost_vector::iterator it=app.begin();it!=app.end();++it)
+	    {
+		app.erase(it);
+	    }
+	}
+    }
     
     agent_task_cost_vector=&task_cost_matrix.at(my_id);
+	  
 }
 
 

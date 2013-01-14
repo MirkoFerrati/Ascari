@@ -15,7 +15,7 @@ public:
     task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index);
     void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
     void createTaskListFromParsedWorld(const Parsed_World& wo);
-    void createTaskCostMatrixFromParsedWorld(const Parsed_World& wo);
+    void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
     void inizializeTaskAssignmentMatrix();
     void run_plugin();
     void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
@@ -28,6 +28,7 @@ public:
 	
 private:
 	agent_id my_id;
+	
 	task_list tasklist;
 	task current_task;
 	
@@ -43,8 +44,6 @@ private:
 	
 	task_assignment_vector* agent_task_assignment_vector;
 	
-	//unsigned int task_number;
-	//unsigned int agent_number;
 	bool task_assigned;
 	bool stop;
 	

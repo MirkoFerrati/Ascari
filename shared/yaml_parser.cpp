@@ -217,6 +217,25 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
         throw "UNDEFINED DISCRETE START STATE";
     }
 
+    //written by Alessandro Settimi
+    
+    if (node.FindValue("TASK_COST_VECTOR"))
+    {
+	const YAML::Node& co=node["TASK_COST_VECTOR"];
+		
+	task_cost_vector app;
+	double cost;
+	std::string id;
+
+	for(unsigned int i=0;i<co.size();)
+	{
+	    co[i] >> id;
+	    co[i+1] >> cost;
+	    ag.agent_task_cost_vector.insert(make_pair(id,cost));
+	    i=i+2;
+	}
+    }
+    //written by Alessandro Settimi
 
 }
 
@@ -317,35 +336,12 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
         if (node[0]["WORLD"].size()>0)
         { 
 	  
-            if (node[0]["WORLD"][0].FindValue("TASK_COST_MATRIX") && node[0]["WORLD"][0].FindValue("TASK_NUMBER") && node[0]["WORLD"][0].FindValue("TASK_LIST"))
+            if (node[0]["WORLD"][0].FindValue("TASK_NUMBER") && node[0]["WORLD"][0].FindValue("TASK_LIST"))
 	    {
 		unsigned int task_number;
 		node[0]["WORLD"][0]["TASK_NUMBER"]>>task_number;
 		
 		createTaskList(node[0]["WORLD"][0]["TASK_LIST"],wo.tl,task_number);
-
-		const YAML::Node& co=node[0]["WORLD"][0]["TASK_COST_MATRIX"];
-		
-		task_cost_vector app;
-		double cost;
-
-		for(unsigned int i=0;i<wo.agents.size();i++) //TODO: supposizione che matrice di costo sia ordinata per agenti e task, 
-							      //meglio fare un vettore per ogni agente che specifica task e costo
-		{
-		    for(unsigned int j=0;j<wo.tl.size();j++)
-		    {
-			co[i*task_number+j] >> cost;
-			app.insert(make_pair(wo.tl[j].task_id,cost)); // SINTASSI MAP?
-		    }
-	
-		    wo.task_cost_matrix.insert(make_pair(wo.agents[i].name,app)); //SINTASSI MAP?
-		    
-		    for (task_cost_vector::iterator it=app.begin();it!=app.end();++it)
-		    {
-			app.erase(it);
-		    }
-		}
-
 	    }
 	
 

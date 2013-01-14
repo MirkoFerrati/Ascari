@@ -86,6 +86,10 @@ public:
     const std::unique_ptr<Parsed_Behavior>& behavior;
     std::string behavior_name;
     
+    //written by Alessandro Settimi
+    task_cost_vector agent_task_cost_vector;
+    //written by Alessandro Settimi
+    
 };
 
 class Parsed_World{
@@ -102,7 +106,6 @@ class Parsed_World{
   
   //written by Alessandro Settimi
   task_list tl;
-  std::map<agent_id,task_cost_vector> task_cost_matrix;
   //written by Alessandro Settimi
 
 //   Parsed_World(int num_agents):agents(num_agents){}
