@@ -1,3 +1,5 @@
+#ifndef ZMQ_FULL_COMMUNICATOR_HPP
+#define ZMQ_FULL_COMMUNICATOR_HPP
 #include <zmq.h>
 #include "zmq_communicator.hpp"
 
@@ -36,3 +38,5 @@ public:
 		this->init_full(agent_name,"tcp://127.0.0.1:5555",1,false);
 	}
 };
+
+#endif //ZMQ_FULL_COMMUNICATOR_HPP

@@ -276,12 +276,9 @@ bool MainWindow::startViewer()
 
 void MainWindow::on_playall_clicked()
 {
-    if (startViewer())
-    {
-        startAgents();
-        sleep(1);
-        startSimulator();
-    }
+    startSimulator();
+    startAgents();
+    startViewer();
 }
 
 void MainWindow::on_StartAgents_clicked()

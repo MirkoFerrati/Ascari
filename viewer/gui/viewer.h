@@ -42,9 +42,10 @@ protected:
     QImage immagine;
     QPixmap pixmap;
     //const std::vector<char>& buffer;
+    	const world_sim_packet& infos;
+
     std::shared_ptr<std::mutex> mutex;
     enum { header_length = 8 };
-	const world_sim_packet& infos;
 	//boost::asio::io_service& io_service;
     void setScalingAndTranslateFactor(double maxX,double minX,double maxY,double minY);
 	double maxX;

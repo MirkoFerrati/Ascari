@@ -1,4 +1,5 @@
-
+#ifndef ZMQ_COMMUNICATOR_HPP
+#define ZMQ_COMMUNICATOR_HPP
 #include <zmq.hpp>
 #include <vector>
 #include "typedefs.h"
@@ -173,6 +174,29 @@ private:
     unsigned int expected_senders;
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 template <typename receive_type,int sock_recv_type>
 class zmq_receive_communicator
 {
@@ -235,3 +259,5 @@ public:
     std::string owner_name;
     unsigned int expected_senders;
 };
+
+#endif //ZMQ_COMMUNICATOR_HPP

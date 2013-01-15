@@ -23,6 +23,9 @@
 
 #define BORDER 0.3+0.2
 
+using namespace std;
+
+
 // Viewer::Viewer(const std::vector<char>& buffer,boost::asio::io_service& io_service, QWidget* parent,int view_type,std::string graphName)
 //         : QWidget(parent)//,buffer(buffer)//,io_service(io_service)
 // {
@@ -30,7 +33,7 @@
 // }
 
 Viewer::Viewer (const world_sim_packet& read, std::shared_ptr<std::mutex> read_mutex, QWidget* parent, int view_type, std::string graphName) : 
-QWidget (parent),infos(read), mutex(read_mutex)
+ QWidget (parent),view_type(view_type),infos(read), mutex(read_mutex)
 {
 init(graphName);
 }
@@ -84,7 +87,6 @@ void Viewer::parse_graph(std::string graphName)
     std::cout << "Number of arcs: " << lemon::countArcs(graph) << std::endl;
 }
 
-using namespace std;
 
 void Viewer::setScalingAndTranslateFactor(double maxX, double minX, double maxY, double minY)
 {
