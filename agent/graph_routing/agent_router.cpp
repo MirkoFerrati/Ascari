@@ -27,7 +27,7 @@ lemon::Random agent_router::generatorRandom;
 
 using namespace std;
 
-agent_router::agent_router(std::vector< int > tarlist, std::map< transition, bool >& events,
+agent_router::agent_router(std::vector< int > tarlist, std::map< transition, events::value >& events,
                            const std::map<std::string, transition>& events_to_index, string identifier,
                            simulation_time& time,std::string graphName
                           )

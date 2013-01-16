@@ -43,14 +43,25 @@ typedef std::string discrete_state;
  */
 typedef std::map<std::string, int> index_map;
 
-enum sub_event_value
+
+namespace sub_events
+{
+enum value
 {
     _TRUE,
     _FALSE,
     _UNDEFINED
 };
-
-
+}
+namespace events
+{
+enum value
+{
+  _TRUE,
+  _FALSE,
+  _UNDEFINED
+};
+}
 
 /**
  * automaton_state is the representation of a discrete state, an indexMap translates the value of automatonState into a string

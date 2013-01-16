@@ -45,8 +45,8 @@ void agent_router::compileExpressions(exprtk::symbol_table< double >& symbol_tab
 
 void agent_router::setTargetStop(bool stop)
 {
-	events.at(events_to_index.at("STOPPED"))=stop;
-	events.at(events_to_index.at("STARTED"))=!stop;
+	events.at(events_to_index.at("STOPPED"))=(stop?events::_TRUE:events::_FALSE);
+	events.at(events_to_index.at("STARTED"))=(!stop?events::_TRUE:events::_FALSE);
 }
 
 

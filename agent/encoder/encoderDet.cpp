@@ -4,7 +4,7 @@
 using namespace std;
 
 
-encoderDet::encoderDet(std::map< int, sub_event_value >& sub_events, const string& agent_name, agent_state& state, const index_map& stateVariablesName_to_Index,  std::map< int, double >& bonusVariables,
+encoderDet::encoderDet(std::map< int, sub_events::value >& sub_events, const string& agent_name, agent_state& state, const index_map& stateVariablesName_to_Index,  std::map< int, double >& bonusVariables,
                        const std::map< string, int >& bonusVariablesName_to_Index, const map< string, string >& topology_expres, const index_map& sub_events_to_index,
                        const map< string, string >& lambda_expres, exprtk::symbol_table<double>& symbol_table)
         :ref_sub_events(sub_events),symbol_table(symbol_table),agent_name(agent_name)
@@ -66,16 +66,16 @@ encoderDet::encoderDet(std::map< int, sub_event_value >& sub_events, const strin
 
 void encoderDet::computeSubEvents(const map< string, agent_state_packet >& state_other_agents)
 {
-    for (map<int,sub_event_value>::iterator it=ref_sub_events.begin();it!=ref_sub_events.end();++it) {
-        it->second=_FALSE;
+    for (map<int,sub_events::value>::iterator it=ref_sub_events.begin();it!=ref_sub_events.end();++it) {
+        it->second=sub_events::_FALSE;
     }
 
     for (map<int,exprtk::expression<double> >::const_iterator it=lambda_expressions.begin();it!=lambda_expressions.end();++it)
     {
         if (it->second.value()==1)
-            ref_sub_events.at(it->first)=_TRUE;
+            ref_sub_events.at(it->first)=sub_events::_TRUE;
         else
-            ref_sub_events.at(it->first)=_FALSE;
+            ref_sub_events.at(it->first)=sub_events::_FALSE;
     }
 
     for (map< string, agent_state_packet >::const_iterator it=state_other_agents.begin();it!=state_other_agents.end();++it) {
@@ -99,11 +99,11 @@ void encoderDet::computeSubEvents(const map< string, agent_state_packet >& state
 			
             for (map<int,exprtk::expression<double> >::const_iterator iit=topology_expressions.begin();iit!=topology_expressions.end();++iit)
             {
-                if (ref_sub_events.at(iit->first)==_FALSE) {
+                if (ref_sub_events.at(iit->first)==sub_events::_FALSE) {
                     if (iit->second.value()==1)
-                        ref_sub_events.at(iit->first)=_TRUE;
+                        ref_sub_events.at(iit->first)=sub_events::_TRUE;
                     else
-                        ref_sub_events.at(iit->first)=_FALSE;
+                        ref_sub_events.at(iit->first)=sub_events::_FALSE;
                 }
             }
 
