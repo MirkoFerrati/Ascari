@@ -6,6 +6,9 @@
 #include <udp_agent_router.hpp>
 #include <zmq_agent_communicator.h>
 #include "collisionchecker.h"
+//written by Alessandro Settimi
+#include <task_assignment_router.hpp>
+//written by Alessandro Settimi
 
 using namespace std;
 
@@ -22,7 +25,7 @@ void simulator::create_communicator(int communicator_type)
 }
 
 simulator::simulator():
-topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT)
+topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT),data_mutex(),ptr_mutex(&data_mutex),ta_router(data,ptr_mutex)
 {
 	max_loops=0;
 	communicator=0;
@@ -217,6 +220,7 @@ simulator::~simulator()
 	  communicator->send_broadcast(sim_packet);
 	
 	graph_router.join_thread();
+	
     delete communicator;
 
     for (unsigned int i=0; i< map_bonus_variables.size();i++)
@@ -234,6 +238,12 @@ void simulator::start_sim(int max_loops)
     time=0;
     //communicator->send_broadcast(time);
 	graph_router.start_thread();
+	
+	//written by Alessandro Settimi
+	ta_router.init(num_agents);
+	ta_router.start_threads();
+	//written by Alessandro Settimi
+	
     main_loop();
 }
 

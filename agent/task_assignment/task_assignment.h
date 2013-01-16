@@ -7,23 +7,24 @@
 #include <yaml_parser.h>
 #include <typedefs.h>
 #include <boost/thread.hpp>
+#include <task_assignment_communicator.h>
 
 class task_assignment: public Plugin_module
 {
 	
 public:
-    task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index);
-    void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
-    void createTaskListFromParsedWorld(const Parsed_World& wo);
-    void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
-    void inizializeTaskAssignmentMatrix();
-    void run_plugin();
-    void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
-    void compileExpressions(exprtk::symbol_table< double >& symbol_table);
-    void printTaskAssignmentMatrix();
-    void printTaskCostMatrix();
+	task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index);
+	void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
+	void createTaskListFromParsedWorld(const Parsed_World& wo);
+	void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
+	void inizializeTaskAssignmentMatrix();
+	void run_plugin();
+	void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
+	void compileExpressions(exprtk::symbol_table< double >& symbol_table);
+	void printTaskAssignmentMatrix();
+	void printTaskCostMatrix();
 
-    ~task_assignment();
+	~task_assignment();
 
 	
 private:
@@ -56,6 +57,15 @@ private:
 	bool task_assignment_algorithm();
 	void setTaskStop(bool stop);
 	bool task_made();
+	
+	ta_packet data_s;
+	std::vector<ta_packet> data_r;
+	std::mutex data_mutex;
+	std::shared_ptr<std::mutex> ptr_mutex;
+	bool converge;
+	bool fresh_data;
+	bool not_started;
+	task_assignment_communicator<ta_packet,ta_packet> ta_communicator;
 };
 
 #endif // TASK_ASSIGNMENT_H

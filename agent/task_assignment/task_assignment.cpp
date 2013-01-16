@@ -5,10 +5,8 @@
 
 using namespace std;
 
-task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index):events(events),events_to_index(events_to_index)
+task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index):my_id(agent.name),events(events),events_to_index(events_to_index),data_mutex(),ptr_mutex(&data_mutex),ta_communicator(data_r,ptr_mutex,converge,my_id,fresh_data)
 {
-    my_id=agent.name;
-    
     createAgentIdAndTaskIdVectorFromParsedWorld(world);
     createTaskListFromParsedWorld(world);
     createTaskCostMatrixFromParsedWorld(agent);
@@ -20,6 +18,14 @@ task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& 
     
     printTaskAssignmentMatrix();
     printTaskCostMatrix();
+    
+    data_s.g=1;
+    data_s.agent_id=my_id;
+    
+    converge=false;
+    fresh_data=true;
+    
+    not_started=true;
 }
 
 
@@ -148,17 +154,42 @@ void task_assignment::printTaskCostMatrix()
 
 int task_assignment::ta_1()
 {
-     //dummy per 3 agenti
      int a=-1;
-     
-     while(0)//non converge
+
+     while(!converge)
      {
-	  //OPTIMIZATION
-     
-	  //COMMUNICATION
+	    sleep(1);
+	    
+	    data_mutex.lock();
+	    
+	    fresh_data=false;
+	    
+	    for (unsigned int i=0;i<data_r.size();i++)
+	    {
+		if (!(data_r[i].agent_id==""))
+		{
+		    data_s.g += data_r[i].g; //dato valido
+		}
+	    }
+	    
+	    data_r.clear();
+
+	    std::cout<<"Invio: "<<data_s.g<<std::endl;
+	    
+	    ta_communicator.send(data_s);
+	    
+	    
+	    //std::cout<<">>> A:"<<data_r.agent_id<<" D:"<<data_r.g<<" | "<<"A:"<<data_s.agent_id<<" D:"<<data_s.g<<" <<<"<<std::endl;
+	    
+	    if (data_s.g>3)
+	    {
+		  converge=true;//simulo un tempo per convergere, la convergenza è se la X è uguale per tutti in realtà
+	    }
+	    
+	    data_mutex.unlock();
      }
      
-     //una volta che si ha la convergenza
+     ta_communicator.send(data_s);
      
      for(unsigned int j=0;j<tasks_id.size();j++)
      {
@@ -182,6 +213,13 @@ bool task_assignment::task_assignment_algorithm()
 
 void task_assignment::run_plugin()
 {
+    if (not_started)
+    {std::cout<<"INIZIALIZZO TA"<<std::endl;
+	 ta_communicator.init(my_id);std::cout<<"HO FATTO INIT"<<std::endl;
+	 ta_communicator.start_threads();std::cout<<"HO FATTO START THREAD"<<std::endl;
+	 not_started=false;std::cout<<"HO FATTO CICCO"<<std::endl;
+    }
+  std::cout<<"HO FATTO TUTTO"<<std::endl;
      if (stop)
      {
 	setTaskStop(true);
@@ -206,7 +244,7 @@ void task_assignment::run_plugin()
 	}
 	else
 	{
-	    std::cout<<"CURRENT TASK: "<<current_task.task_id<<" position: ["<<current_task.task_position[0]<<' '<<current_task.task_position[1]<<' '<<current_task.task_position[2]<<"]"<<std::endl;
+	    std::cout<<"CURRENT TASK: "<<current_task.task_id<<", position: ["<<current_task.task_position[0]<<' '<<current_task.task_position[1]<<' '<<current_task.task_position[2]<<"], cost: "<<agent_task_cost_vector->at(current_task.task_id)<<std::endl;
 	    task_assigned=true;
 	    speed=1;
 	}

@@ -32,6 +32,11 @@
 #define NUM_AGENTS 1
 #define T_CAMP 0.01
 #define SYNC_PROTOCOL "tcp://localhost:5761"
+							
+//written by Alessandro Settimi
+#define AGENT_TA_PORT 5580
+#define SIMULATOR_TA_PORT 5581
+//written by Alessandro Settimi
 
 typedef std::map<int,double> map_int_double;
 typedef std::map<int,double> agent_state;
@@ -208,6 +213,19 @@ struct task
 };
 
 typedef std::vector<task> task_list;
+
+struct ta_packet
+{
+    std::string agent_id;
+    double g;
+
+    template <typename Archive>
+    void serialize(Archive& ar,const unsigned int /*version*/)
+    {
+	ar& agent_id;
+        ar& g;
+    }
+};
 
 //written by Alessandro Settimi
 

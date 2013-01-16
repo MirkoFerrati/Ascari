@@ -8,6 +8,12 @@
 #include <udp_agent_router.hpp>
 #include "collisioncheckerabstract.h"
 #include "random.hpp"
+#include <mutex>
+#include <thread>
+
+//written by Alessandro Settimi
+#include <task_assignment_router.hpp>
+//written by Alessandro Settimi
 
 class simulator
 {
@@ -21,6 +27,11 @@ public:
 	void update_bonus_variables();
 	void setSleep(unsigned secSleep);
     void setCheckCollision(bool checkCollision);
+    
+	//written by Alessandro Settimi
+	void create_ta_communicator();
+	//written by Alessandro Settimi
+    
 private:
 	int max_loops;
 	int secSleep;
@@ -46,6 +57,13 @@ private:
 	std::map<std::string,int> map_bonus_variables;
 	Udp_agent_router<topology_packet> topology_router;
 	Udp_agent_router<graph_packet> graph_router;
+	
+	//written by Alessandro Settimi
+	std::vector<ta_packet> data;
+	std::mutex data_mutex;
+	std::shared_ptr<std::mutex> ptr_mutex;
+	task_assignment_router<ta_packet,ta_packet> ta_router;
+	//written by Alessandro Settimi
 };
 
 
