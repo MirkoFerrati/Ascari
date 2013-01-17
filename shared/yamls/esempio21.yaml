@@ -1,1 +1,224 @@
 #TODO(Simone): scrivere un file di esempio funzionante per il plugin identifier
+- BEHAVIORS:
+    - name: LGV
+      states: [x,y,theta]
+      control_commands: [v,w]
+      DYNAMIC_MAP:
+      - x: 'v*cos(w)'
+        y: 'v*sin(w)'
+        theta: 'sin(w-theta)'
+      CONTROLLERS:
+      - name: go
+        v: v_router
+        w: atan2(ytarget-y,xtarget-x)
+      - name: wait
+        v: 0
+        w: 0
+      DISCRETE_STATES:
+      - name: go
+        controller: go
+      - name: wait
+        controller: wait
+      - name: wait_for_target
+        controller: wait
+      ENCODER:
+      - TOPOLOGY:
+          - topology: [t1]
+            t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+        LAMBDA:
+          - lambda: [Lreached] 
+            Lreached: 'abs(x-xtarget)<3 and abs(y-ytarget)<3'
+      EVENTS:
+      - events: [reached, new_target, stopped, started]
+        reached: 'Lreached'
+        new_target: '!Lreached'
+        stopped: ''
+        started: ''
+      AUTOMATON:
+      - name: aut_machine
+        GO:
+          - WAIT: [stopped]
+            WAIT_FOR_TARGET: [reached]
+        WAIT:
+          - GO: [started]
+        WAIT_FOR_TARGET:
+          - GO: [new_target]
+
+
+
+  WORLD:
+  - bonus_variables: [c]
+    c: 1
+    GRAPH_NAME: 'test5.gml.lgf'
+  AGENTS:
+  - agent: Agente1
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - &initial
+      x: '420'
+      y: '240'
+      theta: '3'
+    STATE_START: GO
+    TARGET_LIST: [1,0,20,0,1,0,20,0,1]
+    BEHAVIOR: LGV  
+    
+  - agent: Agente2
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '715'
+      y: '515'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [8,4,2,3,6,7,1,3]
+    BEHAVIOR: LGV
+    
+  - agent: Agente3
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '1015'
+      y: '515'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [5,4,3,6,7,1,3,2]
+    BEHAVIOR: LGV
+    
+  - agent: Agente4
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '815'
+      y: '515'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [7,8,2,3,5,1,7,2]
+    BEHAVIOR: LGV
+    
+  - agent: Agente5
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '915'
+      y: '515'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [6,2,7,3,5,1,7]
+    BEHAVIOR: LGV
+    
+  - agent: Agente6
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '515'
+      y: '315'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [2,6,3,7,5,2,1,7]
+    BEHAVIOR: LGV
+    
+  - agent: Agente7
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '1020'
+      y: '215'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [20,23,26,29,32,35,38,41]
+    BEHAVIOR: LGV
+    
+  - agent: Agente8
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '315'
+      y: '415'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [30,34,38,42,16,24,28,32]
+    BEHAVIOR: LGV
+    
+  - agent: Agente9
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '415'
+      y: '515'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [11,13,17,19,23,29,31,37]
+    BEHAVIOR: LGV
+    
+  - agent: Agente10
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '1115'
+      y: '515'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [4,9,16,25,36,49,50,51]
+    BEHAVIOR: LGV
+    
+  - agent: Agente11
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '615'
+      y: '515'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [9,8,7,6,5,4,3,2]
+    BEHAVIOR: LGV
+    
+  - agent: Agente12
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '1020'
+      y: '315'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [17,9,87,10,9,87,5,40]
+    BEHAVIOR: LGV
+    
+  - agent: Agente13
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '515'
+      y: '515'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [10,15,20,25,30,35,40,45]
+    BEHAVIOR: LGV      
