@@ -52,7 +52,8 @@ void agent_router::setTargetStop(bool stop)
 
 bool agent_router::target_reached()
 {
-	return events.at(events_to_index.at("REACHED"));
+	return events.at(events_to_index.at("REACHED"))==events::_TRUE;
+	
 }
 
 
@@ -69,7 +70,7 @@ void agent_router::setTarget(lemon::SmartDigraphBase::Node t)
 
 std::pair< int, int > agent_router::getTargetCoords()
 {
-	return std::pair<int,int> ((coord_x)[next], (coord_y)[next]);
+	return std::pair<int,int> ((coord_x)[next] , (coord_y)[next]);
 }
 
 void agent_router::setGraph(lemon::SmartDigraph& g)
