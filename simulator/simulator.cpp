@@ -35,6 +35,10 @@ topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GR
 	secSleep=5000;
 	collisionChecker=0;
 	checkCollision=false;
+	
+	//written by Alessandro Settimi
+	ta_router_started=false;
+	//written by Alessandro Settimi
 }
 
 void simulator::setSleep(unsigned secSleep)
@@ -174,6 +178,16 @@ void simulator::main_loop()
             //communicator->send_broadcast(sim_packet.state_agents);
             communicator->send_broadcast(sim_packet);
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
+	    
+	    //written by Alessandro Settimi
+	    if (!ta_router_started)
+	    {
+		ta_router.init(num_agents);
+		ta_router.start_threads();
+	    
+		ta_router_started=true;
+	    }
+	    //written by Alessandro Settimi
 
             agent_state state_tmp;
             for (int i=0;i<10;i++)//TODO(Mirko): this is 1 second/(sampling time of dynamic)
@@ -238,11 +252,6 @@ void simulator::start_sim(int max_loops)
     time=0;
     //communicator->send_broadcast(time);
 	graph_router.start_thread();
-	
-	//written by Alessandro Settimi
-	ta_router.init(num_agents);
-	ta_router.start_threads();
-	//written by Alessandro Settimi
 	
     main_loop();
 }

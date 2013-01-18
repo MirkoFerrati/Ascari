@@ -214,12 +214,12 @@ bool task_assignment::task_assignment_algorithm()
 void task_assignment::run_plugin()
 {
     if (not_started)
-    {std::cout<<"INIZIALIZZO TA"<<std::endl;
-	 ta_communicator.init(my_id);std::cout<<"HO FATTO INIT"<<std::endl;
-	 ta_communicator.start_threads();std::cout<<"HO FATTO START THREAD"<<std::endl;
-	 not_started=false;std::cout<<"HO FATTO CICCO"<<std::endl;
+    {
+	 ta_communicator.init(my_id);
+	 ta_communicator.start_threads();
+	 not_started=false;
     }
-  std::cout<<"HO FATTO TUTTO"<<std::endl;
+
      if (stop)
      {
 	setTaskStop(true);

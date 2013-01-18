@@ -63,6 +63,7 @@ private:
 	std::mutex data_mutex;
 	std::shared_ptr<std::mutex> ptr_mutex;
 	task_assignment_router<ta_packet,ta_packet> ta_router;
+	bool ta_router_started;
 	//written by Alessandro Settimi
 };
 
