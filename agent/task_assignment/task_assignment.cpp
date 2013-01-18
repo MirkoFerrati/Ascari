@@ -26,8 +26,29 @@ task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& 
     fresh_data=true;
     
     not_started=true;
+    
+    initialize_bilp_problem(task_cost_matrix);
 }
 
+void task_assignment::initialize_bilp_problem(std::map<agent_id,task_cost_vector>& m)
+{
+	int dim=agents_id.size()*tasks_id.size();
+  
+	double C[dim];
+	
+	int z=0;
+	
+	for (unsigned int i=0;i<agents_id.size();i++)
+	{
+	    for (unsigned int j=0;j<tasks_id.size();j++)
+	    {
+		 C[z]=m.at(agents_id[i]).at(tasks_id[j]);
+		 z++;
+	    }
+	}
+    
+	ta_problem.initialize_problem((const char*)"Task_Assignment",GLP_MIN,(int)agents_id.size(),(int)tasks_id.size(),C);
+}
 
 void task_assignment::createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo)
 {
@@ -156,6 +177,8 @@ int task_assignment::ta_1()
 {
      int a=-1;
 
+     ta_problem.solve();
+     
      while(!converge)
      {
 	    sleep(1);

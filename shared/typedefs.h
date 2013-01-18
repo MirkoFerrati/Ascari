@@ -227,6 +227,13 @@ struct ta_packet
     }
 };
 
+#ifndef GLP_MIN
+#define GLP_MIN 1
+#endif
+
+#ifndef GLP_MAX
+#define GLP_MAX 2
+#endif
 //written by Alessandro Settimi
 
 #endif //TYPEDEFS_H

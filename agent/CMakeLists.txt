@@ -9,7 +9,7 @@ add_executable(agent graph_routing/graph_creator.cpp encoder/encoderDet.cpp auto
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/global.cpp
 	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp
 	#written by Alessandro Settimi
-	task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp
+	task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp ../shared/bilp_problem/bilp_problem.cpp
 	#written by Alessandro Settimi
 )
 
@@ -27,7 +27,9 @@ target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
 target_link_libraries(agent zmq)
-
+#written by Alessandro Settimi
+target_link_libraries(agent glpk)
+#written by Alessandro Settimi
 
 include_directories(../agent)
 include_directories(../shared)

@@ -8,6 +8,7 @@
 #include <typedefs.h>
 #include <boost/thread.hpp>
 #include <task_assignment_communicator.h>
+#include <../shared/bilp_problem/bilp_problem.h>
 
 class task_assignment: public Plugin_module
 {
@@ -66,6 +67,10 @@ private:
 	bool fresh_data;
 	bool not_started;
 	task_assignment_communicator<ta_packet,ta_packet> ta_communicator;
+	
+	bilp_problem ta_problem;
+	void initialize_bilp_problem(std::map<agent_id,task_cost_vector>& m);
+	double** C;
 };
 
 #endif // TASK_ASSIGNMENT_H
