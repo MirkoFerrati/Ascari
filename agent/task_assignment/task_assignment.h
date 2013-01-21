@@ -71,6 +71,7 @@ private:
 	bilp_problem ta_problem;
 	void initialize_bilp_problem(std::map<agent_id,task_cost_vector>& m);
 	double** C;
+	void copy_solution_to_TA_matrix(bool* solution);
 };
 
 #endif // TASK_ASSIGNMENT_H

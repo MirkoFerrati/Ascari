@@ -5,7 +5,7 @@
 
 using namespace std;
 
-task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index):my_id(agent.name),events(events),events_to_index(events_to_index),data_mutex(),ptr_mutex(&data_mutex),ta_communicator(data_r,ptr_mutex,converge,my_id,fresh_data)
+task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index):my_id(agent.name),events(events),events_to_index(events_to_index),data_mutex(),ptr_mutex(&data_mutex),ta_communicator(data_r,ptr_mutex,converge,world.agents.size()-1,my_id,fresh_data)
 {
     createAgentIdAndTaskIdVectorFromParsedWorld(world);
     createTaskListFromParsedWorld(world);
@@ -16,11 +16,12 @@ task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& 
     stop=false;
     speed=0;
     
-    printTaskAssignmentMatrix();
+    //printTaskAssignmentMatrix();
     printTaskCostMatrix();
     
     data_s.g=1;
     data_s.agent_id=my_id;
+    data_s.tam=task_assignment_matrix;
     
     converge=false;
     fresh_data=true;
@@ -47,7 +48,7 @@ void task_assignment::initialize_bilp_problem(std::map<agent_id,task_cost_vector
 	    }
 	}
     
-	ta_problem.initialize_problem((const char*)"Task_Assignment",GLP_MIN,(int)agents_id.size(),(int)tasks_id.size(),C);
+	ta_problem.initialize_problem("Task_Assignment",GLP_MIN,(int)agents_id.size(),(int)tasks_id.size(),C);
 }
 
 void task_assignment::createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo)
@@ -124,7 +125,7 @@ void task_assignment::inizializeTaskAssignmentMatrix()
 
 	for(unsigned int j=0;j<tasks_id.size();j++)
 	{
-	    app.insert(make_pair(tasks_id[j],(i==j))); //X identità
+	    app.insert(make_pair(tasks_id[j],false)); //X identità
 	}
 
 	task_assignment_matrix.insert(make_pair(agents_id[i],app));
@@ -141,7 +142,7 @@ void task_assignment::inizializeTaskAssignmentMatrix()
 
 void task_assignment::printTaskAssignmentMatrix()
 {
-    std::cout<<std::endl<<"TASK ASSIGNMENT MATRIX"<<std::endl;
+    std::cout<<"TASK ASSIGNMENT MATRIX"<<std::endl;
     
     for(unsigned int i=0;i<agents_id.size();i++)
     {
@@ -153,12 +154,14 @@ void task_assignment::printTaskAssignmentMatrix()
 	
 	std::cout<<std::endl;
     }
+    
+    std::cout<<std::endl;
 }
 
 
 void task_assignment::printTaskCostMatrix()
 {
-    std::cout<<std::endl<<"TASK COST MATRIX"<<std::endl;
+    std::cout<<"TASK COST MATRIX"<<std::endl;
     
     for(unsigned int i=0;i<agents_id.size();i++)
     {
@@ -170,18 +173,43 @@ void task_assignment::printTaskCostMatrix()
 	
 	std::cout<<std::endl;
     }
+    
+    std::cout<<std::endl;
+}
+
+void task_assignment::copy_solution_to_TA_matrix(bool* solution)
+{
+    for(unsigned int i=0;i<agents_id.size();i++)
+    {
+
+	for(unsigned int j=0;j<tasks_id.size();j++)
+	{
+	    task_assignment_matrix.at(agents_id[i]).at(tasks_id[j])=solution[i*tasks_id.size()+j];
+	}
+	
+    }
 }
 
 
 int task_assignment::ta_1()
 {
      int a=-1;
-
-     ta_problem.solve();
+     
+     unsigned int w=0;
+     
+     unsigned int passi=1;
+     
+     bool solution[agents_id.size()*tasks_id.size()];
      
      while(!converge)
      {
+	    std::cout<<"----------------PASSO "<<passi<<"----------------"<<std::endl<<std::endl;
+       
 	    sleep(1);
+	    
+	    ta_problem.solve(solution);
+     
+	    copy_solution_to_TA_matrix(solution);
 	    
 	    data_mutex.lock();
 	    
@@ -191,25 +219,32 @@ int task_assignment::ta_1()
 	    {
 		if (!(data_r[i].agent_id==""))
 		{
-		    data_s.g += data_r[i].g; //dato valido
+		    if (data_s.tam == data_r[i].tam) w++;
 		}
 	    }
 	    
 	    data_r.clear();
 
-	    std::cout<<"Invio: "<<data_s.g<<std::endl;
+	    std::cout<<"Invio"<<std::endl<<std::endl;
+	    
+	    //a seconda dell' algoritmo qui si usa data_r per trovare il nuovo data_s
 	    
 	    ta_communicator.send(data_s);
 	    
-	    
-	    //std::cout<<">>> A:"<<data_r.agent_id<<" D:"<<data_r.g<<" | "<<"A:"<<data_s.agent_id<<" D:"<<data_s.g<<" <<<"<<std::endl;
-	    
-	    if (data_s.g>3)
+	    if (w==agents_id.size()-1)
 	    {
-		  converge=true;//simulo un tempo per convergere, la convergenza è se la X è uguale per tutti in realtà
+		  std::cout<<"Converge, ";
+		  printTaskAssignmentMatrix();
+		  converge=true;
 	    }
 	    
+	    if(!converge)printTaskAssignmentMatrix();
+	    
+	    w=0;
+	    
 	    data_mutex.unlock();
+	    
+	    passi++;
      }
      
      ta_communicator.send(data_s);

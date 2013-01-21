@@ -218,12 +218,14 @@ struct ta_packet
 {
     std::string agent_id;
     double g;
+    std::map<std::string,task_assignment_vector> tam;
 
     template <typename Archive>
     void serialize(Archive& ar,const unsigned int /*version*/)
     {
 	ar& agent_id;
         ar& g;
+	ar& tam;
     }
 };
 
