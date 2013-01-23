@@ -49,7 +49,7 @@
   WORLD:
   - bonus_variables: [c]
     c: 1
-    GRAPH_NAME: 'test5.gml.lgf'
+    GRAPH_NAME: 'test2.gml.lgf'
   AGENTS:
   - agent: Agente1
     VISIBLE_AREA: circle(9)
