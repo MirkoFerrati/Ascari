@@ -88,7 +88,7 @@ void agent_router::run_plugin()
     if (handshakeCounter<15)
 	{
 		detect_collision(useArc);
-        next_target_reachable=findPath(useArc);
+		next_target_reachable=findPath(useArc);
 	}
     if (!next_target_reachable)
     {
@@ -115,6 +115,7 @@ void agent_router::run_plugin()
 	if (handshakeCounter<=15)
 	{
 		last_time_updated=time;
+		priority=distance_to_target.value();
 		update_lock_packet();
 		communicator.send();
 	}
@@ -146,6 +147,7 @@ void agent_router::update_lock_packet()
     _mutex.lock();
     graph_informations& tmp = info.at(identifier);
     tmp.id=identifier;
+    tmp.priority=priority;
     tmp.isNegotiating=isNegotiating;
     tmp.lockedNode=node_id;
     tmp.timestamp=last_time_updated;
@@ -226,8 +228,10 @@ bool agent_router::detect_collision(lemon::SmartDigraph::ArcMap<bool>& useArc)
         bool isNegotiable = (*it).second.isNegotiating;
         int age=round((round(time*1000.0)-round((*it).second.timestamp*1000.0))/1000.0/TIME_SLOT_FOR_3DGRAPH);
 		//collision=check_for_overtaking(it,age,useArc);
-		if ((isNegotiable)&&(it->second.id.compare(identifier)>0)) continue; //ignoro le prenotazioni di livello più basso negoziabili
-        //qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
+		//if ((isNegotiable)&&(it->second.id.compare(identifier)>0)) continue; //ignoro le prenotazioni di livello più basso negoziabili
+		if ((isNegotiable)&&(it->second.priority>priority)) continue; //se sono piu' lontani vinco io
+		if ((isNegotiable)&&(it->second.priority==priority)&&(it->second.id.compare(identifier)>0)) continue; //se sono pari vince l'id piu' basso
+	//qui sto ignorando gli archi della lista delle prenotazioni che finiscono in un nodo all'ultimo piano
         for (vector<int>::const_iterator itt=(*it).second.lockedNode.begin();itt!=(*it).second.lockedNode.end();++itt)
         {
             int id=(*itt)-age*graph_node_size;

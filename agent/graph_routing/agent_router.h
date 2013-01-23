@@ -60,6 +60,7 @@ private:
 	const std::map<std::string,transition>& events_to_index;
 	lemon::SmartDigraph::ArcMap<int> length;
 	lemon::SmartDigraph::NodeMap<int> coord_x, coord_y;
+	unsigned int priority;
 	std::string identifier;
 	graph_packet info;
 	Udp_graph_communicator communicator;
