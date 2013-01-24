@@ -164,6 +164,7 @@ void operator>> (const YAML::Node& node, std::unique_ptr<Parsed_Behavior>& behav
   
 }
 
+
 //written by Alessandro Settimi
 void createTaskList(const YAML::Node& node, task_assignment_namespace::task_list& task_list,unsigned int task_number)
 {
@@ -187,6 +188,7 @@ void createTaskList(const YAML::Node& node, task_assignment_namespace::task_list
     }
 }
 //written by Alessandro Settimi
+
 
 void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 {
@@ -217,6 +219,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
         throw "UNDEFINED DISCRETE START STATE";
     }
 
+
     //written by Alessandro Settimi
     
     if (node.FindValue("TASK_COST_VECTOR"))
@@ -236,6 +239,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 	}
     }
     //written by Alessandro Settimi
+
 
 }
 

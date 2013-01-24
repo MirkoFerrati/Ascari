@@ -1,8 +1,10 @@
 #include "agent.h"
 #include "graph_routing/agent_router.h"
+
 //written by Alessandro Settimi
 #include "task_assignment/task_assignment.h"
 //written by Alessandro Settimi
+
 #include "identifierModule/identifier_module.h"
 #include <string>
 #include <utility>
@@ -38,6 +40,7 @@ agent::agent(int agent_index,const Parsed_World& world):
 		Plugin_module *plugin=new agent_router(world.agents.at(agent_index).target_list,events,events_to_index,world.agents.at(agent_index).name,time,world.graphName);
 		plugins.push_back(plugin);
 	}
+
 	
 	//written by Alessandro Settimi
 	if (!world.task_list.empty())
@@ -47,6 +50,7 @@ agent::agent(int agent_index,const Parsed_World& world):
 	} 
 	//written by Alessandro Settimi
 	
+
 	/*!
 	 * Aggiungo le variabili richieste dai plugin
 	 */
@@ -205,13 +209,13 @@ void agent::createSubEventsFromParsedAgent(const unique_ptr<Parsed_Behavior>& be
     unsigned i=0;
     for (map<string,string>::const_iterator it=behavior->lambda_expressions.begin();it!=behavior->lambda_expressions.end();++it) {
         sub_events_to_index.insert(make_pair(it->first,i));
-        sub_events.insert(make_pair(i,_FALSE));
+        sub_events.insert(make_pair(i,sub_events::_FALSE));
         i++;
     }
 
     for (map<string,string>::const_iterator it=behavior->topology_expressions.begin();it!=behavior->topology_expressions.end();++it) {
         sub_events_to_index.insert(make_pair(it->first,i));
-        sub_events.insert(make_pair(i,_FALSE));
+        sub_events.insert(make_pair(i,sub_events::_FALSE));
 		i++;
     }
 }
@@ -223,7 +227,7 @@ void agent::createEventsFromParsedAgent(const unique_ptr<Parsed_Behavior>& behav
     for (map<string,string>::const_iterator it=behavior->events_expressions.begin();it!=behavior->events_expressions.end();++it)
     {
         events_to_index.insert(make_pair(it->first,i));
-        events.insert(make_pair(i,false));
+        events.insert(make_pair(i,events::_FALSE));
         i++;
     }
 }
@@ -276,7 +280,9 @@ void agent::main_loop()
             {
                 state.at(it->first)=it->second;
             }
+
             //cout<<"stato: "<<state.at(0)<<" "<<state.at(1)<<" "<<state.at(2)<<endl;
+
             sleep(0);
             encoder->computeSubEvents(state_other_agents);
             event_decoder.decode();

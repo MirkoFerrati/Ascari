@@ -257,6 +257,12 @@ bool MainWindow::startViewer()
             sniffer=new zmq_world_sniffer<world_sim_packet>(buffer,mutex);
             sniffer->start_receiving();
         }
+        else
+	{
+	    delete sniffer;
+            sniffer=new zmq_world_sniffer<world_sim_packet>(buffer,mutex);
+            sniffer->start_receiving();
+	}
         if (insideViewer)
         {
             ui->asdf->removeWidget(insideViewer);

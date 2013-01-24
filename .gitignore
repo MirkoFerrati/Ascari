@@ -1,0 +1,7 @@
+*.kdev4
+*~
+build
+*.old
+*.png
+*.mpeg
+shared/lemon/lemon/lemon/config.h

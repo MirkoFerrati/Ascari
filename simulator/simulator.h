@@ -10,7 +10,6 @@
 #include "random.hpp"
 #include <mutex>
 #include <thread>
-
 //written by Alessandro Settimi
 #include "communication/task_assignment_router.hpp"
 //written by Alessandro Settimi

@@ -69,7 +69,7 @@ protected:
 	/**
 	 * Valori dei sottoeventi lambda e topology
 	 */
-	std::map<int,sub_event_value> sub_events; 
+	std::map<int,sub_events::value> sub_events; 
 	
 	/**
 	 * Mappa dei nomi dei sottoeventi e dei relativi indici
@@ -79,7 +79,7 @@ protected:
 	/**
 	 * Valori degli eventi
 	 */
-	std::map<transition,bool> events;
+	std::map<transition,events::value> events;
 	
 	/**
 	 * Mappa dei nomi degli eventi e dei relativi indici

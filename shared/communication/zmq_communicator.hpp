@@ -1,7 +1,5 @@
-//written by Alessandro Settimi
-#ifndef ZMQ_COMMUNICATOR_H
-#define ZMQ_COMMUNICATOR_H
-//written by Alessandro Settimi
+#ifndef ZMQ_COMMUNICATOR_HPP
+#define ZMQ_COMMUNICATOR_HPP
 #include <zmq.hpp>
 #include <vector>
 #include "typedefs.h"
@@ -176,6 +174,29 @@ private:
     unsigned int expected_senders;
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 template <typename receive_type,int sock_recv_type>
 class zmq_receive_communicator
 {
@@ -239,4 +260,4 @@ public:
     unsigned int expected_senders;
 };
 
-#endif // ZMQ_COMMUNICATOR_H, written by Alessandro Settimi
+#endif //ZMQ_COMMUNICATOR_HPP

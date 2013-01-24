@@ -37,7 +37,6 @@
 #define AGENT_TA_PORT 5580
 #define SIMULATOR_TA_PORT 5581
 //written by Alessandro Settimi
-
 typedef std::map<int,double> map_int_double;
 typedef std::map<int,double> agent_state;
 typedef std::map<int,double> control_command;
@@ -48,14 +47,25 @@ typedef std::string discrete_state;
  */
 typedef std::map<std::string, int> index_map;
 
-enum sub_event_value
+
+namespace sub_events
+{
+enum value
 {
     _TRUE,
     _FALSE,
     _UNDEFINED
 };
-
-
+}
+namespace events
+{
+enum value
+{
+  _TRUE,
+  _FALSE,
+  _UNDEFINED
+};
+}
 
 /**
  * automaton_state is the representation of a discrete state, an indexMap translates the value of automatonState into a string
@@ -96,7 +106,8 @@ struct graph_informations
     bool isNegotiating;
     std::vector<int> lockedNode;
     std::vector<int> lockedArc;
-    std::string id;
+    unsigned int priority; //priorita' durante l'handshake
+    std::string id; //id dell'agente
     simulation_time timestamp; //Un giorno ci metteremo il tempo reale (dal 1970)
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int /*version*/)
@@ -196,17 +207,14 @@ struct circle:public visibleArea
 };
 
 //written by Alessandro Settimi
-
 namespace task_assignment_namespace
 {
-
 typedef double task_cost;
 typedef std::string task_id;
 typedef std::string agent_id;
 typedef std::map<task_id,task_cost> task_cost_vector;
 typedef std::map<task_id,bool> task_assignment_vector;
 typedef int task_assignment_algorithm;
-
 struct task
 {
     std::string task_id;
@@ -215,9 +223,7 @@ struct task
     double task_execution_time;
     double task_deadline;
 };
-
 typedef std::vector<task> task_list;
-
 template <typename data_type>
 struct task_assignment_packet
 {
@@ -227,7 +233,6 @@ struct task_assignment_packet
     
     //double g;
     //std::map<std::string,task_assignment_vector> tam;
-
     template <typename Archive> //TODO: togliere tipo di dato, così il ta_packet è sempre lo stesso
     void serialize(Archive& ar,const unsigned int /*version*/)
     {
@@ -235,8 +240,6 @@ struct task_assignment_packet
         ar& data;
 	//ar& g;
 	//ar& tam;
-    }
-};
 
 typedef task_assignment_packet<double> subgradient_packet;
 typedef task_assignment_packet<std::map<std::string,task_assignment_namespace::task_assignment_vector>> solution_exchange_packet;

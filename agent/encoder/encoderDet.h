@@ -21,7 +21,7 @@ public:
 	 * @param lambda_expres mappa tra nomi delle lambda e relative espressioni INPUT Constructor
 	 * @param sub_events_to_index mappa tra gli indici delle topologie dei lambda e il relativo valore in sub_events
 	 */
-		encoderDet(std::map< int, sub_event_value >& sub_events, const std::string & agent_name,
+		encoderDet(std::map< int, sub_events::value >& sub_events, const std::string & agent_name,
 			agent_state& state,const std::map< std::string,int >& stateVariablesName_to_Index, 
 			std::map<int,double> & bonusVariables,const std::map<std::string,int>& bonusVariablesName_to_Index,
 			std::map<std::string,std::string>const& topology_expres,index_map const& sub_events_to_index,
@@ -30,7 +30,7 @@ public:
 // 		~encoderDet();
 		
 private:
-	std::map<int,sub_event_value>& ref_sub_events; //lambda+topologies
+	std::map<int,sub_events::value>& ref_sub_events; //lambda+topologies
 	agent_state state_target;
 	std::vector<const agent_state_packet*> ref_other_agents;
 	std::map<int,exprtk::expression<double> > lambda_expressions;

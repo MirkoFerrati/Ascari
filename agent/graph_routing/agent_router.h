@@ -21,7 +21,7 @@ class agent_router: public Plugin_module
 {
 	
 public:
-    agent_router(std::vector< int > tarlist, std::map< transition, bool >& events,
+    agent_router(std::vector< int > tarlist, std::map< transition, events::value >& events,
 				 const std::map<std::string,transition>& events_to_index, std::string identifier,
 				 simulation_time& time,std::string graphName);
     void setGraph(lemon::SmartDigraph& g);
@@ -55,11 +55,12 @@ private:
     static lemon::Random generatorRandom;
     unsigned int tarc;
 	std::vector<int> node_id;
-	std::map< transition, bool >& events;
+	std::map< transition, events::value >& events;
 	
 	const std::map<std::string,transition>& events_to_index;
 	lemon::SmartDigraph::ArcMap<int> length;
 	lemon::SmartDigraph::NodeMap<int> coord_x, coord_y;
+	unsigned int priority;
 	std::string identifier;
 	graph_packet info;
 	Udp_graph_communicator communicator;
