@@ -12,7 +12,7 @@ using namespace std;
 
 
 void initialize_communication(simulator& s)
-{
+{    
     s.create_communicator(2);
 }
 

@@ -32,7 +32,11 @@
 #define NUM_AGENTS 1
 #define T_CAMP 0.01
 #define SYNC_PROTOCOL "tcp://localhost:5761"
-
+							
+//written by Alessandro Settimi
+#define AGENT_TA_PORT 5580
+#define SIMULATOR_TA_PORT 5581
+//written by Alessandro Settimi
 typedef std::map<int,double> map_int_double;
 typedef std::map<int,double> agent_state;
 typedef std::map<int,double> control_command;
@@ -202,6 +206,57 @@ struct circle:public visibleArea
     }
 };
 
+//written by Alessandro Settimi
+namespace task_assignment_namespace
+{
+typedef double task_cost;
+typedef std::string task_id;
+typedef std::string agent_id;
+typedef std::map<task_id,task_cost> task_cost_vector;
+typedef std::map<task_id,bool> task_assignment_vector;
+typedef int task_assignment_algorithm;
+struct task
+{
+    std::string task_id;
+    double task_position[3];
+    int task_type;
+    double task_execution_time;
+    double task_deadline;
+};
+typedef std::vector<task> task_list;
+template <typename data_type>
+struct task_assignment_packet
+{
+    std::string agent_id;
+    
+    data_type data;
+    
+    //double g;
+    //std::map<std::string,task_assignment_vector> tam;
+    template <typename Archive> //TODO: togliere tipo di dato, così il ta_packet è sempre lo stesso
+    void serialize(Archive& ar,const unsigned int /*version*/)
+    {
+	ar& agent_id;
+        ar& data;
+	//ar& g;
+	//ar& tam;
+    }
+};
 
+typedef task_assignment_packet<double> subgradient_packet;
+typedef task_assignment_packet<std::map<std::string,task_assignment_namespace::task_assignment_vector>> solution_exchange_packet;
+
+}
+#ifndef GLP_MIN
+#define GLP_MIN 1
+#endif
+
+#ifndef GLP_MAX
+#define GLP_MAX 2
+#endif
+
+#define SUBGRADIENT 0
+#define SOLUTION_EXCHANGE 1
+//written by Alessandro Settimi
 
 #endif //TYPEDEFS_H

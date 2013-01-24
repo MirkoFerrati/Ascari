@@ -1,5 +1,10 @@
 #include "agent.h"
 #include "graph_routing/agent_router.h"
+
+//written by Alessandro Settimi
+#include "task_assignment/task_assignment.h"
+//written by Alessandro Settimi
+
 #include "identifierModule/identifier_module.h"
 #include <string>
 #include <utility>
@@ -35,6 +40,17 @@ agent::agent(int agent_index,const Parsed_World& world):
 		Plugin_module *plugin=new agent_router(world.agents.at(agent_index).target_list,events,events_to_index,world.agents.at(agent_index).name,time,world.graphName);
 		plugins.push_back(plugin);
 	}
+
+	
+	//written by Alessandro Settimi
+	if (!world.task_list.empty())
+	{
+		Plugin_module* plugin=new task_assignment(world,world.agents.at(agent_index),events,events_to_index);
+		plugins.push_back(plugin);
+	} 
+	//written by Alessandro Settimi
+	
+
 	/*!
 	 * Aggiungo le variabili richieste dai plugin
 	 */
@@ -264,7 +280,9 @@ void agent::main_loop()
             {
                 state.at(it->first)=it->second;
             }
-            cout<<"stato: "<<state.at(0)<<" "<<state.at(1)<<" "<<state.at(2)<<endl;
+
+            //cout<<"stato: "<<state.at(0)<<" "<<state.at(1)<<" "<<state.at(2)<<endl;
+
             sleep(0);
             encoder->computeSubEvents(state_other_agents);
             event_decoder.decode();

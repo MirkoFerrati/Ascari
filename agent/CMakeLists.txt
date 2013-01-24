@@ -8,6 +8,9 @@ add_executable(agent graph_routing/graph_creator.cpp encoder/encoderDet.cpp auto
   graph_routing/agent_router.cpp graph_routing/agent_router_utility.cpp graph_routing/udp_graph_communicator.cpp
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/global.cpp
 	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp
+	#written by Alessandro Settimi
+	task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/bilp_problem.cpp
+	#written by Alessandro Settimi
 )
 
 #message(${CMAKE_CXX_FLAGS}) 
@@ -24,7 +27,9 @@ target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
 target_link_libraries(agent zmq)
-
+#written by Alessandro Settimi
+target_link_libraries(agent glpk)
+#written by Alessandro Settimi
 
 include_directories(../agent)
 include_directories(../shared)
@@ -33,6 +38,9 @@ include_directories(../shared/parserYAML/include)
 include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
 include_directories(decoder)
 include_directories(graph_routing)
+#written by Alessandro Settimi
+include_directories(task_assignment)
+#written by Alessandro Settimi
 include_directories(../shared/boost/geometry)
 include_directories(../shared/boost/geometry/*)
 
@@ -53,3 +61,5 @@ configure_file(../shared/graphs/test3.gml.lgf test3.gml.lgf COPYONLY)
 configure_file(../shared/graphs/test4.gml.lgf test4.gml.lgf COPYONLY)
 configure_file(../shared/graphs/test5.gml.lgf test5.gml.lgf COPYONLY)
 configure_file(test.sh test.sh COPYONLY)
+
+add_subdirectory(task_assignment)

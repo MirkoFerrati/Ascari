@@ -7,6 +7,7 @@
 #include <zmq_agent_communicator.h>
 #include "collisionchecker.h"
 
+
 using namespace std;
 
 void simulator::create_communicator(int communicator_type)
@@ -32,6 +33,11 @@ topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GR
 	secSleep=5000;
 	collisionChecker=0;
 	checkCollision=false;
+	
+	//written by Alessandro Settimi
+	ta_router_started=false;
+	task_assignment_algorithm=-1;
+	//written by Alessandro Settimi
 }
 
 void simulator::setSleep(unsigned secSleep)
@@ -57,6 +63,7 @@ void simulator::setCheckCollision(bool checkCollision)
 
 void simulator::initialize(const Parsed_World& wo)
 {
+    task_assignment_algorithm = wo.task_assignment_algorithm;
     initialize_agents(wo.agents);
     bonus_symbol_table.add_constants();
     int i=0;
@@ -171,6 +178,32 @@ void simulator::main_loop()
             //communicator->send_broadcast(sim_packet.state_agents);
             communicator->send_broadcast(sim_packet);
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
+	    
+	    //written by Alessandro Settimi
+	    
+	    
+	    
+	    if (!ta_router_started)
+	    {
+		if (task_assignment_algorithm == 0)
+		{
+		      ta_router = new task_assignment_router<task_assignment_namespace::subgradient_packet> ();
+		   
+		}
+		
+		if (task_assignment_algorithm == 1)
+		{
+		      ta_router = new task_assignment_router<task_assignment_namespace::solution_exchange_packet> ();
+
+		}
+		
+		if (task_assignment_algorithm != -1)
+		{
+		      ta_router->init(num_agents);
+		      ta_router_started=true;
+		}
+	    }
+	    //written by Alessandro Settimi
 
             agent_state state_tmp;
             for (int i=0;i<10;i++)//TODO(Mirko): this is 1 second/(sampling time of dynamic)
@@ -217,6 +250,7 @@ simulator::~simulator()
 	  communicator->send_broadcast(sim_packet);
 	
 	graph_router.join_thread();
+	
     delete communicator;
 
     for (unsigned int i=0; i< map_bonus_variables.size();i++)
@@ -234,6 +268,7 @@ void simulator::start_sim(int max_loops)
     time=0;
     //communicator->send_broadcast(time);
 	graph_router.start_thread();
+	
     main_loop();
 }
 
