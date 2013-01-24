@@ -13,12 +13,14 @@ public:
   	virtual void start_thread()=0;
 	virtual ~task_assignment_communicator_base(){};
 	virtual void init(std::string agent_id)=0;
+	virtual void send()=0;
 };
 
 template <class receive_type, class send_type>
-class task_assignment_communicator: public agent_to_simulator_ta_communicator<receive_type,send_type>
+class task_assignment_communicator: public agent_to_simulator_ta_communicator<receive_type,send_type>, public task_assignment_communicator_base
 {	
 	std::vector<receive_type>& data_receive;
+	const send_type& data_send;
 	
 	std::shared_ptr<std::mutex>& data_mutex;
 	std::thread* receiver;
@@ -72,7 +74,10 @@ class task_assignment_communicator: public agent_to_simulator_ta_communicator<re
 
 public:
 
-	task_assignment_communicator(std::vector<receive_type>& data_receive,std::shared_ptr<std::mutex>& data_mutex,const bool& converge,unsigned int neighbour,std::string my_id,bool& fresh_data):data_receive(data_receive),data_mutex(data_mutex),converge(converge),neighbour(neighbour),my_id(my_id),fresh_data(fresh_data)
+	task_assignment_communicator(std::vector<receive_type>& data_receive,const receive_type& data_send,std::shared_ptr<std::mutex>& data_mutex,
+				     const bool& converge,unsigned int neighbour,std::string my_id,bool& fresh_data)
+			:data_receive(data_receive),data_send(data_send),data_mutex(data_mutex),converge(converge),neighbour(neighbour),
+				     my_id(my_id),fresh_data(fresh_data)
 	{
 		this->init(my_id);
 		this->start_thread();
@@ -87,7 +92,12 @@ public:
 	{
 		receiver=new std::thread(&task_assignment_communicator::receive_loop,std::ref(*this),std::ref(data_receive),std::ref(data_mutex),std::ref(converge),std::ref(neighbour),std::ref(my_id),std::ref(fresh_data));
 	}
-
+	
+	void send()
+	{
+		this->send(data_send);
+	}
+	
 	~task_assignment_communicator()
 	{}
 

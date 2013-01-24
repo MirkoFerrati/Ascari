@@ -5,7 +5,7 @@ using namespace std;
 automatonFSM::automatonFSM(const transitionTable& table)
 :automatonAbstract(table){}
 
-forward_list<automaton_state> automatonFSM::getNextAutomatonState(const forward_list<automaton_state>& oldState, const map<transition,bool>& event)
+forward_list<automaton_state> automatonFSM::getNextAutomatonState(const forward_list<automaton_state>& oldState, const map<transition,events::value>& event)
 {
 	forward_list<automaton_state> result;
 	result.push_front(oldState.front());

@@ -22,7 +22,7 @@ public:
 	 */
 	automatonAbstract(const transitionTable& table)
 	:table(table){}
-	virtual std::forward_list<automaton_state> getNextAutomatonState(std::forward_list<automaton_state>const& oldStates, std::map<transition,bool>const& event)=0; 
+	virtual std::forward_list<automaton_state> getNextAutomatonState(std::forward_list<automaton_state>const& oldStates, std::map<transition,events::value>const& event)=0; 
 	virtual ~automatonAbstract(){};
 protected:
 	transitionTable table;

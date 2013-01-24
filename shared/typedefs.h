@@ -240,6 +240,8 @@ struct task_assignment_packet
         ar& data;
 	//ar& g;
 	//ar& tam;
+    }
+};
 
 typedef task_assignment_packet<double> subgradient_packet;
 typedef task_assignment_packet<std::map<std::string,task_assignment_namespace::task_assignment_vector>> solution_exchange_packet;

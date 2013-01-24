@@ -6,7 +6,7 @@
 using namespace task_assignment_namespace;
 
   
-task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index):my_id(agent.name),events(events),events_to_index(events_to_index),data_mutex(),ptr_mutex(&data_mutex)
+task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, events::value >& events, const std::map<std::string,transition>& events_to_index):my_id(agent.name),events(events),events_to_index(events_to_index),data_mutex(),ptr_mutex(&data_mutex)
 {
     createAgentIdAndTaskIdVectorFromParsedWorld(world);
     createTaskListFromParsedWorld(world);
@@ -238,7 +238,7 @@ int task_assignment ::solution_exchange_algorithm()
 	    //do something with received data | this algorithm does not converge, it can be used for future implementation of another algorithm
 	    //actually it converges if the agents optimal tasks are the same that you find with the bilp on the entire cost matrix
 	    
-	    ta_communicator.send(data_send);
+	    ta_communicator->send();
 	    
 	    if (w==agents_id.size()-1)
 	    {
@@ -256,7 +256,7 @@ int task_assignment ::solution_exchange_algorithm()
 	    passi++;
      }
      
-     ta_communicator.send(data_send);
+     ta_communicator->send();
      
      for(unsigned int j=0;j<tasks_id.size();j++)
      {
@@ -273,7 +273,7 @@ void task_assignment ::run_plugin()
      {
 	  if(task_assignment_algorithm==0)
 	  {
-		  task_assignment_communicator<solution_exchange_packet,solution_exchange_packet> ta_communicator(data_receive,ptr_mutex,converge,agents_id.size()-1,my_id,fresh_data);
+		  //task_assignment_communicator<solution_exchange_packet,solution_exchange_packet> ta_communicator(data_receive,ptr_mutex,converge,agents_id.size()-1,my_id,fresh_data);
 	  }
 	  
      }
