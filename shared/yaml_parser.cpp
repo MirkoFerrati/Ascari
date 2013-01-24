@@ -165,22 +165,22 @@ void operator>> (const YAML::Node& node, std::unique_ptr<Parsed_Behavior>& behav
 }
 
 //written by Alessandro Settimi
-void createTaskList(const YAML::Node& node, task_list& t,unsigned int task_number)
+void createTaskList(const YAML::Node& node, task_assignment_namespace::task_list& task_list,unsigned int task_number)
 {
     unsigned int j=0;
     
     for (unsigned int i=0;i<task_number*7;)
     {
-        task app;
-	t.push_back(app);
+        task_assignment_namespace::task app;
+	task_list.push_back(app);
       
-        node[i] >> t[j].task_id;
-	node[i+1] >> t[j].task_position[0];
-	node[i+2] >> t[j].task_position[1];
-	node[i+3] >> t[j].task_position[2];
-	node[i+4] >> t[j].task_type;
-	node[i+5] >> t[j].task_execution_time;
-	node[i+6] >> t[j].task_deadline;
+        node[i] >> task_list[j].task_id;
+	node[i+1] >> task_list[j].task_position[0];
+	node[i+2] >> task_list[j].task_position[1];
+	node[i+3] >> task_list[j].task_position[2];
+	node[i+4] >> task_list[j].task_type;
+	node[i+5] >> task_list[j].task_execution_time;
+	node[i+6] >> task_list[j].task_deadline;
 	
 	i=i+7;
 	j++;
@@ -223,7 +223,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     {
 	const YAML::Node& co=node["TASK_COST_VECTOR"];
 		
-	task_cost_vector app;
+	task_assignment_namespace::task_cost_vector app;
 	double cost;
 	std::string id;
 
@@ -336,12 +336,25 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
         if (node[0]["WORLD"].size()>0)
         { 
 	  
-            if (node[0]["WORLD"][0].FindValue("TASK_NUMBER") && node[0]["WORLD"][0].FindValue("TASK_LIST"))
+            if (node[0]["WORLD"][0].FindValue("TASK_ASSIGNMENT_ALGORITHM") && node[0]["WORLD"][0].FindValue("TASK_NUMBER") && node[0]["WORLD"][0].FindValue("TASK_LIST"))
 	    {
 		unsigned int task_number;
+		std::string algorithm;
+		
 		node[0]["WORLD"][0]["TASK_NUMBER"]>>task_number;
 		
-		createTaskList(node[0]["WORLD"][0]["TASK_LIST"],wo.tl,task_number);
+		node[0]["WORLD"][0]["TASK_ASSIGNMENT_ALGORITHM"]>>algorithm;
+		
+		wo.task_assignment_algorithm=-1;
+		if (algorithm == "SUBGRADIENT" ) wo.task_assignment_algorithm = SUBGRADIENT; 
+		if (algorithm == "SOLUTION_EXCHANGE" ) wo.task_assignment_algorithm = SOLUTION_EXCHANGE;
+		if (wo.task_assignment_algorithm == -1)
+		{
+		      ERR("UNDEFINED TASK ASSIGNMENT ALGORITHM",NULL);
+		      throw "UNDEFINED TASK ASSIGNMENT ALGORITHM";
+		}
+		
+		createTaskList(node[0]["WORLD"][0]["TASK_LIST"],wo.task_list,task_number);
 	    }
 	
 

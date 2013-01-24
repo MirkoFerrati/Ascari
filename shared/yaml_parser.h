@@ -87,7 +87,7 @@ public:
     std::string behavior_name;
     
     //written by Alessandro Settimi
-    task_cost_vector agent_task_cost_vector;
+    task_assignment_namespace::task_cost_vector agent_task_cost_vector;
     //written by Alessandro Settimi
     
 };
@@ -105,7 +105,8 @@ class Parsed_World{
   std::string graphName;
   
   //written by Alessandro Settimi
-  task_list tl;
+  task_assignment_namespace::task_list task_list;
+  task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
   //written by Alessandro Settimi
 
 //   Parsed_World(int num_agents):agents(num_agents){}

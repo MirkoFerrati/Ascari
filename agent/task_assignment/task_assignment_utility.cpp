@@ -3,17 +3,18 @@
 #include <agent.h>
 #include "typedefs.h"
 
-using namespace std;
+using namespace task_assignment_namespace;
 
-void task_assignment::addReservedVariables(exprtk::symbol_table< double >& symbol_table)
+ 
+void task_assignment ::addReservedVariables(exprtk::symbol_table< double >& symbol_table)
 {
 	symbol_table.add_variable("X_TASK",current_task.task_position[0],false);
 	symbol_table.add_variable("Y_TASK",current_task.task_position[1],false);
 	symbol_table.add_variable("V_T",speed,false);
 }
 
-
-void task_assignment::compileExpressions(exprtk::symbol_table< double >& symbol_table)
+ 
+void task_assignment ::compileExpressions(exprtk::symbol_table< double >& symbol_table)
 {
 	exprtk::parser<double> parser;
 	
@@ -26,21 +27,21 @@ void task_assignment::compileExpressions(exprtk::symbol_table< double >& symbol_
 	
 }
 
-
-void task_assignment::setTaskStop(bool stop)
+ 
+void task_assignment ::setTaskStop(bool stop)
 {
 	events.at(events_to_index.at("STOPPED"))=stop;
 	events.at(events_to_index.at("STARTED"))=!stop;
 }
 
-
-bool task_assignment::task_made()
+ 
+bool task_assignment ::task_made()
 {
 	return events.at(events_to_index.at("REACHED"));
 }
 
-
-task_assignment::~task_assignment()
+ 
+task_assignment ::~task_assignment()
 {
 }
 

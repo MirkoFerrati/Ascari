@@ -6,9 +6,7 @@
 #include <udp_agent_router.hpp>
 #include <zmq_agent_communicator.h>
 #include "collisionchecker.h"
-//written by Alessandro Settimi
-#include <task_assignment_router.hpp>
-//written by Alessandro Settimi
+
 
 using namespace std;
 
@@ -25,7 +23,7 @@ void simulator::create_communicator(int communicator_type)
 }
 
 simulator::simulator():
-topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT),data_mutex(),ptr_mutex(&data_mutex),ta_router(data,ptr_mutex)
+topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT)
 {
 	max_loops=0;
 	communicator=0;
@@ -38,6 +36,7 @@ topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GR
 	
 	//written by Alessandro Settimi
 	ta_router_started=false;
+	task_assignment_algorithm=-1;
 	//written by Alessandro Settimi
 }
 
@@ -64,6 +63,7 @@ void simulator::setCheckCollision(bool checkCollision)
 
 void simulator::initialize(const Parsed_World& wo)
 {
+    task_assignment_algorithm = wo.task_assignment_algorithm;
     initialize_agents(wo.agents);
     bonus_symbol_table.add_constants();
     int i=0;
@@ -180,12 +180,28 @@ void simulator::main_loop()
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 	    
 	    //written by Alessandro Settimi
+	    
+	    
+	    
 	    if (!ta_router_started)
 	    {
-		ta_router.init(num_agents);
-		ta_router.start_threads();
-	    
-		ta_router_started=true;
+		if (task_assignment_algorithm == 0)
+		{
+		      ta_router = new task_assignment_router<task_assignment_namespace::subgradient_packet> ();
+		   
+		}
+		
+		if (task_assignment_algorithm == 1)
+		{
+		      ta_router = new task_assignment_router<task_assignment_namespace::solution_exchange_packet> ();
+
+		}
+		
+		if (task_assignment_algorithm != -1)
+		{
+		      ta_router->init(num_agents);
+		      ta_router_started=true;
+		}
 	    }
 	    //written by Alessandro Settimi
 

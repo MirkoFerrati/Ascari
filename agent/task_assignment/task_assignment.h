@@ -8,7 +8,7 @@
 #include <typedefs.h>
 #include <boost/thread.hpp>
 #include <task_assignment_communicator.h>
-#include <../shared/bilp_problem/bilp_problem.h>
+#include <bilp_problem.h>
 
 class task_assignment: public Plugin_module
 {
@@ -29,22 +29,22 @@ public:
 
 	
 private:
-	agent_id my_id;
+	task_assignment_namespace::agent_id my_id;
 	
-	task_list tasklist;
-	task current_task;
+	task_assignment_namespace::task_list tasklist;
+	task_assignment_namespace::task current_task;
 	
-	std::vector<std::string> agents_id;
+	std::vector<task_assignment_namespace::agent_id> agents_id;
 	
-	std::vector<std::string> tasks_id;
+	std::vector<task_assignment_namespace::task_id> tasks_id;
 	
-	std::map<agent_id,task_cost_vector> task_cost_matrix;
+	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_cost_vector> task_cost_matrix;
 	
-	std::map<agent_id,task_assignment_vector> task_assignment_matrix;
+	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_assignment_vector> task_assignment_matrix;
 	
-	task_cost_vector* agent_task_cost_vector;
+	task_assignment_namespace::task_cost_vector* agent_task_cost_vector;
 	
-	task_assignment_vector* agent_task_assignment_vector;
+	task_assignment_namespace::task_assignment_vector* agent_task_assignment_vector;
 	
 	bool task_assigned;
 	bool stop;
@@ -54,24 +54,27 @@ private:
 	std::map< transition, bool >& events;
 	const std::map<std::string,transition>& events_to_index;
 	
-	int ta_1(); 
-	bool task_assignment_algorithm();
+	task_assignment_communicator_base* ta_communicator;
+	
+	task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
+	
+	int subgradient_algorithm();
+	
+	int solution_exchange_algorithm();
+	
 	void setTaskStop(bool stop);
 	bool task_made();
 	
-	ta_packet data_s;
-	std::vector<ta_packet> data_r;
 	std::mutex data_mutex;
 	std::shared_ptr<std::mutex> ptr_mutex;
 	bool converge;
 	bool fresh_data;
 	bool not_started;
-	task_assignment_communicator<ta_packet,ta_packet> ta_communicator;
 	
 	bilp_problem ta_problem;
-	void initialize_bilp_problem(std::map<agent_id,task_cost_vector>& m);
-	double** C;
-	void copy_solution_to_TA_matrix(bool* solution);
+	void initialize_bilp_problem(std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_cost_vector>& m);
+	std::vector<double> C;
+	void copy_solution_to_TA_matrix(std::vector<bool> solution);
 };
 
 #endif // TASK_ASSIGNMENT_H

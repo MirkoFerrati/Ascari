@@ -197,11 +197,15 @@ struct circle:public visibleArea
 
 //written by Alessandro Settimi
 
+namespace task_assignment_namespace
+{
+
 typedef double task_cost;
 typedef std::string task_id;
 typedef std::string agent_id;
 typedef std::map<task_id,task_cost> task_cost_vector;
 typedef std::map<task_id,bool> task_assignment_vector;
+typedef int task_assignment_algorithm;
 
 struct task
 {
@@ -214,21 +218,30 @@ struct task
 
 typedef std::vector<task> task_list;
 
-struct ta_packet
+template <typename data_type>
+struct task_assignment_packet
 {
     std::string agent_id;
-    double g;
-    std::map<std::string,task_assignment_vector> tam;
+    
+    data_type data;
+    
+    //double g;
+    //std::map<std::string,task_assignment_vector> tam;
 
-    template <typename Archive>
+    template <typename Archive> //TODO: togliere tipo di dato, così il ta_packet è sempre lo stesso
     void serialize(Archive& ar,const unsigned int /*version*/)
     {
 	ar& agent_id;
-        ar& g;
-	ar& tam;
+        ar& data;
+	//ar& g;
+	//ar& tam;
     }
 };
 
+typedef task_assignment_packet<double> subgradient_packet;
+typedef task_assignment_packet<std::map<std::string,task_assignment_namespace::task_assignment_vector>> solution_exchange_packet;
+
+}
 #ifndef GLP_MIN
 #define GLP_MIN 1
 #endif
@@ -236,6 +249,9 @@ struct ta_packet
 #ifndef GLP_MAX
 #define GLP_MAX 2
 #endif
+
+#define SUBGRADIENT 0
+#define SOLUTION_EXCHANGE 1
 //written by Alessandro Settimi
 
 #endif //TYPEDEFS_H

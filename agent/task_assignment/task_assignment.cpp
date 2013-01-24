@@ -3,14 +3,17 @@
 #include <agent.h>
 #include "typedefs.h"
 
-using namespace std;
+using namespace task_assignment_namespace;
 
-task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index):my_id(agent.name),events(events),events_to_index(events_to_index),data_mutex(),ptr_mutex(&data_mutex),ta_communicator(data_r,ptr_mutex,converge,world.agents.size()-1,my_id,fresh_data)
+  
+task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, bool >& events, const std::map<std::string,transition>& events_to_index):my_id(agent.name),events(events),events_to_index(events_to_index),data_mutex(),ptr_mutex(&data_mutex)
 {
     createAgentIdAndTaskIdVectorFromParsedWorld(world);
     createTaskListFromParsedWorld(world);
     createTaskCostMatrixFromParsedWorld(agent);
     inizializeTaskAssignmentMatrix();
+    
+    task_assignment_algorithm=world.task_assignment_algorithm;
     
     task_assigned=false;
     stop=false;
@@ -18,10 +21,6 @@ task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& 
     
     //printTaskAssignmentMatrix();
     printTaskCostMatrix();
-    
-    data_s.g=1;
-    data_s.agent_id=my_id;
-    data_s.tam=task_assignment_matrix;
     
     converge=false;
     fresh_data=true;
@@ -31,19 +30,16 @@ task_assignment::task_assignment(const Parsed_World& world, const Parsed_Agent& 
     initialize_bilp_problem(task_cost_matrix);
 }
 
-void task_assignment::initialize_bilp_problem(std::map<agent_id,task_cost_vector>& m)
-{
-	int dim=agents_id.size()*tasks_id.size();
-  
-	double C[dim];
-	
+ 
+void task_assignment ::initialize_bilp_problem(std::map<agent_id,task_cost_vector>& m)
+{	
 	int z=0;
 	
 	for (unsigned int i=0;i<agents_id.size();i++)
 	{
 	    for (unsigned int j=0;j<tasks_id.size();j++)
 	    {
-		 C[z]=m.at(agents_id[i]).at(tasks_id[j]);
+		 C.push_back(m.at(agents_id[i]).at(tasks_id[j]));
 		 z++;
 	    }
 	}
@@ -51,31 +47,32 @@ void task_assignment::initialize_bilp_problem(std::map<agent_id,task_cost_vector
 	ta_problem.initialize_problem("Task_Assignment",GLP_MIN,(int)agents_id.size(),(int)tasks_id.size(),C);
 }
 
-void task_assignment::createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo)
+ 
+void task_assignment ::createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo)
 {
     for (unsigned int i=0;i<wo.agents.size();i++)
 	agents_id.push_back(wo.agents[i].name);  
     
-    for (unsigned int i=0;i<wo.tl.size();i++)
-	tasks_id.push_back(wo.tl[i].task_id);
+    for (unsigned int i=0;i<wo.task_list.size();i++)
+	tasks_id.push_back(wo.task_list[i].task_id);
 }
 
-
-void task_assignment::createTaskListFromParsedWorld(const Parsed_World& wo)
+ 
+void task_assignment ::createTaskListFromParsedWorld(const Parsed_World& wo)
 {
     
-    for (unsigned int i=0; i< wo.tl.size();i++)
+    for (unsigned int i=0; i< wo.task_list.size();i++)
     {	
 	    task app;
 	    tasklist.push_back(app); //posso fare la push_back di tutto il task?
 	    
-	    tasklist[i].task_id=wo.tl[i].task_id;
-	    tasklist[i].task_position[0]=wo.tl[i].task_position[0];
-	    tasklist[i].task_position[1]=wo.tl[i].task_position[1];
-	    tasklist[i].task_position[2]=wo.tl[i].task_position[2];
-	    tasklist[i].task_type=wo.tl[i].task_type;
-	    tasklist[i].task_execution_time=wo.tl[i].task_execution_time;
-	    tasklist[i].task_deadline=wo.tl[i].task_deadline;
+	    tasklist[i].task_id=wo.task_list[i].task_id;
+	    tasklist[i].task_position[0]=wo.task_list[i].task_position[0];
+	    tasklist[i].task_position[1]=wo.task_list[i].task_position[1];
+	    tasklist[i].task_position[2]=wo.task_list[i].task_position[2];
+	    tasklist[i].task_type=wo.task_list[i].task_type;
+	    tasklist[i].task_execution_time=wo.task_list[i].task_execution_time;
+	    tasklist[i].task_deadline=wo.task_list[i].task_deadline;
 	    
 	    std::cout << std::endl << "TASK " <<tasklist[i].task_id <<':'<< std::endl;
 	    std::cout << "- posizione: " << tasklist[i].task_position[0] <<' '<< tasklist[i].task_position[1]<<' '<< tasklist[i].task_position[2] << std::endl;
@@ -85,7 +82,8 @@ void task_assignment::createTaskListFromParsedWorld(const Parsed_World& wo)
     }
 }
 
-void task_assignment::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a)
+ 
+void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a)
 {   
     task_cost_matrix.insert(make_pair(my_id,a.agent_task_cost_vector));
     
@@ -103,10 +101,7 @@ void task_assignment::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a)
 	    
 	    task_cost_matrix.insert(make_pair(agents_id[i],app));
 	    
-	    for (task_cost_vector::iterator it=app.begin();it!=app.end();++it)
-	    {
-		app.erase(it);
-	    }
+	    app.clear();
 	}
     }
     
@@ -114,8 +109,8 @@ void task_assignment::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a)
 	  
 }
 
-
-void task_assignment::inizializeTaskAssignmentMatrix()
+ 
+void task_assignment ::inizializeTaskAssignmentMatrix()
 {
       
     task_assignment_vector app;
@@ -130,17 +125,14 @@ void task_assignment::inizializeTaskAssignmentMatrix()
 
 	task_assignment_matrix.insert(make_pair(agents_id[i],app));
 	
-	for (task_assignment_vector::iterator it=app.begin();it!=app.end();++it)
-	{
-	    app.erase(it);
-	}
+	app.clear();
     }
     
     agent_task_assignment_vector=&task_assignment_matrix.at(my_id);
 }
 
-
-void task_assignment::printTaskAssignmentMatrix()
+ 
+void task_assignment ::printTaskAssignmentMatrix()
 {
     std::cout<<"TASK ASSIGNMENT MATRIX"<<std::endl;
     
@@ -158,8 +150,8 @@ void task_assignment::printTaskAssignmentMatrix()
     std::cout<<std::endl;
 }
 
-
-void task_assignment::printTaskCostMatrix()
+ 
+void task_assignment ::printTaskCostMatrix()
 {
     std::cout<<"TASK COST MATRIX"<<std::endl;
     
@@ -177,7 +169,8 @@ void task_assignment::printTaskCostMatrix()
     std::cout<<std::endl;
 }
 
-void task_assignment::copy_solution_to_TA_matrix(bool* solution)
+ 
+void task_assignment ::copy_solution_to_TA_matrix(std::vector<bool> solution)
 {
     for(unsigned int i=0;i<agents_id.size();i++)
     {
@@ -190,16 +183,29 @@ void task_assignment::copy_solution_to_TA_matrix(bool* solution)
     }
 }
 
-
-int task_assignment::ta_1()
+ 
+int task_assignment ::subgradient_algorithm()
 {
+      //TODO
+      return 0;
+}
+
+
+
+int task_assignment ::solution_exchange_algorithm()
+{
+     solution_exchange_packet data_send;    //TODO: fare classe base per i dati da inviare e ricevere  
+     data_send.agent_id = my_id;
+		    
+     std::vector<solution_exchange_packet> data_receive;
+  
      int a=-1;
      
      unsigned int w=0;
      
      unsigned int passi=1;
      
-     bool solution[agents_id.size()*tasks_id.size()];
+     std::vector<bool> solution;
      
      while(!converge)
      {
@@ -207,7 +213,9 @@ int task_assignment::ta_1()
        
 	    sleep(1);
 	    
-	    ta_problem.solve(solution);
+	    solution.clear();
+	    
+	    ta_problem.solve(solution); //solution = ta_problem.solve(); mettere vector bool
      
 	    copy_solution_to_TA_matrix(solution);
 	    
@@ -215,21 +223,22 @@ int task_assignment::ta_1()
 	    
 	    fresh_data=false;
 	    
-	    for (unsigned int i=0;i<data_r.size();i++)
+	    for (unsigned int i=0;i<data_receive.size();i++)
 	    {
-		if (!(data_r[i].agent_id==""))
+		if (!(data_receive[i].agent_id==""))
 		{
-		    if (data_s.tam == data_r[i].tam) w++;
+		    if (data_send.data == data_receive[i].data) w++;
 		}
 	    }
 	    
-	    data_r.clear();
+	    data_receive.clear();
 
 	    std::cout<<"Invio"<<std::endl<<std::endl;
 	    
-	    //a seconda dell' algoritmo qui si usa data_r per trovare il nuovo data_s
+	    //do something with received data | this algorithm does not converge, it can be used for future implementation of another algorithm
+	    //actually it converges if the agents optimal tasks are the same that you find with the bilp on the entire cost matrix
 	    
-	    ta_communicator.send(data_s);
+	    ta_communicator.send(data_send);
 	    
 	    if (w==agents_id.size()-1)
 	    {
@@ -247,7 +256,7 @@ int task_assignment::ta_1()
 	    passi++;
      }
      
-     ta_communicator.send(data_s);
+     ta_communicator.send(data_send);
      
      for(unsigned int j=0;j<tasks_id.size();j++)
      {
@@ -258,26 +267,17 @@ int task_assignment::ta_1()
 }
 
 
-bool task_assignment::task_assignment_algorithm()
-{     
-     int a=ta_1();
-     
-     if (a==-1) return false;
-     
-     current_task=tasklist[a];
-     return true;
-}
-
-
-void task_assignment::run_plugin()
+void task_assignment ::run_plugin()
 {
-    if (not_started)
-    {
-	 ta_communicator.init(my_id);
-	 ta_communicator.start_threads();
-	 not_started=false;
-    }
-
+     if (not_started)
+     {
+	  if(task_assignment_algorithm==0)
+	  {
+		  task_assignment_communicator<solution_exchange_packet,solution_exchange_packet> ta_communicator(data_receive,ptr_mutex,converge,agents_id.size()-1,my_id,fresh_data);
+	  }
+	  
+     }
+     
      if (stop)
      {
 	setTaskStop(true);
@@ -296,12 +296,25 @@ void task_assignment::run_plugin()
      }
      else
      {
-	if(!task_assignment_algorithm())
+	int a;
+	
+	if(task_assignment_algorithm==0)
+	{
+	    a=subgradient_algorithm(); //TODO: fare funzione template per l'algoritmo
+	}
+	
+	if(task_assignment_algorithm==1)
+	{
+	    a=solution_exchange_algorithm();
+	}
+       
+	if(a==-1)
 	{
 	    ERR("attenzione, task assignment non riuscito");
 	}
 	else
 	{
+	    current_task=tasklist[a];
 	    std::cout<<"CURRENT TASK: "<<current_task.task_id<<", position: ["<<current_task.task_position[0]<<' '<<current_task.task_position[1]<<' '<<current_task.task_position[2]<<"], cost: "<<agent_task_cost_vector->at(current_task.task_id)<<std::endl;
 	    task_assigned=true;
 	    speed=1;

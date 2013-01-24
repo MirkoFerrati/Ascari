@@ -40,9 +40,9 @@ agent::agent(int agent_index,const Parsed_World& world):
 	}
 	
 	//written by Alessandro Settimi
-	if (!world.tl.empty())
+	if (!world.task_list.empty())
 	{
-		Plugin_module *plugin=new task_assignment(world,world.agents.at(agent_index),events,events_to_index);
+		Plugin_module* plugin=new task_assignment(world,world.agents.at(agent_index),events,events_to_index);
 		plugins.push_back(plugin);
 	} 
 	//written by Alessandro Settimi

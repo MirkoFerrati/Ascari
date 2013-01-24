@@ -12,7 +12,7 @@
 #include <thread>
 
 //written by Alessandro Settimi
-#include <task_assignment_router.hpp>
+#include "communication/task_assignment_router.hpp"
 //written by Alessandro Settimi
 
 class simulator
@@ -59,11 +59,12 @@ private:
 	Udp_agent_router<graph_packet> graph_router;
 	
 	//written by Alessandro Settimi
-	std::vector<ta_packet> data;
-	std::mutex data_mutex;
-	std::shared_ptr<std::mutex> ptr_mutex;
-	task_assignment_router<ta_packet,ta_packet> ta_router;
+	//task_assignment_router ta_router;
 	bool ta_router_started;
+	task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
+	task_assignment_router_base* ta_router;
+	//task_assignment_router<task_assignment_namespace::subgradient_packet> ta_router1;
+	//task_assignment_router<task_assignment_namespace::solution_exchange_packet> ta_router2;
 	//written by Alessandro Settimi
 };
 
