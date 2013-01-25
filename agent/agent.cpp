@@ -2,7 +2,9 @@
 #include "graph_routing/agent_router.h"
 
 //written by Alessandro Settimi
+#ifdef GLPK_FOUND
 #include "task_assignment/task_assignment.h"
+#endif
 //written by Alessandro Settimi
 
 #include "identifierModule/identifier_module.h"
@@ -41,7 +43,8 @@ agent::agent(int agent_index,const Parsed_World& world):
 		plugins.push_back(plugin);
 	}
 
-	
+	#ifdef GLPK_FOUND
+
 	//written by Alessandro Settimi
 	if (!world.task_list.empty())
 	{
@@ -49,7 +52,7 @@ agent::agent(int agent_index,const Parsed_World& world):
 		plugins.push_back(plugin);
 	} 
 	//written by Alessandro Settimi
-	
+	#endif
 
 	/*!
 	 * Aggiungo le variabili richieste dai plugin

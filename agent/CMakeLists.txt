@@ -1,20 +1,26 @@
+cmake_minimum_required(VERSION 2.8)
 
-
-
-add_executable(agent graph_routing/graph_creator.cpp encoder/encoderDet.cpp automaton/automatonFSM.cpp 
+set(agent_SOURCES 
+ graph_routing/graph_creator.cpp encoder/encoderDet.cpp automaton/automatonFSM.cpp 
   communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp ../shared/dynamic.cpp
   communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
   ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp decoder/decoder.cpp 
   graph_routing/agent_router.cpp graph_routing/agent_router_utility.cpp graph_routing/udp_graph_communicator.cpp
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/global.cpp
 	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp
-	#written by Alessandro Settimi
-	task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/bilp_problem.cpp
-	#written by Alessandro Settimi
+	
 )
 
-#message(${CMAKE_CXX_FLAGS}) 
+FIND_PACKAGE(GLPK)
 
+
+if (GLPK_FOUND)
+#written by Alessandro Settimi
+set (agent_SOURCES ${agent_SOURCES} task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/bilp_problem.cpp)
+#written by Alessandro Settimi
+endif (GLPK_FOUND)
+
+add_executable(agent ${agent_SOURCES})
 
 include_directories(identifierModule)
 include_directories(controller)
@@ -27,9 +33,12 @@ target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
 target_link_libraries(agent zmq)
+
+if (GLPK_FOUND)
 #written by Alessandro Settimi
 target_link_libraries(agent glpk)
 #written by Alessandro Settimi
+endif (GLPK_FOUND)
 
 include_directories(../agent)
 include_directories(../shared)
@@ -45,7 +54,8 @@ include_directories(../shared/boost/geometry)
 include_directories(../shared/boost/geometry/*)
 
 find_package(Boost REQUIRED system thread serialization)
- 
+
+
 target_link_libraries(agent ${Boost_LIBRARIES} pthread)
 
 
