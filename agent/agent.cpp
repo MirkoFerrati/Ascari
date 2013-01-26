@@ -42,9 +42,15 @@ agent::agent(int agent_index,const Parsed_World& world):
 		Plugin_module *plugin=new agent_router(world.agents.at(agent_index).target_list,events,events_to_index,world.agents.at(agent_index).name,time,world.graphName);
 		plugins.push_back(plugin);
 	}
-
+	/*
+	if (condition to enable a plugin)
+	{
+		Plugin_module *plugin=new empty_plugin(....);
+		plugins.push_back(plugin);
+	}
+	*/
+	
 	#ifdef GLPK_FOUND
-
 	//written by Alessandro Settimi
 	if (!world.task_list.empty())
 	{

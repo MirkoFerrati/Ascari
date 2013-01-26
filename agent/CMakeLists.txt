@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(agent_SOURCES 
+set(agent_SOURCES empty_plugin/empty_plugin.cpp 
  graph_routing/graph_creator.cpp encoder/encoderDet.cpp automaton/automatonFSM.cpp 
   communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp ../shared/dynamic.cpp
   communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
@@ -50,6 +50,7 @@ include_directories(graph_routing)
 #written by Alessandro Settimi
 include_directories(task_assignment)
 #written by Alessandro Settimi
+include_directories(empty_plugin)
 include_directories(../shared/boost/geometry)
 include_directories(../shared/boost/geometry/*)
 
@@ -72,4 +73,3 @@ configure_file(../shared/graphs/test4.gml.lgf test4.gml.lgf COPYONLY)
 configure_file(../shared/graphs/test5.gml.lgf test5.gml.lgf COPYONLY)
 configure_file(test.sh test.sh COPYONLY)
 
-add_subdirectory(task_assignment)
