@@ -2,7 +2,10 @@
 #define EMPTY_PLUGIN_H
 
 #include "plugin_module.h"
+#include "communication/empty_plugin_communicator.hpp"
 #include "typedefs.h"
+
+
 
 class empty_plugin: public Plugin_module
 {
@@ -21,6 +24,17 @@ double variable2, variable3;
 double delta_variable;
 //the expression used to calculate delta_variable
 exprtk::expression<double> delta_expression;
+
+//id of the agent
+std::string identifier;
+
+//communicator
+empty_communicator_base * communicator;
+
+//used by communicator
+std::vector<empty_packet> data_receive;
+empty_packet data_send;
+std::shared_ptr<std::mutex> data_mutex;
 };
 
 #endif // EMPTY_PLUGIN_H

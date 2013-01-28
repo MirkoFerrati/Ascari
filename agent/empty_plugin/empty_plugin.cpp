@@ -1,11 +1,17 @@
 #include "empty_plugin.h"
 #include "typedefs.h"
 #include "logog.hpp"
+
+
+
 empty_plugin::empty_plugin(std::map< transition, events::value >& events, 
 						   const std::map< std::string, transition >& events_to_index, 
-						   std::string identifier, simulation_time& time)
+						   std::string identifier, simulation_time& time):identifier(identifier)
 {
 	//events gives you access to agent events, identifier is the agent name, time is the time of the simulation
+	
+	communicator=new empty_communicator<empty_packet,empty_packet>(data_receive,data_send,data_mutex,identifier);
+	
 }
 
 
