@@ -74,7 +74,6 @@ agent::agent(int agent_index,const Parsed_World& world):
 void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy)
 {
 	time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
-	initialized=true;
 	symbol_table.add_constants();
 	pi=exprtk::details::numeric::constant::pi;
 	symbol_table.add_variable("PI_GRECO",pi,true);
@@ -93,7 +92,7 @@ void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy
 	createStateFromParsedAgent(behavior);
 	createSubEventsFromParsedAgent(behavior);
 	createEventsFromParsedAgent(behavior);
-
+	
 	
 	createControllersFromParsedAgent(behavior);
 	
@@ -117,6 +116,7 @@ void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy
 	}
 	
 	event_decoder.create(behavior->events_expressions,sub_events_to_index,events_to_index);
+	initialized=true;
 
 }
 
@@ -139,26 +139,24 @@ void agent::createBonusVariablesFromWorld(map< bonusVariable, bonus_expression >
 
 void agent::start()
 {
-	if (!initialized)
-		throw "pls call init function before start";
-   try {
-        inputs.identifier=identifier;
-        int cicli=0;
-        while (1)
-	{
-	main_loop();
-	            cicli++;
-if (time<-1)
-				break;
-	}
-	
-	    }
-    catch (const char* e)
-    {
-        std::cerr<<e<<std::endl;
+    if (!initialized)
+        throw "please call init function before start";
+    try {
+        inputs.identifier = identifier;
+        int cicli = 0;
+	std::cout<<"inizio ciclo infinito di agent s_interrupted="<<s_interrupted<<std::endl;
+        while (!s_interrupted) {
+            main_loop();
+            cicli++;
+            if (time < -1)
+                break;
+        }
+
+    } catch (const char* e) {
+        ERR ("%s", e);
 
     }
-	
+
 }
 
 
@@ -264,8 +262,6 @@ void agent::createStateFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavi
 
 void agent::main_loop()
 {
-
-   
         {
 	// 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
 			world_sim_packet temp=world_comm->receive_agents_status();
@@ -331,5 +327,9 @@ agent::~agent()
     delete world_comm;
     delete automaton;
     delete encoder;
-	delete f_rndom;
+    delete f_rndom;
+    for (unsigned int i=0;i<plugins.size();i++)
+			{
+				delete(plugins[i]);
+			}
 }

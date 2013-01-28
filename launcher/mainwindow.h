@@ -48,7 +48,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QProcess *simulator;
-    QProcess *viewer;
     boost::asio::io_service io_service;
     //std::vector<char> buffer;
     world_sim_packet buffer;

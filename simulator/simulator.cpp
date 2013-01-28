@@ -163,7 +163,7 @@ void simulator::main_loop()
     try {
         sim_packet.time=0;
 		int clock=0;
-        while (1) {
+        while (!s_interrupted) {
 			clock++;
 			if ((clock%10)!=0)
 			{

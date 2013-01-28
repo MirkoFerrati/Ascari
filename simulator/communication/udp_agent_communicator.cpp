@@ -31,3 +31,8 @@ void udp_agent_communicator::send_target(const world_sim_packet&  infos, const t
 {
 
 }
+
+udp_agent_communicator::~udp_agent_communicator()
+{
+
+}

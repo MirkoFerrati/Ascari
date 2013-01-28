@@ -46,6 +46,7 @@ int main(int argc, char **argv) {
 		}
 		World=parse_file(filename);
  	//cout<<World;
+	s_catch_signals();
 	s.initialize(World);
 	initialize_communication(s);
 	if (ap.given("s"))
