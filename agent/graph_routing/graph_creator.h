@@ -36,7 +36,7 @@ private:
 	lemon::SmartDigraph::NodeMap<int>& ncolors,
 	lemon::SmartDigraph::ArcMap<int>& acolors,int startId);
 	void addNodes(lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
-				  lemon::SmartDigraph::NodeMap<int>& ncolors,lemon::SmartDigraph::ArcMap<int>& acolors,int floorNumber);
+				  lemon::SmartDigraph::NodeMap<int>& ncolors,lemon::SmartDigraph::ArcMap<int>& acolors,unsigned int floorNumber);
 };
 
 #endif // GRAPH_CREATOR_H

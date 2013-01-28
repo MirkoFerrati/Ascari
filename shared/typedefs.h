@@ -101,6 +101,17 @@ std::ostream& operator<<( std::ostream& os, const std::vector<T>& m )
     return os;
 }
 
+struct empty_packet
+{
+	std::string agent_id;
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int /*version*/)
+	{
+		ar& agent_id;
+	}
+};
+
+
 struct graph_informations
 {
     bool isNegotiating;
