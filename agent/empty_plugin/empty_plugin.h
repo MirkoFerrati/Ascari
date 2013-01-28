@@ -29,7 +29,7 @@ exprtk::expression<double> delta_expression;
 std::string identifier;
 
 //communicator
-empty_communicator_base * communicator;
+empty_communicator<empty_packet,empty_packet> * communicator;
 
 //used by communicator
 std::vector<empty_packet> data_receive;

@@ -10,7 +10,7 @@ empty_plugin::empty_plugin(std::map< transition, events::value >& events,
 {
 	//events gives you access to agent events, identifier is the agent name, time is the time of the simulation
 	
-	communicator=new empty_communicator<empty_packet,empty_packet>(data_receive,data_send,data_mutex,identifier);
+	communicator=new empty_communicator<empty_packet,empty_packet>(data_receive,data_mutex,identifier);
 	
 }
 
@@ -47,6 +47,7 @@ void empty_plugin::run_plugin()
 	/*
 	if(!started)
 	{
+		communicator->start_thread();
 		do_something_to_start();
 		started=true;
 	}	
@@ -58,5 +59,10 @@ void empty_plugin::run_plugin()
 	//set variables in this way
 	variable1=5;
 	variable2=delta-variable-variable1;
+	
+	//Send new data
+	communicator->send(data_send);
+	//Read received data
+	std::cout<<data_receive<<std::endl;
 	*/
 }
