@@ -65,6 +65,7 @@ public:
       if (sync_socket)
       {
 	sync_socket->close();
+	delete sync_socket;
       }
     }
     
