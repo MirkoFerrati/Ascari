@@ -13,8 +13,8 @@ class testDecoder: public testClass
 	public:
 		void test()
 		{
-			std::map< int, sub_events::value > sub_events;
-			std::map< transition, events::value > events;
+			std::map< int, Sub_events > sub_events;
+			std::map< transition, Events > events;
 			
 			transition t1=(transition)1;
 // 			transition t2=(transition)2;
@@ -23,14 +23,14 @@ class testDecoder: public testClass
 			transition t5=(transition)5;
 			
 			
-			sub_events[1]=sub_events::_TRUE;
-			sub_events[2]=sub_events::_TRUE;
-			sub_events[3]=sub_events::_TRUE;
-			sub_events[4]=sub_events::_FALSE;
-			sub_events[5]=sub_events::_TRUE;
+			sub_events[1]=Sub_events::_TRUE;
+			sub_events[2]=Sub_events::_TRUE;
+			sub_events[3]=Sub_events::_TRUE;
+			sub_events[4]=Sub_events::_FALSE;
+			sub_events[5]=Sub_events::_TRUE;
 			
-			events[t1]=events::_FALSE;
-			events[t5]=events::_FALSE;
+			events[t1]=Events::_FALSE;
+			events[t5]=Events::_FALSE;
 			
 			std::map<std::string,std::string> parsed_events;
 			index_map sub_events_map;
@@ -51,17 +51,17 @@ class testDecoder: public testClass
 			decoder d(&sub_events, &events);
 			d.create(parsed_events,sub_events_map,events_map);
 			
-			sub_events[1]=sub_events::_TRUE;
-			sub_events[2]=sub_events::_UNDEFINED;
-			sub_events[3]=sub_events::_TRUE;
-			sub_events[4]=sub_events::_TRUE;
-			sub_events[5]=sub_events::_FALSE;
+			sub_events[1]=Sub_events::_TRUE;
+			sub_events[2]=Sub_events::_UNDEFINED;
+			sub_events[3]=Sub_events::_TRUE;
+			sub_events[4]=Sub_events::_TRUE;
+			sub_events[5]=Sub_events::_FALSE;
 			
 			
 			
 			d.decode();
-			assert(events[t1]==events::_TRUE);
-			assert(events[t5]==events::_FALSE);
+			assert(events[t1]==Events::_TRUE);
+			assert(events[t5]==Events::_FALSE);
 		}
 };
 

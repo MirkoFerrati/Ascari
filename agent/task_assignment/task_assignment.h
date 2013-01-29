@@ -14,7 +14,7 @@ class task_assignment: public Plugin_module
 {
 	
 public:
-	task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, events::value >& events, const std::map<std::string,transition>& events_to_index);
+	task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index);
 	void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
 	void createTaskListFromParsedWorld(const Parsed_World& wo);
 	void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
@@ -51,7 +51,7 @@ private:
 	
 	double speed;
 	exprtk::expression<double> distance_to_target;
-	std::map< transition, events::value >& events;
+	std::map< transition, Events >& events;
 	const std::map<std::string,transition>& events_to_index;
 	
 	task_assignment_communicator_base* ta_communicator;

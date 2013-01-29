@@ -5,7 +5,7 @@
 using namespace std;
 
 
-decoder::decoder(std::map< int, sub_events::value >* sub_events, std::map< transition, events::value >* events):sub_events(sub_events),events(events)
+decoder::decoder(std::map< int, Sub_events >* sub_events, map< transition, Events >* events):sub_events(sub_events),events(events)
 {
 //Nothing to do here?
 }
@@ -24,7 +24,7 @@ void decoder::create(map< string, string > events_string, const index_map& sub_e
 	{
 		WARN("errore, prima di usare decoder::create si prega di settare events e sub_events",NULL);
 	}
-    map<int,sub_events::value> temp_map;
+    map<int,Sub_events> temp_map;
     for (map<string,transition>::const_iterator it=events_map.begin();it!=events_map.end();++it)
     {
         temp_map.clear();
@@ -34,7 +34,7 @@ void decoder::create(map< string, string > events_string, const index_map& sub_e
         while (ss>>token)
         {
             bool negateVariable=false;
-            sub_events::value value=sub_events::_UNDEFINED;
+            Sub_events value=Sub_events::_UNDEFINED;
             if (token[0]=='!')
             {
                 negateVariable=true;
@@ -43,9 +43,9 @@ void decoder::create(map< string, string > events_string, const index_map& sub_e
             if (sub_events_map.count(token))
             {
                 if (negateVariable)
-                    value=sub_events::_FALSE;
+                    value=Sub_events::_FALSE;
                 else
-                    value=sub_events::_TRUE;
+                    value=Sub_events::_TRUE;
             }
             else
                 ERR("evento non esistente %s",token.c_str());
@@ -57,16 +57,16 @@ void decoder::create(map< string, string > events_string, const index_map& sub_e
 
 void decoder::decode()
 {
-    for (map<transition,events::value>::iterator it=events->begin(); it!=events->end(); ++it)
+    for (map<transition,Events>::iterator it=events->begin(); it!=events->end(); ++it)
     {
-		it->second= events::_TRUE;
-        for (map<int,sub_events::value>::const_iterator iit=internal_table.at(it->first).begin(); iit!=internal_table.at(it->first).end(); ++iit)
+		it->second= Events::_TRUE;
+        for (map<int,Sub_events>::const_iterator iit=internal_table.at(it->first).begin(); iit!=internal_table.at(it->first).end(); ++iit)
         {
-			if (sub_events->at(iit->first)==sub_events::_UNDEFINED || iit->second==sub_events::_UNDEFINED)
+			if (sub_events->at(iit->first)==Sub_events::_UNDEFINED || iit->second==Sub_events::_UNDEFINED)
 				continue;
             if (iit->second!=sub_events->at(iit->first))
             {
-				it->second=events::_FALSE;
+				it->second=Events::_FALSE;
             }
         }
 	}

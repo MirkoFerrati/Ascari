@@ -265,6 +265,7 @@ bool MainWindow::startViewer()
 	{
 	  std::shared_ptr<std::mutex> temp(new std::mutex);
 	  mutex.swap(temp);
+	  
 	}
 	else
 	{

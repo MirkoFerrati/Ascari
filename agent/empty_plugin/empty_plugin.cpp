@@ -4,7 +4,7 @@
 
 
 
-empty_plugin::empty_plugin(std::map< transition, events::value >& events, 
+empty_plugin::empty_plugin(std::map< transition, Events >& events, 
 						   const std::map< std::string, transition >& events_to_index, 
 						   std::string identifier, simulation_time& time):identifier(identifier)
 {
