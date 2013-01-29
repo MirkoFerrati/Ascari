@@ -27,14 +27,17 @@ std::shared_ptr<std::mutex>& data_mutex;
 std::thread* receiver;
 void receive_loop(receive_type& data, std::shared_ptr<std::mutex> data_mutex)
 {
-	receive_type temp;
-	while(1)
+	std::vector<receive_type> temp;
+	while(!s_interrupted)
 	{
 		sleep(0);
-		temp=this->receive().front();//blocking call
+		temp=this->receive();//.front();//blocking call
+		if (temp.size()>0)
+		{
 		data_mutex->lock();
-		data=temp;
+		data=temp.front();
 		data_mutex->unlock();
+		}
 	}
 }
 };

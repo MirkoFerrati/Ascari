@@ -14,7 +14,7 @@ class Viewer : public QWidget
 
   public:
     Viewer(const std::vector< char >& buffer, boost::asio::io_service& io_service, QWidget* parent = 0, int view_type=0, std::string graphName="");
-    Viewer(const world_sim_packet& read, std::shared_ptr<std::mutex> read_mutex, QWidget* parent=0, int view_type=0, std::string graphName="");
+    Viewer(const world_sim_packet& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent=0, int view_type=0, std::string graphName="");
     
     ~Viewer();
     void setScalingFactor(double scalingFactorX, double scalingFactorY);
@@ -44,7 +44,7 @@ protected:
     //const std::vector<char>& buffer;
     	const world_sim_packet& infos;
 
-    std::shared_ptr<std::mutex> mutex;
+    std::shared_ptr<std::mutex>& mutex;
     enum { header_length = 8 };
 	//boost::asio::io_service& io_service;
     void setScalingAndTranslateFactor(double maxX,double minX,double maxY,double minY);

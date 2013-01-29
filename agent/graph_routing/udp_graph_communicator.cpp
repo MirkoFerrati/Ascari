@@ -30,6 +30,7 @@ Udp_graph_communicator::Udp_graph_communicator(boost::signals2::mutex& mutex,gra
 Udp_graph_communicator::~Udp_graph_communicator()
 {
 	should_run=false;
+	_io_service.stop();
 	if (t)
 		t->join();
 }

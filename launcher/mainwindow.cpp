@@ -41,7 +41,22 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete insideViewer;
     delete ui;
+    delete sniffer;
+     if (simulator)
+    {
+      
+        simulator->kill();
+        delete(simulator);
+    }
+
+     for (unsigned int i=0;i<agents.size();i++)
+        {
+            agents[i]->kill();
+            delete(agents[i]);
+        }
+    
 }
 
 void MainWindow::openFile()
@@ -168,6 +183,7 @@ void MainWindow::startSimulator()
 	arguments<< "-check_collision";
     if (simulator)
     {
+      
         simulator->kill();
         delete(simulator);
     }
@@ -177,6 +193,11 @@ void MainWindow::startSimulator()
     simulator->setWorkingDirectory(d.absolutePath());
     simulator->setProcessChannelMode(QProcess::MergedChannels);
     simulator->start(simulatorPath,arguments);
+    if (!simulator->waitForStarted(2000))
+    {
+      QMessageBox::warning(this,"errore","il simulatore non si è avviato");
+      std::cout<<"errore, il simulatore non si è avviato"<<std::endl;
+    };
 }
 
 void MainWindow::on_Updateshell_clicked()
@@ -248,9 +269,9 @@ bool MainWindow::startViewer()
 	else
 	{
 	 mutex->unlock();
-	 mutex->~mutex();
-	  std::shared_ptr<std::mutex> temp(new std::mutex);
-	  mutex.swap(temp);
+	 //mutex->~mutex();
+	  //std::shared_ptr<std::mutex> temp(new std::mutex);
+	  //mutex.swap(temp);
 	}
         if (!sniffer)
         {
@@ -259,9 +280,9 @@ bool MainWindow::startViewer()
         }
         else
 	{
-	    delete sniffer;
-            sniffer=new zmq_world_sniffer<world_sim_packet>(buffer,mutex);
-            sniffer->start_receiving();
+	    //delete sniffer;
+            //sniffer=new zmq_world_sniffer<world_sim_packet>(buffer,mutex);
+            //sniffer->start_receiving();
 	}
         if (insideViewer)
         {

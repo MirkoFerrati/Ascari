@@ -32,10 +32,13 @@ using namespace std;
 //   init(graphName);
 // }
 
-Viewer::Viewer (const world_sim_packet& read, std::shared_ptr<std::mutex> read_mutex, QWidget* parent, int view_type, std::string graphName) : 
+Viewer::Viewer (const world_sim_packet& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent, int view_type, std::string graphName) : 
  QWidget (parent),view_type(view_type),infos(read), mutex(read_mutex)
 {
 init(graphName);
+length=0;
+coord_x=0;
+coord_y=0;
 }
 
 
@@ -129,7 +132,12 @@ void Viewer::setBackImage(string path) {
 }
 
 Viewer::~Viewer() {
-
+if (length)
+  delete length;
+if (coord_x)
+delete coord_x;
+if (coord_y)
+delete coord_y;
 }
 
 void Viewer::paintEvent(QPaintEvent */*event*/)

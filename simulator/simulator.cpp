@@ -163,7 +163,7 @@ void simulator::main_loop()
     try {
         sim_packet.time=0;
 		int clock=0;
-        while (1) {
+        while (!s_interrupted) {
 			clock++;
 			if ((clock%10)!=0)
 			{
@@ -205,6 +205,16 @@ void simulator::main_loop()
 	    }
 	    //written by Alessandro Settimi
 
+	    
+	    /*
+		 * if (condizione per inizializzare il plugin)
+		 * {
+		 * 		empty_router_communicator=new empty_router<empty_packet>();
+		 * 		empty_router->init(num_agents);
+		 * }
+		 * 
+		 */
+	    
             agent_state state_tmp;
             for (int i=0;i<10;i++)//TODO(Mirko): this is 1 second/(sampling time of dynamic)
             {

@@ -13,6 +13,7 @@ public:
     void send_broadcast(const simulation_time& time );
     virtual void send_broadcast(const world_sim_packet& infos);
     void send_target(const world_sim_packet&  infos, const target_abstract* target);
+    ~udp_agent_communicator();
 private:
 	unsigned int num_agents;
 	boost::asio::io_service service;//This must be written before any sender or receiver

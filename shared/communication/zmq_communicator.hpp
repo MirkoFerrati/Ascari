@@ -46,14 +46,28 @@ public:
         assert (sock_send_type == ZMQ_PUSH || sock_send_type == ZMQ_PUB);
         receive_buffer.rebuild (MAX_PACKET_LENGTH);
         send_buffer.rebuild (MAX_PACKET_LENGTH);
-
+	sync_socket=0;
+	int temp=0;
+	receiver_socket.setsockopt(ZMQ_LINGER,&temp,sizeof(temp));
+	sender_socket.setsockopt(ZMQ_LINGER,&temp,sizeof(temp));	
         if (sync == WAIT_SYNC) {
             sync_socket = new zmq::socket_t (static_zmq::context, ZMQ_REP);
+	    sync_socket->setsockopt(ZMQ_LINGER,&temp,sizeof(temp));
         } else if (sync == ASK_SYNC) {
             sync_socket = new zmq::socket_t (static_zmq::context, ZMQ_REQ);
+	    sync_socket->setsockopt(ZMQ_LINGER,&temp,sizeof(temp));
         }
     }
 
+    ~zmq_communicator(){
+      receiver_socket.close();
+      sender_socket.close();
+      if (sync_socket)
+      {
+	sync_socket->close();
+      }
+    }
+    
 protected:
     /**
      * This function will block till the syncing phase is over, if the class was created with a syncing policy!
@@ -81,6 +95,7 @@ protected:
 		{
 		  receiver_socket.setsockopt(ZMQ_SUBSCRIBE,"",0);
 		}
+		
 		results.resize (expected_senders);
         this->owner_name = owner_name;
         if (sync == WAIT_SYNC) {
@@ -91,7 +106,17 @@ protected:
             while (subscribers < expected_senders) {
                 //  - wait for synchronization request
                 zmq::message_t message_tmp;
+		try{
                 sync_socket->recv (&message_tmp);
+		}
+		catch (zmq::error_t ex)
+		{
+		  if (zmq_errno()==EINTR)
+		  {
+		    WARN("programma terminato",NULL);
+		    break;
+		  }
+		}
                 std::string name (static_cast<char*> (message_tmp.data()), message_tmp.size());
 
                 std::string result = "one more client connected to "; //non so chi si sia connesso, sono tutti uguali
@@ -104,9 +129,18 @@ protected:
 				
                 zmq::message_t message (result.size()+1);
                 memcpy (message.data(), result.data(), result.size()+1);
-
+		try{
                 bool rc = sync_socket->send (message); assert(rc);
                 subscribers++;
+		}
+		catch (zmq::error_t ex)
+		{
+		  if (zmq_errno()==EINTR)
+		  {
+		    WARN("programma terminato",NULL);
+		    break;
+		  }
+		}
             }
         } else if (sync == ASK_SYNC) {
             /** TODO(Mirko): implementare il modello qui sotto, e' più robusto
@@ -124,8 +158,16 @@ protected:
             memcpy (message.data(), owner_name.data(), owner_name.size());
             bool rc = sync_socket->send (message); assert(rc);
             message.rebuild (MAX_PACKET_LENGTH);
-            sync_socket->recv (&message);
-
+	    
+            try{
+                sync_socket->recv (&message);
+		}
+		catch (zmq::error_t ex)
+		{
+		  if (zmq_errno()==EINTR)
+		    WARN("programma terminato",NULL);
+		  return false;
+		}
             std::cout << static_cast<char*> (message.data()) << std::endl;
 
         }
@@ -133,14 +175,14 @@ protected:
     }
     
 public: 
-    std::vector<receive_type> receive()
+    std::vector<receive_type> receive(int flags=0)
     {
         unsigned int subscribers = 0;
 	receive_type packet;
 	results.clear();
 	while (subscribers < expected_senders) {
 		
-        receiver_socket.recv(&receive_buffer);
+        receiver_socket.recv(&receive_buffer,flags);
 	//boost::iostreams::stream_buffer<boost::iostreams::basic_array_source<char> > buffer( (char*)receive_buffer.data(), receive_buffer.size());
 	//boost::archive::binary_iarchive archive(buffer, boost::archive::no_header);
         char* receive=reinterpret_cast<char*>(receive_buffer.data());
@@ -207,6 +249,11 @@ class zmq_receive_communicator
         receive_buffer.rebuild (MAX_PACKET_LENGTH);
     }
 
+    ~zmq_receive_communicator()
+    {
+	receiver_socket.close();
+    }
+    
 protected:
     /**
      * This function will block till the syncing phase is over, if the class was created with a syncing policy!
@@ -226,6 +273,9 @@ protected:
 		{
 		  receiver_socket.setsockopt(ZMQ_SUBSCRIBE,"",0);
 		}
+		int temp=0;
+		receiver_socket.setsockopt(ZMQ_LINGER,&temp,sizeof(temp));	
+
 		results.resize (expected_senders);
         this->owner_name = owner_name;
         return true;
@@ -238,8 +288,15 @@ public:
 	receive_type packet;
 	results.clear();
 	while (subscribers < expected_senders) {
-		
+	try{	
         receiver_socket.recv(&receive_buffer);
+	}
+	catch (zmq::error_t ex)
+		{
+		  if (zmq_errno()==EINTR)
+		    WARN("programma terminato",NULL);
+		  break;
+		}
         char* receive=reinterpret_cast<char*>(receive_buffer.data());
 	std::istringstream receive_stream(
 	std::string(receive,receive_buffer.size()));

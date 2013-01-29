@@ -43,7 +43,7 @@ Graph_creator::Graph_creator ( lemon::SmartDigraph &_3Dgraph,lemon::SmartDigraph
 }
 
 void Graph_creator::addNodes ( lemon::SmartDigraph::NodeMap<lemon::dim2::Point<int> >& coords,
-                               lemon::SmartDigraph::NodeMap<int>& ncolors,lemon::SmartDigraph::ArcMap<int>& acolors,int floorNumber )
+                               lemon::SmartDigraph::NodeMap<int>& ncolors,lemon::SmartDigraph::ArcMap<int>& acolors,unsigned int floorNumber )
 {
     using namespace lemon;
     for ( unsigned int i=0; i<graph_node_size; i++ )

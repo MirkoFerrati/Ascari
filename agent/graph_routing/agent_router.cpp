@@ -119,7 +119,7 @@ void agent_router::run_plugin()
 	if (handshakeCounter<=15)
 	{
 		last_time_updated=time;
-		priority=distance_to_target.value();
+		priority=round(distance_to_target.value()/100.0);
 		update_lock_packet();
 		communicator.send();
 	}
