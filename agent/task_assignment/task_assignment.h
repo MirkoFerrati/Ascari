@@ -65,13 +65,14 @@ private:
 	void setTaskStop(bool stop);
 	bool task_made();
 	
-	std::mutex data_receive_mutex;
-	std::mutex data_send_mutex;
 	std::shared_ptr<std::mutex> ptr_receive_mutex;
-	std::shared_ptr<std::mutex> ptr_send_mutex;
+	//std::shared_ptr<std::mutex> ptr_send_mutex;
 	bool converge;
 	bool fresh_data;
 	bool not_started;
+	
+	//TODO: mettere tutti i dati possibili come shared_ptr, passarli al costruttore come riferimento e tanti saluti, quello che modifichi nel main thread lo modifichi anche nel communicator
+	//al costruttore passi l'oggetto puntato 
 	
 	//task_assignment_namespace::task_assignment_packet_base* data_send;
 	//std::vector<task_assignment_namespace::task_assignment_packet_base>* data_receive;
