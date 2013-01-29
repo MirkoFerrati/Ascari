@@ -1,7 +1,7 @@
 - WORLD:
   - TASK_ASSIGNMENT_ALGORITHM: SOLUTION_EXCHANGE #choose SUBGRADIENT or SOLUTION_EXCHANGE, or add another algorithm
     TASK_NUMBER: 3
-    TASK_LIST: [T1,20,10,0,1,1,1000,T2,60,10,0,1,1,1000,T3,40,10,0,1,1,1000]
+    TASK_LIST: [T1,20,100,0,1,1,1000,T2,60,100,0,1,1,1000,T3,40,100,0,1,1,1000]
     #id,position(x,y,z),type,execution time,deadline TODO fare TASK_LIST T1 T2 T3 e poi a capo i parametri per ognuno (T1: . . etc)
     
   AGENTS:

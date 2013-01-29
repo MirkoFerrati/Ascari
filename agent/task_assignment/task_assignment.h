@@ -38,9 +38,9 @@ private:
 	
 	std::vector<task_assignment_namespace::task_id> tasks_id;
 	
-	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_cost_vector> task_cost_matrix;
+	task_assignment_namespace::task_cost_matrix task_cost_matrix;
 	
-	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_assignment_vector> task_assignment_matrix;
+	task_assignment_namespace::task_assignment_matrix task_assignment_matrix;
 	
 	task_assignment_namespace::task_cost_vector* agent_task_cost_vector;
 	
@@ -65,11 +65,19 @@ private:
 	void setTaskStop(bool stop);
 	bool task_made();
 	
-	std::mutex data_mutex;
-	std::shared_ptr<std::mutex> ptr_mutex;
+	std::mutex data_receive_mutex;
+	std::mutex data_send_mutex;
+	std::shared_ptr<std::mutex> ptr_receive_mutex;
+	std::shared_ptr<std::mutex> ptr_send_mutex;
 	bool converge;
 	bool fresh_data;
 	bool not_started;
+	
+	//task_assignment_namespace::task_assignment_packet_base* data_send;
+	//std::vector<task_assignment_namespace::task_assignment_packet_base>* data_receive;
+	
+	//std::unique_ptr<task_assignment_namespace::task_assignment_packet_base> data_send;
+	//std::unique_ptr<std::vector<task_assignment_namespace::task_assignment_packet_base>> data_receive;
 	
 	bilp_problem ta_problem;
 	void initialize_bilp_problem(std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_cost_vector>& m);

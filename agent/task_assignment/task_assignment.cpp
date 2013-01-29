@@ -6,7 +6,8 @@
 using namespace task_assignment_namespace;
 
   
-task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, events::value >& events, const std::map<std::string,transition>& events_to_index):my_id(agent.name),events(events),events_to_index(events_to_index),data_mutex(),ptr_mutex(&data_mutex)
+task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, events::value >& events, const std::map<std::string,transition>& events_to_index)
+:my_id(agent.name),events(events),events_to_index(events_to_index),data_receive_mutex(),data_send_mutex(),ptr_receive_mutex(&data_receive_mutex),ptr_send_mutex(&data_send_mutex)
 {
     createAgentIdAndTaskIdVectorFromParsedWorld(world);
     createTaskListFromParsedWorld(world);
@@ -193,12 +194,13 @@ int task_assignment ::subgradient_algorithm()
 
 
 int task_assignment ::solution_exchange_algorithm()
-{
-     solution_exchange_packet data_send;    //TODO: fare classe base per i dati da inviare e ricevere  
+{    
+     solution_exchange_packet data_send;
+
      data_send.agent_id = my_id;
-		    
-     std::vector<solution_exchange_packet> data_receive;
-  
+     
+     std::vector<solution_exchange_packet>& data_receive = *(std::vector<solution_exchange_packet>*)ta_communicator->get_data();
+         
      int a=-1;
      
      unsigned int w=0;
@@ -215,30 +217,32 @@ int task_assignment ::solution_exchange_algorithm()
 	    
 	    solution.clear();
 	    
-	    ta_problem.solve(solution); //solution = ta_problem.solve(); mettere vector bool
+	    ta_problem.solve(solution);
      
 	    copy_solution_to_TA_matrix(solution);
 	    
-	    data_mutex.lock();
+	    data_receive_mutex.lock();
 	    
 	    fresh_data=false;
 	    
 	    for (unsigned int i=0;i<data_receive.size();i++)
 	    {
-		if (!(data_receive[i].agent_id==""))
+		if (!(data_receive.at(i).agent_id ==""))
 		{
-		    if (data_send.data == data_receive[i].data) w++;
+		    task_assignment_namespace::task_assignment_matrix temp = *(task_assignment_namespace::task_assignment_matrix*)data_receive.at(i).get_data();
+		    
+		    if (task_assignment_matrix == temp) w++;
 		}
 	    }
 	    
 	    data_receive.clear();
-
-	    std::cout<<"Invio"<<std::endl<<std::endl;
 	    
 	    //do something with received data | this algorithm does not converge, it can be used for future implementation of another algorithm
 	    //actually it converges if the agents optimal tasks are the same that you find with the bilp on the entire cost matrix
 	    
-	    ta_communicator->send();
+	    data_send.set_data((void*)&task_assignment_matrix);
+	    ta_communicator->set_data((void*)&data_send);
+	    data_send_mutex.unlock();//send
 	    
 	    if (w==agents_id.size()-1)
 	    {
@@ -251,12 +255,12 @@ int task_assignment ::solution_exchange_algorithm()
 	    
 	    w=0;
 	    
-	    data_mutex.unlock();
+	    data_receive_mutex.unlock();
 	    
 	    passi++;
      }
      
-     ta_communicator->send();
+     data_send_mutex.unlock();//send
      
      for(unsigned int j=0;j<tasks_id.size();j++)
      {
@@ -269,14 +273,23 @@ int task_assignment ::solution_exchange_algorithm()
 
 void task_assignment ::run_plugin()
 {
+  
      if (not_started)
      {
-	  if(task_assignment_algorithm==0)
-	  {
-		  //task_assignment_communicator<solution_exchange_packet,solution_exchange_packet> ta_communicator(data_receive,ptr_mutex,converge,agents_id.size()-1,my_id,fresh_data);
+	  if(task_assignment_algorithm==1)
+	  {		  
+		  //data_send = new solution_exchange_packet(task_assignment_matrix);
+		  //data_receive = new std::vector<solution_exchange_packet>();
+
+		  //ta_communicator = new task_assignment_communicator<solution_exchange_packet,solution_exchange_packet>(*data_receive,*data_send,ptr_mutex,converge,agents_id.size()-1,my_id,fresh_data);
+		  ta_communicator = new task_assignment_communicator<solution_exchange_packet,solution_exchange_packet>(ptr_receive_mutex,ptr_send_mutex,converge,agents_id.size()-1,my_id,fresh_data);
+	  
+		  not_started=false;
 	  }
 	  
-     }
+	  //ta_communicator = new task_assignment_communicator<task_assignment_packet_base,task_assignment_packet_base>(*data_receive,*data_send,ptr_mutex,converge,agents_id.size()-1,my_id,fresh_data);
+     
+    }
      
      if (stop)
      {
@@ -317,7 +330,7 @@ void task_assignment ::run_plugin()
 	    current_task=tasklist[a];
 	    std::cout<<"CURRENT TASK: "<<current_task.task_id<<", position: ["<<current_task.task_position[0]<<' '<<current_task.task_position[1]<<' '<<current_task.task_position[2]<<"], cost: "<<agent_task_cost_vector->at(current_task.task_id)<<std::endl;
 	    task_assigned=true;
-	    speed=1;
+	    speed=0.1;
 	}
      }
 }
