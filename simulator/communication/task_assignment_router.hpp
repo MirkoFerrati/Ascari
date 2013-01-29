@@ -30,7 +30,7 @@ class task_assignment_router: public simulator_to_agent_ta_communicator<datatype
 	{
 		std::vector<datatype> temp;
 		
-		while(1)
+		while(!s_interrupted)
 		{
 			sleep(0);
 			

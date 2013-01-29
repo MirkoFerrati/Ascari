@@ -37,12 +37,12 @@ void task_assignment ::setTaskStop(bool stop)
  
 bool task_assignment ::task_made()
 {
-	return events.at(events_to_index.at("REACHED"))==events::_TRUE;
+	return events.at(events_to_index.at("REACHED"))==Events::_TRUE;
 }
 
  
 task_assignment ::~task_assignment()
 {
-      std::cout<<"DISTRUGGO"<<std::endl;
+
 }
 

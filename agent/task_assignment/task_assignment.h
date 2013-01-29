@@ -66,19 +66,14 @@ private:
 	bool task_made();
 	
 	std::shared_ptr<std::mutex> ptr_receive_mutex;
-	//std::shared_ptr<std::mutex> ptr_send_mutex;
+	
 	bool converge;
 	bool fresh_data;
 	bool not_started;
 	
-	//TODO: mettere tutti i dati possibili come shared_ptr, passarli al costruttore come riferimento e tanti saluti, quello che modifichi nel main thread lo modifichi anche nel communicator
-	//al costruttore passi l'oggetto puntato 
+	std::shared_ptr<task_assignment_namespace::solution_exchange_packet> ptr_solution_exchange_packet;
 	
-	//task_assignment_namespace::task_assignment_packet_base* data_send;
-	//std::vector<task_assignment_namespace::task_assignment_packet_base>* data_receive;
-	
-	//std::unique_ptr<task_assignment_namespace::task_assignment_packet_base> data_send;
-	//std::unique_ptr<std::vector<task_assignment_namespace::task_assignment_packet_base>> data_receive;
+	std::shared_ptr<task_assignment_namespace::subgradient_packet> ptr_subgradient_packet;
 	
 	bilp_problem ta_problem;
 	void initialize_bilp_problem(std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_cost_vector>& m);
