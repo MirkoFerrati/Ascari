@@ -9,7 +9,7 @@ class automatonFSM:public automatonAbstract
 	
 public:
   automatonFSM(const transitionTable& table);
-  std::forward_list<automaton_state> getNextAutomatonState(const std::forward_list< automaton_state >& oldState, const std::map< transition, events::value >& event);
+  std::forward_list<automaton_state> getNextAutomatonState(const std::forward_list< automaton_state >& oldState, const std::map< transition, Events >& event);
 
 private:
   //string name;

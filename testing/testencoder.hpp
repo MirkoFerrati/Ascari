@@ -50,13 +50,13 @@ public:
 	sub_event_to_index.insert(make_pair("l2",4));
 	
 	
-	map< int, sub_events::value > sub_events;
+	map< int, Sub_events > sub_events;
 	
-	sub_events[0]=sub_events::_FALSE;
-	sub_events[1]=sub_events::_FALSE;
-	sub_events[2]=sub_events::_FALSE;
-	sub_events[3]=sub_events::_FALSE;
-	sub_events[4]=sub_events::_FALSE;
+	sub_events[0]=Sub_events::_FALSE;
+	sub_events[1]=Sub_events::_FALSE;
+	sub_events[2]=Sub_events::_FALSE;
+	sub_events[3]=Sub_events::_FALSE;
+	sub_events[4]=Sub_events::_FALSE;
 	
 	map<string,string>topology_expres;
 	topology_expres.insert(make_pair<string,string>("t1","x-xi<0 or t>=0"));
@@ -74,12 +74,12 @@ public:
 		       bonusVariablesName_to_Index, topology_expres, sub_event_to_index, lambda_expres,tmp); 
 	E.computeSubEvents( state_other_agents);
 	
-	assert(sub_events.at(sub_event_to_index.at("t1"))==sub_events::_TRUE);
-	assert(sub_events.at(sub_event_to_index.at("t2"))==sub_events::_FALSE);
-	assert(sub_events.at(sub_event_to_index.at("t3"))==sub_events::_FALSE);
+	assert(sub_events.at(sub_event_to_index.at("t1"))==Sub_events::_TRUE);
+	assert(sub_events.at(sub_event_to_index.at("t2"))==Sub_events::_FALSE);
+	assert(sub_events.at(sub_event_to_index.at("t3"))==Sub_events::_FALSE);
 	
-	assert(sub_events.at(sub_event_to_index.at("l1"))==sub_events::_TRUE);
-	assert(sub_events.at(sub_event_to_index.at("l2"))==sub_events::_FALSE);
+	assert(sub_events.at(sub_event_to_index.at("l1"))==Sub_events::_TRUE);
+	assert(sub_events.at(sub_event_to_index.at("l2"))==Sub_events::_FALSE);
 	
       //assert(abs(new_state[1]-(2+0.01*(3*10+3*2)))<0.0001);
 	//assert(abs(new_state[2]-(10+0.01*(4*10+2*1+2)))<0.0001);

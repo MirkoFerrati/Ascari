@@ -216,13 +216,13 @@ void agent::createSubEventsFromParsedAgent(const unique_ptr<Parsed_Behavior>& be
     unsigned i=0;
     for (map<string,string>::const_iterator it=behavior->lambda_expressions.begin();it!=behavior->lambda_expressions.end();++it) {
         sub_events_to_index.insert(make_pair(it->first,i));
-        sub_events.insert(make_pair(i,sub_events::_FALSE));
+        sub_events.insert(make_pair(i,Sub_events::_FALSE));
         i++;
     }
 
     for (map<string,string>::const_iterator it=behavior->topology_expressions.begin();it!=behavior->topology_expressions.end();++it) {
         sub_events_to_index.insert(make_pair(it->first,i));
-        sub_events.insert(make_pair(i,sub_events::_FALSE));
+        sub_events.insert(make_pair(i,Sub_events::_FALSE));
 		i++;
     }
 }
@@ -234,7 +234,7 @@ void agent::createEventsFromParsedAgent(const unique_ptr<Parsed_Behavior>& behav
     for (map<string,string>::const_iterator it=behavior->events_expressions.begin();it!=behavior->events_expressions.end();++it)
     {
         events_to_index.insert(make_pair(it->first,i));
-        events.insert(make_pair(i,events::_FALSE));
+        events.insert(make_pair(i,Events::_FALSE));
         i++;
     }
 }

@@ -6,7 +6,7 @@
 using namespace task_assignment_namespace;
 
   
-task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, events::value >& events, const std::map<std::string,transition>& events_to_index):my_id(agent.name),events(events),events_to_index(events_to_index),data_mutex(),ptr_mutex(&data_mutex)
+task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index):my_id(agent.name),events(events),events_to_index(events_to_index),data_mutex(),ptr_mutex(&data_mutex)
 {
     createAgentIdAndTaskIdVectorFromParsedWorld(world);
     createTaskListFromParsedWorld(world);

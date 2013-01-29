@@ -40,10 +40,10 @@ public:
 		trans_table.internalTable[left].insert(make_pair(e3,slow));
 		trans_table.internalTable[left].insert(make_pair(e1,fast));
 		
-		map<transition,events::value> events_Status;
-		events_Status.insert(make_pair(e1,events::_FALSE));
-		events_Status.insert(make_pair(e2,events::_FALSE));
-		events_Status.insert(make_pair(e3,events::_FALSE));
+		map<transition,Events> events_Status;
+		events_Status.insert(make_pair(e1,Events::_FALSE));
+		events_Status.insert(make_pair(e2,Events::_FALSE));
+		events_Status.insert(make_pair(e3,Events::_FALSE));
 		
 		automatonFSM test_automaton(trans_table);
 		forward_list<automaton_state> new_state;
@@ -52,21 +52,21 @@ public:
 		
 		old_state.push_front(fast);
 		//trans.push_back(e1);
-		events_Status[e1] = events::_TRUE;
+		events_Status[e1] = Events::_TRUE;
 		new_state=test_automaton.getNextAutomatonState(old_state,events_Status);
 		assert(new_state.front()==fast);
 	
 		old_state.front()=slow;
 		//trans[0]=e2;
-		events_Status[e1] = events::_FALSE;
-		events_Status[e2] = events::_TRUE;
+		events_Status[e1] = Events::_FALSE;
+		events_Status[e2] = Events::_TRUE;
 		new_state=test_automaton.getNextAutomatonState(old_state,events_Status);
 		assert(new_state.front()==slow);
 		
 		old_state.front()=left;
 		//trans[0]=e3;
-		events_Status[e2] = events::_FALSE;
-		events_Status[e3] = events::_TRUE;
+		events_Status[e2] = Events::_FALSE;
+		events_Status[e3] = Events::_TRUE;
 		new_state=test_automaton.getNextAutomatonState(old_state,events_Status);
 		assert(new_state.front()==slow);
 	}	

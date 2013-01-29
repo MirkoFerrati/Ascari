@@ -23,7 +23,6 @@ class Udp_agent_router
 	thread_ptr   t;
 	void service_thread(void) {
 	while (should_run) {
-	  std::cout<<"ciai"<<std::endl;
 		senderTop.send(receiverTop.receive());
     }
 }

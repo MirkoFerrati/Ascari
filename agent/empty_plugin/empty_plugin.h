@@ -10,7 +10,7 @@
 class empty_plugin: public Plugin_module
 {
 public:
-	empty_plugin( std::map< transition, events::value >& events,
+	empty_plugin( std::map< transition, Events >& events,
 				 const std::map<std::string, transition>& events_to_index, std::string identifier,
 			  simulation_time& time);
 void addReservedVariables(exprtk::symbol_table< double >& symbol_table_reference);

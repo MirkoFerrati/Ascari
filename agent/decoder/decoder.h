@@ -8,10 +8,10 @@
 class decoder
 {
 public:
-	decoder(std::map< int, sub_events::value >* sub_events, std::map< transition, events::value >* events);
+	decoder(std::map< int, Sub_events >* sub_events, std::map< transition, Events >* events);
 	decoder();
 
-	void setEventsAndSubEvents(std::map< int, sub_events::value >* sub_events, std::map< transition, events::value >* events)
+	void setEventsAndSubEvents(std::map< int, Sub_events >* sub_events, std::map< transition, Events >* events)
 	{
 		this->events=events;
 		this->sub_events=sub_events;
@@ -22,13 +22,13 @@ public:
 	void decode();
 	
 private:
-	std::map<int,sub_events::value>* sub_events;
-	std::map<transition,events::value>* events;
+	std::map<int,Sub_events>* sub_events;
+	std::map<transition,Events>* events;
 	
 	/**
 	 * Dall'indice dell'evento trovo l'indice dei sottoeventi e i loro valori richiesti
 	 */
-	std::map<int,std::map<int,sub_events::value> > internal_table; //if internal_table[i][j]==sub_events[j] ...
+	std::map<int,std::map<int,Sub_events> > internal_table; //if internal_table[i][j]==sub_events[j] ...
 	
 };
 
