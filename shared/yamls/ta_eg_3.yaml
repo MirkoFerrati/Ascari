@@ -1,0 +1,97 @@
+- WORLD:
+  - TASK_ASSIGNMENT_ALGORITHM: COST_EXCHANGE #choose SUBGRADIENT, COST_EXCHANGE or SOLUTION_EXCHANGE, or add another algorithm
+    TASK_NUMBER: 4
+    TASK_LIST: [T1,40,50,0,1,1,1000,T2,40,-10,0,1,1,1000,T3,40,30,0,1,1,1000,T4,40,10,0,1,1,1000]
+    #id,position(x,y,z),type,execution time,deadline TODO fare TASK_LIST T1 T2 T3 e poi a capo i parametri per ognuno (T1: . . etc)
+    
+  AGENTS:
+  - agent: Agente1
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - &initial
+      x: '20'
+      y: '20'
+      theta: '3'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,1,T2,4,T3,3,T4,2]
+    
+  - agent: Agente2
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '20'
+      y: '20'
+      theta: '4'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,100,T2,4,T3,3,T4,100]
+    
+  - agent: Agente3
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '20'
+      y: '20'
+      theta: '2'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,3,T2,2,T3,2,T4,4]
+    
+  - agent: Agente4
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '20'
+      y: '20'
+      theta: '2'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,2,T2,3,T3,100,T4,1]
+    
+  BEHAVIORS:
+  - name: prova
+    states: [x,y,theta]
+    control_commands: [v,w]
+    
+    DYNAMIC_MAP:
+    - x: 'v*cos(w)'
+      y: 'v*sin(w)'
+      theta: 'sin(w-theta)'
+    CONTROLLERS:
+    - name: go
+      v: v_t
+      w: atan2(y_task-y,x_task-x)
+    - name: wait
+      v: 0
+      w: 0
+    DISCRETE_STATES:
+    - name: go
+      controller: go
+    - name: wait
+      controller: wait
+    - name: wait_for_target
+      controller: wait
+    ENCODER:
+    - TOPOLOGY:
+        - topology: [t1]
+          t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+      LAMBDA:
+        - lambda: [Lreached] 
+          Lreached: 'abs(x-x_task)<3 and abs(y-y_task)<3'
+    EVENTS:
+    - events: [reached, new_target, stopped, started]
+      reached: 'Lreached'
+      new_target: '!Lreached'
+      stopped: ''
+      started: ''
+    AUTOMATON:
+    - name: aut_machine
+      GO:
+        - WAIT: [stopped]
+          WAIT_FOR_TARGET: [reached]
+      WAIT:
+        - GO: [started]
+      WAIT_FOR_TARGET:
+        - GO: [new_target]

@@ -33,7 +33,7 @@ class task_assignment_communicator: public agent_to_simulator_ta_communicator<re
 	bool& fresh_data;
 	std::map< std::string, bool > received_from_agents;
 	
-	void receive_loop(std::vector<receive_type>& data_receive,std::shared_ptr<std::mutex>& data_mutex,const bool& converge,unsigned int neighbour,std::string my_id,bool& fresh_data)
+	void receive_loop(std::vector<receive_type>& data_receive,std::shared_ptr<std::mutex>& ptr_data_mutex,const bool& converge,unsigned int neighbour,std::string my_id,bool& fresh_data)
 	{
 	      std::vector<receive_type> temp;
 
@@ -45,7 +45,7 @@ class task_assignment_communicator: public agent_to_simulator_ta_communicator<re
 		      {
 			    temp=this->receive();//blocking call
 
-			    data_mutex->lock();
+			    ptr_data_mutex->lock();
 
 			    for (unsigned int i=0;i<temp.size();i++)
 			    {
@@ -68,7 +68,7 @@ class task_assignment_communicator: public agent_to_simulator_ta_communicator<re
 				std::cout<<std::endl;
 			    }
 
-			    data_mutex->unlock();
+			    ptr_data_mutex->unlock();
 		      }
 		      
 	      }

@@ -7,7 +7,6 @@
 #include <zmq_agent_communicator.h>
 #include "collisionchecker.h"
 
-
 using namespace std;
 
 void simulator::create_communicator(int communicator_type)
@@ -185,22 +184,32 @@ void simulator::main_loop()
 	    
 	    if (!ta_router_started)
 	    {
-		if (task_assignment_algorithm == 0)
+		if (task_assignment_algorithm == SUBGRADIENT)
 		{
 		      ta_router = new task_assignment_router<task_assignment_namespace::subgradient_packet> ();
 		   
 		}
 		
-		if (task_assignment_algorithm == 1)
+		if (task_assignment_algorithm == SOLUTION_EXCHANGE)
 		{
 		      ta_router = new task_assignment_router<task_assignment_namespace::solution_exchange_packet> ();
 
+		}
+		
+		if (task_assignment_algorithm == COST_EXCHANGE)
+		{		      
+		      ta_router = new task_assignment_router<task_assignment_namespace::cost_exchange_packet> ();
 		}
 		
 		if (task_assignment_algorithm != -1)
 		{
 		      ta_router->init(num_agents);
 		      ta_router_started=true;
+		}
+		
+		if (task_assignment_algorithm == -1)
+		{
+		      ERR("attenzione, algoritmo per il task assignment non selezionato");
 		}
 	    }
 	    //written by Alessandro Settimi

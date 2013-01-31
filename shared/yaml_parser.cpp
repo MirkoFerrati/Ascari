@@ -229,11 +229,15 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 	task_assignment_namespace::task_cost_vector app;
 	double cost;
 	std::string id;
+	std::string temp;
 
 	for(unsigned int i=0;i<co.size();)
 	{
 	    co[i] >> id;
-	    co[i+1] >> cost;
+	    co[i+1] >> temp;
+	    if(temp=="INF") cost=INF;
+	    else co[i+1] >> cost;
+	    
 	    ag.agent_task_cost_vector.insert(make_pair(id,cost));
 	    i=i+2;
 	}
@@ -353,6 +357,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
 		
 		if (algorithm == "SUBGRADIENT" ) wo.task_assignment_algorithm = SUBGRADIENT; 
 		if (algorithm == "SOLUTION_EXCHANGE" ) wo.task_assignment_algorithm = SOLUTION_EXCHANGE;
+		if (algorithm == "COST_EXCHANGE") wo.task_assignment_algorithm = COST_EXCHANGE;
 		if (wo.task_assignment_algorithm == -1)
 		{
 		      ERR("UNDEFINED TASK ASSIGNMENT ALGORITHM",NULL);

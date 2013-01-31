@@ -6,8 +6,8 @@
 using namespace task_assignment_namespace;
 
   
-task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index)
-:my_id(agent.name),events(events),events_to_index(events_to_index)
+task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index)
+:time(time),my_id(agent.name),x0(agent.initial_states.at("X")),y0(agent.initial_states.at("Y")),events(events),events_to_index(events_to_index)
 {    
     std::shared_ptr<std::mutex> temp(new std::mutex);
     ptr_receive_mutex.swap(temp);
@@ -18,35 +18,46 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     inizializeTaskAssignmentMatrix();
     
     task_assignment_algorithm=world.task_assignment_algorithm;
+    printTaskCostMatrix();
+    
+    update_costs_with_position();
+    printTaskCostMatrix();
+    
+    update_costs_with_deadlines();
+    printTaskCostMatrix();
     
     task_assigned=false;
     stop=false;
     speed=0;
-    
-    printTaskCostMatrix();
     
     converge=false;
     fresh_data=true;
     
     not_started=true;
     
-    initialize_bilp_problem(task_cost_matrix);
+    initialize_bilp_problem();
 }
 
- 
-void task_assignment ::initialize_bilp_problem(std::map<agent_id,task_cost_vector>& m)
-{	
+void task_assignment ::copy_cost_matrix_to_cost_vector()
+{
+  	C.clear();
+	
 	int z=0;
 	
 	for (unsigned int i=0;i<agents_id.size();i++)
 	{
 	    for (unsigned int j=0;j<tasks_id.size();j++)
 	    {
-		 C.push_back(m.at(agents_id[i]).at(tasks_id[j]));
+		 C.push_back(task_cost_matrix.at(agents_id[i]).at(tasks_id[j]));
 		 z++;
 	    }
 	}
-    
+}
+ 
+void task_assignment ::initialize_bilp_problem()
+{	
+	copy_cost_matrix_to_cost_vector();
+	
 	ta_problem.initialize_problem("Task_Assignment",GLP_MIN,(int)agents_id.size(),(int)tasks_id.size(),C);
 }
 
@@ -54,7 +65,7 @@ void task_assignment ::initialize_bilp_problem(std::map<agent_id,task_cost_vecto
 void task_assignment ::createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo)
 {
     for (unsigned int i=0;i<wo.agents.size();i++)
-	agents_id.push_back(wo.agents[i].name);  
+      agents_id.push_back(wo.agents[i].name);  
     
     for (unsigned int i=0;i<wo.task_list.size();i++)
 	tasks_id.push_back(wo.task_list[i].task_id);
@@ -112,6 +123,25 @@ void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a
 	  
 }
 
+void task_assignment::update_costs_with_position()
+{
+    for (unsigned int i=0;i<tasks_id.size();i++) //controllo quali costi devo inviare
+    {
+	  if(task_cost_matrix.at(my_id).at(tasks_id.at(i))!=INF)
+	      task_cost_matrix.at(my_id).at(tasks_id.at(i)) += distance_from_task(tasks_id.at(i));
+    }
+}
+
+
+void task_assignment::update_costs_with_deadlines()
+{
+    for (unsigned int i=0;i<tasks_id.size();i++) //controllo quali costi devo inviare
+    {
+	  if(task_cost_matrix.at(my_id).at(tasks_id.at(i))!=INF)
+	      task_cost_matrix.at(my_id).at(tasks_id.at(i)) /= time_to_deadline(tasks_id.at(i));
+    }
+}
+
  
 void task_assignment ::inizializeTaskAssignmentMatrix()
 {
@@ -163,7 +193,14 @@ void task_assignment ::printTaskCostMatrix()
 
 	for(unsigned int j=0;j<tasks_id.size();j++)
 	{
-	    std::cout<<task_cost_matrix.at(agents_id[i]).at(tasks_id[j])<<' ';
+	    if(task_cost_matrix.at(agents_id[i]).at(tasks_id[j])==INF)
+	    {
+		std::cout<<"INF"<<' ';
+	    }
+	    else
+	    {
+		std::cout<<task_cost_matrix.at(agents_id[i]).at(tasks_id[j])<<' ';
+	    }
 	}
 	
 	std::cout<<std::endl;
@@ -186,105 +223,46 @@ void task_assignment ::copy_solution_to_TA_matrix(std::vector<bool> solution)
     }
 }
 
- 
-int task_assignment ::subgradient_algorithm()
-{
-      //TODO
-      return 0;
-}
-
-
-
-int task_assignment ::solution_exchange_algorithm()
-{    
-     ptr_solution_exchange_packet.get()->agent_id=my_id;
-  
-     std::vector<solution_exchange_packet>& data_receive = *(std::vector<solution_exchange_packet>*)ta_communicator->get_data();
-         
-     int a=-1;
-     
-     unsigned int w=0;
-     
-     unsigned int passi=1;
-     
-     std::vector<bool> solution;
-     
-     while(!converge && !s_interrupted)
-     {
-	    std::cout<<"----------------PASSO "<<passi<<"----------------"<<std::endl<<std::endl;
-
-	    sleep(1);
-	    
-	    solution.clear();
-	    
-	    ta_problem.solve(solution);
-     
-	    copy_solution_to_TA_matrix(solution);
-	    
-	    ptr_receive_mutex->lock();
-	    
-	    fresh_data=false;
-	    
-	    for (unsigned int i=0;i<data_receive.size();i++)
-	    {
-		if (!(data_receive.at(i).agent_id ==""))
-		{
-		    task_assignment_namespace::task_assignment_matrix temp = *(task_assignment_namespace::task_assignment_matrix*)data_receive.at(i).get_data();
-		    
-		    if (task_assignment_matrix == temp) w++;
-		}
-	    }
-	    
-	    data_receive.clear();
-	    
-	    //do something with received data | this algorithm does not converge, it can be used for future implementation of another algorithm
-	    //actually it converges if the agents optimal tasks are the same that you find with the bilp on the entire cost matrix
-	    	    
-	    ptr_solution_exchange_packet.get()->data=task_assignment_matrix;
-	    
-	    ta_communicator->send();
-	    
-	    if (w==agents_id.size()-1)
-	    {
-		  std::cout<<"Converge, ";
-		  printTaskAssignmentMatrix();
-		  converge=true;
-	    }
-	    
-	    if(!converge)printTaskAssignmentMatrix();
-	    
-	    w=0;
-	    
-	    ptr_receive_mutex->unlock();
-	    
-	    passi++;
-     }
-     
-     ta_communicator->send();
-
-     for(unsigned int j=0;j<tasks_id.size();j++)
-     {
-	    if(agent_task_assignment_vector->at(tasks_id[j]) == true) a=j;
-     }
-     
-     return a;
-}
-
 
 void task_assignment ::run_plugin()
 {
   
      if (not_started)
      {
-	  if(task_assignment_algorithm==1)
+	  if(task_assignment_algorithm==SOLUTION_EXCHANGE)
 	  {		  
 		  std::shared_ptr<solution_exchange_packet> temp(new solution_exchange_packet);
 		  ptr_solution_exchange_packet.swap(temp);
 		  ta_communicator = new task_assignment_communicator<solution_exchange_packet,solution_exchange_packet>(ptr_receive_mutex,ptr_solution_exchange_packet.get(),converge,agents_id.size()-1,my_id,fresh_data);
-	  
+		
+		  std::cout<<"TASK ASSIGNMENT ALGORITHM: SOLUTION EXCHANGE"<<std::endl;
 		  not_started=false;
 	  }
-	      
+	  
+	  if(task_assignment_algorithm==SUBGRADIENT)
+	  {
+		  std::shared_ptr<subgradient_packet> temp(new subgradient_packet);
+		  ptr_subgradient_packet.swap(temp);
+		  ta_communicator = new task_assignment_communicator<subgradient_packet,subgradient_packet>(ptr_receive_mutex,ptr_subgradient_packet.get(),converge,agents_id.size()-1,my_id,fresh_data);
+	  
+		  std::cout<<"TASK ASSIGNMENT ALGORITHM: SUBGRADIENT"<<std::endl;
+		  not_started=false;
+	  }
+	  
+	  if(task_assignment_algorithm==COST_EXCHANGE)
+	  {
+		  std::shared_ptr<cost_exchange_packet> temp(new cost_exchange_packet);
+		  ptr_cost_exchange_packet.swap(temp);
+		  ta_communicator = new task_assignment_communicator<cost_exchange_packet,cost_exchange_packet>(ptr_receive_mutex,ptr_cost_exchange_packet.get(),converge,agents_id.size()-1,my_id,fresh_data);
+	  
+		  std::cout<<"TASK ASSIGNMENT ALGORITHM: COST EXCHANGE"<<std::endl;
+		  not_started=false;
+	  }
+	    
+	  if(task_assignment_algorithm==-1)
+	  {
+		ERR("attenzione, algoritmo per il task assignment non selezionato");
+	  }
     }
      
      if (stop)
@@ -307,16 +285,21 @@ void task_assignment ::run_plugin()
      {
 	int a;
 	
-	if(task_assignment_algorithm==0)
+	if(task_assignment_algorithm==SUBGRADIENT)
 	{
 	    a=subgradient_algorithm(); //TODO: fare funzione template per l'algoritmo
 	}
 	
-	if(task_assignment_algorithm==1)
+	if(task_assignment_algorithm==SOLUTION_EXCHANGE)
 	{
 	    a=solution_exchange_algorithm();
 	}
        
+        if(task_assignment_algorithm==COST_EXCHANGE)
+	{
+	    a=cost_exchange_algorithm();
+	}
+	
 	if(a==-1)
 	{
 	    ERR("attenzione, task assignment non riuscito");

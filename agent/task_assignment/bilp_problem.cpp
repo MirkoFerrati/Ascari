@@ -133,6 +133,14 @@ void bilp_problem::add_structural_variables()
 	}
 }
 
+void bilp_problem::set_cost_vector(std::vector<double> cost_vector)
+{
+	for (int i=1;i<num_var+1;i++)
+	{
+		glp_set_obj_coef(problem, i, cost_vector[i-1]); //settaggio del coefficiente del funzionale di costo relativo alla variabile (c)
+	}
+}
+
 void bilp_problem::create_problem(std::vector<double> cost_vector)
 {
 	problem = glp_create_prob(); //costruttore, problema vuoto
@@ -143,10 +151,7 @@ void bilp_problem::create_problem(std::vector<double> cost_vector)
 	
 	add_structural_variables();
 	
-	for (int i=1;i<num_var+1;i++)
-	{
-		glp_set_obj_coef(problem, i, cost_vector[i-1]); //settaggio del coefficiente del funzionale di costo relativo alla variabile (c)
-	}
+	set_cost_vector(cost_vector);
 	
 	glp_load_matrix(problem, size, A_i.data(), A_j.data(), A_ij.data()); //caricamento matrice di vincolo (A)
 

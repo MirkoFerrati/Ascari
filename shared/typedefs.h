@@ -236,21 +236,12 @@ struct task
 typedef std::vector<task> task_list;
 
 
-class task_assignment_packet_base
-{
-public:
-   std::string agent_id;
-   
-   virtual void* get_data()=0;
-   virtual ~task_assignment_packet_base(){};
-};
-
-
 template <typename data_type>
-class task_assignment_packet: public task_assignment_packet_base
+class task_assignment_packet
 {
 public:
     
+    std::string agent_id;
     data_type data;
     
     task_assignment_packet()
@@ -274,8 +265,22 @@ public:
     }
 };
 
+struct solution_cost_packet
+{
+      task_assignment_matrix ta_matrix;
+      std::map<task_id,task_cost> costs;
+      
+      template <typename Archive>
+      void serialize(Archive& ar,const unsigned int /*version*/)
+      {
+	ar& ta_matrix;
+        ar& costs;
+      }
+};
+
 typedef task_assignment_packet<double> subgradient_packet;
-typedef task_assignment_packet<std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_assignment_vector>> solution_exchange_packet;
+typedef task_assignment_packet<std::map<agent_id,task_assignment_vector>> solution_exchange_packet;
+typedef task_assignment_packet<solution_cost_packet> cost_exchange_packet;
 
 }
 #ifndef GLP_MIN
@@ -286,8 +291,11 @@ typedef task_assignment_packet<std::map<task_assignment_namespace::agent_id,task
 #define GLP_MAX 2
 #endif
 
+#define INF 1000.0
+
 #define SUBGRADIENT 0
 #define SOLUTION_EXCHANGE 1
+#define COST_EXCHANGE 2
 //written by Alessandro Settimi
 
 #endif //TYPEDEFS_H
