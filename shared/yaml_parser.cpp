@@ -166,22 +166,27 @@ void operator>> (const YAML::Node& node, std::unique_ptr<Parsed_Behavior>& behav
 
 
 //written by Alessandro Settimi
-void createTaskList(const YAML::Node& node, task_assignment_namespace::task_list& task_list,unsigned int task_number)
+void createTaskList(const YAML::Node& node, task_assignment_namespace::task_list& task_list,std::vector<task_assignment_namespace::task_id>& tasks_id,
+unsigned int task_number)
 {
     unsigned int j=0;
     
     for (unsigned int i=0;i<task_number*7;)
     {
-        task_assignment_namespace::task app;
-	task_list.push_back(app);
+        task_assignment_namespace::task_id temp1;
+	node[i] >> temp1;
+	tasks_id.push_back(temp1);
       
-        node[i] >> task_list[j].task_id;
-	node[i+1] >> task_list[j].task_position[0];
-	node[i+2] >> task_list[j].task_position[1];
-	node[i+3] >> task_list[j].task_position[2];
-	node[i+4] >> task_list[j].task_type;
-	node[i+5] >> task_list[j].task_execution_time;
-	node[i+6] >> task_list[j].task_deadline;
+        task_assignment_namespace::task temp2;
+      
+	node[i+1] >> temp2.task_position[0];
+	node[i+2] >> temp2.task_position[1];
+	node[i+3] >> temp2.task_position[2];
+	node[i+4] >> temp2.task_type;
+	node[i+5] >> temp2.task_execution_time;
+	node[i+6] >> temp2.task_deadline;
+	
+	task_list.insert(make_pair(temp1,temp2));
 	
 	i=i+7;
 	j++;
@@ -364,7 +369,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
 		      throw "UNDEFINED TASK ASSIGNMENT ALGORITHM";
 		}
 		
-		createTaskList(node[0]["WORLD"][0]["TASK_LIST"],wo.task_list,task_number);
+		createTaskList(node[0]["WORLD"][0]["TASK_LIST"],wo.task_list,wo.tasks_id,task_number);
 	    }
 	
 

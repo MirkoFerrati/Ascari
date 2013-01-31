@@ -227,14 +227,12 @@ typedef int task_assignment_algorithm;
 
 struct task
 {
-    std::string task_id;
     double task_position[3];
     int task_type;
     double task_execution_time;
     double task_deadline;
 };
-typedef std::vector<task> task_list;
-
+typedef std::map<task_id,task> task_list;
 
 template <typename data_type>
 class task_assignment_packet

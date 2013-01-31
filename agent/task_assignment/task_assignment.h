@@ -73,12 +73,14 @@ private:
 	
 	double time_to_deadline(task_assignment_namespace::task_id task_id);
 	
+	void update_costs_with_expiring_deadlines();
+	
 	//algorithms
-	int subgradient_algorithm();
+	task_assignment_namespace::task_id subgradient_algorithm();
 	
-	int solution_exchange_algorithm();
+	task_assignment_namespace::task_id solution_exchange_algorithm();
 	
-	int cost_exchange_algorithm();
+	task_assignment_namespace::task_id cost_exchange_algorithm();
 	//
 	
 	void setTaskStop(bool stop);

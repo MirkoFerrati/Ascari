@@ -42,34 +42,24 @@ bool task_assignment ::task_made()
 
 double task_assignment ::distance_from_task(task_assignment_namespace::task_id task_id)
 {
-	for (unsigned int i=0;i<tasklist.size();i++) //TODO: meglio fare la task list map<task_id,task>
-	{
-	      if (tasklist.at(i).task_id == task_id)
-	      return sqrt((x0-tasklist.at(i).task_position[0])*(x0-tasklist.at(i).task_position[0])+(y0-tasklist.at(i).task_position[1])*(y0-tasklist.at(i).task_position[1]));
-	}
-	return 0;
+	return sqrt((x0-tasklist.at(task_id).task_position[0])*(x0-tasklist.at(task_id).task_position[0])+(y0-tasklist.at(task_id).task_position[1])*(y0-tasklist.at(task_id).task_position[1]));
 }
 
 double task_assignment ::time_to_deadline(task_assignment_namespace::task_id task_id)
 {
-	for (unsigned int i=0;i<tasklist.size();i++) //TODO: meglio fare la task list map<task_id,task>
+	double temp = tasklist.at(task_id).task_deadline-time;
+	
+	if (temp==-time) return 1;
+	
+	if (temp > 0) return temp;
+	  
+	if (temp < 0) 
 	{
-	      if (tasklist.at(i).task_id == task_id)
-	      {
-		    double temp = tasklist.at(i).task_deadline-time;
-		    
-		    if (temp==-time) return 1;
-		    
-		    if (temp > 0) return temp;
-		      
-		    if (temp < 0) 
-		    {
-			std::cout<<"Deadline per il task "<<task_id<<" superata";
-			ERR("!");
-			return 1;
-		    }
-	      }
+	    std::cout<<"Deadline per il task "<<task_id<<" superata";
+	    ERR("!");
+	    return 1;
 	}
+	
 	return 1;
 }
  

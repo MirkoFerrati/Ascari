@@ -49,15 +49,16 @@ class task_assignment_communicator: public agent_to_simulator_ta_communicator<re
 
 			    for (unsigned int i=0;i<temp.size();i++)
 			    {
-				if(temp[i].agent_id!=my_id && !(received_from_agents.count(temp[i].agent_id)))
+				if(temp[i].agent_id!=my_id )
 				{
-				    received_from_agents.insert(make_pair(temp[i].agent_id,true));
+				    if (!(received_from_agents.count(temp[i].agent_id)))
+					  received_from_agents.insert(make_pair(temp[i].agent_id,true));
 				    data_receive.push_back(temp[i]);
 				    std::cout<<"Ricevo da "<<temp[i].agent_id<<std::endl;
 				}
 			    }
 
-			    if (data_receive.size()<neighbour)
+			    if (received_from_agents.size()<neighbour)
 			    {
 				fresh_data=false;
 			    }
