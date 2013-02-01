@@ -8,7 +8,7 @@ using namespace task_assignment_namespace;
   
 task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index)
 :time(time),my_id(agent.name),x0(agent.initial_states.at("X")),y0(agent.initial_states.at("Y")),events(events),events_to_index(events_to_index)
-{    
+{        
     std::shared_ptr<std::mutex> temp(new std::mutex);
     ptr_receive_mutex.swap(temp);
     
@@ -38,21 +38,6 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     initialize_bilp_problem();
 }
 
-void task_assignment ::copy_cost_matrix_to_cost_vector()
-{
-  	C.clear();
-	
-	int z=0;
-	
-	for (unsigned int i=0;i<agents_id.size();i++)
-	{
-	    for (unsigned int j=0;j<tasks_id.size();j++)
-	    {
-		 C.push_back(task_cost_matrix.at(agents_id[i]).at(tasks_id[j]));
-		 z++;
-	    }
-	}
-}
  
 void task_assignment ::initialize_bilp_problem()
 {	
@@ -114,51 +99,6 @@ void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a
 	  
 }
 
-void task_assignment::update_costs_with_position()
-{
-    for (unsigned int i=0;i<tasks_id.size();i++)
-    {
-	  if(task_cost_matrix.at(my_id).at(tasks_id.at(i))!=INF)
-	      task_cost_matrix.at(my_id).at(tasks_id.at(i)) += distance_from_task(tasks_id.at(i));
-    }
-}
-
-
-void task_assignment::update_costs_with_deadlines()
-{
-    for (unsigned int i=0;i<tasks_id.size();i++)
-    {
-	  if(task_cost_matrix.at(my_id).at(tasks_id.at(i))!=INF)
-	      task_cost_matrix.at(my_id).at(tasks_id.at(i)) /= time_to_deadline(tasks_id.at(i));
-    }
-}
-
-void task_assignment::update_costs_with_expiring_deadlines()
-{//per ora è semplicemente se c'è una deadline, ancora è statico
-    for (unsigned int i=0;i<agents_id.size();i++)
-    {
-	  if (agents_id.at(i) != my_id)
-	  {
-		for (unsigned int j=0;j<tasks_id.size();j++)
-		{
-		      if (task_cost_matrix.at(my_id).at(tasks_id.at(j))!=INF)
-		      {
-			      double app = task_cost_matrix.at(agents_id.at(i)).at(tasks_id.at(j));
-			      
-			      if (tasklist.at(tasks_id.at(j)).task_deadline!=0)
-			      {
-				  if(app !=0 && app < task_cost_matrix.at(my_id).at(tasks_id.at(j)))
-				  {
-					  task_cost_matrix.at(my_id).at(tasks_id.at(j)) = INF;
-					  ptr_cost_exchange_packet.get()->data.costs.insert(make_pair(tasks_id.at(j),task_cost_matrix.at(my_id).at(tasks_id.at(j)))); 
-				  }
-			      }
-			      
-		      }
-		}
-	  }
-    }
-}
  
 void task_assignment ::inizializeTaskAssignmentMatrix()
 {
@@ -224,20 +164,6 @@ void task_assignment ::printTaskCostMatrix()
     }
     
     std::cout<<std::endl;
-}
-
- 
-void task_assignment ::copy_solution_to_TA_matrix(std::vector<bool> solution)
-{
-    for(unsigned int i=0;i<agents_id.size();i++)
-    {
-
-	for(unsigned int j=0;j<tasks_id.size();j++)
-	{
-	    task_assignment_matrix.at(agents_id[i]).at(tasks_id[j])=solution[i*tasks_id.size()+j];
-	}
-	
-    }
 }
 
 

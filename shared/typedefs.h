@@ -266,7 +266,7 @@ public:
 struct solution_cost_packet
 {
       task_assignment_matrix ta_matrix;
-      std::map<task_id,task_cost> costs;
+      task_cost_vector costs;
       
       template <typename Archive>
       void serialize(Archive& ar,const unsigned int /*version*/)
@@ -277,7 +277,7 @@ struct solution_cost_packet
 };
 
 typedef task_assignment_packet<double> subgradient_packet;
-typedef task_assignment_packet<std::map<agent_id,task_assignment_vector>> solution_exchange_packet;
+typedef task_assignment_packet<task_assignment_matrix> solution_exchange_packet;
 typedef task_assignment_packet<solution_cost_packet> cost_exchange_packet;
 
 }
@@ -289,7 +289,7 @@ typedef task_assignment_packet<solution_cost_packet> cost_exchange_packet;
 #define GLP_MAX 2
 #endif
 
-#define INF 1000.0
+#define INF 1000000.0
 
 #define SUBGRADIENT 0
 #define SOLUTION_EXCHANGE 1
