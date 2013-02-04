@@ -9,6 +9,7 @@
 #include <boost/thread.hpp>
 #include <task_assignment_communicator.h>
 #include <bilp_problem.h>
+#include <random.hpp>
 
 class task_assignment: public Plugin_module
 {
@@ -29,6 +30,8 @@ public:
 
 	
 private:
+	rndom<double> rndom_double;
+	
 	simulation_time& time;
     
 	task_assignment_namespace::agent_id my_id;

@@ -1,3 +1,5 @@
+#ifndef RANDOM_HPP
+#define RANDOM_HPP
 
 #include <exprtk.hpp>
 #pragma GCC diagnostic push
@@ -37,3 +39,5 @@ struct rndom : public exprtk::ifunction<T>
 };
 
 #pragma GCC diagnostic pop
+
+#endif //RANDOM_HPP
