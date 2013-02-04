@@ -201,7 +201,21 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     node["VISIBLE_AREA"]>>ag.visibility;
     node["COMMUNICATION_AREA"]>>ag.communication;
    
-    
+    ag.monitoring=false;  
+  
+     if (node.FindValue("MONITORING"))
+    {
+	int tmp_mon;
+	node["MONITORING"]>>tmp_mon;
+	if(tmp_mon==1)
+	  ag.monitoring=true;  	
+	else{
+	    ag.monitoring=false;
+	  if(tmp_mon!=0){
+	   ERR("UNRECOGNIZED VALUE FOR MONITORING. SET TO FALSE");
+	  }
+	}
+    }
     
     
     for (unsigned int i=0;i<ag.behavior->state.size();i++)

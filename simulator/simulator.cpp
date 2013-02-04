@@ -209,7 +209,7 @@ void simulator::main_loop()
 		
 		if (task_assignment_algorithm == -1)
 		{
-		      ERR("attenzione, algoritmo per il task assignment non selezionato");
+	//	      ERR("attenzione, algoritmo per il task assignment non selezionato");
 		}
 	    }
 	    //written by Alessandro Settimi

@@ -86,6 +86,8 @@ public:
     const std::unique_ptr<Parsed_Behavior>& behavior;
     std::string behavior_name;
     
+    bool monitoring;
+    
     //written by Alessandro Settimi
     task_assignment_namespace::task_cost_vector agent_task_cost_vector;
     //written by Alessandro Settimi

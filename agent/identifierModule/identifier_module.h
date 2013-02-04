@@ -17,7 +17,8 @@ public:
     void addReservedVariables (exprtk::symbol_table< double >& arg1);
     void compileExpressions (exprtk::symbol_table< double >& arg1);
     void run_plugin();
-    identifier_module (Parsed_World const& W, world_sim_packet const& sensed_agents);
+    identifier_module (Parsed_World const& W, const std::map<int,double> & sensed_bonus_variables, const std::map<std::string,int> & map_bonus_variables_to_id,
+    const std::map<std::string,agent_state_packet> &sensed_state_agents, const simulation_time & sensed_time);
     
     
 
@@ -30,7 +31,10 @@ private:
     std::map <std::string,int> index_behaviors;
     std::map <std::string,std::vector< bool >> identifier_matrix;
     world_sim_packet old_sensed_agents;
-    world_sim_packet const & sensed_agents;
+    const std::map<int,double> & sensed_bonus_variables;
+    const std::map<std::string,int> & map_bonus_variables_to_id;
+    const std::map<std::string,agent_state_packet> &sensed_state_agents;
+    const simulation_time & sensed_time;
     std::vector<dynamic*> dynamics;
     agent_state old_temp_state;
     control_command temp_command;

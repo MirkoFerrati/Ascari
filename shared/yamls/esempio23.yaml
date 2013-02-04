@@ -61,8 +61,8 @@
   AGENTS:
   - agent: Agente1
     VISIBLE_AREA: circle(9)
-    COMMUNICATION_AREA: =  circle(10)
-    #MONITORING = 0
+    COMMUNICATION_AREA:  circle(10)
+    MONITORING: 0
     #COLLABORATIVE = 1
     states: [x,y,theta]
     control_commands: [v,w]
@@ -77,6 +77,7 @@
   - agent: Agente2
     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
+    MONITORING: 0
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
@@ -98,88 +99,88 @@
     STATE_START: FAST
     BEHAVIOR: LGV
     
-  - agent: Agente4
-    VISIBLE_AREA: circle(9)
-    COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - x: '281'
-      y: '251'
-      theta: '0.4'
-    STATE_START: FAST
-    BEHAVIOR: LGV
-    
-  - agent: Agente5
-    VISIBLE_AREA: circle(9)
-    COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - x: '291'
-      y: '151'
-      theta: '-0.5'
-    STATE_START: FAST
-    BEHAVIOR: LGV
-    
-  - agent: Agente6
-    VISIBLE_AREA: circle(9)
-    COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - x: '151'
-      y: '231'
-      theta: '0.6'
-    STATE_START: FAST
-    BEHAVIOR: LGV
-    
-  - agent: Agente7
-    VISIBLE_AREA: circle(9)
-    COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - x: '312'
-      y: '221'
-      theta: '-0.7'
-    STATE_START: FAST
-    BEHAVIOR: LGV
-    
-  - agent: Agente8
-    VISIBLE_AREA: circle(9)
-    COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - x: '331'
-      y: '41'
-      theta: '0.8'
-    STATE_START: FAST
-    BEHAVIOR: LGV
-    
-  - agent: Agente9
-    VISIBLE_AREA: circle(9)
-    COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - x: '341'
-      y: '451'
-      theta: '-0.9'
-    STATE_START: FAST
-    BEHAVIOR: LGV
-    
-  - agent: Agente10
-    VISIBLE_AREA: circle(9)
-    COMMUNICATION_AREA: =  circle(10)
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - x: '10'
-      y: '10'
-      theta: '0'
-    STATE_START: FAST
-    BEHAVIOR: LGV
-    
-    
+#   - agent: Agente4
+#     VISIBLE_AREA: circle(9)
+#     COMMUNICATION_AREA: =  circle(10)
+#     states: [x,y,theta]
+#     control_commands: [v,w]
+#     INITIAL:
+#     - x: '281'
+#       y: '251'
+#       theta: '0.4'
+#     STATE_START: FAST
+#     BEHAVIOR: LGV
+#     
+#   - agent: Agente5
+#     VISIBLE_AREA: circle(9)
+#     COMMUNICATION_AREA: =  circle(10)
+#     states: [x,y,theta]
+#     control_commands: [v,w]
+#     INITIAL:
+#     - x: '291'
+#       y: '151'
+#       theta: '-0.5'
+#     STATE_START: FAST
+#     BEHAVIOR: LGV
+#     
+#   - agent: Agente6
+#     VISIBLE_AREA: circle(9)
+#     COMMUNICATION_AREA: =  circle(10)
+#     states: [x,y,theta]
+#     control_commands: [v,w]
+#     INITIAL:
+#     - x: '151'
+#       y: '231'
+#       theta: '0.6'
+#     STATE_START: FAST
+#     BEHAVIOR: LGV
+#     
+#   - agent: Agente7
+#     VISIBLE_AREA: circle(9)
+#     COMMUNICATION_AREA: =  circle(10)
+#     states: [x,y,theta]
+#     control_commands: [v,w]
+#     INITIAL:
+#     - x: '312'
+#       y: '221'
+#       theta: '-0.7'
+#     STATE_START: FAST
+#     BEHAVIOR: LGV
+#     
+#   - agent: Agente8
+#     VISIBLE_AREA: circle(9)
+#     COMMUNICATION_AREA: =  circle(10)
+#     states: [x,y,theta]
+#     control_commands: [v,w]
+#     INITIAL:
+#     - x: '331'
+#       y: '41'
+#       theta: '0.8'
+#     STATE_START: FAST
+#     BEHAVIOR: LGV
+#     
+#   - agent: Agente9
+#     VISIBLE_AREA: circle(9)
+#     COMMUNICATION_AREA: =  circle(10)
+#     states: [x,y,theta]
+#     control_commands: [v,w]
+#     INITIAL:
+#     - x: '341'
+#       y: '451'
+#       theta: '-0.9'
+#     STATE_START: FAST
+#     BEHAVIOR: LGV
+#     
+#   - agent: Agente10
+#     VISIBLE_AREA: circle(9)
+#     COMMUNICATION_AREA: =  circle(10)
+#     states: [x,y,theta]
+#     control_commands: [v,w]
+#     INITIAL:
+#     - x: '10'
+#       y: '10'
+#       theta: '0'
+#     STATE_START: FAST
+#     BEHAVIOR: LGV
+#     
+#     

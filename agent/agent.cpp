@@ -42,6 +42,14 @@ agent::agent(int agent_index,const Parsed_World& world):
 		Plugin_module *plugin=new agent_router(world.agents.at(agent_index).target_list,events,events_to_index,world.agents.at(agent_index).name,time,world.graphName);
 		plugins.push_back(plugin);
 	}
+	
+	if (world.agents.at(agent_index).monitoring)
+	{
+		
+		Plugin_module *monitor=new identifier_module(world,bonusVariables,map_bonus_variables_to_id,state_other_agents,time);
+		plugins.push_back(monitor);
+	}
+	
 	/*
 	if (condition to enable a plugin)
 	{
@@ -286,7 +294,7 @@ void agent::main_loop()
                 state.at(it->first)=it->second;
             }
 
-            //cout<<"stato: "<<state.at(0)<<" "<<state.at(1)<<" "<<state.at(2)<<endl;
+            cout<<"stato: "<<state.at(0)<<" "<<state.at(1)<<" "<<state.at(2)<<endl;
 
             sleep(0);
             encoder->computeSubEvents(state_other_agents);
@@ -309,12 +317,13 @@ void agent::main_loop()
 	    }
             world_comm->send_control_command(inputs,NULL);
 
-            //string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
-            //for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();++it)
-            //{
-            //    if (it->second==discreteState[0])
-            //        tmp=it->first;
-            //}
+            string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
+            for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();++it)
+            {
+                if (it->second==discreteState.front())
+                    tmp=it->first;
+            }
+            cout<<tmp<<endl;
 
 //             cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)
 // 			<<" "<<state_other_agents.at(identifier).state.at(2)<<endl;

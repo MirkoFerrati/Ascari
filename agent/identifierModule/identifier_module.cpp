@@ -1,8 +1,9 @@
 #include "identifier_module.h"
 using namespace std;
 
-identifier_module::identifier_module (const Parsed_World& W, const  world_sim_packet& sensed_agents) :
-     parsed_world (W), sensed_agents (sensed_agents), communicator()
+identifier_module::identifier_module (Parsed_World const& W, const std::map<int,double> & sensed_bonus_variables, const std::map<std::string,int> & map_bonus_variables_to_id,
+    const std::map<std::string,agent_state_packet> &sensed_state_agents, const simulation_time & sensed_time) :
+     parsed_world (W), sensed_bonus_variables(sensed_bonus_variables),map_bonus_variables_to_id(map_bonus_variables_to_id),sensed_state_agents (sensed_state_agents), sensed_time(sensed_time), communicator()
 {
     std::map <std::string, int> index_behaviors;
     std::map <std::string, std::vector< bool >> identifier_matrix;
@@ -78,12 +79,12 @@ void identifier_module::run_plugin()
      */
 
     //controllo il tempo
-    assert (sensed_agents.time - old_sensed_agents.time > 0.001);
+    assert (sensed_time - old_sensed_agents.time > 0.001);
 
     //Elimino gli agenti che non vedo più
 for (auto & agent_name: sim_agents) {
 
-        if (sensed_agents.state_agents.internal_map.find (agent_name.first) == sensed_agents.state_agents.internal_map.end()) {
+        if (sensed_state_agents.find (agent_name.first) == sensed_state_agents.end()) {
             agent_name.second.clear();
         }
     }
@@ -106,7 +107,7 @@ for (auto & agent_name: sim_agents) {
                 auto new_state = dynamics.at ( (*dummy_ref)->behavior_identifier)->getNextState();
                 //controllo se l'evoluzione e' coerente
 		//TODO(Simone): trovare una metrica migliore
-                if (new_state != sensed_agents.state_agents.internal_map.at (agent->first).state) {
+                if (new_state != sensed_state_agents.at (agent->first).state) {
                     //Elimino i dummy non coerenti
                     (*dummy_ref)->dummy.getDiscreteStates().remove(command->first);
 		    if((*dummy_ref)->dummy.getDiscreteStates().empty()){ 
@@ -121,7 +122,7 @@ for (auto & agent_name: sim_agents) {
 
 
     //Creo i nuovi dummy per gli agenti appena entrati
-for (const auto & sensed_agent: sensed_agents.state_agents.internal_map) {
+for (const auto & sensed_agent: sensed_state_agents) {
         if (sim_agents.find (sensed_agent.first) == sim_agents.end()) {
             create_agents (sensed_agent.first);
         }
@@ -130,6 +131,15 @@ for (const auto & sensed_agent: sensed_agents.state_agents.internal_map) {
 
 
     //Aggiorno la struttura dati old_sensed_agents
-    old_sensed_agents = sensed_agents;
+    
+    //old_sensed_agents.bonus_variables = sensed_bonus_variables;
+    
+    for (auto it=map_bonus_variables_to_id.begin();it!=map_bonus_variables_to_id.end();++it)
+			{
+			old_sensed_agents.bonus_variables.insert(make_pair(it->first,sensed_bonus_variables.at(it->second))); 
+			}
+    
+    old_sensed_agents.state_agents.internal_map=sensed_state_agents;
+    old_sensed_agents.time=sensed_time;
 
 }
