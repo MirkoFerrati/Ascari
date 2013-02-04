@@ -220,38 +220,65 @@ typedef double task_cost;
 typedef std::string task_id;
 typedef std::string agent_id;
 typedef std::map<task_id,task_cost> task_cost_vector;
+typedef std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_cost_vector> task_cost_matrix;
 typedef std::map<task_id,bool> task_assignment_vector;
+typedef std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_assignment_vector> task_assignment_matrix;
 typedef int task_assignment_algorithm;
+
 struct task
 {
-    std::string task_id;
     double task_position[3];
     int task_type;
     double task_execution_time;
     double task_deadline;
 };
-typedef std::vector<task> task_list;
+typedef std::map<task_id,task> task_list;
+
 template <typename data_type>
-struct task_assignment_packet
+class task_assignment_packet
 {
-    std::string agent_id;
+public:
     
+    std::string agent_id;
     data_type data;
     
-    //double g;
-    //std::map<std::string,task_assignment_vector> tam;
-    template <typename Archive> //TODO: togliere tipo di dato, così il ta_packet è sempre lo stesso
+    task_assignment_packet()
+    {}
+    
+    void set_data(void *data)
+    {
+	  this->data=*(data_type*)data;
+    }
+    
+    void* get_data()
+    {
+	  return &data;
+    }
+    
+    template <typename Archive>
     void serialize(Archive& ar,const unsigned int /*version*/)
     {
 	ar& agent_id;
         ar& data;
-	//ar& g;
-	//ar& tam;
     }
 };
 
+struct solution_cost_packet
+{
+      task_assignment_matrix ta_matrix;
+      task_cost_vector costs;
+      
+      template <typename Archive>
+      void serialize(Archive& ar,const unsigned int /*version*/)
+      {
+	ar& ta_matrix;
+        ar& costs;
+      }
+};
+
 typedef task_assignment_packet<double> subgradient_packet;
-typedef task_assignment_packet<std::map<std::string,task_assignment_namespace::task_assignment_vector>> solution_exchange_packet;
+typedef task_assignment_packet<task_assignment_matrix> solution_exchange_packet;
+typedef task_assignment_packet<solution_cost_packet> cost_exchange_packet;
 
 }
 #ifndef GLP_MIN
@@ -262,8 +289,11 @@ typedef task_assignment_packet<std::map<std::string,task_assignment_namespace::t
 #define GLP_MAX 2
 #endif
 
+#define INF 1000000.0
+
 #define SUBGRADIENT 0
 #define SOLUTION_EXCHANGE 1
+#define COST_EXCHANGE 2
 //written by Alessandro Settimi
 
 #endif //TYPEDEFS_H

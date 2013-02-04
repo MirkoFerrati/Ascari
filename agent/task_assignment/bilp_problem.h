@@ -14,6 +14,7 @@ public:
     void add_constraints();
     void add_structural_variables();
     void create_problem(std::vector<double> cost_vector);
+    void set_cost_vector(std::vector<double> cost_vector);
     void solve(std::vector<bool>&);
     
     ~bilp_problem();

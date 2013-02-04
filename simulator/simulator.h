@@ -25,11 +25,7 @@ public:
 	void initialize (Parsed_World const&);
 	void update_bonus_variables();
 	void setSleep(unsigned secSleep);
-    void setCheckCollision(bool checkCollision);
-    
-	//written by Alessandro Settimi
-	void create_ta_communicator();
-	//written by Alessandro Settimi
+	void setCheckCollision(bool checkCollision);
     
 private:
 	int max_loops;
@@ -58,12 +54,11 @@ private:
 	Udp_agent_router<graph_packet> graph_router;
 	
 	//written by Alessandro Settimi
-	//task_assignment_router ta_router;
+
 	bool ta_router_started;
 	task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
 	task_assignment_router_base* ta_router;
-	//task_assignment_router<task_assignment_namespace::subgradient_packet> ta_router1;
-	//task_assignment_router<task_assignment_namespace::solution_exchange_packet> ta_router2;
+
 	//written by Alessandro Settimi
 };
 

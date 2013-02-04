@@ -104,6 +104,7 @@ class Parsed_World{
   std::string graphName;
   
   //written by Alessandro Settimi
+  std::vector<task_assignment_namespace::task_id> tasks_id;
   task_assignment_namespace::task_list task_list;
   task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
   //written by Alessandro Settimi

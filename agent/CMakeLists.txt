@@ -11,14 +11,15 @@ set(agent_SOURCES empty_plugin/empty_plugin.cpp
 	
 )
 
-FIND_PACKAGE(GLPK)
+FIND_PACKAGE(GLPK 4.33)
 
-
-if (GLPK_FOUND)
+set(GLPK_FOUND 0)
+if (${GLPK_FOUND})
+add_definitions(-DGLPK_FOUND)
 #written by Alessandro Settimi
-set (agent_SOURCES ${agent_SOURCES} task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/bilp_problem.cpp)
+set (agent_SOURCES ${agent_SOURCES} task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/task_assignment_algorithms.cpp task_assignment/bilp_problem.cpp)
 #written by Alessandro Settimi
-endif (GLPK_FOUND)
+endif (${GLPK_FOUND})
 
 add_executable(agent ${agent_SOURCES})
 
@@ -34,11 +35,11 @@ target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
 target_link_libraries(agent zmq)
 
-if (GLPK_FOUND)
+if (${GLPK_FOUND})
 #written by Alessandro Settimi
 target_link_libraries(agent glpk)
 #written by Alessandro Settimi
-endif (GLPK_FOUND)
+endif (${GLPK_FOUND})
 
 include_directories(../agent)
 include_directories(../shared)
