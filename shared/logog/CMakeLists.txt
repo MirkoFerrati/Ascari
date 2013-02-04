@@ -1,16 +1,9 @@
-cmake_minimum_required (VERSION 2.8.4)
-#enable_testing()
-#project (logog)
-#include(CTest)
-# logog needs thread support on linux
-find_package( Threads )
+cmake_minimum_required (VERSION 2.8)
 set( RUNTIME_OUTPUT_DIRECTORY bin/ )
 set( ARCHIVE_OUTPUT_DIRECTORY bin/ )
-set( LIBRARY_OUTPUT_DIRECTORY bin/ )
-set( CMAKE_BINARY_DIR build/ )
-set( CMAKE_LEGACY_CYGWIN_WIN32 0 )
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-variadic-macros -Wall -Wno-long-long")
-include_directories( include )
+#set( LIBRARY_OUTPUT_DIRECTORY bin/ )
+find_package(thread)
+include_directories(include )
 add_library( logog
 	src/api.cpp 
 	src/checkpoint.cpp
@@ -28,18 +21,4 @@ add_library( logog
 	src/topic.cpp
 	src/unittest.cpp
 )
-#set_target_properties(logog PROPERTIES DEBUG_POSTFIX "d")
-#add_executable( test-logog test/test.cpp )
-#target_link_libraries( test-logog logog ${CMAKE_THREAD_LIBS_INIT})
-#add_test( NAME test-harness COMMAND test-logog )
-#install(TARGETS logog ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-#install(DIRECTORY include/ DESTINATION "${CMAKE_INSTALL_PREFIX}/include/logog"
-#          FILES_MATCHING PATTERN "*.hpp")
 
-# Docs generation with Doxygen
-#find_package( Doxygen )
-#if( DOXYGEN_FOUND )
-#	add_custom_target (doc ${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/doxyfile
-#		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-#		COMMENT "Generating source code documentation with Doxygen." VERBATIM)
-#endif() # DOXYGEN_FOUND
