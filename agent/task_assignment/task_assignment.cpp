@@ -76,14 +76,14 @@ void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a
     for (unsigned int i=0;i<agents_id.size();i++)
     {
       
-	if(agents_id[i]!=my_id)
+	if(agents_id.at(i)!=my_id)
 	{
 	    for (unsigned int j=0;j<tasks_id.size();j++)
 	    {
-		app.insert(std::make_pair(tasks_id[j],0)); //i vettori di costo degli altri robot inizializzati come nulli
+		app.insert(std::make_pair(tasks_id.at(j),0)); //i vettori di costo degli altri robot inizializzati come nulli
 	    }
 	    
-	    task_cost_matrix.insert(std::make_pair(agents_id[i],app));
+	    task_cost_matrix.insert(std::make_pair(agents_id.at(i),app));
 	    
 	    app.clear();
 	}
@@ -97,19 +97,19 @@ void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a
 void task_assignment ::inizializeTaskAssignmentMatrix()
 {
       
-    task_assignment_vector app;
+    task_assignment_vector temp;
     
     for(unsigned int i=0;i<agents_id.size();i++)
     {
 
 	for(unsigned int j=0;j<tasks_id.size();j++)
 	{
-	    app.insert(std::make_pair(tasks_id[j],false)); //X identità
+	    temp.insert(std::make_pair(tasks_id.at(j),false));
 	}
 
-	task_assignment_matrix.insert(std::make_pair(agents_id[i],app));
+	task_assignment_matrix.insert(std::make_pair(agents_id.at(i),temp));
 	
-	app.clear();
+	temp.clear();
     }
     
     agent_task_assignment_vector=&task_assignment_matrix.at(my_id);
@@ -125,7 +125,7 @@ void task_assignment ::printTaskAssignmentMatrix()
 
 	for(unsigned int j=0;j<tasks_id.size();j++)
 	{
-	    std::cout<<task_assignment_matrix.at(agents_id[i]).at(tasks_id[j])<<' ';
+	    std::cout<<task_assignment_matrix.at(agents_id.at(i)).at(tasks_id.at(j))<<' ';
 	}
 	
 	std::cout<<std::endl;
@@ -144,13 +144,13 @@ void task_assignment ::printTaskCostMatrix()
 
 	for(unsigned int j=0;j<tasks_id.size();j++)
 	{
-	    if(task_cost_matrix.at(agents_id[i]).at(tasks_id[j])==INF)
+	    if(task_cost_matrix.at(agents_id.at(i)).at(tasks_id.at(j))==INF)
 	    {
 		std::cout<<"INF"<<' ';
 	    }
 	    else
 	    {
-		std::cout<<task_cost_matrix.at(agents_id[i]).at(tasks_id[j])<<' ';
+		std::cout<<task_cost_matrix.at(agents_id.at(i)).at(tasks_id.at(j))<<' ';
 	    }
 	}
 	
