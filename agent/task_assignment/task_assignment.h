@@ -78,6 +78,10 @@ private:
 	
 	void update_costs_with_expiring_deadlines();
 	
+	bool check_expiring_task_selection(task_assignment_namespace::task_id task_id);
+		
+	task_assignment_namespace::task_cost_vector basic_values;
+	
 	//algorithms
 	task_assignment_namespace::task_id subgradient_algorithm();
 	

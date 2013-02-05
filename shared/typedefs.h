@@ -276,7 +276,20 @@ struct solution_cost_packet
       }
 };
 
-typedef task_assignment_packet<double> subgradient_packet;
+struct subgradient_task_packet
+{
+      task_id task;
+      double subgradient;
+      
+      template <typename Archive>
+      void serialize(Archive& ar, const unsigned int /*version*/)
+      {
+	ar& task;
+	ar& subgradient;
+      }
+};
+
+typedef task_assignment_packet<subgradient_task_packet> subgradient_packet;
 typedef task_assignment_packet<task_assignment_matrix> solution_exchange_packet;
 typedef task_assignment_packet<solution_cost_packet> cost_exchange_packet;
 

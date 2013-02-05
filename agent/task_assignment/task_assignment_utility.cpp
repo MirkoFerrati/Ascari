@@ -117,42 +117,53 @@ void task_assignment::update_costs_with_deadlines()
 }
 
 
-void task_assignment::update_costs_with_expiring_deadlines()
-{//per ora è semplicemente se c'è una deadline, ancora è statico
-    task_cost_vector::iterator iter = std::min_element(task_cost_matrix.at(my_id).begin(), task_cost_matrix.at(my_id).end());
-    double min_cost = iter->second;
-
-    for (unsigned int i=0;i<agents_id.size();i++)
-    {
-	  if (agents_id.at(i) != my_id)
-	  {
-		for (unsigned int j=0;j<tasks_id.size();j++)
-		{
-		  
-		      if (task_cost_matrix.at(my_id).at(tasks_id.at(j))!=INF)
-		      {
-			      double app = task_cost_matrix.at(agents_id.at(i)).at(tasks_id.at(j));
-			      double deadline = tasklist.at(tasks_id.at(j)).task_deadline;
-			      
-			      if (tasklist.at(tasks_id.at(j)).task_deadline!=0)
-			      {
-				  if(app !=0 && app < task_cost_matrix.at(my_id).at(tasks_id.at(j)))
-				  {
-					  for (unsigned int k=0;k<tasks_id.size();k++)
-					  {
-						  if (task_cost_matrix.at(my_id).at(tasks_id.at(k))<INF && tasks_id.at(k)!=tasks_id.at(j) && (tasklist.at(tasks_id.at(k)).task_deadline*((min_cost-1)/(min_cost)) > deadline))// || tasklist.at(tasks_id.at(k)).task_deadline==0))
-						  {
-							  task_cost_matrix.at(my_id).at(tasks_id.at(k)) = (1-(deadline/tasklist.at(tasks_id.at(k)).task_deadline))*min_cost-rndom_double(0.0,1.0);
-						  }
-					  }
-				  }
-			      }
-		      }
-		}
-	  }
-    }
+bool task_assignment::check_expiring_task_selection(task_assignment_namespace::task_id task_id)
+{
+      double min=INF;
+      
+      for (unsigned int j=0;j<agents_id.size();j++)
+      {
+	    if (min > task_cost_matrix.at(agents_id.at(j)).at(task_id))
+		    min = task_cost_matrix.at(agents_id.at(j)).at(task_id);
+      }
+      
+      if (min==agent_task_cost_vector->at(task_id)) return true;
+      return false;
 }
 
+void task_assignment::update_costs_with_expiring_deadlines()
+{//per ora è semplicemente se c'è una deadline, ancora è statico
+    
+      for (unsigned int i=0;i<tasks_id.size();i++)
+      {
+	    if (tasklist.at(tasks_id.at(i)).task_deadline!=0 && agent_task_cost_vector->at(tasks_id.at(i)) != INF)
+	    {
+		  for (unsigned int j=0;j<agents_id.size();j++)
+		  {
+			if (check_expiring_task_selection(tasks_id.at(i)))
+			{
+			      for (unsigned int k=0;k<tasks_id.size();k++)
+			      {
+				    if (tasks_id.at(k) != tasks_id.at(i))
+				    {
+					  agent_task_cost_vector->at(tasks_id.at(k))=INF;
+				    }
+			      }
+			}
+			else
+			{
+			      for (unsigned int k=0;k<tasks_id.size();k++)
+			      {
+				    if (tasks_id.at(k) != tasks_id.at(i))
+				    {
+					  agent_task_cost_vector->at(tasks_id.at(k))=basic_values.at(tasks_id.at(k));
+				    }
+			      }
+			}
+		  }
+	    }
+      }
+}
 
 task_assignment ::~task_assignment()
 {

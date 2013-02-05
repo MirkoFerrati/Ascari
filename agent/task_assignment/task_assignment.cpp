@@ -20,12 +20,6 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     task_assignment_algorithm=world.task_assignment_algorithm;
     printTaskCostMatrix();
     
-    update_costs_with_deadlines();
-    printTaskCostMatrix();
-    
-    update_costs_with_position();
-    printTaskCostMatrix();
-    
     task_assigned=false;
     stop=false;
     speed=0;
@@ -62,7 +56,7 @@ void task_assignment ::createTaskListFromParsedWorld(const Parsed_World& wo)
     
     for (unsigned int i=0; i< wo.task_list.size();i++)
     {	
-	    tasklist.insert(make_pair(tasks_id.at(i),wo.task_list.at(tasks_id.at(i))));
+	    tasklist.insert(std::make_pair(tasks_id.at(i),wo.task_list.at(tasks_id.at(i))));
 	    
 	    std::cout << std::endl << "TASK " << tasks_id.at(i) <<':'<< std::endl;
 	    std::cout << "- posizione: " << tasklist.at(tasks_id.at(i)).task_position[0] <<' '<< tasklist.at(tasks_id.at(i)).task_position[1]<<' '<< tasklist.at(tasks_id.at(i)).task_position[2] << std::endl;
@@ -75,7 +69,7 @@ void task_assignment ::createTaskListFromParsedWorld(const Parsed_World& wo)
  
 void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a)
 {   
-    task_cost_matrix.insert(make_pair(my_id,a.agent_task_cost_vector));
+    task_cost_matrix.insert(std::make_pair(my_id,a.agent_task_cost_vector));
     
     task_cost_vector app;
     
@@ -86,10 +80,10 @@ void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a
 	{
 	    for (unsigned int j=0;j<tasks_id.size();j++)
 	    {
-		app.insert(make_pair(tasks_id[j],0)); //i vettori di costo degli altri robot inizializzati come nulli
+		app.insert(std::make_pair(tasks_id[j],0)); //i vettori di costo degli altri robot inizializzati come nulli
 	    }
 	    
-	    task_cost_matrix.insert(make_pair(agents_id[i],app));
+	    task_cost_matrix.insert(std::make_pair(agents_id[i],app));
 	    
 	    app.clear();
 	}
@@ -110,10 +104,10 @@ void task_assignment ::inizializeTaskAssignmentMatrix()
 
 	for(unsigned int j=0;j<tasks_id.size();j++)
 	{
-	    app.insert(make_pair(tasks_id[j],false)); //X identità
+	    app.insert(std::make_pair(tasks_id[j],false)); //X identità
 	}
 
-	task_assignment_matrix.insert(make_pair(agents_id[i],app));
+	task_assignment_matrix.insert(std::make_pair(agents_id[i],app));
 	
 	app.clear();
     }
