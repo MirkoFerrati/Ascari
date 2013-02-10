@@ -23,6 +23,7 @@ class Udp_agent_router
 	thread_ptr   t;
 	void service_thread(void) {
 	while (should_run) {
+		if ( service.stopped() ) break;
 		senderTop.send(receiverTop.receive());
     }
 }
@@ -61,6 +62,7 @@ void set_run(bool running)
 ~Udp_agent_router()
 {
 	should_run=false;
+	service.stop();
 	if (t)
 	  t->interrupt();	
 }
