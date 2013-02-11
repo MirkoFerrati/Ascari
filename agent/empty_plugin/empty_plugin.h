@@ -16,14 +16,18 @@ public:
 void addReservedVariables(exprtk::symbol_table< double >& symbol_table_reference);
 void compileExpressions(exprtk::symbol_table< double >& symbol_table_reference);
 void run_plugin();
+
 private:
+//events and events_to_index
+const std::map< std::string, transition >& events_to_index;
+const std::map< transition, Events >& events;
 //Some variables used in yaml file
 double variable1;
 double variable2, variable3;
 //a variable taken from yaml file
-double delta_variable;
+double delta_variable,y;
 //the expression used to calculate delta_variable
-exprtk::expression<double> delta_expression;
+exprtk::expression<double> delta_expression,y_expression;
 
 //id of the agent
 std::string identifier;

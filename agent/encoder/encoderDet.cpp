@@ -36,8 +36,13 @@ encoderDet::encoderDet(std::map< int, Sub_events >& sub_events, const string& ag
         exprtk::expression<double> tmp_expression;
         tmp_expression.register_symbol_table(symbol_table);
         string string_tmp_expression=it->second;
-        parser.compile(string_tmp_expression,tmp_expression);
-        lambda_expressions.insert(make_pair(sub_events_to_index.at(it->first),tmp_expression));
+         if (parser.compile(string_tmp_expression,tmp_expression))
+		lambda_expressions.insert(make_pair(sub_events_to_index.at(it->first),tmp_expression));
+	 else
+		{
+			ERR("Errore durante la creazione dell'espressione della lambda %s,:%s",string_tmp_expression.c_str(),parser.error().c_str());
+			throw "Errore durante la creazione dell'espressione della lambda";
+		}
     }
 
 
