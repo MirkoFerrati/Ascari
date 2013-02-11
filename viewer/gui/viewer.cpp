@@ -35,10 +35,11 @@ using namespace std;
 Viewer::Viewer (const world_sim_packet& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent, int view_type, std::string graphName) : 
  QWidget (parent),view_type(view_type),infos(read), mutex(read_mutex)
 {
-init(graphName);
 length=0;
 coord_x=0;
 coord_y=0;
+init(graphName);
+
 }
 
 

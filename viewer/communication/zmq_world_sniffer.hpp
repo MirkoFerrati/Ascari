@@ -4,6 +4,7 @@
 #include "../shared/communication/zmq_full_communicator.hpp"
 #include <mutex>
 #include <thread>
+#include <vector>
 
 template <typename receive_type> 
 class zmq_world_sniffer: 
@@ -14,25 +15,37 @@ public:
 	zmq_world_sniffer(receive_type& data,std::shared_ptr<std::mutex>& data_mutex):data(data),data_mutex(data_mutex)
 	{
 		this->init("viewer");
+		receiver=0;
 	}
 	;
 	void start_receiving()
 	{
-		receiver=new std::thread(&zmq_world_sniffer::receive_loop,std::ref(*this),std::ref(data),std::ref(data_mutex));
+		is_running=true;
+		receiver=new std::thread(&zmq_world_sniffer::receive_loop,std::ref(*this),std::ref(data),std::ref(data_mutex),std::ref(is_running));
 	};
 
+	~zmq_world_sniffer(){
+		if (receiver)
+		{
+			is_running=false;
+			receiver->join();
+			delete receiver;
+		}
+	};
+	
 private:
 receive_type& data;
+bool is_running;
 std::shared_ptr<std::mutex>& data_mutex;
 std::thread* receiver;
-void receive_loop(receive_type& data, std::shared_ptr<std::mutex> data_mutex)
+void receive_loop(receive_type& data, std::shared_ptr<std::mutex>& data_mutex,bool& is_running)
 {
 	std::vector<receive_type> temp;
-	while(!s_interrupted)
+	while(!s_interrupted && is_running)
 	{
 		sleep(0);
 		temp=this->receive();//.front();//blocking call
-		if (temp.size()>0)
+		if (!temp.empty())
 		{
 		data_mutex->lock();
 		data=temp.front();
@@ -41,4 +54,5 @@ void receive_loop(receive_type& data, std::shared_ptr<std::mutex> data_mutex)
 	}
 }
 };
+
 #endif //ZMQ_WORLD_SNIFFER_HPP
