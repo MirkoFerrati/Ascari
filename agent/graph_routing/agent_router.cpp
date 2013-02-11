@@ -55,6 +55,9 @@ agent_router::agent_router (std::vector< int > tarlist, std::map< transition, Ev
     last_time_updated = time;
     stop = next_target_reachable = false;
     handshakeCounter = 0;
+	d=0;
+	speed=0;
+	priority=10000;
 }
 
 bool agent_router::isTimeToCheckForPathFree()

@@ -334,6 +334,7 @@ agent::~agent()
     delete automaton;
     delete encoder;
     delete f_rndom;
+	symbol_table.clear();
     for (unsigned int i=0;i<plugins.size();i++)
 			{
 				delete(plugins[i]);
