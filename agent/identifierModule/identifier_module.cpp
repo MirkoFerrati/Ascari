@@ -5,8 +5,6 @@ identifier_module::identifier_module (Parsed_World const& W, const std::map<int,
     const std::map<std::string,agent_state_packet> &sensed_state_agents, const simulation_time & sensed_time) :
      parsed_world (W), sensed_bonus_variables(sensed_bonus_variables),map_bonus_variables_to_id(map_bonus_variables_to_id),sensed_state_agents (sensed_state_agents), sensed_time(sensed_time), communicator()
 {
-    std::map <std::string, int> index_behaviors;
-    std::map <std::string, std::vector< bool >> identifier_matrix;
     int i = 0;
 for (auto const & behavior: W.behaviors) {
         index_behaviors[behavior.second->name] = i;
@@ -55,7 +53,7 @@ void identifier_module::create_agents (std::string agent_name)
 for (auto const& behavior: parsed_world.behaviors) {
     if (identifier_matrix[agent_name].at(index_behaviors.at(behavior.first)))
     {
-	dummy_agent* tmp_agent=new dummy_agent(agent_name,behavior,index_behaviors.at(behavior.first));
+	dummy_agent* tmp_agent=new dummy_agent(agent_name,behavior,index_behaviors.at(behavior.first),parsed_world);
 	
 	sim_agents[agent_name].push_front(std::unique_ptr<dummy_agent>(tmp_agent));
 	
@@ -99,7 +97,7 @@ for (auto & agent_name: sim_agents) {
             ++old_dummy_ref;
             //Evolvo il singolo dummy
             communicator.send ( (**dummy_ref), old_sensed_agents.state_agents);
-            (*dummy_ref)->dummy.main_loop();
+            (*dummy_ref)->dummy.dummy_loop(sensed_bonus_variables,sensed_state_agents,sensed_time);
             auto control_command_packet = communicator.receive ( (**dummy_ref));
             for (auto command = control_command_packet.commands.begin(); command != control_command_packet.commands.end(); ++command) {
                 //preparo il comando relativo allo stato discreto iesimo

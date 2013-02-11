@@ -18,11 +18,13 @@
 class agent
 {
 public:
-	agent(std::string name,  const std::unique_ptr< Parsed_Behavior >& behavior);
+	agent(std::string name,  const std::unique_ptr< Parsed_Behavior >& behavior,const Parsed_World & world);
 	agent(int agent_index, const Parsed_World& world);
 	~agent();
 	void init(const std::unique_ptr< Parsed_Behavior >& behavior, bool isDummy);
     void start();
+    void agent_loop();
+    void dummy_loop(const std::map<int,double> & sensed_bonus_variables,const std::map<std::string,agent_state_packet> &sensed_state_agents,const simulation_time & sensed_time);
     void main_loop();
 	
     inline std::forward_list<automaton_state> & getDiscreteStates()

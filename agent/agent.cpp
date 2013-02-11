@@ -22,9 +22,11 @@
 
 using namespace std;
 
-agent::agent(std::string name,const std::unique_ptr<Parsed_Behavior>& behavior)
+agent::agent(std::string name,const std::unique_ptr<Parsed_Behavior>& behavior, const Parsed_World & world)
         :identifier(name)
 {
+  
+  createBonusVariablesFromWorld(world.bonus_expressions);
 //qui poi uno setta tutto quello che manca oppure lascia vuoto
 initialized=false;
 encoder=0;
@@ -127,6 +129,15 @@ void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy
 	{
 	   
 		//TODO(Mirko): we will think about identifierModule later
+		//TODO:create non-deterministic automaton
+		automaton=new automatonFSM(createAutomatonTableFromParsedAgent(behavior));
+		encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id,bonusVariables,
+							   map_bonus_variables_to_id, behavior->topology_expressions,
+						 sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table);
+		 for (unsigned int i=0;i<plugins.size();i++)
+	    {
+		plugins[i]->compileExpressions(symbol_table);
+	    }
 	}
 	
 	event_decoder.create(behavior->events_expressions,sub_events_to_index,events_to_index);
@@ -160,7 +171,7 @@ void agent::start()
         int cicli = 0;
 	std::cout<<"inizio ciclo infinito di agent s_interrupted="<<s_interrupted<<std::endl;
         while (!s_interrupted) {
-            main_loop();
+            agent_loop();
             cicli++;
             if (time < -1)
                 break;
@@ -274,7 +285,7 @@ void agent::createStateFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavi
 
 
 
-void agent::main_loop()
+void agent::agent_loop()
 {
         {
 	// 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
@@ -287,7 +298,37 @@ void agent::main_loop()
 			bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
 			}
            
-			//TODO(Mirko): questo ciclo for copia informazioni che in teoria gia' abbiamo, forse non vale la pena di usare la variabile state
+	
+			main_loop();
+        }
+
+
+
+}
+
+
+void agent::dummy_loop(const std::map<int,double> & sensed_bonus_variables,const std::map<std::string,agent_state_packet> &sensed_state_agents,const simulation_time & sensed_time)
+    
+{
+        {
+			state_other_agents.insert(sensed_state_agents.begin(),sensed_state_agents.end());//TODO(Mirko): si possono evitare le copie e gli swap?
+			time=sensed_time;
+			
+			bonusVariables.insert(sensed_bonus_variables.begin(),sensed_bonus_variables.end()); 
+			
+	
+			main_loop();
+        }
+
+
+
+}
+
+
+
+void agent::main_loop()
+{
+        		//TODO(Mirko): questo ciclo for copia informazioni che in teoria gia' abbiamo, forse non vale la pena di usare la variabile state
             for (map<int,double>::const_iterator it=state_other_agents.at(identifier).state.begin();
                     it!=state_other_agents.at(identifier).state.end();++it)
             {
@@ -331,11 +372,13 @@ void agent::main_loop()
 // 		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
 // 			break;
 
-        }
+        
 
 
 
 }
+
+
 
 agent::~agent()
 {

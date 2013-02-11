@@ -24,7 +24,7 @@ public:
 
 private:
     void create_agents(std::string agent_name);
-	const Parsed_World &parsed_world;
+	const Parsed_World & parsed_world;
 	
     agent_to_dummy_communicator communicator;
     std::map<std::string,std::forward_list<std::unique_ptr<dummy_agent>>> sim_agents;
