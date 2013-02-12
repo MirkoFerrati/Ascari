@@ -227,7 +227,7 @@ bool agent_router::detect_collision (lemon::SmartDigraph::ArcMap<bool>& useArc)
             if (id < graph_node_size) //Se il nodo e' finito nel passato oppure al piano terra lo ignoro
                 continue;
             //Calcolo le collisioni
-            for (unsigned int i = 0; i < node_id.size(); i++) {
+            for (int i = 0; i < node_id.size(); i++) {
                 if (node_id[i] == id) {
                     if ( (i - j < 0) || (i == j && it->second.id.compare (identifier) < 0)) {
                         for (SmartDigraph::InArcIt arc (graph, graph.nodeFromId (id)); arc != INVALID; ++arc) {

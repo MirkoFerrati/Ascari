@@ -151,6 +151,7 @@ protected:
                 Subscribers connect SUB socket and when they receive a Hello message they tell the publisher via a REQ/REP socket pair.
                 When the publisher has had all the necessary confirmations, it starts to send real data.
               */
+	    sleep(1);
             sync_socket->connect (!sync_protocol.compare("")?SYNC_PROTOCOL:sync_protocol.c_str());
 
             std::cout << owner_name << " connecting to server..." << std::endl;
@@ -170,7 +171,7 @@ protected:
 		  return false;
 		}
             std::cout << static_cast<char*> (message.data()) << std::endl;
-
+ 
         }
         return true;
     }

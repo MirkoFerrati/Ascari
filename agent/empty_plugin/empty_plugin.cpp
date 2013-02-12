@@ -6,7 +6,8 @@
 
 empty_plugin::empty_plugin(std::map< transition, Events >& events, 
 						   const std::map< std::string, transition >& events_to_index, 
-						   std::string identifier, simulation_time& time):identifier(identifier)
+						   std::string identifier, simulation_time& time):identifier(identifier),events (events),
+      events_to_index (events_to_index)
 {
 	//events gives you access to agent events, identifier is the agent name, time is the time of the simulation
 	
@@ -34,6 +35,12 @@ void empty_plugin::compileExpressions(exprtk::symbol_table< double >& symbol_tab
 		ERR("impossibile creare l'espressione: %s","x-y");
 		throw "impossibile creare l'espressione";
 	}
+	delta_expression.register_symbol_table(symbol_table);
+	if (!parser.compile("y",y_expression))
+	{
+		ERR("impossibile creare l'espressione: %s","y");
+		throw "impossibile creare l'espressione";
+	}
 }
 
 
@@ -56,6 +63,7 @@ void empty_plugin::run_plugin()
 	do_the_plugin_stuff_here;
 	//read variables in this way:
 	delta_variable=delta_expression.value();
+	y=y_expression.value();
 	//set variables in this way
 	variable1=5;
 	variable2=delta-variable-variable1;
