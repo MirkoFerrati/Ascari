@@ -179,6 +179,13 @@ void bilp_problem::solve(std::vector<bool>& solution)
 	
 }
 
+
+double bilp_problem::get_function_value()
+{
+	return function_value;
+}
+
+
 bilp_problem::~bilp_problem()
 {
 	glp_delete_prob(problem); //deallocazione del problema

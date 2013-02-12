@@ -5,6 +5,7 @@
 #include "../communication/zmq_world_sniffer.hpp"
 #include "lemon/arg_parser.h"
 #include "logog.hpp"
+#include "../gml2lgf/graph.h"
 
 
 void center(QWidget &widget,int WIDTH=800,int HEIGHT=800)
@@ -30,6 +31,11 @@ int main(int argc, char *argv[])
 {
     LOGOG_INITIALIZE();
     {
+	//written by Alessandro Settimi
+
+	std::string filename;
+	//written by Alessandro Settimi
+      
         logog::Cout out;
 //         if (argc<2)
 //             std::cout<<"inserire il tipo di visualizzazione: 1-baseball 2-grafi 3-vuoto"<<std::endl;
@@ -37,12 +43,17 @@ int main(int argc, char *argv[])
         std::string graphName;
 		int viewerType;
         ap.refOption("f","Graph filename",graphName);
+	
+	//written by Alessandro Settimi
+	ap.refOption("f","Yaml filename",filename,true);
+	//written by Alessandro Settimi
+			
         ap.synonym("filename","f");
-		ap.refOption("t"," 1-baseball 2-grafi 3-vuoto",viewerType,true);
+		ap.refOption("t"," 1-baseball 2-grafi 3-vuoto 4-Task Assignment",viewerType,true);
         ap.throwOnProblems();
         try {
             ap.parse();
-			if (viewerType==2 && !ap.given("f"))
+			if ((viewerType==2 || viewerType==4) && !ap.given("f"))
 			{
 				ERR("inserire il nome del file%s","");
 				return 0;
@@ -52,7 +63,14 @@ int main(int argc, char *argv[])
             ERR("errore nella lettura dei parametri %s",ex.reason());
             return 0;
         }
-      
+        
+	//written by Alessandro Settimi
+        if(viewerType == 4)
+	{
+	    graphName=filename;
+	}
+	//written by Alessandro Settimi
+
         QApplication app(argc,argv);
         boost::asio::io_service io_service;
         std::vector<char> buffer;
@@ -60,6 +78,7 @@ int main(int argc, char *argv[])
 	std::shared_ptr<std::mutex> read_mutex(new std::mutex);
 	buffer.resize(MAX_PACKET_LENGTH);
         Viewer window(read,read_mutex,NULL,viewerType,graphName);
+	
         udp_world_sniffer sniffer(buffer,io_service);
 	zmq_world_sniffer<world_sim_packet> sniffer_test(read,read_mutex);
         window.setWindowTitle("Visualizer");

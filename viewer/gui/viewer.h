@@ -1,6 +1,10 @@
 #ifndef VIEWER
 #define VIEWER
 
+//written by Alessandro Settimi
+#include "yaml_parser.h"
+#include <typedefs.h>
+//written by Alessandro Settimi
 
 #include "Agent.h"
 #include <lemon/smart_graph.h>
@@ -23,6 +27,9 @@ class Viewer : public QWidget
     void start();
     int view_type;
 
+    //written by Alessandro Settimi
+    void set_tasklist(const Parsed_World& wo);
+    //written by Alessandro Settimi
    
 protected:
     void paintEvent(QPaintEvent *event);
@@ -57,6 +64,11 @@ protected:
     lemon::SmartDigraph::Node next;
     lemon::SmartDigraph::ArcMap<int> *length;
     lemon::SmartDigraph::NodeMap<int> *coord_x, *coord_y;
+    
+    //written by Alessandro Settimi
+    task_assignment_namespace::task_list tasklist;
+    std::vector<task_assignment_namespace::task_id> tasks_id;
+    //written by Alessandro Settimi
    
 };
 

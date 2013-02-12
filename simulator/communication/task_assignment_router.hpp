@@ -42,7 +42,7 @@ class task_assignment_router: public simulator_to_agent_ta_communicator<datatype
 			
 			for (unsigned int i=0;i<temp.size();i++)
 			{
-				std::cout<<">> AGENT:"<<data.at(i).agent_id<<std::endl;
+				std::cout<<">> RESEND: "<<data.at(i).agent_id<<std::endl;
 				this->send(data.at(i));
 			}
 		      

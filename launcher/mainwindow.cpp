@@ -247,10 +247,16 @@ bool MainWindow::startViewer()
     {
         viewerType=3;
     }
+    //written by Alessandro Settimi
+    if (ui->selectViewType->selectedItems().first()->text().compare("TaskAssignment")==0)
+    {
+        viewerType=4;
+    }
+    //written by Alessandro Settimi
     if (viewerType>0)
     {
         QString a;
-        arguments <<"-t"<< a.setNum(viewerType);
+        //arguments <<"-t"<< a.setNum(viewerType);
         std::string graphname="";
         if (viewerType==2)
         {
@@ -258,7 +264,13 @@ bool MainWindow::startViewer()
             QDir d = QFileInfo(file).absoluteDir();
             graphname=(d.absolutePath().append("/").append(QString::fromStdString(world.graphName).toLower())).toStdString();
         }
-
+	
+	//written by Alessandro Settimi
+	if (viewerType==4)
+        {
+            graphname=fileName.toStdString();
+        }
+	//written by Alessandro Settimi
 
         //buffer.resize(MAX_PACKET_LENGTH);
         if (!mutex)

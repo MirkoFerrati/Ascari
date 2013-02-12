@@ -278,13 +278,11 @@ struct solution_cost_packet
 
 struct subgradient_task_packet
 {
-      task_id task;
       double subgradient;
       
       template <typename Archive>
       void serialize(Archive& ar, const unsigned int /*version*/)
       {
-	ar& task;
 	ar& subgradient;
       }
 };

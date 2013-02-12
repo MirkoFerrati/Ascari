@@ -16,10 +16,10 @@ task_id task_assignment::cost_exchange_algorithm()
      unsigned int passi=1;
      
      update_costs_with_deadlines();
-     printTaskCostMatrix();
+     printTaskCostMatrix(task_cost_matrix);
       
      update_costs_with_position();
-     printTaskCostMatrix();
+     printTaskCostMatrix(task_cost_matrix);
           
      task_cost_vector basic_values;
      
@@ -69,7 +69,7 @@ task_id task_assignment::cost_exchange_algorithm()
 		}
 	    }
 	    
-	    copy_cost_matrix_to_cost_vector();
+	    copy_cost_matrix_to_cost_vector(task_cost_matrix);
 	    ta_problem.set_cost_vector(C);
 	    
 	    data_receive.clear();
@@ -95,6 +95,8 @@ task_id task_assignment::cost_exchange_algorithm()
      }
      
      ta_communicator->send();
+     
+     printTaskCostMatrix(task_cost_matrix);
 
      for(unsigned int j=0;j<tasks_id.size();j++)
      {

@@ -11,15 +11,7 @@ void task_assignment::convergence_control_routine(unsigned int w)
      {
        	    std::cout<<std::endl<<"---------------- STOP ----------------"<<std::endl<<std::endl;
 	    std::cout<<"Converge, ";
-	    printTaskAssignmentMatrix();
-	    printTaskCostMatrix();
 	    converge=true;
-     }
-    
-     if(!converge)
-     {
-	    printTaskAssignmentMatrix();
-	    printTaskCostMatrix();
      }
 }
 
@@ -59,8 +51,7 @@ double task_assignment ::time_to_deadline(task_assignment_namespace::task_id tas
 	  
 	if (temp < 0) 
 	{
-	    std::cout<<"Deadline per il task "<<task_id<<" superata";
-	    ERR("!");
+	    std::cout<<"Deadline per il task "<<task_id<<" superata!";
 	    return 1;
 	}
 	

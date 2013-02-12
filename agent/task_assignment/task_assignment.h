@@ -24,7 +24,7 @@ public:
 	void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
 	void compileExpressions(exprtk::symbol_table< double >& symbol_table);
 	void printTaskAssignmentMatrix();
-	void printTaskCostMatrix();
+	void printTaskCostMatrix(task_assignment_namespace::task_cost_matrix& C_matrix);
 
 	~task_assignment();
 
@@ -109,7 +109,7 @@ private:
 	void initialize_bilp_problem();
 	std::vector<double> C;
 	void copy_solution_to_TA_matrix(std::vector<bool> solution);
-	void copy_cost_matrix_to_cost_vector();
+	void copy_cost_matrix_to_cost_vector(task_assignment_namespace::task_cost_matrix& C_matrix);
 
 };
 

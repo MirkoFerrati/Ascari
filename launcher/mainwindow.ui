@@ -178,6 +178,11 @@
               <string>Vuoto</string>
              </property>
             </item>
+	    <item>
+             <property name="text">
+              <string>TaskAssignment</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>

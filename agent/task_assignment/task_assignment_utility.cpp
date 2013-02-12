@@ -55,7 +55,7 @@ void task_assignment ::copy_solution_to_TA_matrix(std::vector<bool> solution)
 }
  
  
- void task_assignment ::copy_cost_matrix_to_cost_vector()
+ void task_assignment ::copy_cost_matrix_to_cost_vector(task_assignment_namespace::task_cost_matrix& C_matrix)
 {
   	C.clear();
 	
@@ -65,7 +65,7 @@ void task_assignment ::copy_solution_to_TA_matrix(std::vector<bool> solution)
 	{
 	    for (unsigned int j=0;j<tasks_id.size();j++)
 	    {
-		 C.push_back(task_cost_matrix.at(agents_id[i]).at(tasks_id[j]));
+		 C.push_back(C_matrix.at(agents_id[i]).at(tasks_id[j]));
 		 z++;
 	    }
 	}

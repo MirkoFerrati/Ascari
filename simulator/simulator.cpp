@@ -62,7 +62,10 @@ void simulator::setCheckCollision(bool checkCollision)
 
 void simulator::initialize(const Parsed_World& wo)
 {
+    //written by Alessandro Settimi
     task_assignment_algorithm = wo.task_assignment_algorithm;
+    //written by Alessandro Settimi
+    
     initialize_agents(wo.agents);
     bonus_symbol_table.add_constants();
     int i=0;
