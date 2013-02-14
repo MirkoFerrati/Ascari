@@ -94,7 +94,6 @@ for (auto & agent_name: sim_agents) {
         //Evolvo i dummy di ogni agente
         auto old_dummy_ref = agent->second.before_begin(); //uso una forward list, devo tenermi un puntatore di riserva
         for (auto dummy_ref = agent->second.begin(); dummy_ref != agent->second.end(); ++dummy_ref) {
-            ++old_dummy_ref;
             //Evolvo il singolo dummy
             communicator.send ( (**dummy_ref), old_sensed_agents.state_agents);
             (*dummy_ref)->dummy.dummy_loop(sensed_bonus_variables,sensed_state_agents,sensed_time);
@@ -113,6 +112,8 @@ for (auto & agent_name: sim_agents) {
                     agent->second.erase_after (old_dummy_ref);
 		    dummy_ref=old_dummy_ref;
 		    }
+		    else
+		      ++old_dummy_ref;
                 }
             }
         }
