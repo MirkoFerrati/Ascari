@@ -60,6 +60,15 @@ void Viewer::init(std::string graphName)
     {
         parse_graph(graphName);
     }
+    
+    //written by Alessandro Settimi
+    if (view_type==4)
+    {
+	 Parsed_World World=parse_file(graphName); //scambiato col filename
+	 set_tasklist(World);
+    }
+    //written by Alessandro Settimi
+    
     for (lemon::SmartDigraph::NodeIt n(graph);n!=lemon::INVALID;++n)
 	{
 		if (maxX<(*coord_x)[n]) maxX=(*coord_x)[n]*1.1;
@@ -131,6 +140,15 @@ void Viewer::setBackImage(string path) {
     }
     pixmap.convertFromImage(immagine);
 }
+
+//written by Alessandro Settimi
+void Viewer::set_tasklist(const Parsed_World& wo)
+{
+     tasklist=wo.task_list;
+     tasks_id=wo.tasks_id;
+}
+//written by Alessandro Settimi
+
 
 Viewer::~Viewer() {
 if (length)
@@ -260,7 +278,36 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
         painter.drawRect(-2,-2,5,5);
         painter.restore();
     }
+    
+    
+    //written by Alessandro Settimi
+    if (view_type==4)
+    { 
+	for (unsigned int i=0;i<tasks_id.size();i++)
+	{
+		painter.save();
+		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+		painter.setBrush(QColor("blue"));
+		painter.drawRect(-7,-7,14,14);
+		painter.restore();
+		
+		painter.save();
+		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+		painter.setBrush(QColor("white"));
+		painter.drawRect(-6.5,-6.5,12.5,12.5);
+		painter.restore();
+		
+		painter.save();
+		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+		painter.setBrush(QColor("black"));
+		painter.scale(painter.fontMetrics().height()/100.0,-painter.fontMetrics().height()/100.0);
+		painter.drawText(10,30,QString(tasks_id.at(i).c_str()));
+		painter.restore();
+	}
+    }
+    //written by Alessandro Settimi
 
+    
     for (map<string,Agent>::const_iterator it=agents.begin();it!=agents.end();++it)
     {
         painter.save();
@@ -282,7 +329,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
         {
 			painter.scale(2,2);
             painter.drawConvexPolygon(hourHand, 3);
-			if (view_type==2)
+			if (view_type==2 || view_type==4)
 			{
 				painter.save();
 				painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
@@ -327,6 +374,17 @@ mutex->lock();
         //setTranslateFactor((agents[it->first].getMaxX()+agents[it->first].getMinX())/2,(agents[it->first].getMaxY()+agents[it->first].getMinY())/2);
         setScalingAndTranslateFactor(agents[it->first].getMaxX(),agents[it->first].getMinX(),agents[it->first].getMaxY(),agents[it->first].getMinY());
     }
+    
+    //written by Alessandro Settimi
+    if (view_type==4)
+    {
+	for(unsigned int i=0;i<tasks_id.size();i++)
+	{
+	    setScalingAndTranslateFactor(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[0]-7,tasklist.at(tasks_id.at(i)).task_position[1],tasklist.at(tasks_id.at(i)).task_position[1]-7);
+	}
+    }
+    //written by Alessandro Settimi
+    
     time=infos.time;
     mutex->unlock();
     repaint();

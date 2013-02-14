@@ -18,13 +18,7 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     inizializeTaskAssignmentMatrix();
     
     task_assignment_algorithm=world.task_assignment_algorithm;
-    printTaskCostMatrix();
-    
-    update_costs_with_deadlines();
-    printTaskCostMatrix();
-    
-    update_costs_with_position();
-    printTaskCostMatrix();
+    printTaskCostMatrix(task_cost_matrix);
     
     task_assigned=false;
     stop=false;
@@ -41,7 +35,7 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
  
 void task_assignment ::initialize_bilp_problem()
 {	
-	copy_cost_matrix_to_cost_vector();
+	copy_cost_matrix_to_cost_vector(task_cost_matrix);
 	
 	ta_problem.initialize_problem("Task_Assignment",GLP_MIN,(int)agents_id.size(),(int)tasks_id.size(),C);
 }
@@ -62,7 +56,7 @@ void task_assignment ::createTaskListFromParsedWorld(const Parsed_World& wo)
     
     for (unsigned int i=0; i< wo.task_list.size();i++)
     {	
-	    tasklist.insert(make_pair(tasks_id.at(i),wo.task_list.at(tasks_id.at(i))));
+	    tasklist.insert(std::make_pair(tasks_id.at(i),wo.task_list.at(tasks_id.at(i))));
 	    
 	    std::cout << std::endl << "TASK " << tasks_id.at(i) <<':'<< std::endl;
 	    std::cout << "- posizione: " << tasklist.at(tasks_id.at(i)).task_position[0] <<' '<< tasklist.at(tasks_id.at(i)).task_position[1]<<' '<< tasklist.at(tasks_id.at(i)).task_position[2] << std::endl;
@@ -75,21 +69,21 @@ void task_assignment ::createTaskListFromParsedWorld(const Parsed_World& wo)
  
 void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a)
 {   
-    task_cost_matrix.insert(make_pair(my_id,a.agent_task_cost_vector));
+    task_cost_matrix.insert(std::make_pair(my_id,a.agent_task_cost_vector));
     
     task_cost_vector app;
     
     for (unsigned int i=0;i<agents_id.size();i++)
     {
       
-	if(agents_id[i]!=my_id)
+	if(agents_id.at(i)!=my_id)
 	{
 	    for (unsigned int j=0;j<tasks_id.size();j++)
 	    {
-		app.insert(make_pair(tasks_id[j],0)); //i vettori di costo degli altri robot inizializzati come nulli
+		app.insert(std::make_pair(tasks_id.at(j),0)); //i vettori di costo degli altri robot inizializzati come nulli
 	    }
 	    
-	    task_cost_matrix.insert(make_pair(agents_id[i],app));
+	    task_cost_matrix.insert(std::make_pair(agents_id.at(i),app));
 	    
 	    app.clear();
 	}
@@ -103,19 +97,19 @@ void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a
 void task_assignment ::inizializeTaskAssignmentMatrix()
 {
       
-    task_assignment_vector app;
+    task_assignment_vector temp;
     
     for(unsigned int i=0;i<agents_id.size();i++)
     {
 
 	for(unsigned int j=0;j<tasks_id.size();j++)
 	{
-	    app.insert(make_pair(tasks_id[j],false)); //X identità
+	    temp.insert(std::make_pair(tasks_id.at(j),false));
 	}
 
-	task_assignment_matrix.insert(make_pair(agents_id[i],app));
+	task_assignment_matrix.insert(std::make_pair(agents_id.at(i),temp));
 	
-	app.clear();
+	temp.clear();
     }
     
     agent_task_assignment_vector=&task_assignment_matrix.at(my_id);
@@ -131,7 +125,7 @@ void task_assignment ::printTaskAssignmentMatrix()
 
 	for(unsigned int j=0;j<tasks_id.size();j++)
 	{
-	    std::cout<<task_assignment_matrix.at(agents_id[i]).at(tasks_id[j])<<' ';
+	    std::cout<<task_assignment_matrix.at(agents_id.at(i)).at(tasks_id.at(j))<<' ';
 	}
 	
 	std::cout<<std::endl;
@@ -141,7 +135,7 @@ void task_assignment ::printTaskAssignmentMatrix()
 }
 
  
-void task_assignment ::printTaskCostMatrix()
+void task_assignment ::printTaskCostMatrix(task_assignment_namespace::task_cost_matrix& C_matrix)
 {
     std::cout<<"TASK COST MATRIX"<<std::endl;
     
@@ -150,13 +144,13 @@ void task_assignment ::printTaskCostMatrix()
 
 	for(unsigned int j=0;j<tasks_id.size();j++)
 	{
-	    if(task_cost_matrix.at(agents_id[i]).at(tasks_id[j])==INF)
+	    if(C_matrix.at(agents_id.at(i)).at(tasks_id.at(j))==INF)
 	    {
 		std::cout<<"INF"<<' ';
 	    }
 	    else
 	    {
-		std::cout<<task_cost_matrix.at(agents_id[i]).at(tasks_id[j])<<' ';
+		std::cout<<C_matrix.at(agents_id.at(i)).at(tasks_id.at(j))<<' ';
 	    }
 	}
 	
@@ -204,7 +198,7 @@ void task_assignment ::run_plugin()
 	    
 	  if(task_assignment_algorithm==-1)
 	  {
-		ERR("attenzione, algoritmo per il task assignment non selezionato");
+		std::cout<<"attenzione, algoritmo per il task assignment non selezionato"<<std::endl;;
 	  }
     }
      
@@ -245,7 +239,7 @@ void task_assignment ::run_plugin()
 	
 	if(a=="TASK_ASSIGNMENT_FAILED")
 	{
-	    ERR("attenzione, task assignment non riuscito");
+	    std::cout<<"attenzione, task assignment non riuscito"<<std::endl;
 	}
 	else
 	{

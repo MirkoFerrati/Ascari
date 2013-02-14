@@ -16,6 +16,7 @@ public:
     void create_problem(std::vector<double> cost_vector);
     void set_cost_vector(std::vector<double> cost_vector);
     void solve(std::vector<bool>&);
+    double get_function_value();
     
     ~bilp_problem();
   

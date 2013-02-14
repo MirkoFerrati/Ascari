@@ -52,7 +52,7 @@ class task_assignment_communicator: public agent_to_simulator_ta_communicator<re
 				if(temp[i].agent_id!=my_id )
 				{
 				    if (!(received_from_agents.count(temp[i].agent_id)))
-					  received_from_agents.insert(make_pair(temp[i].agent_id,true));
+					  received_from_agents.insert(std::make_pair(temp[i].agent_id,true));
 				    data_receive.push_back(temp[i]);
 				    std::cout<<"Ricevo da "<<temp[i].agent_id<<std::endl;
 				}
