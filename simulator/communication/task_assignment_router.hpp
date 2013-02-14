@@ -23,10 +23,10 @@ template <typename datatype>
 class task_assignment_router: public simulator_to_agent_ta_communicator<datatype,datatype>, public task_assignment_router_base
 {		
   	std::vector<datatype> data;
-	std::mutex data_mutex;
+//	std::mutex data_mutex;
 	std::thread* sender_receiver;
 	
-	void loop(std::vector<datatype>& data, std::mutex& data_mutex)
+	void loop(std::vector<datatype>& data)
 	{
 		std::vector<datatype> temp;
 		
@@ -36,7 +36,7 @@ class task_assignment_router: public simulator_to_agent_ta_communicator<datatype
 			
 			temp=this->receive();//blocking call
 			
-			data_mutex.lock();
+//			data_mutex.lock();
 			
 			data=temp;
 			
@@ -46,7 +46,7 @@ class task_assignment_router: public simulator_to_agent_ta_communicator<datatype
 				this->send(data.at(i));
 			}
 		      
-			data_mutex.unlock();
+//			data_mutex.unlock();
 		}
 	}
 
@@ -64,7 +64,7 @@ class task_assignment_router: public simulator_to_agent_ta_communicator<datatype
 	
 	void start_thread()
 	{
-		sender_receiver=new std::thread(&task_assignment_router::loop,std::ref(*this),std::ref(data),std::ref(data_mutex));
+		sender_receiver=new std::thread(&task_assignment_router::loop,std::ref(*this),std::ref(data));
 	}
 
 	~task_assignment_router()
