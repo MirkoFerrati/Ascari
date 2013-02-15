@@ -10,7 +10,7 @@
 #include "time.h"
 #include "testagentudpcommunicator.hpp"
 // #include "testgeometry.hpp"
-
+#include <forward_list>
 /**
  * @author MirkoF
  * Questo progetto e' ancora troppo piccolo per avere un vero framework di unit testing, per adesso 
@@ -20,6 +20,31 @@
 
 int main(int /*argc*/, char** /*argv*/) {
 	srand(time(NULL));
+	
+	int i=0;
+	std::forward_list<double> test;
+	for (i=0;i<10;i++)
+	  test.insert_after(test.before_begin(),i);
+	auto old_pointer=test.before_begin();
+	for (auto pointer=test.begin();pointer!=test.end();++pointer)
+	{
+	  old_pointer++;
+	  if (true)//(*pointer>0)
+	  {
+	      test.erase_after(old_pointer);
+	      pointer=old_pointer;
+	      break;
+	  }
+	  
+	    
+	}
+	
+	for (auto p:test)
+	  cout<<p<<" ";
+	cout<<endl;
+	
+	
+	
 	vector<pair<testClass*,string> > tests;
 	tests.push_back(make_pair(new testRandom(),"random"));
 	tests.push_back(make_pair(new testController(),"controllore"));
