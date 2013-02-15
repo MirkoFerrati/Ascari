@@ -167,9 +167,11 @@ private:
 
 
 struct world_sim_packet {
+  
     std::map<std::string,double> bonus_variables;
     agents_name_to_states state_agents;
-	simulation_time time;
+    simulation_time time;
+    
     template <typename Archive>
     void serialize(Archive& ar,const unsigned int /*version*/)
     {
@@ -177,7 +179,7 @@ struct world_sim_packet {
         ar& bonus_variables;
         ar& state_agents;
     }
-
+    
 };
 
 struct control_command_packet

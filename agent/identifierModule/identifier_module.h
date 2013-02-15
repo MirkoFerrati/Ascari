@@ -7,7 +7,6 @@
 #include <dynamic.h>
 #include <forward_list>
 #include "agent_to_dummy_communicator.hpp"
-
 #include "dummy_agent.hpp"
 
 class identifier_module: public Plugin_module
@@ -19,14 +18,14 @@ public:
     void run_plugin();
     identifier_module (Parsed_World const& W, const std::map<int,double> & sensed_bonus_variables, const std::map<std::string,int> & map_bonus_variables_to_id,
     const std::map<std::string,agent_state_packet> &sensed_state_agents, const simulation_time & sensed_time);
-    
+    ~identifier_module();
     
 
 private:
     void create_agents(std::string agent_name);
 	const Parsed_World & parsed_world;
 	
-    agent_to_dummy_communicator communicator;
+    agent_to_dummy_communicator* communicator;
     std::map<std::string,std::forward_list<std::unique_ptr<dummy_agent>>> sim_agents;
     std::map <std::string,int> index_behaviors;
     std::map <std::string,std::vector< bool >> identifier_matrix;
@@ -36,7 +35,7 @@ private:
     const std::map<std::string,agent_state_packet> &sensed_state_agents;
     const simulation_time & sensed_time;
     std::vector<dynamic*> dynamics;
-    agent_state old_temp_state;
+    agent_state state_reference;
     control_command temp_command;
     std::map<std::string,std::mutex> mutexes;
 };
