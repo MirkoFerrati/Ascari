@@ -88,7 +88,7 @@ task_id task_assignment ::subgradient_algorithm()
 			{			  
 			      for (unsigned int j=0;j<tasks_id.size();j++)
 			      {
-				    if(/*COSA PRENDE NEW_VALUE?*/)
+				    if(/*COSA PRENDE NEW_VALUE?*/1)
 				    {
 					task_cost_matrix.at(agents_id.at(i)).at(tasks_id.at(j))=new_value;
 				    }
