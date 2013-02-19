@@ -1,10 +1,10 @@
 #ifndef ZMQ_AGENT_COMMUNICATOR_H
 #define ZMQ_AGENT_COMMUNICATOR_H
-#include <agent_communicator_abstract.h>
+#include "../communication/agent_communicator_abstract.h"
 #include <communication/zmq_full_communicator.hpp>
 #include <zmq.hpp>
 
-class zmq_agent_communicator : public agent_communicator_abstract,
+class zmq_agent_communicator : public simulator_namespace::agent_communicator_abstract,
 public zmq_simulator_to_agent_communicator<control_command_packet,world_sim_packet>
 {
 public:

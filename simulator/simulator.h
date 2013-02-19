@@ -5,7 +5,7 @@
 #include "dynamic.h"
 #include <vector>
 #include <map>
-#include <udp_agent_router.hpp>
+#include "communication/udp_agent_router.hpp"
 #include "collisioncheckerabstract.h"
 #include "random.hpp"
 #include <mutex>
@@ -33,7 +33,7 @@ private:
 	bool checkCollision;
 	CollisionCheckerAbstract *collisionChecker;
 	std::vector<dynamic*> dynamic_module;
-	agent_communicator_abstract* communicator;
+	simulator_namespace::agent_communicator_abstract* communicator;
 	world_sim_packet sim_packet;
 	index_map agent_states_to_index;
 	std::vector<index_map> agent_commands_to_index;

@@ -11,7 +11,7 @@
 #include "communication/world_communicator_abstract.h"
 #include "../shared/yaml_parser.h"
 #include "encoder/encoderAbstract.h"
-#include "decoder.h"
+#include "decoder/decoder.h"
 #include "random.hpp"
 #include "plugin_module.h"
 
@@ -108,7 +108,7 @@ protected:
 	//agent_communicator_abstract* agent_comm;
 	
 	//in dummy this will be a way to access identifier informations, in agent this will communicate with simulator (tcp or shared memory)
-	world_communicator_abstract* world_comm;
+	agent_namespace::world_communicator_abstract* world_comm;
 	
 	//in dummy agent this will not be initialized
 	//The identifier_module has become a plugin, so idModule is useless here

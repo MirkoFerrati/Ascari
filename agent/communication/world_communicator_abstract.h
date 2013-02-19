@@ -4,7 +4,8 @@
 #include "typedefs.h"
 
 #include <vector>
-
+namespace agent_namespace
+{
 struct target_abstract
 {
 	std::string identifier;
@@ -19,5 +20,5 @@ public:
 	virtual void send_control_command(control_command_packet&, const target_abstract* target)=0;
 	virtual ~world_communicator_abstract(){};
 };
-
+}
 #endif // WORLD_COMMUNICATOR_H

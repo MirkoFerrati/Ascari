@@ -11,6 +11,7 @@
 #include "boost/date_time/posix_time/posix_time_types.hpp"
 #include <boost/lexical_cast.hpp>
 #include <vector>
+#include <mutex>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
@@ -44,6 +45,7 @@ public:
     zmq_communicator() : sender_socket (static_zmq::context, sock_send_type), receiver_socket (static_zmq::context, sock_recv_type) {
         assert (sock_recv_type == ZMQ_PULL || sock_recv_type == ZMQ_SUB);
         assert (sock_send_type == ZMQ_PUSH || sock_send_type == ZMQ_PUB);
+	initialized=false;
         receive_buffer.rebuild (MAX_PACKET_LENGTH);
         send_buffer.rebuild (MAX_PACKET_LENGTH);
 	sync_socket=0;
@@ -173,12 +175,31 @@ protected:
             std::cout << static_cast<char*> (message.data()) << std::endl;
  
         }
+        initialized=true;
         return true;
     }
     
 public: 
+  
+  #ifdef ZMQDEBUG
+std::mutex check_for_unique_call;
+
+#endif //ZMQDEBUG
+  
     std::vector<receive_type> receive(int flags=0)
     {
+      if (!initialized)
+      {
+	ERR("receive chiamata senza avere inizializzato il communicator",NULL);
+	throw "";
+      }
+#ifdef ZMQDEBUG
+bool fail=!check_for_unique_call.try_lock();
+if (fail)
+{
+  ERR("receive e' gia' in esecuzione,probabilmente ci sono due thread concorrenti che chiamano la stessa receive",NULL);
+}
+#endif //ZMQDEBUG
         unsigned int subscribers = 0;
 	receive_type packet;
 	results.clear();
@@ -196,6 +217,10 @@ public:
         results.push_back(packet);
 	subscribers++;
     }
+      #ifdef ZMQDEBUG
+check_for_unique_call.unlock();
+
+#endif //ZMQDEBUG
     return results;
     };
     void send(send_type const & infos)
@@ -216,6 +241,7 @@ private:
     std::vector <receive_type> results;
     std::string owner_name;
     unsigned int expected_senders;
+    bool initialized;
 };
 
 

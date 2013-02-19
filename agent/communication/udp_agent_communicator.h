@@ -11,7 +11,7 @@
 #include <communication/udp_sender.hpp>
 
 
-class udp_agent_communicator : public agent_communicator_abstract
+class udp_agent_communicator : public agent_namespace::agent_communicator_abstract
 {
 public:
 	/*!

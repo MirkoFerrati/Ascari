@@ -1,11 +1,11 @@
 #ifndef TCP_AGENT_COMMUNICATOR_H
 #define TCP_AGENT_COMMUNICATOR_H
-#include <agent_communicator_abstract.h>
 #include "communication/udp_sender.hpp"
 #include "communication/udp_receiver.hpp"
+#include "../communication/agent_communicator_abstract.h"
 
 
-class udp_agent_communicator: public agent_communicator_abstract
+class udp_agent_communicator: public simulator_namespace::agent_communicator_abstract
 {
 public:
 	udp_agent_communicator(int num_agents);

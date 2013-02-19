@@ -1,6 +1,6 @@
 #include "yaml_checker.h"
-#include <simulator/simulator.h>
-
+#include "../simulator/simulator.h"
+#include "../agent/agent.h"
 Yaml_checker::Yaml_checker()
 {
 
@@ -13,8 +13,12 @@ void Yaml_checker::checkYaml (std::string filename)
   try
   {
   World=parse_file(filename);
-  simulator s;
+ simulator s;
   s.initialize(World);
+  
+   for (unsigned int i = 0; i < World.agents.size(); i++)
+        agent a1 (i, World);
+  
   }catch (std::exception& ex)
   {
     failed=true;

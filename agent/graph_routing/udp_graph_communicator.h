@@ -1,6 +1,6 @@
 #ifndef UDP_GRAPH_COMMUNICATOR_H
 #define UDP_GRAPH_COMMUNICATOR_H
-#include "agent_communicator_abstract.h"
+#include "../communication/agent_communicator_abstract.h"
 #include <boost/signals2/mutex.hpp>
 #include "typedefs.h"
 #include <iostream>
@@ -14,7 +14,7 @@
 typedef boost::shared_ptr<boost::thread> thread_ptr;
 
 
-class Udp_graph_communicator : public agent_communicator_abstract
+class Udp_graph_communicator : public agent_namespace::agent_communicator_abstract
 {
 public:
 	/*!

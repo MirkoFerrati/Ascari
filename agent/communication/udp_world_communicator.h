@@ -13,11 +13,11 @@ struct udp_target
 };
 
 
-class udp_world_communicator: public world_communicator_abstract
+class udp_world_communicator: public agent_namespace::world_communicator_abstract
 {
 public:
     world_sim_packet receive_agents_status();
-	void send_control_command(control_command_packet& command, const target_abstract* target);
+	void send_control_command(control_command_packet& command, const agent_namespace::target_abstract* target);
 	udp_world_communicator();
 // 	~udp_world_communicator();
 private:

@@ -3,7 +3,9 @@
 
 #include "typedefs_topology.h"
 #include "typedefs.h"
+#include <../agent/agent.h>
 
+namespace agent_namespace{
 class agent_communicator_abstract
 {
 public:
@@ -12,5 +14,5 @@ public:
 	virtual ~agent_communicator_abstract(){};
 
 };
-
+}
 #endif // AGENT_COMMUNICATOR_H
