@@ -1,1 +1,0 @@
-#define tol 1

@@ -31,7 +31,7 @@ public:
      * Setta il comunicatore
      */
 
-    void setCommunicator (world_communicator_abstract*);
+    void setCommunicator (std::shared_ptr< world_communicator_abstract >& communicator);
 
     /**
      * Setta l'identificatore
@@ -122,7 +122,7 @@ protected:
     //agent_communicator_abstract* agent_comm;
 
     //in dummy this will be a way to access identifier informations, in agent this will communicate with simulator (tcp or shared memory)
-    world_communicator_abstract* world_comm;
+    std::shared_ptr<world_communicator_abstract> world_comm;
 
     //in dummy agent this will not be initialized
     //The identifier_module has become a plugin, so idModule is useless here

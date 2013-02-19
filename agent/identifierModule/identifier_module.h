@@ -9,6 +9,9 @@
 #include "agent_to_dummy_communicator.hpp"
 #include "dummy_agent.hpp"
 
+#define tol 1
+
+
 class identifier_module: public Plugin_module
 {
 
@@ -25,7 +28,7 @@ private:
     void create_agents(std::string agent_name);
 	const Parsed_World & parsed_world;
 	
-    agent_to_dummy_communicator* communicator;
+    std::shared_ptr<agent_to_dummy_communicator> communicator;
     std::map<std::string,std::forward_list<std::unique_ptr<dummy_agent>>> sim_agents;
     std::map <std::string,int> index_behaviors;
     std::map <std::string,std::vector< bool >> identifier_matrix;
@@ -38,6 +41,8 @@ private:
     agent_state state_reference;
     control_command temp_command;
     std::map<std::string,std::mutex> mutexes;
+    bool agentStatesAreConsistent(const agent_state& first, const agent_state& second);
+    void printDebug();
 };
 
 

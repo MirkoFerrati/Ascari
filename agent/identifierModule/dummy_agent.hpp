@@ -8,7 +8,7 @@
 
 struct dummy_agent
 {
-  dummy_agent(std::string agent_name,const std::pair<const std::string, std::unique_ptr<Parsed_Behavior>>& behavior,int behavior_id, const Parsed_World & world, world_communicator_abstract * communicator)
+  dummy_agent(std::string agent_name,const std::pair<const std::string, std::unique_ptr<Parsed_Behavior>>& behavior,int behavior_id, const Parsed_World & world,std::shared_ptr< world_communicator_abstract > communicator)
   :dummy(agent_name,behavior.second,world),behavior_identifier(behavior_id),identifier(agent_name)
   {
     //char temp[5];

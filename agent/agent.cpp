@@ -93,7 +93,7 @@ agent::agent(int agent_index,const Parsed_World& world):
 //qui invece mi setto quello che manca a mano
 }
 
-void agent::setCommunicator (world_communicator_abstract* communicator)
+void agent::setCommunicator (std::shared_ptr<world_communicator_abstract>& communicator)
 {
 world_comm=communicator;
 }
@@ -137,7 +137,7 @@ void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy
 							   map_bonus_variables_to_id, behavior->topology_expressions,
 						 sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table);
 		//world_comm=new udp_world_communicator();
-		world_comm=new zmq_world_communicator(identifier);
+		world_comm=std::make_shared<zmq_world_communicator>(identifier);
 		 for (unsigned int i=0;i<plugins.size();i++)
 	    {
 		plugins[i]->compileExpressions(symbol_table);
@@ -379,8 +379,11 @@ void agent::main_loop()
 
 agent::~agent()
 {
-    //TODO: il dummy agent non può distruggere il comunicatore..... è a comune nel modulo identificatore. Però agent si!!!!
+    //TODO: il dummy agent non puo' distruggere il comunicatore..... e' a comune nel modulo identificatore. Pero' agent si'!!!!
+    
     //delete world_comm;
+    
+    
     delete automaton;
     delete encoder;
     delete f_rndom;
