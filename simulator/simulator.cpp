@@ -34,6 +34,7 @@ topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GR
 	checkCollision=false;
 	
 	//written by Alessandro Settimi
+	ta_router=0;
 	ta_router_started=false;
 	task_assignment_algorithm=-1;
 	//written by Alessandro Settimi
@@ -281,7 +282,13 @@ simulator::~simulator()
     for (unsigned int i=0;i<dynamic_module.size();i++)
         delete dynamic_module[i];
 
-    delete f_rndom;
+    
+      delete f_rndom;
+    
+    delete ta_router;
+    
+    
+      delete collisionChecker;
 }
 
 void simulator::start_sim(int max_loops)
