@@ -33,13 +33,13 @@ void empty_plugin::compileExpressions(exprtk::symbol_table< double >& symbol_tab
 	if (!parser.compile("x-y",delta_expression))
 	{
 		ERR("impossibile creare l'espressione: %s","x-y");
-		throw "impossibile creare l'espressione";
+// 		throw "impossibile creare l'espressione";
 	}
 	delta_expression.register_symbol_table(symbol_table);
 	if (!parser.compile("y",y_expression))
 	{
 		ERR("impossibile creare l'espressione: %s","y");
-		throw "impossibile creare l'espressione";
+// 		throw "impossibile creare l'espressione";
 	}
 }
 

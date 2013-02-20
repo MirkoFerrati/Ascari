@@ -32,7 +32,7 @@ dynamic::dynamic(agent_state& StateReferenceWARN,control_command& controlReferen
 		if (!parser.compile(string_tmp_expression,expression_tmp))
 		{
 		  ERR("impossibile creare l'espressione: %s %s",string_tmp_expression.c_str(),parser.error().c_str());
-		  throw "impossibile creare l'espressione";
+// 		  throw "impossibile creare l'espressione";
 		}
 		expressions.emplace_back(expression_tmp);
 		map_expressions.insert(make_pair(state_variables_name.at(i),i));

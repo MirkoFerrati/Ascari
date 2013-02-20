@@ -41,7 +41,7 @@ encoderDet::encoderDet(std::map< int, Sub_events >& sub_events, const string& ag
 	else
 		{
 			ERR("Errore durante la creazione dell'espressione della lambda %s,:%s",string_tmp_expression.c_str(),parser.error().c_str());
-			throw "Errore durante la creazione dell'espressione della lambda";
+// 			throw "Errore durante la creazione dell'espressione della lambda";
 		}
     }
 
@@ -56,7 +56,7 @@ encoderDet::encoderDet(std::map< int, Sub_events >& sub_events, const string& ag
 		else
 		{
 			ERR("Errore durante la creazione dell'espressione della topologia %s,:%s",string_tmp_expression.c_str(),parser.error().c_str());
-			throw "Errore durante la creazione dell'espressione della topologia";
+// 			throw "Errore durante la creazione dell'espressione della topologia";
 		}
     }
 

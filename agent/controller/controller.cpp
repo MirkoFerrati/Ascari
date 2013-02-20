@@ -34,7 +34,7 @@ controller::controller(const map< int,string >& map_id_expressions,
 		else
 		{
 			ERR("impossibile creare l'espressione: %s %s",tmp_expression.c_str(),parser.error().c_str());
-			throw "impossibile creare l'espressione";
+// 			throw "impossibile creare l'espressione";
 		}
 	}
 	

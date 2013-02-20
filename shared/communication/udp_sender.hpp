@@ -43,8 +43,7 @@ public:
       << std::hex << outbound_data_.size();
     if (!header_stream || header_stream.str().size() != header_length)
     {
-      throw
-		"error during packet creation";
+      throw "error during packet creation";
     }
     outbound_header_ = header_stream.str();
 

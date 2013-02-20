@@ -151,7 +151,7 @@ void operator>> (const YAML::Node& node, std::unique_ptr<Parsed_Behavior>& behav
                             if (behavior->automaton[actual_state].count(tran_ev[j]))
                             {
                                 ERR("DUPLICATED EVENT %s", tran_ev[j].c_str());
-                                throw "DUPLICATED EVENT";
+//                                 throw "DUPLICATED EVENT";
                             }
                             behavior->automaton[actual_state].insert(pair<event_name, discreteState_Name>(tran_ev[j],new_state));
                         }
@@ -221,7 +221,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     if (!ag.behavior->discrete_states.count(ag.state_start))
     {
         ERR("UNDEFINED START DISCRETE STATE %s", ag.state_start.c_str());
-        throw "UNDEFINED DISCRETE START STATE";
+//         throw "UNDEFINED DISCRETE START STATE";
     }
 
 
@@ -296,7 +296,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
        if (!behaviors_nodes[i].FindValue("NAME")){
 	 
             ERR("BEHAVIOR NAME UNDEFINED: BEHAVIOR NUMBER %d", i);
-            throw "BEHAVIOR NAME UNDEFINED";
+//             throw "BEHAVIOR NAME UNDEFINED";
         }
       
 	behaviors_nodes[i]["NAME"]>> tmp_beh_name;
@@ -321,7 +321,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
      if (!agent_nodes[i].FindValue("BEHAVIOR"))
     {
         ERR("BEHAVIOR NAME UNSPECIFIED FOR AGENT %s", tmp_ag_name.c_str());
-        throw "BEHAVIOR NAME UNSPECIFIED FOR AGENT";
+//         throw "BEHAVIOR NAME UNSPECIFIED FOR AGENT";
     }
     
     std::string tmp_agent_behavior_name;
@@ -330,7 +330,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
      if (!wo.behaviors.count(tmp_agent_behavior_name))
     {
         ERR("UNDEFINED BEHAVIOR %s FOR AGENT %s", tmp_agent_behavior_name.c_str(), tmp_ag_name.c_str());
-        throw "UNDEFINED BEHAVIOR %s FOR AGENT %s";
+//         throw "UNDEFINED BEHAVIOR %s FOR AGENT %s";
     }
     wo.agents.emplace_back(wo.behaviors[tmp_agent_behavior_name]);
 	wo.agents[i].name=tmp_ag_name;
@@ -340,7 +340,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
         if ((wo.agents[i].target_list.size()==0 && wo.graphName.compare("UNSET")!=0)|| (wo.agents[i].target_list.size()>0 && wo.graphName.compare("UNSET")==0) ) {
 
             ERR("GRAPH NAME OR TARGET LIST UNDEFINED", NULL);
-            throw "GRAPH NAME OR TARGET LIST UNDEFINED";
+//             throw "GRAPH NAME OR TARGET LIST UNDEFINED";
         }
 
     }
@@ -366,7 +366,7 @@ void operator>>(const YAML::Node& node, Parsed_World& wo)
 		if (wo.task_assignment_algorithm == -1)
 		{
 		      ERR("UNDEFINED TASK ASSIGNMENT ALGORITHM",NULL);
-		      throw "UNDEFINED TASK ASSIGNMENT ALGORITHM";
+// 		      throw "UNDEFINED TASK ASSIGNMENT ALGORITHM";
 		}
 		
 		createTaskList(node[0]["WORLD"][0]["TASK_LIST"],wo.task_list,wo.tasks_id,task_number);
