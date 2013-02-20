@@ -36,7 +36,7 @@ void agent_router::compileExpressions(exprtk::symbol_table< double >& symbol_tab
 	distance_to_target.register_symbol_table(symbol_table);
 	if (!parser.compile("sqrt((XTARGET-X)^2+(YTARGET-Y)^2)",distance_to_target))
 	{
-		ERR("impossibile creare l'espressione: %s","sqrt(sqr(XTARGET)+sqr(YTARGET))");
+		ERR("impossibile creare l'espressione: %s %s","sqrt(sqr(XTARGET)+sqr(YTARGET))",parser.error().c_str());
 		throw "impossibile creare l'espressione";
 	}
 	

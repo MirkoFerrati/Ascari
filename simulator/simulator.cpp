@@ -97,7 +97,7 @@ void simulator::initialize(const Parsed_World& wo)
         }
         else
         {
-            ERR("impossibile creare l'espressione: %s",string_tmp_expression.c_str());
+            ERR("impossibile creare l'espressione: %s %s",string_tmp_expression.c_str(),parser.error().c_str());
             throw "impossibile creare l'espressione";
         }
 
