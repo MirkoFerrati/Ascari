@@ -11,6 +11,8 @@ set(agent_SOURCES empty_plugin/empty_plugin.cpp
 	
 )
 
+#add_definitions(-DZMQDEBUG)
+
 FIND_PACKAGE(GLPK 4.33)
 
 set(GLPK_FOUND 0)
