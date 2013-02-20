@@ -55,7 +55,7 @@ agent::agent(int agent_index,const Parsed_World& world):
 	if (world.agents.at(agent_index).monitoring)
 	{
 		
-		Plugin_module *monitor=new identifier_module(world,bonusVariables,map_bonus_variables_to_id,state_other_agents,time);
+		Plugin_module *monitor=new identifier_module(world,bonusVariables,map_bonus_variables_to_id,state_other_agents,time,identifier);
 		plugins.push_back(monitor);
 	}
 	
@@ -148,7 +148,7 @@ void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy
 	   
 		//TODO(Mirko): we will think about identifierModule later
 		//TODO:create non-deterministic automaton
-		automaton=new automatonFSM(createAutomatonTableFromParsedAgent(behavior));
+		automaton=new automatonEFSM(createAutomatonTableFromParsedAgent(behavior));
 		encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id,bonusVariables,
 							   map_bonus_variables_to_id, behavior->topology_expressions,
 						 sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table);
@@ -328,11 +328,13 @@ void agent::main_loop()
                 state.at(it->first)=it->second;
             }
 
-            if (inputs.identifier.size()>1) 
-	      cout<<"AGENTE:"<< inputs.identifier<<"-";
-	    else
+            if (!(inputs.identifier.size()>1)) 
+	     // cout<<"AGENTE:"<< inputs.identifier<<"-";
+	    //else
+	    {
 	      cout<<"AGENTE:"<<identifier<<" -";
-            cout<<"stato: "<<state.at(0)<<" "<<state.at(1)<<" "<<state.at(2)<<endl;
+            cout<<"stato: "<<state.at(0)<<" "<<state.at(1)<<" "<<state.at(2)<<endl<<endl;
+	    }
 
             sleep(0);
             encoder->computeSubEvents(state_other_agents);
@@ -352,7 +354,9 @@ void agent::main_loop()
 	    {
 	      controllers.at(map_discreteStateId_to_controllerId.at(discrete)).computeControl();
 	      inputs.commands.at(discrete)=inputs.default_command;
+	      std::cout<< discrete;
 	    }
+	    std::cout<< std::endl;
             world_comm->send_control_command(inputs,(target_abstract*) (&identifier));
 
             string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
@@ -361,7 +365,7 @@ void agent::main_loop()
                 if (it->second==discreteState.front())
                     tmp=it->first;
             }
-            cout<<tmp<<endl;
+            //cout<<tmp<<endl;
 
 //             cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)
 // 			<<" "<<state_other_agents.at(identifier).state.at(2)<<endl;

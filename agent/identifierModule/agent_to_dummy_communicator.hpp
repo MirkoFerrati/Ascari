@@ -43,6 +43,7 @@ public:
       //buffer_control.insert(make_pair(control_command.identifier,control_command));
       buffer_control[control_command.identifier]=control_command;
       
+      
     };
     
     control_command_packet receive_control_command (std::string const & source) {

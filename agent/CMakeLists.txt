@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 set(agent_SOURCES empty_plugin/empty_plugin.cpp 
- graph_routing/graph_creator.cpp encoder/encoderDet.cpp automaton/automatonFSM.cpp 
+ graph_routing/graph_creator.cpp encoder/encoderDet.cpp automaton/automatonFSM.cpp automaton/automatonEFSM.cpp
   communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp ../shared/dynamic.cpp
   communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
   ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp decoder/decoder.cpp 

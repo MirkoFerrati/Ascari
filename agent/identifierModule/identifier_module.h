@@ -10,6 +10,7 @@
 #include "dummy_agent.hpp"
 
 #define tol 1
+#define mon_debug_mode 1
 
 
 class identifier_module: public Plugin_module
@@ -20,14 +21,15 @@ public:
     void compileExpressions (exprtk::symbol_table< double >& arg1);
     void run_plugin();
     identifier_module (Parsed_World const& W, const std::map<int,double> & sensed_bonus_variables, const std::map<std::string,int> & map_bonus_variables_to_id,
-    const std::map<std::string,agent_state_packet> &sensed_state_agents, const simulation_time & sensed_time);
+    const std::map<std::string,agent_state_packet> &sensed_state_agents, const simulation_time & sensed_time,std::string owner);
     ~identifier_module();
     
 
 private:
     void create_agents(std::string agent_name);
 	const Parsed_World & parsed_world;
-	
+    
+    std::string owner;
     std::shared_ptr<agent_to_dummy_communicator> communicator;
     std::map<std::string,std::forward_list<std::unique_ptr<dummy_agent>>> sim_agents;
     std::map <std::string,int> index_behaviors;
