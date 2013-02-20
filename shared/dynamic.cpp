@@ -8,16 +8,16 @@ dynamic::dynamic(agent_state& StateReferenceWARN,control_command& controlReferen
 		 std::map< std::string, std::string > expression_map, std::vector< std::string > state_variables_name, 
 		 std::vector< std::string > control_variables_name):StateReferenceWARN(StateReferenceWARN)
 {
-	symbol_table=new exprtk::symbol_table<double>();
+	//symbol_table=new exprtk::symbol_table<double>();
 	for (unsigned int i=0;i<StateReferenceWARN.size();i++)
 	{
-		symbol_table->add_variable(state_variables_name.at(i),StateReferenceWARN.at(i));
+		symbol_table.add_variable(state_variables_name.at(i),StateReferenceWARN.at(i));
 	}
 	for (unsigned int i=0;i<controlReferenceWARN.size();i++)
 	{
-		symbol_table->add_variable(control_variables_name.at(i),controlReferenceWARN.at(i));
+		symbol_table.add_variable(control_variables_name.at(i),controlReferenceWARN.at(i));
 	}
-	symbol_table->add_constants();
+	symbol_table.add_constants();
 	
     exprtk::parser<double> parser;
 	
@@ -27,21 +27,25 @@ dynamic::dynamic(agent_state& StateReferenceWARN,control_command& controlReferen
 	for (unsigned int i=0;i<state_variables_name.size();i++)
 	{
 		exprtk::expression<double> expression_tmp;//=new exprtk::expression<double>();
-		expression_tmp.register_symbol_table(*symbol_table);
+		expression_tmp.register_symbol_table(symbol_table);
 		string string_tmp_expression=expression_map.at(state_variables_name.at(i));
-		parser.compile(string_tmp_expression,expression_tmp);
-		expressions.push_back(expression_tmp);
+		if (!parser.compile(string_tmp_expression,expression_tmp))
+		{
+		  ERR("impossibile creare l'espressione: %s %s",string_tmp_expression.c_str(),parser.error().c_str());
+		  throw "impossibile creare l'espressione";
+		}
+		expressions.emplace_back(expression_tmp);
 		map_expressions.insert(make_pair(state_variables_name.at(i),i));
+		
+		
+		  
 	}
 	
 }
 
 dynamic::~dynamic()
 {
-// 	for (unsigned int i=0;i<expressions.size();i++)
-// 		delete(expressions[i]);
-expressions.clear();
-	delete(symbol_table);
+	//delete(symbol_table);
 }
 
 

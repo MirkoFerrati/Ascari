@@ -17,8 +17,13 @@ void Yaml_checker::checkYaml (std::string filename)
   s.initialize(World);
   
    for (unsigned int i = 0; i < World.agents.size(); i++)
-        agent a1 (i, World);
-  
+   {
+        agent a1 (i, World,true);
+	if (!a1.initialized) 
+	{
+	  failed=true;
+	}
+   }
   }catch (std::exception& ex)
   {
     failed=true;

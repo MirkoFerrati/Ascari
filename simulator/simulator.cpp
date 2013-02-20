@@ -276,8 +276,8 @@ simulator::~simulator()
 	
     delete communicator;
 
-    for (unsigned int i=0; i< map_bonus_variables.size();i++)
-        bonus_expressions.at(i).~expression();
+//     for (unsigned int i=0; i< map_bonus_variables.size();i++)
+//         bonus_expressions.at(i).~expression();
 
     for (unsigned int i=0;i<dynamic_module.size();i++)
         delete dynamic_module[i];

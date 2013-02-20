@@ -32,7 +32,7 @@ init(behavior,true);
 }
 
 
-agent::agent(int agent_index,const Parsed_World& world):
+agent::agent(int agent_index,const Parsed_World& world, bool noStart):
 	identifier(world.agents.at(agent_index).name)
 {
 	createBonusVariablesFromWorld(world.bonus_expressions);
@@ -70,14 +70,14 @@ agent::agent(int agent_index,const Parsed_World& world):
 		
 	}
 	
-	init(world.agents.at(agent_index).behavior,false);
+	init(world.agents.at(agent_index).behavior,false,noStart);
 	discreteState.push_front(map_discreteStateName_to_id.at(world.agents.at(agent_index).state_start));
 	
 //qui invece mi setto quello che manca a mano
 }
 
 
-void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy)
+void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy,bool noStart)
 {
 	time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
 	symbol_table.add_constants();
@@ -109,7 +109,7 @@ void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy
 							   map_bonus_variables_to_id, behavior->topology_expressions,
 						 sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table);
 		//world_comm=new udp_world_communicator();
-		world_comm=new zmq_world_communicator(identifier);
+		if (!noStart) world_comm=new zmq_world_communicator(identifier);
 		 for (unsigned int i=0;i<plugins.size();i++)
 	    {
 		plugins[i]->compileExpressions(symbol_table);

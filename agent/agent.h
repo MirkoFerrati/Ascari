@@ -19,9 +19,9 @@ class agent
 {
 public:
 	agent(std::string name,  const std::unique_ptr< Parsed_Behavior >& behavior);
-	agent(int agent_index, const Parsed_World& world);
+	agent(int agent_index, const Parsed_World& world,bool noStart=false);
 	~agent();
-	void init(const std::unique_ptr< Parsed_Behavior >& behavior, bool isDummy);
+	void init(const std::unique_ptr< Parsed_Behavior >& behavior, bool isDummy,bool noStart=false);
     void start();
     void main_loop();
 	
@@ -30,11 +30,11 @@ public:
       return discreteState;
     }
     
-    
+    bool initialized;
 	
 protected:
     
-	bool initialized;
+	
 	
 	/**
 	 * Name of agent and it is used for unique indentification
