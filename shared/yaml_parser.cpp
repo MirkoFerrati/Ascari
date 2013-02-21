@@ -205,7 +205,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
   
      if (node.FindValue("MONITORING"))
     {
-	int tmp_mon;
+	int tmp_mon=0;
 	node["MONITORING"]>>tmp_mon;
 	if(tmp_mon==1)
 	  ag.monitoring=true;  	
@@ -220,7 +220,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
     
     for (unsigned int i=0;i<ag.behavior->state.size();i++)
     {
-        initial_state_value tmp_initial;
+        initial_state_value tmp_initial=0;
         node["INITIAL"][0][ag.behavior->state[i]]>>tmp_initial;
         ag.initial_states.insert(pair<stateVariable,initial_state_value>(ag.behavior->state[i],tmp_initial));
     }

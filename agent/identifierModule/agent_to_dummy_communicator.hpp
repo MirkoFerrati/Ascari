@@ -14,7 +14,7 @@ public:
     
     agent_to_dummy_communicator ()
     {
-     
+     buf_agents=0;
     };
     
     ~agent_to_dummy_communicator (){
@@ -26,8 +26,14 @@ public:
     
     world_sim_packet receive_agents_status(){
     
-    return *buf_agents;
-    
+      if (buf_agents!=0)
+	  return *buf_agents;
+      else
+      {
+	ERR("MONITOR: ESEGUITA RECEIVE PRIMA DI UNA SEND",NULL);
+	throw "MONITOR: ESEGUITA RECEIVE PRIMA DI UNA SEND";
+      }
+	
       
     };
     
