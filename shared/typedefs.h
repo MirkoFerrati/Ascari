@@ -119,6 +119,13 @@ struct dummy_state
       else
 	return false;
   }
+  bool operator<(const dummy_state & other ) const
+  {
+    if ((*this).automatonState<other.automatonState)
+      return true;
+      else
+	return false;
+  }
 };
 
 
