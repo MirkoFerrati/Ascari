@@ -43,7 +43,11 @@ public:
     inline std::forward_list<automaton_state> & getDiscreteStates() {
         return discreteState;
     }
-
+    
+    inline void setDiscreteState(int new_state) {
+	discreteState.clear();
+        discreteState.push_front(new_state);
+    }
 
 
 protected:

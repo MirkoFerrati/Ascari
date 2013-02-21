@@ -108,6 +108,20 @@ struct empty_packet
 };
 
 
+struct dummy_state
+{
+  int automatonState;
+  agent_state state;
+  bool operator ==(const dummy_state & other) const
+  {
+    if ((*this).automatonState==other.automatonState)
+      return true;
+      else
+	return false;
+  }
+};
+
+
 struct graph_informations
 {
     bool isNegotiating;

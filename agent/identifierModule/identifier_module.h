@@ -9,8 +9,9 @@
 #include "agent_to_dummy_communicator.hpp"
 #include "dummy_agent.hpp"
 
-#define tol 1
+#define tol 0.25
 #define mon_debug_mode 1
+#define update_after 10
 
 
 class identifier_module: public Plugin_module
@@ -45,6 +46,7 @@ private:
     std::map<std::string,std::mutex> mutexes;
     bool agentStatesAreConsistent(const agent_state& first, const agent_state& second);
     void printDebug();
+    int ncicli;
 };
 
 

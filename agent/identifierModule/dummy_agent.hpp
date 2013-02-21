@@ -17,12 +17,24 @@ struct dummy_agent
     
     dummy.setCommunicator(communicator);
     dummy.setControlCommandIdentifier(identifier);
+    
+    dummy_state tmp;
+    for (auto dstate = dummy.getDiscreteStates().begin(); dstate != dummy.getDiscreteStates().end(); ++dstate) {
+	    tmp.automatonState=*dstate;
+            states.push_front(tmp);
+    }
+    
+    
   }
 public:
   agent dummy;
   int behavior_identifier;
+  std::forward_list<dummy_state> states;
   std::string identifier;
   std::mutex comm_mutex;
+   inline std::forward_list<dummy_state> & getDiscreteStates() {
+        return states;
+    }
 };
 
 
