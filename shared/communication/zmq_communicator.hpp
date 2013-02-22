@@ -38,8 +38,6 @@ template <typename receive_type, typename send_type, int sock_send_type, int soc
 class zmq_communicator
 {
 
-
-
 public:
     zmq_communicator() : sender_socket (static_zmq::context, sock_send_type), receiver_socket (static_zmq::context, sock_recv_type) {
         assert (sock_recv_type == ZMQ_PULL || sock_recv_type == ZMQ_SUB);
@@ -216,29 +214,6 @@ private:
     std::string owner_name;
     unsigned int expected_senders;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 template <typename receive_type,int sock_recv_type>
 class zmq_receive_communicator

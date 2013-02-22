@@ -5,6 +5,7 @@
 #include "../communication/zmq_world_sniffer.hpp"
 #include "lemon/arg_parser.h"
 #include "logog.hpp"
+#include "communication/zmq_identifier_sniffer.hpp"
 
 
 void center(QWidget &widget,int WIDTH=800,int HEIGHT=800)
@@ -38,7 +39,7 @@ int main(int argc, char *argv[])
 		int viewerType;
         ap.refOption("f","Graph filename",graphName);
         ap.synonym("filename","f");
-		ap.refOption("t"," 1-baseball 2-grafi 3-vuoto",viewerType,true);
+		ap.refOption("t"," 1-baseball 2-grafi 3-vuoto 5-monitor",viewerType,true);
         ap.throwOnProblems();
         try {
             ap.parse();
@@ -57,16 +58,25 @@ int main(int argc, char *argv[])
         boost::asio::io_service io_service;
         std::vector<char> buffer;
         world_sim_packet read;
-	std::shared_ptr<std::mutex> read_mutex(new std::mutex);
-	buffer.resize(MAX_PACKET_LENGTH);
+		monitor_packet monitor_read;
+		std::shared_ptr<std::mutex> read_mutex(new std::mutex);
+		std::shared_ptr<std::mutex> monitor_read_mutex(new std::mutex);
+		buffer.resize(MAX_PACKET_LENGTH);
         Viewer window(read,read_mutex,NULL,viewerType,graphName);
         udp_world_sniffer sniffer(buffer,io_service);
-	zmq_world_sniffer<world_sim_packet> sniffer_test(read,read_mutex);
-        window.setWindowTitle("Visualizer");
+		zmq_world_sniffer<world_sim_packet> sniffer_test(read,read_mutex);
+		world_sniffer_abstract* identifier_sniffer;
+		if (viewerType==5)
+		{
+			identifier_sniffer= new zmq_identifier_sniffer<monitor_packet>(monitor_read,monitor_read_mutex);
+			identifier_sniffer->start_receiving();
+			window.setMonitor(monitor_read,monitor_read_mutex);
+		}	
+		window.setWindowTitle("Visualizer");
         window.show();
         center(window);
         sniffer_test.start_receiving();
-        window.start();
+		window.start();
 
         return app.exec();
     }

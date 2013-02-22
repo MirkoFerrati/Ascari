@@ -51,12 +51,16 @@ private:
     boost::asio::io_service io_service;
     //std::vector<char> buffer;
     world_sim_packet buffer;
-    std::shared_ptr<std::mutex> mutex;
+	monitor_packet monitor_buffer;
+    std::shared_ptr<std::mutex> mutex, monitor_mutex;
     void openFile();
     QSettings *settings;
 	Parsed_World world;
         Viewer * insideViewer;
         world_sniffer_abstract *sniffer;
+		
+		world_sniffer_abstract* identifier_sniffer;
+		
 	std::vector<QProcess*> agents;
     QString fileName,simulatorPath,agentPath,viewerPath;
 };
