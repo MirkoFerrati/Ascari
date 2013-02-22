@@ -9,7 +9,8 @@
 
 struct dummy_agent
 {
-  dummy_agent(std::string agent_name,const std::pair<const std::string, std::unique_ptr<Parsed_Behavior>>& behavior,int behavior_id, const Parsed_World & world,std::shared_ptr< world_communicator_abstract > communicator)
+  dummy_agent(std::string agent_name,const std::pair<const std::string, std::unique_ptr<Parsed_Behavior>>& behavior,int behavior_id, 
+	      const Parsed_World & world,std::shared_ptr< world_communicator_abstract > communicator, const agent_state & ref_state)
   :dummy(agent_name,behavior.second,world),behavior_identifier(behavior_id),identifier(agent_name)
   {
     //char temp[5];
@@ -22,6 +23,7 @@ struct dummy_agent
     dummy_state tmp;
     for (auto dstate = dummy.getDiscreteStates().begin(); dstate != dummy.getDiscreteStates().end(); ++dstate) {
 	    tmp.automatonState=*dstate;
+	    tmp.state=ref_state;
             states.push_front(tmp);
     }
     

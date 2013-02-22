@@ -60,7 +60,7 @@ void identifier_module::compileExpressions (exprtk::symbol_table< double >& /*sy
 }
 
 
-void identifier_module::create_agents (std::string agent_name)
+void identifier_module::create_agents (std::string agent_name, const agent_state & ref_state)
 {
     /**
      * Piu' o meno cosi':
@@ -73,6 +73,7 @@ void identifier_module::create_agents (std::string agent_name)
      * }
      *
      */
+    
     assert (sim_agents[agent_name].empty());
     if (identifier_matrix[agent_name].empty()) {
         identifier_matrix[agent_name].resize (index_behaviors.size(), true);
@@ -80,7 +81,7 @@ void identifier_module::create_agents (std::string agent_name)
 
 for (auto const & behavior: parsed_world.behaviors) {
         if (identifier_matrix[agent_name].at (index_behaviors.at (behavior.first))) {
-            dummy_agent* tmp_agent = new dummy_agent (agent_name, behavior, index_behaviors.at (behavior.first), parsed_world,std::dynamic_pointer_cast<world_communicator_abstract>(communicator));
+            dummy_agent* tmp_agent = new dummy_agent (agent_name, behavior, index_behaviors.at (behavior.first), parsed_world,std::dynamic_pointer_cast<world_communicator_abstract>(communicator), ref_state);
 
             sim_agents[agent_name].push_front (std::unique_ptr<dummy_agent> (tmp_agent));
 
@@ -123,8 +124,7 @@ void identifier_module::run_plugin()
     //controllo il tempo
     assert (sensed_time - old_sensed_agents.time > 0.001);
     ncicli++;
-    if (sensed_time < 0.5){
-     ncicli=-2;
+    if (ncicli < 2){
       return;
     }
     
@@ -151,8 +151,9 @@ for (auto & agent_name: sim_agents) {
 	    if ((ncicli % update_after)==0){
 	      for (unsigned i=0; i<state_reference.size();i++)
 		state_reference[i]=old_sensed_agents.state_agents.internal_map.at (agent->first).state.at(i);
-		(*dummy_ref)->getDiscreteStates().sort();
-		(*dummy_ref)->getDiscreteStates().unique();
+
+		(*dummy_ref)->getDummyStates().sort();
+		(*dummy_ref)->getDummyStates().unique();
 	      }
             //Evolvo il singolo dummy
             std::forward_list<dummy_state> tmp_states;
@@ -165,17 +166,21 @@ for (auto & agent_name: sim_agents) {
 		{
 		    state_reference[i]=(*dummystate).state.at(i);
 		}
+
 	      }
 	      std::cout<<"Stato Partenza:"<<(*dummystate).automatonState<<std::endl;
 	      std::cout << "Riferimento : " << state_reference.at (0) << " " << state_reference.at (1) << " " << state_reference.at (2) << endl;
 		
 	      (*dummy_ref)->dummy.setDiscreteState((*discstate).automatonState);
+
 	      (*dummy_ref)->dummy.main_loop();
 	      
 	      auto control_command_packet = communicator->receive_control_command ( (*dummy_ref)->identifier);
 	      for (auto dstate = (*dummy_ref)->dummy.getDiscreteStates().begin(); dstate != (*dummy_ref)->dummy.getDiscreteStates().end(); ++dstate) {
 	      //preparo il comando relativo allo stato discreto iesimo
-		  temp_command = control_command_packet.commands.at (*dstate);
+		  for (unsigned i=0; i<control_command_packet.commands.at (*dstate).size();i++ ){
+		  temp_command[i] = control_command_packet.commands.at (*dstate).at(i);
+		  }
 		  std::cout << "Controllo : " << temp_command.at (0) << " " << temp_command.at (1) << endl;
 		  agent_state new_state = dynamics.at ( (*dummy_ref)->behavior_identifier)->getNextState();
 		 // std::cout << &temp_command.at(0) << endl << &temp_command.at (1) << endl;
@@ -204,7 +209,7 @@ for (auto & agent_name: sim_agents) {
 	      } 
 	      else
 	      {
-		(*dummy_ref)->getDiscreteStates().swap(tmp_states);
+		(*dummy_ref)->getDummyStates().swap(tmp_states);
 		  ++old_dummy_ref;
 	      }
 	  }
@@ -228,7 +233,9 @@ for (auto & agent_name: sim_agents) {
     //Creo i nuovi dummy per gli agenti appena entrati
 for (const auto & sensed_agent: sensed_state_agents) {
         if (sim_agents.find (sensed_agent.first) == sim_agents.end() && strcmp(sensed_agent.first.c_str(),(*this).owner.c_str())!=0) {
-            create_agents (sensed_agent.first);
+            create_agents (sensed_agent.first, sensed_agent.second.state);
+	    //il controllo se devo creare o meno l'agente (se e' gia stato escluso per un beaavior non devo crearlo) viene fatto dentro la 
+	    //la funzione create_agents
         }
     }
     //Aggiorno la struttura dati old_sensed_agents

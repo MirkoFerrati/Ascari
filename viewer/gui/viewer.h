@@ -21,8 +21,9 @@ class Viewer : public QWidget
     void setTranslateFactor(double tx=0,double ty=0);
     void setBackImage(std::string path);
     void start();
+    void setMonitor(monitor_packet monitor_read, std::shared_ptr< std::mutex > monitor_read_mutex);
     int view_type;
-
+    
    
 protected:
     void paintEvent(QPaintEvent *event);
@@ -42,10 +43,12 @@ protected:
     QImage immagine;
     QPixmap pixmap;
     //const std::vector<char>& buffer;
-    	const world_sim_packet& infos;
-
+    const world_sim_packet& infos;
     std::shared_ptr<std::mutex>& mutex;
-    enum { header_length = 8 };
+	monitor_packet& monitor_read;
+	std::shared_ptr<std::mutex >& monitor_read_mutex;
+	
+	enum { header_length = 8 };
 	//boost::asio::io_service& io_service;
     void setScalingAndTranslateFactor(double maxX,double minX,double maxY,double minY);
 	double maxX;

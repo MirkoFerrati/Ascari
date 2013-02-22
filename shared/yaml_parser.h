@@ -68,7 +68,7 @@ class Parsed_Agent {
 public:
 	Parsed_Agent(const std::unique_ptr<Parsed_Behavior>& behavior):behavior(behavior)
 	{
-		
+	monitoring=false;	
 	}
 	friend std::ostream& operator<<(std::ostream& os, const Parsed_Agent& ag );
     

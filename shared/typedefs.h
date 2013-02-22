@@ -7,9 +7,11 @@
 #include <list>
 #include "boost/serialization/map.hpp"
 #include "boost/serialization/vector.hpp"
+#include "boost/serialization/deque.hpp"
 #include <exprtk.hpp>
 #include <iostream>
 #include <fstream>
+#include <forward_list>
 //if we are debugging we want a strong typedef, if we are releasing we want the code to be optimized
 //we are going to remove all strong_typedef during the code writing
 #ifndef NDEBUG
@@ -119,6 +121,44 @@ struct dummy_state
       else
 	return false;
   }
+  bool operator<(const dummy_state & other ) const
+  {
+    if ((*this).automatonState<other.automatonState)
+      return true;
+      else
+	return false;
+  }
+};
+
+
+struct monitor_result
+{
+	std::string agent_id;
+	std::string behavior_name;
+	bool ok;
+	
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int /*version*/)
+	{
+		ar& behavior_name;
+		ar& ok;
+		ar& agent_id;
+	}
+	
+};
+
+struct monitor_packet
+{
+	std::string id;
+	std::deque<monitor_result> agents;	
+	
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int /*version*/)
+	{
+		ar& agents;
+		ar& id;
+	}
+	
 };
 
 

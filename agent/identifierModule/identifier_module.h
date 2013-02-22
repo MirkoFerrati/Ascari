@@ -27,7 +27,7 @@ public:
     
 
 private:
-    void create_agents(std::string agent_name);
+    void create_agents(std::string, const agent_state& );
 	const Parsed_World & parsed_world;
     
     std::string owner;
@@ -46,7 +46,7 @@ private:
     std::map<std::string,std::mutex> mutexes;
     bool agentStatesAreConsistent(const agent_state& first, const agent_state& second);
     void printDebug();
-    int ncicli;
+    unsigned ncicli;
 };
 
 

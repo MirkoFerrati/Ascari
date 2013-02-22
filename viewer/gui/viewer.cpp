@@ -43,6 +43,7 @@ init(graphName);
 }
 
 
+
 void Viewer::init(std::string graphName)
 {
     time=0;
@@ -70,6 +71,13 @@ void Viewer::init(std::string graphName)
 	}
 	setScalingAndTranslateFactor(0,0,0,0);	
 }
+
+void Viewer::setMonitor(monitor_packet& monitor_read, shared_ptr< mutex > monitor_read_mutex)
+{
+	this->monitor_read=monitor_read;
+	this->monitor_read_mutex=monitor_read_mutex;
+}
+
 
 void Viewer::parse_graph(std::string graphName)
 {

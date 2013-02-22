@@ -4,6 +4,7 @@
 #include <viewer.h>
 #include <udp_world_sniffer.h>
 #include <zmq_world_sniffer.hpp>
+#include <zmq_identifier_sniffer.hpp>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -247,6 +248,10 @@ bool MainWindow::startViewer()
     {
         viewerType=3;
     }
+    if (ui->selectViewType->selectedItems().first()->text().compare("Monitor")==0)
+	{
+		viewerType=5;
+	}
     if (viewerType>0)
     {
         QString a;
@@ -258,41 +263,53 @@ bool MainWindow::startViewer()
             QDir d = QFileInfo(file).absoluteDir();
             graphname=(d.absolutePath().append("/").append(QString::fromStdString(world.graphName).toLower())).toStdString();
         }
-
-
-        //buffer.resize(MAX_PACKET_LENGTH);
         if (!mutex)
-	{
-	  std::shared_ptr<std::mutex> temp(new std::mutex);
-	  mutex.swap(temp);
-	  
-	}
-	else
-	{
-	 mutex->unlock();
-	 //mutex->~mutex();
-	  //std::shared_ptr<std::mutex> temp(new std::mutex);
-	  //mutex.swap(temp);
-	}
+		{
+			std::shared_ptr<std::mutex> temp(new std::mutex);
+			mutex.swap(temp);
+		}
+		else
+		{
+			mutex->unlock();
+		}
         if (!sniffer)
         {
             sniffer=new zmq_world_sniffer<world_sim_packet>(buffer,mutex);
             sniffer->start_receiving();
         }
         else
-	{
-	    //delete sniffer;
-            //sniffer=new zmq_world_sniffer<world_sim_packet>(buffer,mutex);
-            //sniffer->start_receiving();
-	}
+		{
+		}
         if (insideViewer)
         {
             ui->asdf->removeWidget(insideViewer);
             delete insideViewer;
         }
+        
+        
+		if (viewerType==5)
+		{
+			if (!monitor_mutex)
+			{
+				std::shared_ptr<std::mutex> temp(new std::mutex);
+				monitor_mutex.swap(temp);
+			}
+			else
+			{
+				monitor_mutex->unlock();
+			}
+			if (!identifier_sniffer)
+			{
+			identifier_sniffer= new zmq_world_sniffer<monitor_packet>(monitor_buffer,monitor_mutex);
+			identifier_sniffer->start_receiving();
+			}
+		}	
+		
         insideViewer=new Viewer(buffer,mutex,0,viewerType,graphname);
-
-
+		if (viewerType==5)
+		{
+			insideViewer->setMonitor(monitor_buffer,monitor_mutex);
+		}
         ui->asdf->addWidget(insideViewer);
         insideViewer->start();
 
@@ -323,3 +340,4 @@ void MainWindow::on_StartViewer_clicked()
 {
     startViewer();
 }
+
