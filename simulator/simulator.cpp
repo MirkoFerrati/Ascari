@@ -17,7 +17,13 @@ void simulator::create_communicator(int communicator_type)
     }
     else if (communicator_type==2)
 	{
-		communicator=new zmq_agent_communicator(num_agents);
+	  std::list<std::string> clients;
+	  for (auto it=agents_name_to_index.begin();it!=agents_name_to_index.end();++it)
+	  {
+	      clients.push_back(it->first);
+	      std::cout<<it->first<<std::endl;
+	  }
+		communicator=new zmq_agent_communicator(num_agents,clients);
 	}
 }
 

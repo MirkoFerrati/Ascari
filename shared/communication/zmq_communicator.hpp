@@ -29,9 +29,9 @@ enum Synctypes {
 
 
 /**
- * 
+ *
  * Receiver and sender are (optionally) synchronized
- * \param infos sent is not modified, data received are returned in a std::vector 
+ * \param infos sent is not modified, data received are returned in a std::vector
  * Everything is copied in a buffer, sometimes more than once
  * TODO(Mirko): implement zero-copy
  */
@@ -45,105 +45,124 @@ public:
     zmq_communicator() : sender_socket (static_zmq::context, sock_send_type), receiver_socket (static_zmq::context, sock_recv_type) {
         assert (sock_recv_type == ZMQ_PULL || sock_recv_type == ZMQ_SUB);
         assert (sock_send_type == ZMQ_PUSH || sock_send_type == ZMQ_PUB);
-	initialized=false;
+        initialized = false;
         receive_buffer.rebuild (MAX_PACKET_LENGTH);
         send_buffer.rebuild (MAX_PACKET_LENGTH);
-	sync_socket=0;
-	int temp=0;
-	receiver_socket.setsockopt(ZMQ_LINGER,&temp,sizeof(temp));
-	sender_socket.setsockopt(ZMQ_LINGER,&temp,sizeof(temp));	
+        sync_socket = 0;
+        int temp = 0;
+        receiver_socket.setsockopt (ZMQ_LINGER, &temp, sizeof (temp));
+        sender_socket.setsockopt (ZMQ_LINGER, &temp, sizeof (temp));
         if (sync == WAIT_SYNC) {
             sync_socket = new zmq::socket_t (static_zmq::context, ZMQ_REP);
-	    sync_socket->setsockopt(ZMQ_LINGER,&temp,sizeof(temp));
+            sync_socket->setsockopt (ZMQ_LINGER, &temp, sizeof (temp));
         } else if (sync == ASK_SYNC) {
             sync_socket = new zmq::socket_t (static_zmq::context, ZMQ_REQ);
-	    sync_socket->setsockopt(ZMQ_LINGER,&temp,sizeof(temp));
+            sync_socket->setsockopt (ZMQ_LINGER, &temp, sizeof (temp));
         }
     }
 
-    ~zmq_communicator(){
-      receiver_socket.close();
-      sender_socket.close();
-      if (sync_socket)
-      {
-	sync_socket->close();
-	delete sync_socket;
-      }
+    ~zmq_communicator() {
+        receiver_socket.close();
+        sender_socket.close();
+        if (sync_socket) {
+            sync_socket->close();
+            delete sync_socket;
+        }
     }
-    
+
 protected:
+
+    std::list<std::string> clients;
+
+    void setClientsName (const std::list<std::string>& clients) {
+        clientsNamed = true;
+        this->clients = clients;
+    }
+
+
+
     /**
      * This function will block till the syncing phase is over, if the class was created with a syncing policy!
      * */
-	bool init_full(std::string owner_name,std::string receiver_protocol, std::string sender_protocol,
-				   std::string sync_protocol="",unsigned int expected_senders=1,bool bind_receiver=false, bool bind_sender=true) {
-        this->expected_senders=expected_senders;
-		if (bind_receiver)
-		{
-			receiver_socket.bind(receiver_protocol.c_str());
-		}
-		else
-		{
-			receiver_socket.connect(receiver_protocol.c_str());
-		}
-		if (bind_sender)
-		{
-			sender_socket.bind(sender_protocol.c_str());
-		}
-		else
-		{
-			sender_socket.connect(sender_protocol.c_str());
-		}
-		if (sock_recv_type==ZMQ_SUB)
-		{
-		  receiver_socket.setsockopt(ZMQ_SUBSCRIBE,"",0);
-		}
-		
-		results.resize (expected_senders);
+    bool init_full (std::string owner_name, std::string receiver_protocol, std::string sender_protocol,
+                    std::string sync_protocol = "", unsigned int expected_senders = 1, bool bind_receiver = false, bool bind_sender = true) {
+        this->expected_senders = expected_senders;
+        if (clientsNamed) {
+            if (expected_senders != clients.size()) {
+                ERR ("clients name not coerent with expected_senders size", NULL);
+                throw "clients name not coerent with expected_senders size";
+            }
+        }
+        if (bind_receiver) {
+            receiver_socket.bind (receiver_protocol.c_str());
+        } else {
+            receiver_socket.connect (receiver_protocol.c_str());
+        }
+        if (bind_sender) {
+            sender_socket.bind (sender_protocol.c_str());
+        } else {
+            sender_socket.connect (sender_protocol.c_str());
+        }
+        if (sock_recv_type == ZMQ_SUB) {
+            receiver_socket.setsockopt (ZMQ_SUBSCRIBE, "", 0);
+        }
+
+        results.resize (expected_senders);
         this->owner_name = owner_name;
         if (sync == WAIT_SYNC) {
-          sync_socket->bind (!sync_protocol.compare("")?SYNC_PROTOCOL:sync_protocol.c_str());
+            sync_socket->bind (!sync_protocol.compare ("") ? SYNC_PROTOCOL : sync_protocol.c_str());
 
             std::cout << owner_name << " waiting for clients..." << std::endl;
             unsigned int subscribers = 0;
             while (subscribers < expected_senders) {
                 //  - wait for synchronization request
                 zmq::message_t message_tmp;
-		try{
-                sync_socket->recv (&message_tmp);
-		}
-		catch (zmq::error_t ex)
-		{
-		  if (zmq_errno()==EINTR)
-		  {
-		    WARN("programma terminato",NULL);
-		    break;
-		  }
-		}
+                try {
+                    sync_socket->recv (&message_tmp);
+                } catch (zmq::error_t ex) {
+                    if (zmq_errno() == EINTR) {
+                        WARN ("programma terminato", NULL);
+                        break;
+                    }
+                }
                 std::string name (static_cast<char*> (message_tmp.data()), message_tmp.size());
 
-                std::string result = "one more client connected to "; //non so chi si sia connesso, sono tutti uguali
-				std::cout << result << " server: " << name <<std::endl;
-				
-                //  - send synchronization reply
-                result.append(owner_name);
-				result.append(" ");
-				result.append (name);
-				
-                zmq::message_t message (result.size()+1);
-                memcpy (message.data(), result.data(), result.size()+1);
-		try{
-                bool rc = sync_socket->send (message); assert(rc);
-                subscribers++;
-		}
-		catch (zmq::error_t ex)
+                std::string result = "one more client connected to ";
+                std::cout << result << " server: " << name << std::endl;
+                bool rejected=true;
+		if (clientsNamed) 
 		{
-		  if (zmq_errno()==EINTR)
-		  {
-		    WARN("programma terminato",NULL);
-		    break;
-		  }
-		}
+                    auto client = std::find (clients.begin(), clients.end(), name);
+                    if (client != clients.end())
+		    {
+                        clients.erase(client);
+			rejected=false;
+                    }
+                     else
+		    {
+		      std::cout<< name<< " rejected"<<std::endl;
+		    }
+                }
+               if (!rejected || !clientsNamed)
+	       {
+		  //  - send synchronization reply
+                        result.append (owner_name);
+                        result.append (" ");
+                        result.append (name);
+
+                        zmq::message_t message (result.size() + 1);
+                        memcpy (message.data(), result.data(), result.size() + 1);
+                        try {
+                            bool rc = sync_socket->send (message); assert (rc);
+                            subscribers++;
+                        } catch (zmq::error_t ex) {
+                            if (zmq_errno() == EINTR) {
+                                WARN ("programma terminato", NULL);
+                                break;
+                            }
+                        }
+                        std::cout<< name<< " accepted"<<std::endl;
+	       }
             }
         } else if (sync == ASK_SYNC) {
             /** TODO(Mirko): implementare il modello qui sotto, e' più robusto
@@ -153,88 +172,82 @@ protected:
                 Subscribers connect SUB socket and when they receive a Hello message they tell the publisher via a REQ/REP socket pair.
                 When the publisher has had all the necessary confirmations, it starts to send real data.
               */
-	    sleep(1);
-            sync_socket->connect (!sync_protocol.compare("")?SYNC_PROTOCOL:sync_protocol.c_str());
+            sleep (1);
+            sync_socket->connect (!sync_protocol.compare ("") ? SYNC_PROTOCOL : sync_protocol.c_str());
 
             std::cout << owner_name << " connecting to server..." << std::endl;
 
             zmq::message_t message (owner_name.size());
             memcpy (message.data(), owner_name.data(), owner_name.size());
-            bool rc = sync_socket->send (message); assert(rc);
+            bool rc = sync_socket->send (message); assert (rc);
             message.rebuild (MAX_PACKET_LENGTH);
-	    
-            try{
+
+            try {
                 sync_socket->recv (&message);
-		}
-		catch (zmq::error_t ex)
-		{
-		  if (zmq_errno()==EINTR)
-		    WARN("programma terminato",NULL);
-		  return false;
-		}
+            } catch (zmq::error_t ex) {
+                if (zmq_errno() == EINTR)
+                    WARN ("programma terminato", NULL);
+                return false;
+            }
             std::cout << static_cast<char*> (message.data()) << std::endl;
- 
+
         }
-        initialized=true;
+        initialized = true;
         return true;
     }
-    
-public: 
-  
-  #ifdef ZMQDEBUG
-std::mutex check_for_unique_call;
+
+public:
+
+#ifdef ZMQDEBUG
+    std::mutex check_for_unique_call;
 
 #endif //ZMQDEBUG
-  
-    std::vector<receive_type> receive(int flags=0)
-    {
-      if (!initialized)
-      {
-	ERR("receive chiamata senza avere inizializzato il communicator",NULL);
-	throw "";
-      }
+
+    std::vector<receive_type> receive (int flags = 0) {
+        if (!initialized) {
+            ERR ("receive chiamata senza avere inizializzato il communicator", NULL);
+            throw "";
+        }
 #ifdef ZMQDEBUG
-bool fail=!check_for_unique_call.try_lock();
-if (fail)
-{
-  ERR("receive e' gia' in esecuzione,probabilmente ci sono due thread concorrenti che chiamano la stessa receive",NULL);
-}
+        bool fail = !check_for_unique_call.try_lock();
+        if (fail) {
+            ERR ("receive e' gia' in esecuzione,probabilmente ci sono due thread concorrenti che chiamano la stessa receive", NULL);
+        }
 #endif //ZMQDEBUG
         unsigned int subscribers = 0;
-	receive_type packet;
-	results.clear();
-	while (subscribers < expected_senders) {
-		
-        receiver_socket.recv(&receive_buffer,flags);
-	//boost::iostreams::stream_buffer<boost::iostreams::basic_array_source<char> > buffer( (char*)receive_buffer.data(), receive_buffer.size());
-	//boost::archive::binary_iarchive archive(buffer, boost::archive::no_header);
-        char* receive=reinterpret_cast<char*>(receive_buffer.data());
-	//std::cout<<receive<<std::endl;
-	std::istringstream receive_stream(
-	std::string(receive,receive_buffer.size()));
-	boost::archive::text_iarchive archive(receive_stream);
-	archive >> packet;
-        results.push_back(packet);
-	subscribers++;
-    }
-      #ifdef ZMQDEBUG
-check_for_unique_call.unlock();
+        receive_type packet;
+        results.clear();
+        while (subscribers < expected_senders) {
+
+            receiver_socket.recv (&receive_buffer, flags);
+            //boost::iostreams::stream_buffer<boost::iostreams::basic_array_source<char> > buffer( (char*)receive_buffer.data(), receive_buffer.size());
+            //boost::archive::binary_iarchive archive(buffer, boost::archive::no_header);
+            char* receive = reinterpret_cast<char*> (receive_buffer.data());
+            //std::cout<<receive<<std::endl;
+            std::istringstream receive_stream (
+                std::string (receive, receive_buffer.size()));
+            boost::archive::text_iarchive archive (receive_stream);
+            archive >> packet;
+            results.push_back (packet);
+            subscribers++;
+        }
+#ifdef ZMQDEBUG
+        check_for_unique_call.unlock();
 
 #endif //ZMQDEBUG
-    return results;
+        return results;
     };
-    void send(send_type const & infos)
-    {
+    void send (send_type const& infos) {
         std::ostringstream archive_stream;
-	boost::archive::text_oarchive archive(archive_stream);
-	archive << infos;
-	send_buffer.rebuild(archive_stream.str().length()+1);
-	reinterpret_cast<char*>( memcpy(send_buffer.data(), archive_stream.str().data(),archive_stream.str().length()+1));
-	//std::cout<<temp<<std::endl;
-	sender_socket.send(send_buffer);
+        boost::archive::text_oarchive archive (archive_stream);
+        archive << infos;
+        send_buffer.rebuild (archive_stream.str().length() + 1);
+        reinterpret_cast<char*> (memcpy (send_buffer.data(), archive_stream.str().data(), archive_stream.str().length() + 1));
+        //std::cout<<temp<<std::endl;
+        sender_socket.send (send_buffer);
     };
 
-	
+
 private:
     zmq::socket_t sender_socket, receiver_socket, *sync_socket;
     zmq::message_t receive_buffer, send_buffer;
@@ -242,6 +255,7 @@ private:
     std::string owner_name;
     unsigned int expected_senders;
     bool initialized;
+    bool clientsNamed;
 };
 
 
@@ -267,77 +281,69 @@ private:
 
 
 
-template <typename receive_type,int sock_recv_type>
+template <typename receive_type, int sock_recv_type>
 class zmq_receive_communicator
 {
-  
-  public:
+
+public:
     zmq_receive_communicator() : receiver_socket (static_zmq::context, sock_recv_type) {
         assert (sock_recv_type == ZMQ_SUB);
         receive_buffer.rebuild (MAX_PACKET_LENGTH);
     }
 
-    ~zmq_receive_communicator()
-    {
-	receiver_socket.close();
+    ~zmq_receive_communicator() {
+        receiver_socket.close();
     }
-    
+
 protected:
     /**
      * This function will block till the syncing phase is over, if the class was created with a syncing policy!
      * */
-	bool init_full(std::string owner_name,std::string receiver_protocol,unsigned int expected_senders=1,bool bind_receiver=false) {
-        	this->expected_senders=expected_senders;
-		if (bind_receiver)
-		{
-			receiver_socket.bind(receiver_protocol.c_str());
-		}
-		else
-		{
-			receiver_socket.connect(receiver_protocol.c_str());
-		}
-	
-		if (sock_recv_type==ZMQ_SUB)
-		{
-		  receiver_socket.setsockopt(ZMQ_SUBSCRIBE,"",0);
-		}
-		int temp=0;
-		receiver_socket.setsockopt(ZMQ_LINGER,&temp,sizeof(temp));	
+    bool init_full (std::string owner_name, std::string receiver_protocol, unsigned int expected_senders = 1, bool bind_receiver = false) {
+        this->expected_senders = expected_senders;
+        if (bind_receiver) {
+            receiver_socket.bind (receiver_protocol.c_str());
+        } else {
+            receiver_socket.connect (receiver_protocol.c_str());
+        }
 
-		results.resize (expected_senders);
+        if (sock_recv_type == ZMQ_SUB) {
+            receiver_socket.setsockopt (ZMQ_SUBSCRIBE, "", 0);
+        }
+        int temp = 0;
+        receiver_socket.setsockopt (ZMQ_LINGER, &temp, sizeof (temp));
+
+        results.resize (expected_senders);
         this->owner_name = owner_name;
         return true;
     }
-    
+
 public:
-    std::vector<receive_type> receive()
-    {
+    std::vector<receive_type> receive() {
         unsigned int subscribers = 0;
-	receive_type packet;
-	results.clear();
-	while (subscribers < expected_senders) {
-	try{	
-        receiver_socket.recv(&receive_buffer);
-	}
-	catch (zmq::error_t ex)
-		{
-		  if (zmq_errno()==EINTR)
-		    WARN("programma terminato",NULL);
-		  break;
-		}
-        char* receive=reinterpret_cast<char*>(receive_buffer.data());
-	std::istringstream receive_stream(
-	std::string(receive,receive_buffer.size()));
-	boost::archive::text_iarchive archive(receive_stream);
-	archive >> packet;
-        results.push_back(packet);
-	subscribers++;
-    }
-    return results;
+        receive_type packet;
+        results.clear();
+        while (subscribers < expected_senders) {
+            try {
+                receiver_socket.recv (&receive_buffer);
+            } catch (zmq::error_t ex) {
+                if (zmq_errno() == EINTR)
+                    WARN ("programma terminato", NULL);
+                break;
+            }
+            char* receive = reinterpret_cast<char*> (receive_buffer.data());
+            std::istringstream receive_stream (
+                std::string (receive, receive_buffer.size()));
+            boost::archive::text_iarchive archive (receive_stream);
+            archive >> packet;
+            results.push_back (packet);
+            subscribers++;
+        }
+        return results;
     };
-  
-  
-  private:
+
+
+private:
     zmq::socket_t receiver_socket;
     zmq::message_t receive_buffer;
     std::vector <receive_type> results;
