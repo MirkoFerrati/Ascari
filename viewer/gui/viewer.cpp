@@ -20,6 +20,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
 #include <lemon/lgf_reader.h>
+#include <map>
 
 #define BORDER 0.3+0.2
 
@@ -39,7 +40,7 @@ length=0;
 coord_x=0;
 coord_y=0;
 init(graphName);
-
+monitor=true;
 }
 
 
@@ -288,7 +289,7 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
         }
         else
         {
-			painter.scale(2,2);
+	    painter.scale(2,2);
             painter.drawConvexPolygon(hourHand, 3);
 			if (view_type==2)
 			{
@@ -297,6 +298,20 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
 				painter.scale(painter.fontMetrics().height()/70.0,-painter.fontMetrics().height()/70.0);
 				painter.drawText(0,0,QString(it->first.substr(6).c_str()));
 				painter.restore();
+			}
+			if (view_type==5 && monitor)
+			{
+			      painter.save();
+			      QPen pen;
+			      pen.setColor(QColor("lightblue"));
+			      pen.setStyle(Qt::DashLine);
+			      painter.setPen(pen);
+			      for (auto target:monitor_read->at(it->first).agents)
+			      {
+				if (!target.ok)
+				  painter.drawLine(0,0,agents.at(target.agent_id).x,agents.at(target.agent_id).y);
+			      }
+			      painter.restore();
 			}
         }
         painter.restore();
@@ -358,6 +373,11 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Q:
     {
         qApp->exit();
+    }
+    break;
+    case Qt::Key_M:
+    {
+        monitor=!monitor;
     }
     break;
     default:

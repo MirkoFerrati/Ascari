@@ -9,11 +9,12 @@
 #include <QtGui/QKeyEvent>
 #include <boost/asio.hpp>
 #include <mutex>
+#include <map>
 class Viewer : public QWidget
 {
 
   public:
-    Viewer(const std::vector< char >& buffer, boost::asio::io_service& io_service, QWidget* parent = 0, int view_type=0, std::string graphName="");
+    //Viewer(const std::vector< char >& buffer, boost::asio::io_service& io_service, QWidget* parent = 0, int view_type=0, std::string graphName="");
     Viewer(const world_sim_packet& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent=0, int view_type=0, std::string graphName="");
     
     ~Viewer();
@@ -36,6 +37,7 @@ protected:
   private:
     int timerId;
     int time;
+    bool monitor;
     std::map<std::string,Agent> agents;
     std::vector<QColor> colors;
     double scalingFactorX, scalingFactorY, translateX, translateY;
