@@ -212,7 +212,7 @@ void operator>> (const YAML::Node& node, Parsed_Agent& ag)
 	else{
 	    ag.monitoring=false;
 	  if(tmp_mon!=0){
-	   ERR("UNRECOGNIZED VALUE FOR MONITORING. SET TO FALSE");
+	   ERR("UNRECOGNIZED VALUE FOR MONITORING. SET TO FALSE",NULL);
 	  }
 	}
     }

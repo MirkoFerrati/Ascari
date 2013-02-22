@@ -171,7 +171,7 @@ for (auto & agent_name: sim_agents) {
 	      std::cout<<"Stato Partenza:"<<(*dummystate).automatonState<<std::endl;
 	      std::cout << "Riferimento : " << state_reference.at (0) << " " << state_reference.at (1) << " " << state_reference.at (2) << endl;
 		
-	      (*dummy_ref)->dummy.setDiscreteState((*discstate).automatonState);
+	      (*dummy_ref)->dummy.setDiscreteState((*dummystate).automatonState);
 
 	      (*dummy_ref)->dummy.main_loop();
 	      

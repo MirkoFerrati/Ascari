@@ -72,7 +72,7 @@ void Viewer::init(std::string graphName)
 	setScalingAndTranslateFactor(0,0,0,0);	
 }
 
-void Viewer::setMonitor(monitor_packet& monitor_read, shared_ptr< mutex > monitor_read_mutex)
+void Viewer::setMonitor(std::map< std::string, monitor_packet >* monitor_read, shared_ptr< std::mutex > monitor_read_mutex)
 {
 	this->monitor_read=monitor_read;
 	this->monitor_read_mutex=monitor_read_mutex;

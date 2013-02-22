@@ -21,7 +21,7 @@ class Viewer : public QWidget
     void setTranslateFactor(double tx=0,double ty=0);
     void setBackImage(std::string path);
     void start();
-    void setMonitor(monitor_packet monitor_read, std::shared_ptr< std::mutex > monitor_read_mutex);
+    void setMonitor(std::map<std::string,monitor_packet>* monitor_read, std::shared_ptr< std::mutex > monitor_read_mutex);
     int view_type;
     
    
@@ -44,9 +44,9 @@ protected:
     QPixmap pixmap;
     //const std::vector<char>& buffer;
     const world_sim_packet& infos;
-    std::shared_ptr<std::mutex>& mutex;
-	monitor_packet& monitor_read;
-	std::shared_ptr<std::mutex >& monitor_read_mutex;
+    std::shared_ptr<std::mutex> mutex;
+	std::map<std::string,monitor_packet> *monitor_read;
+	std::shared_ptr<std::mutex > monitor_read_mutex;
 	
 	enum { header_length = 8 };
 	//boost::asio::io_service& io_service;
