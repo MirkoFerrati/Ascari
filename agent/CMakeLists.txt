@@ -9,7 +9,7 @@ set(agent_SOURCES empty_plugin/empty_plugin.cpp
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/global.cpp
 	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp 
 	identifierModule/agent_to_dummy_communicator.hpp identifierModule/dummy_agent.hpp
-	identifierModule/identifier_module.cpp
+	identifierModule/identifier_module.cpp identifierModule/identifierModule_communicator.hpp
 	
 	
 )

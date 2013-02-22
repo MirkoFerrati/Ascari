@@ -6,12 +6,14 @@ using namespace std;
 
 
 identifier_module::identifier_module (Parsed_World const& W, const std::map<int, double> & sensed_bonus_variables, const std::map<std::string, int> & map_bonus_variables_to_id,
-                                      const std::map<std::string, agent_state_packet> &sensed_state_agents, const simulation_time& sensed_time,std::string owner) :
-    parsed_world (W), sensed_bonus_variables (sensed_bonus_variables), map_bonus_variables_to_id (map_bonus_variables_to_id), sensed_state_agents (sensed_state_agents), sensed_time (sensed_time),owner(owner)
+                                      const std::map<std::string, agent_state_packet> &sensed_state_agents, const simulation_time& sensed_time, std::string owner) :
+    parsed_world (W), sensed_bonus_variables (sensed_bonus_variables), map_bonus_variables_to_id (map_bonus_variables_to_id), sensed_state_agents (sensed_state_agents), sensed_time (sensed_time), owner (owner)
 {
     int i = 0;
-    ncicli=0;
+    ncicli = 0;
     communicator = std::make_shared<agent_to_dummy_communicator>();
+    viewer_comm = new identifierModule_communicator<monitor_packet, monitor_packet> (packet_viewer, buffer_received, owner);
+    packet_viewer.id = owner;
 
 for (auto const & behavior: W.behaviors) {
         index_behaviors[behavior.second->name] = i;
@@ -60,7 +62,7 @@ void identifier_module::compileExpressions (exprtk::symbol_table< double >& /*sy
 }
 
 
-void identifier_module::create_agents (std::string agent_name, const agent_state & ref_state)
+void identifier_module::create_agents (std::string agent_name, const agent_state& ref_state)
 {
     /**
      * Piu' o meno cosi':
@@ -73,7 +75,7 @@ void identifier_module::create_agents (std::string agent_name, const agent_state
      * }
      *
      */
-    
+
     assert (sim_agents[agent_name].empty());
     if (identifier_matrix[agent_name].empty()) {
         identifier_matrix[agent_name].resize (index_behaviors.size(), true);
@@ -81,7 +83,7 @@ void identifier_module::create_agents (std::string agent_name, const agent_state
 
 for (auto const & behavior: parsed_world.behaviors) {
         if (identifier_matrix[agent_name].at (index_behaviors.at (behavior.first))) {
-            dummy_agent* tmp_agent = new dummy_agent (agent_name, behavior, index_behaviors.at (behavior.first), parsed_world,std::dynamic_pointer_cast<world_communicator_abstract>(communicator), ref_state);
+            dummy_agent* tmp_agent = new dummy_agent (agent_name, behavior, index_behaviors.at (behavior.first), parsed_world, std::dynamic_pointer_cast<world_communicator_abstract> (communicator), ref_state);
 
             sim_agents[agent_name].push_front (std::unique_ptr<dummy_agent> (tmp_agent));
 
@@ -124,15 +126,14 @@ void identifier_module::run_plugin()
     //controllo il tempo
     assert (sensed_time - old_sensed_agents.time > 0.001);
     ncicli++;
-    if (ncicli < 2){
-      return;
+    if (ncicli < 2) {
+        return;
     }
-    
-    if (mon_debug_mode==1)
-		{
-		std::cout<<"Modulo Identificatore"<<ncicli<<std::endl; 
-                }
-    
+
+    if (mon_debug_mode == 1) {
+        std::cout << "Modulo Identificatore" << ncicli << std::endl;
+    }
+
     //Elimino gli agenti che non vedo più
 for (auto & agent_name: sim_agents) {
         if (sensed_state_agents.find (agent_name.first) == sensed_state_agents.end()) {
@@ -142,100 +143,109 @@ for (auto & agent_name: sim_agents) {
 
     //Evolvo gli agenti
     for (auto agent = sim_agents.begin(); agent != sim_agents.end(); ++agent) {
-	
         //state_reference = old_sensed_agents.state_agents.internal_map.at (agent->first).state;
         //Evolvo i dummy di ogni agente
         auto old_dummy_ref = agent->second.before_begin(); //uso una forward list, devo tenermi un puntatore di riserva
         for (auto dummy_ref = agent->second.begin(); dummy_ref != agent->second.end(); ++dummy_ref) {
-	  
-	    if ((ncicli % update_after)==0){
-	      for (unsigned i=0; i<state_reference.size();i++)
-		state_reference[i]=old_sensed_agents.state_agents.internal_map.at (agent->first).state.at(i);
-		(*dummy_ref)->getDummyStates().sort();
-		(*dummy_ref)->getDummyStates().unique();
-	      }
+            if ( (ncicli % update_after) == 0) {
+                for (unsigned i = 0; i < state_reference.size(); i++)
+                    state_reference[i] = old_sensed_agents.state_agents.internal_map.at (agent->first).state.at (i);
+                (*dummy_ref)->getDummyStates().sort();
+                (*dummy_ref)->getDummyStates().unique();
+            }
             //Evolvo il singolo dummy
             std::forward_list<dummy_state> tmp_states;
             communicator->send (&old_sensed_agents);
-	    for (auto dummystate = (*dummy_ref)->getDummyStates().begin(); dummystate != (*dummy_ref)->getDummyStates().end(); ++dummystate) {
-	        
-	      if (!((ncicli % update_after)==0)){
-		for (unsigned i=0; i<state_reference.size();i++)
-		state_reference[i]=(*dummystate).state.at(i);
-	      
-	      }
-	      std::cout<<"Stato Partenza:"<<(*dummystate).automatonState<<std::endl;
-	      std::cout << "Riferimento : " << state_reference.at (0) << " " << state_reference.at (1) << " " << state_reference.at (2) << endl;
-		
-	      (*dummy_ref)->dummy.setDiscreteState((*dummystate).automatonState);
-		
-	      (*dummy_ref)->dummy.main_loop();
-	      auto control_command_packet = communicator->receive_control_command ( (*dummy_ref)->identifier);
-	      for (auto dstate = (*dummy_ref)->dummy.getDiscreteStates().begin(); dstate != (*dummy_ref)->dummy.getDiscreteStates().end(); ++dstate) {
-	      //preparo il comando relativo allo stato discreto iesimo
-		  for (unsigned i=0; i<control_command_packet.commands.at (*dstate).size();i++ ){
-		  temp_command[i] = control_command_packet.commands.at (*dstate).at(i);
-		  }
-		  std::cout << "Controllo : " << temp_command.at (0) << " " << temp_command.at (1) << endl;
-		
-		  agent_state new_state = dynamics.at ( (*dummy_ref)->behavior_identifier)->getNextState();
-		 // std::cout << &temp_command.at(0) << endl << &temp_command.at (1) << endl;
-		  //controllo se l'evoluzione e' coerente
-		  if (mon_debug_mode==1){
-		  
-		  std::cout << "Agent:" << agent->first << " Behavior:" << (*dummy_ref)->behavior_identifier << std::endl;
-		  std::cout<<(*dstate)<<std::endl;
-		  std::cout << "Stato Vero:" << sensed_state_agents.at (agent->first).state.at (0) << " " << sensed_state_agents.at (agent->first).state.at (1) << " " << sensed_state_agents.at (agent->first).state.at (2) << endl;
-		  std::cout << "Stato Stimato: " << new_state.at (0) << " " << new_state.at (1) << " " << new_state.at (2) << endl;
-		  }
-		  
-		  if (agentStatesAreConsistent (new_state, sensed_state_agents.at (agent->first).state)) {
-		    dummy_state tmp_state;
-		    tmp_state.state=new_state;
-		    tmp_state.automatonState=(*dstate);
-		    tmp_states.push_front(tmp_state);
-		  }
-	      }
-	
-	      
-	    }
-	        
-	    
-	    
-	      if ( tmp_states.empty()) {
-		  identifier_matrix.at (agent->first).at ( (*dummy_ref)->behavior_identifier) = false;
-		  agent->second.erase_after (old_dummy_ref);
-		 dummy_ref = old_dummy_ref;
-	      } 
-	      else
-	      {
-		(*dummy_ref)->getDummyStates().swap(tmp_states);
-		  ++old_dummy_ref;
-	      }
-	  }
-        {
-	 std::cout << "Classifier " << std::endl;
-        for (auto agent = identifier_matrix.begin(); agent != identifier_matrix.end(); ++agent) 
-	{
-            std::cout << agent->first << ":";
+            for (auto dummystate = (*dummy_ref)->getDummyStates().begin(); dummystate != (*dummy_ref)->getDummyStates().end(); ++dummystate) {
+                if (! ( (ncicli % update_after) == 0)) {
+                    for (unsigned i = 0; i < state_reference.size(); i++)
+                        state_reference[i] = (*dummystate).state.at (i);
+                }
+                {
+                    std::cout << "Stato Partenza:" << (*dummystate).automatonState << std::endl;
+                    std::cout << "Riferimento : " << state_reference.at (0) << " " << state_reference.at (1) << " " << state_reference.at (2) << endl;
+                }
+                (*dummy_ref)->dummy.setDiscreteState ( (*dummystate).automatonState);
+                (*dummy_ref)->dummy.main_loop();
+                auto control_command_packet = communicator->receive_control_command ( (*dummy_ref)->identifier);
+                for (auto dstate = (*dummy_ref)->dummy.getDiscreteStates().begin(); dstate != (*dummy_ref)->dummy.getDiscreteStates().end(); ++dstate) {
+                    //preparo il comando relativo allo stato discreto iesimo
+                    for (unsigned i = 0; i < control_command_packet.commands.at (*dstate).size(); i++) {
+                        temp_command[i] = control_command_packet.commands.at (*dstate).at (i);
+                    }
+                    agent_state new_state = dynamics.at ( (*dummy_ref)->behavior_identifier)->getNextState();
+                    //controllo se l'evoluzione e' coerente
+                    if (mon_debug_mode == 1) {
 
-            for (unsigned int j = 0; j < agent->second.size(); ++j) 
-	    {
-                std::cout << " " << agent->second.at (j);
-
-
+                        std::cout << "Agent:" << agent->first << " Behavior:" << (*dummy_ref)->behavior_identifier << std::endl;
+                        std::cout << (*dstate) << std::endl;
+                        std::cout << "Stato Vero:" << sensed_state_agents.at (agent->first).state.at (0) << " " << sensed_state_agents.at (agent->first).state.at (1) << " " << sensed_state_agents.at (agent->first).state.at (2) << endl;
+                        std::cout << "Stato Stimato: " << new_state.at (0) << " " << new_state.at (1) << " " << new_state.at (2) << endl;
+                    }
+                    if (agentStatesAreConsistent (new_state, sensed_state_agents.at (agent->first).state)) {
+                        dummy_state tmp_state;
+                        tmp_state.state = new_state;
+                        tmp_state.automatonState = (*dstate);
+                        tmp_states.push_front (tmp_state);
+                    }
+                }
             }
-            std::cout << std::endl;
-        }
-	}
-    }
 
+            if (tmp_states.empty()) {
+                identifier_matrix.at (agent->first).at ( (*dummy_ref)->behavior_identifier) = false;
+                agent->second.erase_after (old_dummy_ref);
+                dummy_ref = old_dummy_ref;
+            } else {
+                (*dummy_ref)->getDummyStates().swap (tmp_states);
+                ++old_dummy_ref;
+            }
+        }
+        {
+
+           
+        }
+    }
+    
+     if (mon_debug_mode == 1) {
+                std::cout << "Classifier " << std::endl;
+                for (auto agent = identifier_matrix.begin(); agent != identifier_matrix.end(); ++agent) {
+                    std::cout << agent->first << ":";
+
+                    for (unsigned int j = 0; j < agent->second.size(); ++j) {
+                        std::cout << " " << agent->second.at (j);
+
+
+                    }
+                    std::cout << std::endl;
+                }
+            }
+    for (auto agent = identifier_matrix.begin(); agent != identifier_matrix.end(); ++agent) {
+        unsigned tmp_class = 0;
+	std::string tmp_behavior="";
+	for (auto behavior= index_behaviors.begin(); behavior!=index_behaviors.end();++behavior) {
+	  if (agent->second.at(behavior->second)==true){
+	    tmp_behavior=behavior->first;
+	    tmp_class++;
+	  }
+        }
+        monitor_result tmp_res;
+	tmp_res.agent_id=agent->first;
+        if (tmp_class==0)
+	  tmp_res.ok=false;
+	if (tmp_class==1){
+	  tmp_res.ok=true;
+	  tmp_res.behavior_name=tmp_behavior;
+	}
+	packet_viewer.agents.push_front(tmp_res);
+    }
+    viewer_comm->send();
+    packet_viewer.agents.clear();
     //Creo i nuovi dummy per gli agenti appena entrati
 for (const auto & sensed_agent: sensed_state_agents) {
-        if (sim_agents.find (sensed_agent.first) == sim_agents.end() && strcmp(sensed_agent.first.c_str(),(*this).owner.c_str())!=0) {
+        if (sim_agents.find (sensed_agent.first) == sim_agents.end() && strcmp (sensed_agent.first.c_str(), (*this).owner.c_str()) != 0) {
             create_agents (sensed_agent.first, sensed_agent.second.state);
-	    //il controllo se devo creare o meno l'agente (se e' gia stato escluso per un beaavior non devo crearlo) viene fatto dentro la 
-	    //la funzione create_agents
+            //il controllo se devo creare o meno l'agente (se e' gia stato escluso per un beaavior non devo crearlo) viene fatto dentro la
+            //la funzione create_agents
         }
     }
 

@@ -7,6 +7,7 @@
 #include <dynamic.h>
 #include <forward_list>
 #include "agent_to_dummy_communicator.hpp"
+#include "identifierModule_communicator.hpp"
 #include "dummy_agent.hpp"
 
 #define tol 0.25
@@ -43,6 +44,13 @@ private:
     std::vector<dynamic*> dynamics;
     agent_state state_reference;
     control_command temp_command;
+    monitor_packet packet_viewer;
+    
+    //questo per ora non serve
+    monitor_packet buffer_received;
+    
+    identifierModule_communicator<monitor_packet,monitor_packet>* viewer_comm;
+    
     std::map<std::string,std::mutex> mutexes;
     bool agentStatesAreConsistent(const agent_state& first, const agent_state& second);
     void printDebug();
