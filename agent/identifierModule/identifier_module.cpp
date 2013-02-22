@@ -248,13 +248,7 @@ for (const auto & sensed_agent: sensed_state_agents) {
             //la funzione create_agents
         }
     }
-
-
-
     //Aggiorno la struttura dati old_sensed_agents
-
-    //old_sensed_agents.bonus_variables = sensed_bonus_variables;
-
     for (auto it = map_bonus_variables_to_id.begin(); it != map_bonus_variables_to_id.end(); ++it) {
         old_sensed_agents.bonus_variables.insert (make_pair (it->first, sensed_bonus_variables.at (it->second)));
     }
@@ -266,9 +260,6 @@ for (const auto & sensed_agent: sensed_state_agents) {
 
 identifier_module::~identifier_module()
 {
-
-    //delete communicator;
-
 
     for (unsigned int i = 0; i < dynamics.size(); i++)
         delete dynamics[i];

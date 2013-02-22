@@ -300,7 +300,7 @@ bool MainWindow::startViewer()
 			}
 			if (!identifier_sniffer)
 			{
-			identifier_sniffer= new zmq_world_sniffer<monitor_packet>(monitor_buffer,monitor_mutex);
+			identifier_sniffer= new zmq_identifier_sniffer(monitor_buffer,monitor_mutex);
 			identifier_sniffer->start_receiving();
 			}
 		}	
@@ -308,7 +308,7 @@ bool MainWindow::startViewer()
         insideViewer=new Viewer(buffer,mutex,0,viewerType,graphname);
 		if (viewerType==5)
 		{
-			insideViewer->setMonitor(monitor_buffer,monitor_mutex);
+			insideViewer->setMonitor(&monitor_buffer,monitor_mutex);
 		}
         ui->asdf->addWidget(insideViewer);
         insideViewer->start();

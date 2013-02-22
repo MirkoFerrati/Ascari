@@ -9,11 +9,12 @@
 #include <QtGui/QKeyEvent>
 #include <boost/asio.hpp>
 #include <mutex>
+#include <map>
 class Viewer : public QWidget
 {
 
   public:
-    Viewer(const std::vector< char >& buffer, boost::asio::io_service& io_service, QWidget* parent = 0, int view_type=0, std::string graphName="");
+    //Viewer(const std::vector< char >& buffer, boost::asio::io_service& io_service, QWidget* parent = 0, int view_type=0, std::string graphName="");
     Viewer(const world_sim_packet& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent=0, int view_type=0, std::string graphName="");
     
     ~Viewer();
@@ -21,7 +22,7 @@ class Viewer : public QWidget
     void setTranslateFactor(double tx=0,double ty=0);
     void setBackImage(std::string path);
     void start();
-    void setMonitor(monitor_packet monitor_read, std::shared_ptr< std::mutex > monitor_read_mutex);
+    void setMonitor(std::map<std::string,monitor_packet>* monitor_read, std::shared_ptr< std::mutex > monitor_read_mutex);
     int view_type;
     
    
@@ -36,6 +37,7 @@ protected:
   private:
     int timerId;
     int time;
+    bool monitor;
     std::map<std::string,Agent> agents;
     std::vector<QColor> colors;
     double scalingFactorX, scalingFactorY, translateX, translateY;
@@ -44,9 +46,9 @@ protected:
     QPixmap pixmap;
     //const std::vector<char>& buffer;
     const world_sim_packet& infos;
-    std::shared_ptr<std::mutex>& mutex;
-	monitor_packet& monitor_read;
-	std::shared_ptr<std::mutex >& monitor_read_mutex;
+    std::shared_ptr<std::mutex> mutex;
+	std::map<std::string,monitor_packet> *monitor_read;
+	std::shared_ptr<std::mutex > monitor_read_mutex;
 	
 	enum { header_length = 8 };
 	//boost::asio::io_service& io_service;
