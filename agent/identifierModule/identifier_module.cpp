@@ -151,31 +151,32 @@ for (auto & agent_name: sim_agents) {
 	    if ((ncicli % update_after)==0){
 	      for (unsigned i=0; i<state_reference.size();i++)
 		state_reference[i]=old_sensed_agents.state_agents.internal_map.at (agent->first).state.at(i);
-	      
+		(*dummy_ref)->getDiscreteStates().sort();
 		(*dummy_ref)->getDiscreteStates().unique();
 	      }
             //Evolvo il singolo dummy
             std::forward_list<dummy_state> tmp_states;
             communicator->send (&old_sensed_agents);
-	    for (auto discstate = (*dummy_ref)->getDiscreteStates().begin(); discstate != (*dummy_ref)->getDiscreteStates().end(); ++discstate) {
-	        
-	      if (!((ncicli % update_after)==0)){
+	    for (auto dummystate = (*dummy_ref)->getDummyStates().begin(); dummystate != (*dummy_ref)->getDummyStates().end(); ++dummystate) 
+	    {   
+	      if (!((ncicli % update_after)==0))
+	      {
 		for (unsigned i=0; i<state_reference.size();i++)
-		state_reference[i]=(*discstate).state.at(i);
-	      
+		{
+		    state_reference[i]=(*dummystate).state.at(i);
+		}
 	      }
-	      std::cout<<"Stato Partenza:"<<(*discstate).automatonState<<std::endl;
+	      std::cout<<"Stato Partenza:"<<(*dummystate).automatonState<<std::endl;
 	      std::cout << "Riferimento : " << state_reference.at (0) << " " << state_reference.at (1) << " " << state_reference.at (2) << endl;
 		
 	      (*dummy_ref)->dummy.setDiscreteState((*discstate).automatonState);
-		
 	      (*dummy_ref)->dummy.main_loop();
+	      
 	      auto control_command_packet = communicator->receive_control_command ( (*dummy_ref)->identifier);
 	      for (auto dstate = (*dummy_ref)->dummy.getDiscreteStates().begin(); dstate != (*dummy_ref)->dummy.getDiscreteStates().end(); ++dstate) {
 	      //preparo il comando relativo allo stato discreto iesimo
 		  temp_command = control_command_packet.commands.at (*dstate);
 		  std::cout << "Controllo : " << temp_command.at (0) << " " << temp_command.at (1) << endl;
-		
 		  agent_state new_state = dynamics.at ( (*dummy_ref)->behavior_identifier)->getNextState();
 		 // std::cout << &temp_command.at(0) << endl << &temp_command.at (1) << endl;
 		  //controllo se l'evoluzione e' coerente
@@ -188,17 +189,13 @@ for (auto & agent_name: sim_agents) {
 		  }
 		  
 		  if (agentStatesAreConsistent (new_state, sensed_state_agents.at (agent->first).state)) {
-		    dummy_state tmp_state;
-		    tmp_state.state=new_state;
-		    tmp_state.automatonState=(*dstate);
-		    tmp_states.push_front(tmp_state);
+		    dummy_state tmp_dummystate;
+		    tmp_dummystate.state=new_state;
+		    tmp_dummystate.automatonState=(*dstate);
+		    tmp_states.push_front(tmp_dummystate);
 		  }
-	      }
-	
-	      
-	    }
-	        
-	    
+	      } 
+	    }    
 	    
 	      if ( tmp_states.empty()) {
 		  identifier_matrix.at (agent->first).at ( (*dummy_ref)->behavior_identifier) = false;
@@ -234,13 +231,7 @@ for (const auto & sensed_agent: sensed_state_agents) {
             create_agents (sensed_agent.first);
         }
     }
-
-
-
     //Aggiorno la struttura dati old_sensed_agents
-
-    //old_sensed_agents.bonus_variables = sensed_bonus_variables;
-
     for (auto it = map_bonus_variables_to_id.begin(); it != map_bonus_variables_to_id.end(); ++it) {
         old_sensed_agents.bonus_variables.insert (make_pair (it->first, sensed_bonus_variables.at (it->second)));
     }
@@ -252,9 +243,6 @@ for (const auto & sensed_agent: sensed_state_agents) {
 
 identifier_module::~identifier_module()
 {
-
-    //delete communicator;
-
 
     for (unsigned int i = 0; i < dynamics.size(); i++)
         delete dynamics[i];

@@ -5,6 +5,7 @@
 #include <mutex>
 #include "agent_to_dummy_communicator.hpp"
 #include "../agent/agent.h"
+#include <string>
 
 struct dummy_agent
 {
@@ -32,7 +33,7 @@ public:
   std::forward_list<dummy_state> states;
   std::string identifier;
   std::mutex comm_mutex;
-   inline std::forward_list<dummy_state> & getDiscreteStates() {
+   inline std::forward_list<dummy_state> & getDummyStates() {
         return states;
     }
 };
