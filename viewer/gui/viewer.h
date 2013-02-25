@@ -53,6 +53,7 @@ protected:
 	enum { header_length = 8 };
 	//boost::asio::io_service& io_service;
     void setScalingAndTranslateFactor(double maxX,double minX,double maxY,double minY);
+    void drawArrow( int x1, int y1, int x2, int y2, double sze, QPainter* painter );
 	double maxX;
 	double minX;
 	double maxY;
