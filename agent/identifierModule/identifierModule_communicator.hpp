@@ -20,7 +20,7 @@ public:
 	identifierModule_communicator(send_type& data_send,receive_type& data_receive,std::string& my_id)
 			:data_send(data_send),data_receive(data_receive), my_id(my_id)
 	{
-		
+		this->init(my_id);
 	}
 	
 
