@@ -47,9 +47,9 @@ private:
     monitor_packet packet_viewer;
     
     //questo per ora non serve
-    monitor_packet buffer_received;
+   // monitor_packet buffer_received;
     
-    identifierModule_communicator<monitor_packet,monitor_packet>* viewer_comm;
+    identifierModule_communicator<monitor_packet>* viewer_comm;
     
     std::map<std::string,std::mutex> mutexes;
     bool agentStatesAreConsistent(const agent_state& first, const agent_state& second);

@@ -12,7 +12,7 @@ identifier_module::identifier_module ( Parsed_World const& W, const std::map<int
   int i = 0;
   ncicli = 0;
   communicator = std::make_shared<agent_to_dummy_communicator>();
-  viewer_comm = new identifierModule_communicator<monitor_packet, monitor_packet> ( packet_viewer, buffer_received, owner );
+  viewer_comm = new identifierModule_communicator<monitor_packet> ( packet_viewer, owner );
   packet_viewer.id = owner;
 
 for ( auto const & behavior: W.behaviors )
@@ -267,7 +267,7 @@ for ( auto & agent_name: sim_agents )
   //Creo i nuovi dummy per gli agenti appena entrati
 for ( const auto & sensed_agent: sensed_state_agents )
     {
-      if ( sim_agents.find ( sensed_agent.first ) == sim_agents.end() && strcmp ( sensed_agent.first.c_str(), ( *this ).owner.c_str() ) != 0 )
+      if ( sim_agents.find ( sensed_agent.first ) == sim_agents.end() && sensed_agent.first != owner )
         {
           create_agents ( sensed_agent.first, sensed_agent.second.state );
           //il controllo se devo creare o meno l'agente (se e' gia stato escluso per un beaavior non devo crearlo) viene fatto dentro la
