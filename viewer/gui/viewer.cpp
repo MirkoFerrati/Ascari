@@ -347,8 +347,10 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
                 for ( auto target:monitor_read->at ( it->first ).agents )
                     {
                         if ( !target.ok )
+			{
                             painter.drawLine (it->second.x , it->second.y,agents.at ( target.agent_id ).x,agents.at ( target.agent_id ).y );
-			     drawArrow (it->second.x , it->second.y,agents.at ( target.agent_id ).x,agents.at ( target.agent_id ).y,1,&painter );
+			     drawArrow (it->second.x , it->second.y,agents.at ( target.agent_id ).x,agents.at ( target.agent_id ).y,20,&painter );
+			}
                     }
                 }
                 painter.restore();
