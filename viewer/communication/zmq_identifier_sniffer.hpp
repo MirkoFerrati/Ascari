@@ -32,6 +32,7 @@ void receive_loop(std::map<std::string,monitor_packet>& data, std::shared_ptr<st
 	{
 		sleep(0);
 		temp=this->receive();//.front();//blocking call
+		std::cout<<"ricevuto un pacchetto"<<std::endl;
 		if (temp.size()>0)
 		{
 		data_mutex->lock();

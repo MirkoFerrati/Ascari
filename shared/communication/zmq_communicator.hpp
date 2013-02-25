@@ -201,8 +201,8 @@ public:
 	boost::archive::text_oarchive archive(archive_stream);
 	archive << infos;
 	send_buffer.rebuild(archive_stream.str().length()+1);
-	reinterpret_cast<char*>( memcpy(send_buffer.data(), archive_stream.str().data(),archive_stream.str().length()+1));
-	//std::cout<<temp<<std::endl;
+	std::string temp=reinterpret_cast<char*>( memcpy(send_buffer.data(), archive_stream.str().data(),archive_stream.str().length()+1));
+	std::cout<<temp<<std::endl;
 	sender_socket.send(send_buffer);
     };
 

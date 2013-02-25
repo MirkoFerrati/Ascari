@@ -306,11 +306,14 @@ void Viewer::paintEvent(QPaintEvent */*event*/)
 			      pen.setColor(QColor("lightblue"));
 			      pen.setStyle(Qt::DashLine);
 			      painter.setPen(pen);
+				  if (monitor_read->count(it->first))
+				  {
 			      for (auto target:monitor_read->at(it->first).agents)
 			      {
 				if (!target.ok)
 				  painter.drawLine(0,0,agents.at(target.agent_id).x,agents.at(target.agent_id).y);
 			      }
+				  }
 			      painter.restore();
 			}
         }
