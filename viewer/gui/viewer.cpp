@@ -342,6 +342,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
                 pen.setColor ( QColor ( "blue" ) );
                 pen.setStyle ( Qt::DashLine );
                 painter.setPen ( pen );
+		monitor_read_mutex->lock();
                 if ( monitor_read->count ( it->first ) )
                 {
                 for ( auto target:monitor_read->at ( it->first ).agents )
@@ -353,6 +354,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 			}
                     }
                 }
+                monitor_read_mutex->unlock();
                 painter.restore();
             }
     }

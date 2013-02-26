@@ -181,7 +181,11 @@ public:
 	results.clear();
 	while (subscribers < expected_senders) {
 		
-        receiver_socket.recv(&receive_buffer,flags);
+        bool rc=receiver_socket.recv(&receive_buffer,flags);
+	if (!rc)
+	{
+	    ERR("brutte cose",NULL);
+	}
 	//boost::iostreams::stream_buffer<boost::iostreams::basic_array_source<char> > buffer( (char*)receive_buffer.data(), receive_buffer.size());
 	//boost::archive::binary_iarchive archive(buffer, boost::archive::no_header);
         char* receive=reinterpret_cast<char*>(receive_buffer.data());

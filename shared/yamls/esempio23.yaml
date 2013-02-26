@@ -61,7 +61,7 @@
   - agent: Agente1
     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA:  circle(10)
-    MONITORING: 1
+    MONITORING: 0
     #COLLABORATIVE = 1
     states: [x,y,theta]
     control_commands: [v,w]
@@ -76,7 +76,7 @@
   - agent: Agente2
     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
-    MONITORING: 1
+    MONITORING: 0
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
