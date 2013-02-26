@@ -228,7 +228,19 @@ void operator>> ( const YAML::Node& node, Parsed_Agent& ag )
         int tmp_mon=0;
         node["MONITORING"]>>tmp_mon;
         if ( tmp_mon==1 )
+        {
             ag.monitoring=true;
+            if ( node.FindValue ( "KNOWN_BEHAVIORS" ) )
+            {
+                node["KNOWN_BEHAVIORS"]>>ag.known_behaviors;
+            }
+            else
+            {
+
+                ERR ( "NO KNOWN BEHAVIORS SPECIFIED FOR IDENTIFIER MODULE",NULL );
+                throw "NO KNOWN BEHAVIORS SPECIFIED FOR IDENTIFIER MODULE";
+            }
+        }
         else
         {
             ag.monitoring=false;
@@ -237,8 +249,9 @@ void operator>> ( const YAML::Node& node, Parsed_Agent& ag )
                 ERR ( "UNRECOGNIZED VALUE FOR MONITORING. SET TO FALSE",NULL );
             }
         }
-    }
 
+
+    }
 
     for ( unsigned int i=0; i<ag.behavior->state.size(); i++ )
     {
@@ -340,6 +353,13 @@ void operator>> ( const YAML::Node& node, Parsed_World& wo )
         }
 
         behaviors_nodes[i]["NAME"]>> tmp_beh_name;
+
+        if ( wo.behaviors.find ( tmp_beh_name ) !=wo.behaviors.end() )
+        {
+            ERR ( "DUPLICATED BEHAVIOR %s", tmp_beh_name.c_str() );
+            throw "DUPLICATED BEHAVIOR";
+        }
+
         {
             std::unique_ptr<Parsed_Behavior> tmp_ptr ( new Parsed_Behavior() );
             wo.behaviors.insert ( std::make_pair ( tmp_beh_name,std::move ( tmp_ptr ) ) );

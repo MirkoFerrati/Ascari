@@ -106,7 +106,7 @@ inputs.identifier=new_identifier;
 
 
 void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy)
-{
+{	
 	time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
 	symbol_table.add_constants();
 	pi=exprtk::details::numeric::constant::pi;

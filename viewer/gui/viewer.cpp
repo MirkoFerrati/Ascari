@@ -349,7 +349,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
                         if ( !target.ok )
 			{
                             painter.drawLine (it->second.x , it->second.y,agents.at ( target.agent_id ).x,agents.at ( target.agent_id ).y );
-			     drawArrow (it->second.x , it->second.y,agents.at ( target.agent_id ).x,agents.at ( target.agent_id ).y,20,&painter );
+			     drawArrow (agents.at ( target.agent_id ).x,agents.at ( target.agent_id ).y,it->second.x , it->second.y,20,&painter );
 			}
                     }
                 }

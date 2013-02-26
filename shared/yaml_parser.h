@@ -82,6 +82,8 @@ public:
     communication_area communication;
     
     std::vector<target_id> target_list;
+    std::vector<std::string> known_behaviors;
+    
     
     const std::unique_ptr<Parsed_Behavior>& behavior;
     std::string behavior_name;
