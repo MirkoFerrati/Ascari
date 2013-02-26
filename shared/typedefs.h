@@ -166,6 +166,19 @@ private:
 };
 
 
+struct agent_simulator_handshake_packet{
+  bool accepted;
+  std::string message;
+  
+  template <typename Archive>
+    void serialize(Archive& ar,const unsigned int /*version*/)
+    {
+	ar& accepted;
+        ar& message;
+    }
+  
+};
+
 struct world_sim_packet {
     std::map<std::string,double> bonus_variables;
     agents_name_to_states state_agents;
