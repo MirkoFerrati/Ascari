@@ -30,7 +30,7 @@
             co: 'abs(atan2(yi-y,xi-x)%(2*pi)-theta%(2*pi))<angle and (x-xi)*(x-xi)+(y-yi)*(y-yi)<dst*dst '
         LAMBDA:
           - lambda: [L1,out]
-            out: '(x>500 or x<0 or y>500 or y<0)'
+            out: '(x>600 or x<0 or y>600 or y<0)'
             L1: '1'
       EVENTS:
       - events: [out,in, co,free]
@@ -54,14 +54,14 @@
             
   WORLD:
   - bonus_variables: [dim,dst,angle]
-    dim: 500
+    dim: 600
     dst: 50
     angle: 1.5
   AGENTS:
   - agent: Agente1
     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA:  circle(10)
-    MONITORING: 0
+    MONITORING: 1
     #COLLABORATIVE = 1
     states: [x,y,theta]
     control_commands: [v,w]
@@ -76,7 +76,7 @@
   - agent: Agente2
     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
-    MONITORING: 0
+    MONITORING: 1
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:

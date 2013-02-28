@@ -7,9 +7,11 @@
 #include <list>
 #include "boost/serialization/map.hpp"
 #include "boost/serialization/vector.hpp"
+#include "boost/serialization/deque.hpp"
 #include <exprtk.hpp>
 #include <iostream>
 #include <fstream>
+#include <forward_list>
 //if we are debugging we want a strong typedef, if we are releasing we want the code to be optimized
 //we are going to remove all strong_typedef during the code writing
 #ifndef NDEBUG
@@ -108,6 +110,58 @@ struct empty_packet
 };
 
 
+struct dummy_state
+{
+  int automatonState;
+  agent_state state;
+  bool operator ==(const dummy_state & other) const
+  {
+    if ((*this).automatonState==other.automatonState)
+      return true;
+      else
+	return false;
+  }
+  bool operator<(const dummy_state & other ) const
+  {
+    if ((*this).automatonState<other.automatonState)
+      return true;
+      else
+	return false;
+  }
+};
+
+
+struct monitor_result
+{
+	std::string agent_id;
+	std::string behavior_name;
+	bool ok;
+	
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int /*version*/)
+	{
+		ar& behavior_name;
+		ar& ok;
+		ar& agent_id;
+	}
+	
+};
+
+struct monitor_packet
+{
+	std::string id;
+	std::deque<monitor_result> agents;	
+	
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int /*version*/)
+	{
+		ar& agents;
+		ar& id;
+	}
+	
+};
+
+
 struct graph_informations
 {
     bool isNegotiating;
@@ -180,9 +234,11 @@ struct agent_simulator_handshake_packet{
 };
 
 struct world_sim_packet {
+  
     std::map<std::string,double> bonus_variables;
     agents_name_to_states state_agents;
-	simulation_time time;
+    simulation_time time;
+    
     template <typename Archive>
     void serialize(Archive& ar,const unsigned int /*version*/)
     {
@@ -190,7 +246,7 @@ struct world_sim_packet {
         ar& bonus_variables;
         ar& state_agents;
     }
-
+    
 };
 
 struct control_command_packet

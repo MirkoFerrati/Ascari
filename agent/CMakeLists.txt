@@ -1,13 +1,16 @@
 cmake_minimum_required(VERSION 2.8)
 
 set(agent_SOURCES empty_plugin/empty_plugin.cpp 
- graph_routing/graph_creator.cpp encoder/encoderDet.cpp automaton/automatonFSM.cpp 
+ graph_routing/graph_creator.cpp encoder/encoderDet.cpp automaton/automatonFSM.cpp automaton/automatonEFSM.cpp
   communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp ../shared/dynamic.cpp
   communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
   ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp decoder/decoder.cpp 
   graph_routing/agent_router.cpp graph_routing/agent_router_utility.cpp graph_routing/udp_graph_communicator.cpp
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/global.cpp
-	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp
+	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp 
+	identifierModule/agent_to_dummy_communicator.hpp identifierModule/dummy_agent.hpp
+	identifierModule/identifier_module.cpp identifierModule/identifierModule_communicator.hpp
+	
 	
 )
 

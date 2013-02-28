@@ -15,22 +15,42 @@
 #include "random.hpp"
 #include "plugin_module.h"
 
+
+
 class agent
 {
 public:
-	agent(std::string name,  const std::unique_ptr< Parsed_Behavior >& behavior);
-	agent(int agent_index, const Parsed_World& world,bool noStart=false);
-	~agent();
-	void init(const std::unique_ptr< Parsed_Behavior >& behavior, bool isDummy,bool noStart=false);
+    agent (std::string name,  const std::unique_ptr< Parsed_Behavior >& behavior, const Parsed_World& world);
+    agent (int agent_index, const Parsed_World& world,bool noStart=false);
+    ~agent();
+    void init (const std::unique_ptr< Parsed_Behavior >& behavior, bool isDummy,bool noStart=false);
     void start();
     void main_loop();
-	
-    inline std::forward_list<automaton_state> & getDiscreteStates()
-    {
-      return discreteState;
+
+    /**
+     * Setta il comunicatore
+     */
+
+    void setCommunicator (std::shared_ptr< agent_namespace::world_communicator_abstract >& communicator);
+
+    /**
+     * Setta l'identificatore
+     */
+
+    void setControlCommandIdentifier (std::string);
+
+
+    inline std::forward_list<automaton_state> & getDiscreteStates() {
+        return discreteState;
     }
     
     bool initialized;
+    
+    inline void setDiscreteState(int new_state) {
+	discreteState.clear();
+        discreteState.push_front(new_state);
+    }
+
 	
 protected:
     
@@ -108,7 +128,8 @@ protected:
 	//agent_communicator_abstract* agent_comm;
 	
 	//in dummy this will be a way to access identifier informations, in agent this will communicate with simulator (tcp or shared memory)
-	agent_namespace::world_communicator_abstract* world_comm;
+	    std::shared_ptr<agent_namespace::world_communicator_abstract> world_comm;
+
 	
 	//in dummy agent this will not be initialized
 	//The identifier_module has become a plugin, so idModule is useless here
@@ -145,11 +166,13 @@ protected:
 	void createStateFromParsedAgent(const std::unique_ptr<Parsed_Behavior>& behavior);
 
     void createBonusVariablesFromWorld(std::map< bonusVariable, bonus_expression > bonus);
+    
+
 
 private:
-	rndom<double>* f_rndom;
-	double pi;
-	agent(const agent& a);
+    rndom<double>* f_rndom;
+    double pi;
+    agent (const agent& a);
 };
 
 #endif // AGENT_H

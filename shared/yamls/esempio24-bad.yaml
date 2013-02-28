@@ -1,0 +1,193 @@
+#TODO(Simone): scrivere un file di esempio funzionante per il plugin identifier
+- BEHAVIORS:
+    - name: LGV
+      states: [x,y,theta]
+      control_commands: [v,w]
+      DYNAMIC_MAP:
+      - x: 'v*cos(theta)'
+        y: 'v*sin(theta)'
+        theta: 'w'
+      CONTROLLERS:
+      - name: FAST
+        v: 3
+        w: 0
+      - name: BACK
+        v: 3
+        w: '(sin(atan2(dim/2-y,dim/2-x)-theta)+0.01)%pi'
+      - name: LEFT
+        v: 3
+        w: 0.5
+      DISCRETE_STATES:
+      - name: FAST
+        controller: FAST
+      - name: BACK
+        controller: BACK
+      - name: LEFT
+        controller: LEFT
+      ENCODER:
+      - TOPOLOGY:
+          - topology: [co]            
+            co: '0'
+        LAMBDA:
+          - lambda: [L1,out]
+            out: '(x>600 or x<0 or y>600 or y<0)'
+            L1: '1'
+      EVENTS:
+      - events: [out,in, co,free]
+        out: 'out'
+        in: '!out'
+        co: 'co'
+        free: '!co'
+        
+      AUTOMATON:
+      - name: aut_machine
+        FAST:
+          - BACK: [out]
+            LEFT: [co]
+              
+        BACK:
+          - FAST: [in]
+            LEFT: [co]
+            
+        LEFT:
+          - FAST: [free]
+            
+  WORLD:
+  - bonus_variables: [dim,dst,angle]
+    dim: 500
+    dst: 50
+    angle: 1.5
+  AGENTS:
+  - agent: Agente1
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA:  circle(10)
+    MONITORING: 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - &initial
+      x: '42'
+      y: '24'
+      theta: '-0.1'
+    STATE_START: FAST
+    BEHAVIOR: LGV  
+    
+  - agent: Agente2
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    MONITORING: 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '171'
+      y: '151'
+      theta: '0.2'
+    STATE_START: FAST
+    BEHAVIOR: LGV
+    
+  - agent: Agente3
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    MONITORING: 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '111'
+      y: '51'
+      theta: '-0.3'
+    STATE_START: FAST
+    BEHAVIOR: LGV
+    
+  - agent: Agente4
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    MONITORING: 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '281'
+      y: '251'
+      theta: '0.4'
+    STATE_START: FAST
+    BEHAVIOR: LGV
+    
+  - agent: Agente5
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    MONITORING: 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '291'
+      y: '151'
+      theta: '-0.5'
+    STATE_START: FAST
+    BEHAVIOR: LGV
+    
+  - agent: Agente6
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    MONITORING: 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '151'
+      y: '231'
+      theta: '0.6'
+    STATE_START: FAST
+    BEHAVIOR: LGV
+    
+  - agent: Agente7
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    MONITORING: 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '312'
+      y: '221'
+      theta: '-0.7'
+    STATE_START: FAST
+    BEHAVIOR: LGV
+    
+  - agent: Agente8
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    MONITORING: 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '331'
+      y: '41'
+      theta: '0.8'
+    STATE_START: FAST
+    BEHAVIOR: LGV
+    
+  - agent: Agente9
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    MONITORING: 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '341'
+      y: '451'
+      theta: '-0.9'
+    STATE_START: FAST
+    BEHAVIOR: LGV
+    
+  - agent: Agente10
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    MONITORING: 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '10'
+      y: '10'
+      theta: '0'
+    STATE_START: FAST
+    BEHAVIOR: LGV
+    
+    

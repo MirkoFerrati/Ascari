@@ -14,21 +14,30 @@
 #include "communication/udp_world_communicator.h"
 #include "communication/zmq_world_communicator.h"
 
+
 #include "logog.hpp"
 #include "automaton/automatonFSM.h"
+#include "automaton/automatonEFSM.h"
 #include "encoder/encoderDet.h"
 #include "geometry.hpp"
 
 
 using namespace std;
 
-agent::agent(std::string name,const std::unique_ptr<Parsed_Behavior>& behavior)
+agent::agent(std::string name,const std::unique_ptr<Parsed_Behavior>& behavior, const Parsed_World & world)
         :identifier(name)
 {
+  
+  createBonusVariablesFromWorld(world.bonus_expressions);
 //qui poi uno setta tutto quello che manca oppure lascia vuoto
 initialized=false;
 encoder=0;
 init(behavior,true);
+
+
+for (auto const & disc_state : map_discreteStateName_to_id)
+discreteState.push_front(disc_state.second);
+
 }
 
 
@@ -42,6 +51,14 @@ agent::agent(int agent_index,const Parsed_World& world, bool noStart):
 		Plugin_module *plugin=new agent_router(world.agents.at(agent_index).target_list,events,events_to_index,world.agents.at(agent_index).name,time,world.graphName);
 		plugins.push_back(plugin);
 	}
+	
+	if (world.agents.at(agent_index).monitoring)
+	{
+		
+		Plugin_module *monitor=new identifier_module(world,bonusVariables,map_bonus_variables_to_id,state_other_agents,time,identifier);
+		plugins.push_back(monitor);
+	}
+	
 	/*
 	if (condition to enable a plugin)
 	{
@@ -76,9 +93,20 @@ agent::agent(int agent_index,const Parsed_World& world, bool noStart):
 //qui invece mi setto quello che manca a mano
 }
 
+void agent::setCommunicator (std::shared_ptr<agent_namespace::world_communicator_abstract>& communicator)
+{
+world_comm=communicator;
+}
+
+
+void agent::setControlCommandIdentifier (string new_identifier)
+{
+inputs.identifier=new_identifier;
+}
+
 
 void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy,bool noStart)
-{
+{	
 	time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)	
 	symbol_table.add_constants();
 	pi=exprtk::details::numeric::constant::pi;
@@ -109,18 +137,23 @@ void agent::init(const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy
 							   map_bonus_variables_to_id, behavior->topology_expressions,
 						 sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table);
 		//world_comm=new udp_world_communicator();
-		if (!noStart) world_comm=new zmq_world_communicator(identifier);
-		 for (unsigned int i=0;i<plugins.size();i++)
-	    {
-		plugins[i]->compileExpressions(symbol_table);
-	    }
+		if (!noStart) world_comm=std::make_shared<zmq_world_communicator>(identifier);
+		
 	}
 	else
 	{
 	   
 		//TODO(Mirko): we will think about identifierModule later
+		//TODO:create non-deterministic automaton
+		automaton=new automatonEFSM(createAutomatonTableFromParsedAgent(behavior));
+		encoder=new encoderDet(sub_events, identifier,state,map_statename_to_id,bonusVariables,
+							   map_bonus_variables_to_id, behavior->topology_expressions,
+						 sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table);
 	}
-	
+	 for (unsigned int i=0;i<plugins.size();i++)
+	    {
+		plugins[i]->compileExpressions(symbol_table);
+	    }
 	event_decoder.create(behavior->events_expressions,sub_events_to_index,events_to_index);
 	initialized=true;
 
@@ -268,9 +301,9 @@ void agent::createStateFromParsedAgent(const unique_ptr<Parsed_Behavior>& behavi
 
 void agent::main_loop()
 {
-        {
+  
 	// 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
-			world_sim_packet temp=world_comm->receive_agents_status();
+			world_sim_packet temp = world_comm->receive_agents_status();
 			state_other_agents.swap(temp.state_agents.internal_map);//TODO(Mirko): si possono evitare le copie e gli swap?
 			time=temp.time;
 			
@@ -279,14 +312,22 @@ void agent::main_loop()
 			bonusVariables.at(map_bonus_variables_to_id.at(it->first))=it->second; 
 			}
            
-			//TODO(Mirko): questo ciclo for copia informazioni che in teoria gia' abbiamo, forse non vale la pena di usare la variabile state
+	
+
+        		//TODO(Mirko): questo ciclo for copia informazioni che in teoria gia' abbiamo, forse non vale la pena di usare la variabile state
             for (map<int,double>::const_iterator it=state_other_agents.at(identifier).state.begin();
                     it!=state_other_agents.at(identifier).state.end();++it)
             {
                 state.at(it->first)=it->second;
             }
 
-            //cout<<"stato: "<<state.at(0)<<" "<<state.at(1)<<" "<<state.at(2)<<endl;
+            if (!(inputs.identifier.size()>1)) 
+	     // cout<<"AGENTE:"<< inputs.identifier<<"-";
+	    //else
+	    {
+	      cout<<"AGENTE:"<<identifier<<" -";
+            cout<<"stato: "<<state.at(0)<<" "<<state.at(1)<<" "<<state.at(2)<<endl<<endl;
+	    }
 
             sleep(0);
             encoder->computeSubEvents(state_other_agents);
@@ -306,15 +347,18 @@ void agent::main_loop()
 	    {
 	      controllers.at(map_discreteStateId_to_controllerId.at(discrete)).computeControl();
 	      inputs.commands.at(discrete)=inputs.default_command;
+	      std::cout<< discrete;
 	    }
-            world_comm->send_control_command(inputs,NULL);
+	    std::cout<< std::endl;
+            world_comm->send_control_command(inputs,(agent_namespace::target_abstract*) (&identifier));
 
-            //string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
-            //for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();++it)
-            //{
-            //    if (it->second==discreteState[0])
-            //        tmp=it->first;
-            //}
+            string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
+            for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();++it)
+            {
+                if (it->second==discreteState.front())
+                    tmp=it->first;
+            }
+            //cout<<tmp<<endl;
 
 //             cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)
 // 			<<" "<<state_other_agents.at(identifier).state.at(2)<<endl;
@@ -322,15 +366,21 @@ void agent::main_loop()
 // 		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
 // 			break;
 
-        }
+        
 
 
 
 }
 
+
+
 agent::~agent()
 {
-    delete world_comm;
+    //TODO: il dummy agent non puo' distruggere il comunicatore..... e' a comune nel modulo identificatore. Pero' agent si'!!!!
+    
+    //delete world_comm;
+    
+    
     delete automaton;
     delete encoder;
     delete f_rndom;

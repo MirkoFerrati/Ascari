@@ -40,8 +40,6 @@ template <typename receive_type, typename send_type, int sock_send_type, int soc
 class zmq_communicator
 {
 
-
-
 public:
     zmq_communicator() : sender_socket ( static_zmq::context, sock_send_type ), receiver_socket ( static_zmq::context, sock_recv_type )
     {
@@ -308,8 +306,11 @@ public:
         results.clear();
         while ( subscribers < expected_senders )
         {
-
-            receiver_socket.recv ( &receive_buffer, flags );
+bool rc=receiver_socket.recv(&receive_buffer,flags);
+	if (!rc)
+	{
+	    ERR("brutte cose",NULL);
+	}
             char* receive = reinterpret_cast<char*> ( receive_buffer.data() );
             //std::cout<<receive<<std::endl;
             std::istringstream receive_stream (
@@ -324,6 +325,7 @@ public:
 
 #endif //ZMQDEBUG
         return results;
+
     };
     void send ( send_type const& infos )
     {
@@ -353,29 +355,7 @@ private:
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-template <typename receive_type, int sock_recv_type>
+template <typename receive_type,int sock_recv_type>
 class zmq_receive_communicator
 {
 
