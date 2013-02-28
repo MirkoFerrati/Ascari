@@ -12,6 +12,7 @@
 #include <thread>
 //written by Alessandro Settimi
 #include "communication/task_assignment_router.hpp"
+#include "visibility/visibility.h"
 //written by Alessandro Settimi
 
 class simulator
@@ -60,6 +61,8 @@ private:
 	task_assignment_router_base* ta_router;
 
 	//written by Alessandro Settimi
+	
+	std::map<std::string,std::shared_ptr<visibleArea> > agents_visibility;
 };
 
 

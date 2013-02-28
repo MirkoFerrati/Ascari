@@ -218,7 +218,15 @@ void createTaskList ( const YAML::Node& node, task_assignment_namespace::task_li
 void operator>> ( const YAML::Node& node, Parsed_Agent& ag )
 {
 
-    node["VISIBLE_AREA"]>>ag.visibility;
+     if ( node.FindValue ( "VISIBLE_AREA" ) ) 
+     {
+        node["VISIBLE_AREA"]>>ag.visibility;
+    }
+    else
+    {
+        WARN( "NO VISIBLE AREA SPECIFIED",NULL );
+//         throw "NO VISIBLE AREA SPECIFIED";
+    }
     node["COMMUNICATION_AREA"]>>ag.communication;
 
     ag.monitoring=false;

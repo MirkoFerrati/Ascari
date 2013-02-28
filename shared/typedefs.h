@@ -264,24 +264,6 @@ struct control_command_packet
 };
 
 
-struct visibleArea
-{
-    virtual bool contains(agent_state me,agent_state other);
-    virtual ~visibleArea();
-};
-
-struct circle:public visibleArea
-{
-    double radius;
-    int first_axis;
-    int second_axis;
-
-    bool contains(agent_state me,agent_state other)
-    {
-        return pow(me.at(first_axis)-other.at(first_axis),2)+pow(me.at(second_axis)-other.at(second_axis),2)<pow(radius,2);
-    }
-};
-
 //written by Alessandro Settimi
 namespace task_assignment_namespace
 {

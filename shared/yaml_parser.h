@@ -36,7 +36,6 @@ typedef std::string lambda_expression;
 // typedef std::map<lambda_name, lambda_expression> Lambda_MapExpressions;
 typedef std::string event_name;
 typedef std::string event_expression;
-typedef std::string visible_area;
 typedef std::string communication_area;
 typedef std::string graph_name;
 
@@ -78,7 +77,7 @@ public:
    
     discreteState_Name state_start;
    
-    visible_area visibility;
+    std::string visibility;
     communication_area communication;
     
     std::vector<target_id> target_list;

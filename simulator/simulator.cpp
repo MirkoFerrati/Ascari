@@ -6,6 +6,7 @@
 #include <udp_agent_router.hpp>
 #include <zmq_agent_communicator.h>
 #include "collisionchecker.h"
+#include "visibility/visibility.h"
 
 using namespace std;
 
@@ -151,7 +152,10 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
 
         dynamic_module.push_back(d);
 
-
+	if (ag.at(i).visibility!="")
+	{
+	  agents_visibility[ag.at(i).name]=visibleArea::createVisibilityFromParsedVisibleArea(ag.at(i).visibility,agents_name_to_index);
+	}
     }
 
 
