@@ -22,7 +22,7 @@ return receive().front(); //TODO(Mirko): zerocopy here
   }
 
 
-void zmq_world_communicator::send_control_command(control_command_packet& packet, const agent_namespace::target_abstract* /*target*/)
+void zmq_world_communicator::send_control_command(control_command_packet& packet, const target_abstract& /*target*/)
 {
 send(packet);
 }

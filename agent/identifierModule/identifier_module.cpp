@@ -7,7 +7,7 @@ using namespace std;
 
 identifier_module::identifier_module ( Parsed_World const& W, const std::map<int, double> & sensed_bonus_variables, const std::map<std::string, int> & map_bonus_variables_to_id,
                                        const std::map<std::string, agent_state_packet> &sensed_state_agents, const simulation_time& sensed_time, std::string owner ) :
-  parsed_world ( W ), sensed_bonus_variables ( sensed_bonus_variables ), map_bonus_variables_to_id ( map_bonus_variables_to_id ), sensed_state_agents ( sensed_state_agents ), sensed_time ( sensed_time ), owner ( owner )
+  parsed_world ( W ),owner ( owner ), sensed_bonus_variables ( sensed_bonus_variables ), map_bonus_variables_to_id ( map_bonus_variables_to_id ), sensed_state_agents ( sensed_state_agents ), sensed_time ( sensed_time ) 
 {
   int i = 0;
   ncicli = 0;

@@ -154,7 +154,7 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
 
 	if (ag.at(i).visibility!="")
 	{
-	  agents_visibility[ag.at(i).name]=visibleArea::createVisibilityFromParsedVisibleArea(ag.at(i).visibility,agents_name_to_index);
+	  agents_visibility[ag.at(i).name]=visibleArea::createVisibilityFromParsedVisibleArea(ag.at(i).visibility,agent_states_to_index);
 	}
     }
 

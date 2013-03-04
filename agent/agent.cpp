@@ -350,7 +350,7 @@ void agent::main_loop()
 	      std::cout<< discrete;
 	    }
 	    std::cout<< std::endl;
-            world_comm->send_control_command(inputs,(agent_namespace::target_abstract*) (&identifier));
+            world_comm->send_control_command(inputs,identifier);
 
             string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
             for (index_map::const_iterator it=map_discreteStateName_to_id.begin();it!=map_discreteStateName_to_id.end();++it)

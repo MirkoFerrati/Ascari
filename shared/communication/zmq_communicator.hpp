@@ -252,7 +252,7 @@ protected:
         }
         if ( sock_recv_type == ZMQ_SUB )
         {
-            receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, "", 0 );
+            receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, owner_name.c_str(), owner_name.length()+1 );
         }
 
         results.resize ( expected_senders );
@@ -312,9 +312,13 @@ bool rc=receiver_socket.recv(&receive_buffer,flags);
 	    ERR("brutte cose",NULL);
 	}
             char* receive = reinterpret_cast<char*> ( receive_buffer.data() );
-            //std::cout<<receive<<std::endl;
-            std::istringstream receive_stream (
-                std::string ( receive, receive_buffer.size() ) );
+	    //TODO(Mirko): codice brutto, migliorare
+            std::cout<<receive<<std::endl;
+	    std::string tmp;
+	    std::istringstream iss(receive);
+	    iss >> tmp >> tmp;
+            std::istringstream receive_stream (tmp);
+               // std::string ( receive, receive_buffer.size() ) );
             boost::archive::text_iarchive archive ( receive_stream );
             archive >> packet;
             results.push_back ( packet );
@@ -327,7 +331,7 @@ bool rc=receiver_socket.recv(&receive_buffer,flags);
         return results;
 
     };
-    void send ( send_type const& infos )
+    void send ( send_type const& infos, const target_abstract & target="" )
     {
         if ( !initialized )
         {
@@ -337,10 +341,14 @@ bool rc=receiver_socket.recv(&receive_buffer,flags);
         std::ostringstream archive_stream;
         boost::archive::text_oarchive archive ( archive_stream );
         archive << infos;
-        send_buffer.rebuild ( archive_stream.str().length() + 1 );
-        reinterpret_cast<char*> ( memcpy ( send_buffer.data(), archive_stream.str().data(), archive_stream.str().length() + 1 ) );
-        //std::cout<<temp<<std::endl;
-        sender_socket.send ( send_buffer );
+	
+	send_buffer.rebuild ( archive_stream.str().length() + 1+target.length()+2 );
+	memcpy(send_buffer.data(), target.c_str(),target.length()+1);
+	static_cast<char*> (send_buffer.data())[target.length()+2]=' ';
+        std::string temp=reinterpret_cast<char*> ( memcpy (static_cast<char*> (send_buffer.data())+target.length()+3, archive_stream.str().data(), archive_stream.str().length() + 1 ) );
+        std::cout<<temp<<std::endl;
+        
+	sender_socket.send ( send_buffer );
     };
 
 
@@ -417,13 +425,21 @@ public:
                     WARN ( "programma terminato", NULL );
                 break;
             }
-            char* receive = reinterpret_cast<char*> ( receive_buffer.data() );
-            std::istringstream receive_stream (
-                std::string ( receive, receive_buffer.size() ) );
+            
+              char* receive = reinterpret_cast<char*> ( receive_buffer.data() );
+	    //TODO(Mirko): codice brutto, migliorare
+            std::cout<<receive<<std::endl;
+	    std::string tmp;
+	    std::istringstream iss(receive);
+	    iss >> tmp >> tmp;
+            std::istringstream receive_stream (tmp);
+               // std::string ( receive, receive_buffer.size() ) );
             boost::archive::text_iarchive archive ( receive_stream );
             archive >> packet;
             results.push_back ( packet );
             subscribers++;
+            
+          
         }
         return results;
     };

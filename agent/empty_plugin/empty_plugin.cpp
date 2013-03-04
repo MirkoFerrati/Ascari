@@ -6,8 +6,8 @@
 
 empty_plugin::empty_plugin(std::map< transition, Events >& events, 
 						   const std::map< std::string, transition >& events_to_index, 
-						   std::string identifier, simulation_time& time):identifier(identifier),events (events),
-      events_to_index (events_to_index)
+						   std::string identifier, simulation_time& time):
+      events_to_index (events_to_index),events (events),identifier(identifier)
 {
 	//events gives you access to agent events, identifier is the agent name, time is the time of the simulation
 	

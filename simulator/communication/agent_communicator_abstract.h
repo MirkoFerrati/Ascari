@@ -6,10 +6,6 @@
 #include <string>
 
 
-struct target_abstract
-{
-	std::string identifier;
-};
 namespace simulator_namespace
 {
 class agent_communicator_abstract

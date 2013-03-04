@@ -5,11 +5,6 @@
 
 
 
-struct target_abstract
-{
-	std::string identifier;
-};
-
 
 class world_sniffer_abstract
 {

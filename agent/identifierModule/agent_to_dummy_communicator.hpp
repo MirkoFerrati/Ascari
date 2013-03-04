@@ -42,7 +42,7 @@ public:
       buf_agents = infos;
     };
     
-    void send_control_command (control_command_packet& control_command, const agent_namespace::target_abstract* target)
+    void send_control_command (control_command_packet& control_command, const target_abstract& /*target*/)
     {
       
       //buffer_control.insert(make_pair(control_command.identifier,control_command));
