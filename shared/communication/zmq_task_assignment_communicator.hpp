@@ -20,6 +20,6 @@ class simulator_to_agent_ta_communicator: public zmq_communicator<receive_type,s
 public:
 	void init(unsigned int expected_senders=1)
 	{
-		this->init_full("simulator","tcp://127.0.0.1:5581","tcp://127.0.0.1:5580","tcp://127.0.0.1:5582",expected_senders,true,true);
+		this->init_full("simulator",false,"tcp://127.0.0.1:5581","tcp://127.0.0.1:5580","tcp://127.0.0.1:5582",expected_senders,true,true);
 	}
 };

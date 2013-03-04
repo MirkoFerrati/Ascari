@@ -222,7 +222,7 @@ protected:
     /**
      * This function will block till the syncing phase is over, if the class was created with a syncing policy!
      * */
-    bool init_full ( std::string owner_name, std::string receiver_protocol, std::string sender_protocol,
+    bool init_full ( std::string owner_name,bool filter, std::string receiver_protocol, std::string sender_protocol,
                      std::string sync_protocol = "", unsigned int expected_senders = 1, bool bind_receiver = false, bool bind_sender = true )
     {
         this->expected_senders = expected_senders;
@@ -252,7 +252,10 @@ protected:
         }
         if ( sock_recv_type == ZMQ_SUB )
         {
+	  if (filter)
             receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, owner_name.c_str(), owner_name.length()+1 );
+	  else
+	    receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, "", 0 );
         }
 
         results.resize ( expected_senders );
@@ -313,13 +316,14 @@ bool rc=receiver_socket.recv(&receive_buffer,flags);
 	}
             char* receive = reinterpret_cast<char*> ( receive_buffer.data() );
 	    //TODO(Mirko): codice brutto, migliorare
-            std::cout<<receive<<std::endl;
+//             std::cout<<receive<<std::endl;
 	    std::string tmp;
 	    std::istringstream iss(receive);
-	    iss >> tmp >> tmp;
-            std::istringstream receive_stream (tmp);
+	    iss >> tmp; 
+// 	    std::cout<<tmp<<std::endl;
+//             std::istringstream receive_stream (tmp);
                // std::string ( receive, receive_buffer.size() ) );
-            boost::archive::text_iarchive archive ( receive_stream );
+            boost::archive::text_iarchive archive ( iss );
             archive >> packet;
             results.push_back ( packet );
             subscribers++;
@@ -331,7 +335,7 @@ bool rc=receiver_socket.recv(&receive_buffer,flags);
         return results;
 
     };
-    void send ( send_type const& infos, const target_abstract & target="" )
+    void send ( send_type const& infos, const target_abstract & target="all" )
     {
         if ( !initialized )
         {
@@ -341,12 +345,16 @@ bool rc=receiver_socket.recv(&receive_buffer,flags);
         std::ostringstream archive_stream;
         boost::archive::text_oarchive archive ( archive_stream );
         archive << infos;
-	
-	send_buffer.rebuild ( archive_stream.str().length() + 1+target.length()+2 );
-	memcpy(send_buffer.data(), target.c_str(),target.length()+1);
-	static_cast<char*> (send_buffer.data())[target.length()+2]=' ';
-        std::string temp=reinterpret_cast<char*> ( memcpy (static_cast<char*> (send_buffer.data())+target.length()+3, archive_stream.str().data(), archive_stream.str().length() + 1 ) );
-        std::cout<<temp<<std::endl;
+	std::string tmp=target;
+	tmp.append(" ");
+	tmp.append(archive_stream.str());
+	//send_buffer.rebuild ( archive_stream.str().length() + 1+target.length()+2 );
+	send_buffer.rebuild(tmp.length()+1);
+	memcpy(send_buffer.data(), tmp.c_str(),tmp.length()+1);
+	//((char*) send_buffer.data())[target.length()]=' ';
+         //memcpy (send_buffer.data(), archive_stream.str().data(), archive_stream.str().length() + 1 ) ;
+	 std::string temp=reinterpret_cast<char*> (send_buffer.data());
+//         std::cout<<temp<<std::endl;
         
 	sender_socket.send ( send_buffer );
     };

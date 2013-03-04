@@ -13,7 +13,7 @@ public zmq_communicator<receive_type,send_type,ZMQ_PUSH,ZMQ_SUB,ASK_SYNC>
 public:
 	void init(std::string agent_name)
 	{
-		this->init_full(agent_name,"tcp://127.0.0.1:5555","tcp://127.0.0.1:5556","tcp://127.0.0.1:5557",1,false,false);
+		this->init_full(agent_name,false,"tcp://127.0.0.1:5555","tcp://127.0.0.1:5556","tcp://127.0.0.1:5557",1,false,false);
 	}
 };
 
@@ -24,7 +24,7 @@ public zmq_communicator<receive_type,send_type,ZMQ_PUB,ZMQ_PULL,WAIT_SYNC>
 public:
 	void init(unsigned int expected_senders=1)
 	{
-		this->init_full("simulator","tcp://127.0.0.1:5556","tcp://127.0.0.1:5555","tcp://127.0.0.1:5557",expected_senders,true,true);
+		this->init_full("simulator",false,"tcp://127.0.0.1:5556","tcp://127.0.0.1:5555","tcp://127.0.0.1:5557",expected_senders,true,true);
 	}
 };
 
@@ -35,7 +35,7 @@ public zmq_receive_communicator<receive_type,ZMQ_SUB>
 public:
 	void init(std::string agent_name)
 	{
-		this->init_full(agent_name,"tcp://127.0.0.1:5555",1,false);
+		this->init_full(agent_name,false,"tcp://127.0.0.1:5555",1,false);
 	}
 };
 

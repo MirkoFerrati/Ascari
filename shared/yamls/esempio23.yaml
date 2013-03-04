@@ -59,7 +59,7 @@
     angle: 1.5
   AGENTS:
   - agent: Agente1
-    VISIBLE_AREA: circle(9)
+    VISIBLE_AREA: circle(x,y,100)
     COMMUNICATION_AREA:  circle(10)
     MONITORING: 0
     #COLLABORATIVE = 1
@@ -74,7 +74,7 @@
     BEHAVIOR: LGV  
     
   - agent: Agente2
-    VISIBLE_AREA: circle(9)
+    VISIBLE_AREA: circle(x,y,100)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 0
     states: [x,y,theta]

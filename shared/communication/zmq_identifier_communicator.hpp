@@ -9,7 +9,7 @@ class identifier_to_viewer_communicator : public zmq_communicator<send_type,send
 public:
 	void init(std::string agent_name)
 	{
-		this->init_full(agent_name,"tcp://127.0.0.1:5580","tcp://127.0.0.1:5581","",1,false,false);
+		this->init_full(agent_name,false,"tcp://127.0.0.1:5580","tcp://127.0.0.1:5581","",1,false,false);
 	}
 private:
 	std::vector<send_type> receive()=delete;
@@ -21,6 +21,6 @@ class viewer_from_identifier_sniffer: public zmq_receive_communicator<receive_ty
 public:
 	void init(unsigned int expected_senders=1)
 	{
-		this->init_full("viewer_identifier_sniffer","tcp://127.0.0.1:5581",expected_senders,true);
+		this->init_full("viewer_identifier_sniffer",false,"tcp://127.0.0.1:5581",expected_senders,true);
 	}
 };
