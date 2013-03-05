@@ -28,7 +28,7 @@ void simulator::create_communicator(int communicator_type)
 	}
 }
 
-simulator::simulator():
+simulator::simulator():agent_packet(sim_packet.bonus_variables,sim_packet.time),
 topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT)
 {
 	max_loops=0;
@@ -114,6 +114,7 @@ void simulator::initialize(const Parsed_World& wo)
 }
 
 
+
 void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
 {
     num_agents=ag.size();
@@ -127,6 +128,8 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
         control_command_packet& command_packet=commands.at(ag.at(i).name);
         agent_packet.identifier=ag.at(i).name;
         command_packet.identifier=ag.at(i).name;
+	
+	
         
         index_map commands_to_index_tmp;
 
@@ -154,7 +157,7 @@ void simulator::initialize_agents(const vector<Parsed_Agent>& ag)
 
 	if (ag.at(i).visibility!="")
 	{
-	  agents_visibility[ag.at(i).name]=visibleArea::createVisibilityFromParsedVisibleArea(ag.at(i).visibility,agent_states_to_index);
+	  agents_visibility[i]=visibleArea::createVisibilityFromParsedVisibleArea(ag.at(i).visibility,agent_states_to_index);
 	}
     }
 
@@ -189,7 +192,25 @@ void simulator::main_loop()
 //             communicator->send_broadcast(time++);
             update_bonus_variables();
             //communicator->send_broadcast(sim_packet.state_agents);
-            communicator->send_broadcast(sim_packet);
+	    
+	    //communicator->send_broadcast(sim_packet);
+	    // sim_packet contiene tutte le informazioni che mi servono. Lo personalizzo per ogni agente
+	    
+	    for (auto agent=sim_packet.state_agents.internal_map.begin();agent!=sim_packet.state_agents.internal_map.end();agent++){
+	    
+	     agent_packet.state_agents.internal_map.clear();
+	     for (auto other=sim_packet.state_agents.internal_map.begin();other!=sim_packet.state_agents.internal_map.end();other++){
+	     
+	       if (agent->first==other->first || !agents_visibility.at(agents_name_to_index.at(agent->first))->isVisible(sim_packet.state_agents.internal_map.at(agent->first).state,sim_packet.state_agents.internal_map.at(other->first).state))
+		 continue;
+	       agent_packet.state_agents.internal_map[other->first]=&other->second;
+	    }
+
+	     //communicator->send_target(agent_packet,agent->first);
+	     communicator->send_target(sim_packet,agent->first);
+	    }
+	    
+	    
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 	    
 	    //written by Alessandro Settimi

@@ -27,7 +27,7 @@ void udp_agent_communicator::send_broadcast(const world_sim_packet& infos)
 }
 
 
-void udp_agent_communicator::send_target(const world_sim_packet&  infos, const target_abstract* target)
+void udp_agent_communicator::send_target(const world_sim_packet&  infos, const target_abstract& /*target*/)
 {
 
 }

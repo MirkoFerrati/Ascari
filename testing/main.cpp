@@ -9,6 +9,8 @@
 #include "testrandom.hpp"
 #include "time.h"
 #include "testagentudpcommunicator.hpp"
+#include "testserialize.hpp"
+
 // #include "testgeometry.hpp"
 #include <forward_list>
 /**
@@ -53,6 +55,8 @@ int main(int /*argc*/, char** /*argv*/) {
 	tests.push_back(make_pair(new testEncoder(),"Encoder"));
 	tests.push_back(make_pair(new testAutomaton(),"automaton"));
 	tests.push_back(make_pair(new testDecoder(),"Decoder"));
+	tests.push_back(make_pair(new testSerialize(),"Serialize"));
+	
 	//tests.push_back(make_pair(new testAgentUDPCommunicator(),"Agent Udp Communicator"));
 // 	tests.push_back(make_pair(new testGeometry(),"Geometry"));
 	
