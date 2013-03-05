@@ -25,9 +25,9 @@ void zmq_agent_communicator::send_broadcast(const world_sim_packet& infos)
 }
 
 
-void zmq_agent_communicator::send_target(const world_sim_packet& /*infos*/, const target_abstract* /*target*/)
+void zmq_agent_communicator::send_target(const world_sim_packet& infos, const target_abstract& target)
 {
-    throw "not implemented";
+    send(infos,target);
 }
 
 

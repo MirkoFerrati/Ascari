@@ -27,7 +27,7 @@ public:
 	void update_bonus_variables();
 	void setSleep(unsigned secSleep);
 	void setCheckCollision(bool checkCollision);
-    
+	
 private:
 	int max_loops;
 	int secSleep;
@@ -36,6 +36,7 @@ private:
 	std::vector<dynamic*> dynamic_module;
 	simulator_namespace::agent_communicator_abstract* communicator;
 	world_sim_packet sim_packet;
+	agent_sim_packet agent_packet;
 	index_map agent_states_to_index;
 	std::vector<index_map> agent_commands_to_index;
 	index_map agents_name_to_index;
@@ -62,7 +63,7 @@ private:
 
 	//written by Alessandro Settimi
 	
-	std::map<std::string,std::shared_ptr<visibleArea> > agents_visibility;
+	std::map<int,std::shared_ptr<visibleArea> > agents_visibility;
 };
 
 

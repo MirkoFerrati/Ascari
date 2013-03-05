@@ -391,7 +391,7 @@ protected:
     /**
      * This function will block till the syncing phase is over, if the class was created with a syncing policy!
      * */
-    bool init_full ( std::string owner_name, std::string receiver_protocol, unsigned int expected_senders = 1, bool bind_receiver = false )
+    bool init_full ( std::string owner_name, bool filter, std::string receiver_protocol, unsigned int expected_senders = 1, bool bind_receiver = false )
     {
         this->expected_senders = expected_senders;
         if ( bind_receiver )

@@ -220,6 +220,23 @@ private:
 };
 
 
+struct agents_name_to_ref_states
+//TODO(MIRKO): Controllare se questa struttura serve oppure può essere inclusa in World_sim_packet
+{
+  friend class boost::serialization::access;
+  std::map<std::string,agent_state_packet*> internal_map;
+
+private:
+    template <typename Archive>
+    void serialize(Archive& ar, const unsigned int /*version*/)
+    {
+        ar& internal_map;
+
+    }
+};
+
+
+
 struct agent_simulator_handshake_packet{
   bool accepted;
   std::string message;
@@ -248,6 +265,48 @@ struct world_sim_packet {
     }
     
 };
+
+struct agent_sim_packet{
+  //pacchetto personalizzato per ogni agente in base alla visibilita'
+  const std::map<std::string,double>& bonus_variables;
+   agents_name_to_ref_states state_agents;
+  const simulation_time& time;
+    
+    agent_sim_packet(const std:: map<std::string,double>& bonus, const simulation_time& t)
+    :bonus_variables(bonus),time(t)
+    {
+	
+    }
+    
+    template <typename Archive>
+    void serialize(Archive& ar,const unsigned int /*version*/)
+    {
+		ar& time;
+        ar& bonus_variables;
+        ar& state_agents;
+    }
+    
+};
+
+struct agent_sim_packet_receive{
+  //pacchetto personalizzato per ogni agente in base alla visibilita'
+  std::map<std::string,double> bonus_variables;
+   agents_name_to_ref_states state_agents;
+  simulation_time time;
+    
+    
+    template <typename Archive>
+    void serialize(Archive& ar,const unsigned int /*version*/)
+    {
+		ar& time;
+        ar& bonus_variables;
+        ar& state_agents;
+    }
+    
+};
+
+
+
 
 struct control_command_packet
 {

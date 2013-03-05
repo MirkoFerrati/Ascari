@@ -12,7 +12,7 @@ public:
     std::vector< control_command_packet > receive_control_commands();
     void send_broadcast(const simulation_time& time );
     virtual void send_broadcast(const world_sim_packet& infos);
-    void send_target(const world_sim_packet&  infos, const target_abstract* target);
+    void send_target(const world_sim_packet&  infos, const target_abstract& target);
     ~udp_agent_communicator();
 private:
 	unsigned int num_agents;
