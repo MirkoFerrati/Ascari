@@ -186,23 +186,33 @@ protected:
                  When the publisher has had all the necessary confirmations, it starts to send real data.
                */
         std::cout << owner_name << " connecting to server..." << std::endl;
-
+	 agent_simulator_handshake_packet infos;
+       bool exit=false;
+	while(!exit){
         zmq::message_t message ( owner_name.size() );
         memcpy ( message.data(), owner_name.data(), owner_name.size() );
         bool rc = sync_socket->send ( message );
         assert ( rc );
         message.rebuild ( MAX_PACKET_LENGTH );
-        agent_simulator_handshake_packet infos;
         try
         {
-            bool rc = sync_socket->recv ( &message );
-            assert ( rc );
+            bool rc = sync_socket->recv ( &message,ZMQ_NOBLOCK );
+	    if (rc)
+	    {
             char* receive = reinterpret_cast<char*> ( message.data() );
             //std::cout<<receive<<std::endl;
             std::istringstream receive_stream (
                 std::string ( receive, receive_buffer.size() ) );
             boost::archive::text_iarchive archive ( receive_stream );
             archive >> infos;
+	    exit=true;
+	    }
+	    else 
+	    {
+	      usleep(250000);
+	      continue;
+	    }
+	   
         }
         catch ( zmq::error_t ex )
         {
@@ -210,6 +220,7 @@ protected:
                 WARN ( "programma terminato", NULL );
             return false;
         }
+	}
         std::cout << infos.message << std::endl;
         if ( !infos.accepted )
         {
@@ -264,6 +275,8 @@ protected:
         {
             sync_socket->bind ( !sync_protocol.compare ( "" ) ? SYNC_PROTOCOL : sync_protocol.c_str() );
             waitSync();
+	    sync_socket->close();
+	    delete sync_socket;
 
         }
         else if ( sync == ASK_SYNC )
@@ -277,6 +290,8 @@ protected:
                 ERR ( "sync refused, check configuration and previous messages", NULL );
                 abort();
             };
+	        sync_socket->close();
+	    delete sync_socket;
 
         }
         initialized = true;
