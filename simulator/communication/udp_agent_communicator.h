@@ -11,13 +11,13 @@ public:
 	udp_agent_communicator(int num_agents);
     std::vector< control_command_packet > receive_control_commands();
     void send_broadcast(const simulation_time& time );
-    virtual void send_broadcast(const world_sim_packet& infos);
-    void send_target(const world_sim_packet&  infos, const target_abstract& target);
+    virtual void send_broadcast(const agent_sim_packet& infos);
+    void send_target(const agent_sim_packet&  infos, const target_abstract& target);
     ~udp_agent_communicator();
 private:
 	unsigned int num_agents;
 	boost::asio::io_service service;//This must be written before any sender or receiver
-	udp_sender<world_sim_packet> state_sender;
+	udp_sender<agent_sim_packet> state_sender;
 	udp_receiver<control_command_packet > control_receiver;
 	
 };

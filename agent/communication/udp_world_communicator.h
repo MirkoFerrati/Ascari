@@ -16,13 +16,13 @@ struct udp_target
 class udp_world_communicator: public agent_namespace::world_communicator_abstract
 {
 public:
-    world_sim_packet receive_agents_status();
+    agent_sim_packet_receiver receive_agents_status();
 	void send_control_command(control_command_packet& command, const target_abstract& target);
 	udp_world_communicator();
 // 	~udp_world_communicator();
 private:
 	boost::asio::io_service io_service;
-      udp_receiver<world_sim_packet > world_sim_receiver;
+      udp_receiver<agent_sim_packet_receiver > world_sim_receiver;
     
 	udp_receiver<simulation_time> time_receiver;
 	udp_sender<control_command_packet> control_command_sender;

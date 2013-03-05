@@ -201,13 +201,19 @@ void simulator::main_loop()
 	     agent_packet.state_agents.internal_map.clear();
 	     for (auto other=sim_packet.state_agents.internal_map.begin();other!=sim_packet.state_agents.internal_map.end();other++){
 	     
-	       if (agent->first==other->first || !agents_visibility.at(agents_name_to_index.at(agent->first))->isVisible(sim_packet.state_agents.internal_map.at(agent->first).state,sim_packet.state_agents.internal_map.at(other->first).state))
-		 continue;
-	       agent_packet.state_agents.internal_map[other->first]=&other->second;
+	       if (agent->first==other->first || agents_visibility.at(agents_name_to_index.at(agent->first))->isVisible(sim_packet.state_agents.internal_map.at(agent->first).state,sim_packet.state_agents.internal_map.at(other->first).state))
+	       { 
+		agent_packet.state_agents.internal_map[other->first]=&other->second;
+	       }
+	       else
+	       {
+		  continue;
+	       
+	       }
 	    }
 
 	     //communicator->send_target(agent_packet,agent->first);
-	     communicator->send_target(sim_packet,agent->first);
+	     communicator->send_target(agent_packet,agent->first);
 	    }
 	    
 	    
@@ -301,7 +307,7 @@ simulator::~simulator()
 {
 	sim_packet.time=-10;
 	if (communicator)
-	  communicator->send_broadcast(sim_packet);
+	  communicator->send_broadcast(agent_packet);
 	
 	graph_router.join_thread();
 	

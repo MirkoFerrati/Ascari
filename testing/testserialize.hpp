@@ -55,7 +55,7 @@ public:
 	
 	
 	
-	agent_sim_packet_receive sim_packet;
+	agent_sim_packet_receiver sim_packet;
 	//alle boost sembra che non piacciano le reference in ricezione
 	
 

@@ -51,7 +51,7 @@ private:
     QProcess *simulator;
     boost::asio::io_service io_service;
     //std::vector<char> buffer;
-    world_sim_packet buffer;
+    agent_sim_packet_receiver buffer;
     std::map<std::string,monitor_packet> monitor_buffer;
     std::shared_ptr<std::mutex> mutex, monitor_mutex;
     void openFile();

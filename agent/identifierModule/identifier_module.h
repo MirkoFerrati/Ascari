@@ -37,6 +37,7 @@ private:
     std::map <std::string,int> index_behaviors;
     std::map <std::string,std::vector< bool >> identifier_matrix;
     world_sim_packet old_sensed_agents;
+    agent_sim_packet agent_packet;//TODO CONTROLLARE QUI
     const std::map<int,double> & sensed_bonus_variables;
     const std::map<std::string,int> & map_bonus_variables_to_id;
     const std::map<std::string,agent_state_packet> &sensed_state_agents;

@@ -19,7 +19,7 @@ class Viewer : public QWidget
 
   public:
     //Viewer(const std::vector< char >& buffer, boost::asio::io_service& io_service, QWidget* parent = 0, int view_type=0, std::string graphName="");
-    Viewer(const world_sim_packet& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent=0, int view_type=0, std::string graphName="");
+    Viewer(const agent_sim_packet_receiver& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent=0, int view_type=0, std::string graphName="");
     
     ~Viewer();
     void setScalingFactor(double scalingFactorX, double scalingFactorY);
@@ -53,7 +53,7 @@ protected:
     QImage immagine;
     QPixmap pixmap;
     //const std::vector<char>& buffer;
-    const world_sim_packet& infos;
+    const agent_sim_packet_receiver& infos;
     std::shared_ptr<std::mutex> mutex;
 	std::map<std::string,monitor_packet> *monitor_read;
 	std::shared_ptr<std::mutex > monitor_read_mutex;

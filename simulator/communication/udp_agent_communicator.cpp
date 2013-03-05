@@ -21,13 +21,13 @@ std::vector< control_command_packet > udp_agent_communicator::receive_control_co
 }
 
 
-void udp_agent_communicator::send_broadcast(const world_sim_packet& infos)
+void udp_agent_communicator::send_broadcast(const agent_sim_packet& infos)
 {
 	state_sender.send(infos);
 }
 
 
-void udp_agent_communicator::send_target(const world_sim_packet&  infos, const target_abstract& /*target*/)
+void udp_agent_communicator::send_target(const agent_sim_packet&  infos, const target_abstract& /*target*/)
 {
 
 }

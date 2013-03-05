@@ -19,13 +19,13 @@ std::vector< control_command_packet > zmq_agent_communicator::receive_control_co
 	return receive();
 }
 
-void zmq_agent_communicator::send_broadcast(const world_sim_packet& infos)
+void zmq_agent_communicator::send_broadcast(const agent_sim_packet& infos)
 {
 	send(infos);
 }
 
 
-void zmq_agent_communicator::send_target(const world_sim_packet& infos, const target_abstract& target)
+void zmq_agent_communicator::send_target(const agent_sim_packet& infos, const target_abstract& target)
 {
     send(infos,target);
 }

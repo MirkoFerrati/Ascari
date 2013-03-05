@@ -7,7 +7,7 @@ using namespace std;
 
 identifier_module::identifier_module ( Parsed_World const& W, const std::map<int, double> & sensed_bonus_variables, const std::map<std::string, int> & map_bonus_variables_to_id,
                                        const std::map<std::string, agent_state_packet> &sensed_state_agents, const simulation_time& sensed_time, std::string owner ) :
-  parsed_world ( W ),owner ( owner ), sensed_bonus_variables ( sensed_bonus_variables ), map_bonus_variables_to_id ( map_bonus_variables_to_id ), sensed_state_agents ( sensed_state_agents ), sensed_time ( sensed_time ) 
+  parsed_world ( W ),owner ( owner ), sensed_bonus_variables ( sensed_bonus_variables ), map_bonus_variables_to_id ( map_bonus_variables_to_id ), sensed_state_agents ( sensed_state_agents ), sensed_time ( sensed_time ), agent_packet(old_sensed_agents.bonus_variables,old_sensed_agents.time)
 {
   int i = 0;
   ncicli = 0;
@@ -169,7 +169,7 @@ for ( auto & agent_name: sim_agents )
             }
           //Evolvo il singolo dummy
           std::forward_list<dummy_state> tmp_states;
-          communicator->send ( &old_sensed_agents );
+          communicator->send ( &agent_packet );//TODO CONTROLLARE QUI
           for ( auto dummystate = ( *dummy_ref )->getDummyStates().begin(); dummystate != ( *dummy_ref )->getDummyStates().end(); ++dummystate )
             {
               if ( ! ( ( ncicli % update_after ) == 0 ) )

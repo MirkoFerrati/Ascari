@@ -439,14 +439,15 @@ public:
             std::cout<<receive<<std::endl;
 	    std::string tmp;
 	    std::istringstream iss(receive);
-	    iss >> tmp >> tmp;
-            std::istringstream receive_stream (tmp);
+	    iss >> tmp; 
+// 	    std::cout<<tmp<<std::endl;
+//             std::istringstream receive_stream (tmp);
                // std::string ( receive, receive_buffer.size() ) );
-            boost::archive::text_iarchive archive ( receive_stream );
+            boost::archive::text_iarchive archive ( iss );
             archive >> packet;
             results.push_back ( packet );
             subscribers++;
-            
+        
           
         }
         return results;

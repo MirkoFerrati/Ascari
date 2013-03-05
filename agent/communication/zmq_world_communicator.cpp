@@ -7,7 +7,7 @@ zmq_world_communicator::zmq_world_communicator(std::string agent_name)
 }
 
 
-world_sim_packet zmq_world_communicator::receive_agents_status()
+agent_sim_packet_receiver zmq_world_communicator::receive_agents_status()
 {
   try{
 return receive().front(); //TODO(Mirko): zerocopy here

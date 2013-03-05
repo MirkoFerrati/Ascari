@@ -23,7 +23,7 @@ public:
     
     
     
-    world_sim_packet receive_agents_status(){
+    agent_sim_packet_receiver receive_agents_status(){
     
       if (buf_agents!=0)
 	  return *buf_agents;
@@ -37,9 +37,9 @@ public:
     };
     
     
-    void send ( world_sim_packet* infos) {
-      
-      buf_agents = infos;
+    void send ( agent_sim_packet* infos) {
+      //TODO RISCRIVERe
+      //buf_agents = infos;
     };
     
     void send_control_command (control_command_packet& control_command, const target_abstract& /*target*/)
@@ -61,7 +61,7 @@ public:
     
 public:
 
-  world_sim_packet *buf_agents;
+  agent_sim_packet_receiver *buf_agents;
   std::map<std::string, control_command_packet > buffer_control;
   
 };
