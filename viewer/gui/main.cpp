@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
         QApplication app(argc,argv);
         boost::asio::io_service io_service;
         std::vector<char> buffer;
-        agent_sim_packet_receiver read;
+        world_sim_packet read;
 	std::map<std::string,monitor_packet> monitor_read;
 	std::shared_ptr<std::mutex> read_mutex(new std::mutex);
 	std::shared_ptr<std::mutex> monitor_read_mutex(new std::mutex);
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
         Viewer window(read,read_mutex,NULL,viewerType,graphName);
 	
         udp_world_sniffer sniffer(buffer,io_service);
-	zmq_world_sniffer<agent_sim_packet_receiver> sniffer_test(read,read_mutex);
+	zmq_world_sniffer<world_sim_packet> sniffer_test(read,read_mutex);
 	std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
 	if (viewerType==5)
 	{

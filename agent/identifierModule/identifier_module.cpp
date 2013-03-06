@@ -133,10 +133,9 @@ void identifier_module::run_plugin()
   //controllo il tempo
   assert ( sensed_time - old_sensed_agents.time > 0.001 );
   ncicli++;
-  if ( ncicli < 2 )
-    {
-      return;
-    }
+  if ( ncicli > 2 )
+    {//salto alcuni cicli iniziali. In fondo aggiorno le strutture dati che mi servono
+     
 
   if ( mon_debug_mode == 1 )
     {
@@ -152,6 +151,8 @@ for ( auto & agent_name: sim_agents )
           agent_name.second.clear();
         }
     }
+    
+    communicator->send (agent_packet);
 
   //Evolvo gli agenti
   for ( auto agent = sim_agents.begin(); agent != sim_agents.end(); ++agent )
@@ -172,7 +173,7 @@ for ( auto & agent_name: sim_agents )
           std::forward_list<dummy_state> tmp_states;
 	  
 	 
-          communicator->send ( &agent_packet );
+          //communicator->send ( &agent_packet ); lo porto fuori tanto è uguale per tutti
           for ( auto dummystate = ( *dummy_ref )->getDummyStates().begin(); dummystate != ( *dummy_ref )->getDummyStates().end(); ++dummystate )
             {
               if ( ! ( ( ncicli % update_after ) == 0 ) )
@@ -277,6 +278,9 @@ for ( const auto & sensed_agent: sensed_state_agents )
           //la funzione create_agents
         }
     }
+    
+    }
+    
   //Aggiorno la struttura dati old_sensed_agents
   for ( auto it = map_bonus_variables_to_id.begin(); it != map_bonus_variables_to_id.end(); ++it )
     {

@@ -45,6 +45,7 @@ public:
     {
         assert ( sock_recv_type == ZMQ_PULL || sock_recv_type == ZMQ_SUB );
         assert ( sock_send_type == ZMQ_PUSH || sock_send_type == ZMQ_PUB );
+	clientsNamed=false;
         initialized = false;
         receive_buffer.rebuild ( MAX_PACKET_LENGTH );
         send_buffer.rebuild ( MAX_PACKET_LENGTH );
@@ -196,7 +197,8 @@ protected:
         message.rebuild ( MAX_PACKET_LENGTH );
         try
         {
-            bool rc = sync_socket->recv ( &message,ZMQ_NOBLOCK );
+            //bool rc = sync_socket->recv ( &message,ZMQ_NOBLOCK );TODO(MIRKO). QUI HO RIPRISTINATO
+            bool rc = sync_socket->recv ( &message);
 	    if (rc)
 	    {
             char* receive = reinterpret_cast<char*> ( message.data() );
@@ -264,7 +266,7 @@ protected:
         if ( sock_recv_type == ZMQ_SUB )
         {
 	  if (filter)
-            receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, owner_name.c_str(), owner_name.length()+1 );
+            receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, owner_name.data(), strlen(owner_name.data()) );
 	  else
 	    receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, "", 0 );
         }
@@ -451,7 +453,7 @@ public:
             
               char* receive = reinterpret_cast<char*> ( receive_buffer.data() );
 	    //TODO(Mirko): codice brutto, migliorare
-            std::cout<<receive<<std::endl;
+            //std::cout<<receive<<std::endl;
 	    std::string tmp;
 	    std::istringstream iss(receive);
 	    iss >> tmp; 

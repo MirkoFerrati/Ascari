@@ -293,7 +293,7 @@ bool MainWindow::startViewer()
 	}
         if (!sniffer)
         {
-            sniffer=std::unique_ptr<zmq_world_sniffer<agent_sim_packet_receiver> > (new zmq_world_sniffer<agent_sim_packet_receiver> ( buffer,mutex ));
+            sniffer=std::unique_ptr<zmq_world_sniffer<world_sim_packet> > (new zmq_world_sniffer<world_sim_packet> ( buffer,mutex ));
             sniffer->start_receiving();
         }
         else

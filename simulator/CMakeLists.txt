@@ -1,7 +1,7 @@
 
 
 add_executable(simulator collisionchecker.cpp ../shared/dynamic.cpp 
-communication/udp_agent_communicator.cpp simulator.cpp main.cpp 
+communication/udp_agent_communicator.cpp simulator.cpp main.cpp communication/zmq_viewer_communicator.hpp
 communication/agent_communicator_abstract.h ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp 
 communication/zmq_agent_communicator.cpp ../shared/communication/global.cpp visibility/visibility.cpp
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/zmq_communicator.hpp communication/task_assignment_router.hpp

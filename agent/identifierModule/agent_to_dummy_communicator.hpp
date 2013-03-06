@@ -13,20 +13,19 @@ public:
     
     agent_to_dummy_communicator ()
     {
-     buf_agents=0;
     };
     
     ~agent_to_dummy_communicator (){
       buffer_control.clear();
-
+      
     };
     
     
     
     agent_sim_packet_receiver receive_agents_status(){
     
-      if (buf_agents!=0)
-	  return *buf_agents;
+      if (buf_agents.time!=0)
+	  return buf_agents;
       else
       {
 	ERR("MONITOR: ESEGUITA RECEIVE PRIMA DI UNA SEND",NULL);
@@ -37,9 +36,14 @@ public:
     };
     
     
-    void send ( agent_sim_packet* infos) {
-      //TODO RISCRIVERe
-      //buf_agents = infos;
+    void send ( agent_sim_packet& infos) {
+
+      buf_agents.bonus_variables=infos.bonus_variables;
+      buf_agents.time=infos.time;
+      
+      for (auto agent=infos.state_agents.internal_map.begin();agent!=infos.state_agents.internal_map.end();agent++){
+	buf_agents.state_agents.internal_map[agent->first]=(agent->second);
+      }
     };
     
     void send_control_command (control_command_packet& control_command, const target_abstract& /*target*/)
@@ -61,7 +65,7 @@ public:
     
 public:
 
-  agent_sim_packet_receiver *buf_agents;
+  agent_sim_packet_receiver buf_agents;
   std::map<std::string, control_command_packet > buffer_control;
   
 };

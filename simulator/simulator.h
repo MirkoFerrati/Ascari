@@ -1,6 +1,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 #include "communication/agent_communicator_abstract.h"
+#include "communication/viewer_communicator_abstract.h"
 #include "yaml_parser.h"
 #include "dynamic.h"
 #include <vector>
@@ -35,6 +36,7 @@ private:
 	CollisionCheckerAbstract *collisionChecker;
 	std::vector<dynamic*> dynamic_module;
 	simulator_namespace::agent_communicator_abstract* communicator;
+	simulator_namespace::viewer_communicator_abstract* viewer_communicator;
 	world_sim_packet sim_packet;
 	agent_sim_packet agent_packet;
 	index_map agent_states_to_index;

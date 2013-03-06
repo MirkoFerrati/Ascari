@@ -28,6 +28,18 @@ public:
 	}
 };
 
+
+template <class receive_type,class send_type>
+class zmq_simulator_to_viewer_communicator: 
+public zmq_communicator<receive_type,send_type,ZMQ_PUB,ZMQ_PULL,NO_SYNC>
+{
+public:
+  void init(unsigned int expected_senders=1)
+  {
+    this->init_full("simulator",false,"tcp://127.0.0.1:5558","tcp://127.0.0.1:5559","",expected_senders,true,true);
+  }
+};
+
 template <class receive_type>
 class zmq_sniffer_simulator_communicator : 
 public zmq_receive_communicator<receive_type,ZMQ_SUB>
@@ -35,7 +47,7 @@ public zmq_receive_communicator<receive_type,ZMQ_SUB>
 public:
 	void init(std::string agent_name)
 	{
-		this->init_full(agent_name,false,"tcp://127.0.0.1:5555",1,false);
+		this->init_full(agent_name,false,"tcp://127.0.0.1:5559",1,false);
 	}
 };
 

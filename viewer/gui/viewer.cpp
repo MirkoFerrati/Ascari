@@ -33,7 +33,7 @@ using namespace std;
 //   init(graphName);
 // }
 
-Viewer::Viewer ( const agent_sim_packet_receiver& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent, int view_type, std::string graphName ) :
+Viewer::Viewer ( const world_sim_packet& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent, int view_type, std::string graphName ) :
     QWidget ( parent ),view_type ( view_type ),infos ( read ), mutex ( read_mutex )
 {
     length=0;
@@ -441,9 +441,9 @@ void Viewer::timerEvent ( QTimerEvent */*event*/ )
         }
     */
     mutex->lock();
-    for ( map<string, agent_state_packet*>::const_iterator it=infos.state_agents.internal_map.begin(); it!=infos.state_agents.internal_map.end(); ++it )
+    for ( map<string, agent_state_packet>::const_iterator it=infos.state_agents.internal_map.begin(); it!=infos.state_agents.internal_map.end(); ++it )
     {
-        agents[it->first].translate ( *(it->second) );
+        agents[it->first].translate ( (it->second) );
         //setScalingFactor(agents[it->first].getMaxX()-agents[it->first].getMinX(),agents[it->first].getMaxY()-agents[it->first].getMinY());
         //setTranslateFactor((agents[it->first].getMaxX()+agents[it->first].getMinX())/2,(agents[it->first].getMaxY()+agents[it->first].getMinY())/2);
         setScalingAndTranslateFactor ( agents[it->first].getMaxX(),agents[it->first].getMinX(),agents[it->first].getMaxY(),agents[it->first].getMinY() );

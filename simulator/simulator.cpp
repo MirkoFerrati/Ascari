@@ -5,6 +5,8 @@
 #include "debug_constants.h"
 #include <udp_agent_router.hpp>
 #include <zmq_agent_communicator.h>
+#include <zmq_viewer_communicator.hpp>
+
 #include "collisionchecker.h"
 #include "visibility/visibility.h"
 
@@ -31,6 +33,7 @@ void simulator::create_communicator(int communicator_type)
 simulator::simulator():agent_packet(sim_packet.bonus_variables,sim_packet.time),
 topology_router(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT),graph_router(SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT)
 {
+	viewer_communicator=new zmq_viewer_communicator();
 	max_loops=0;
 	communicator=0;
 	num_agents=0;
@@ -217,6 +220,7 @@ void simulator::main_loop()
 	    }
 	    
 	    
+	    viewer_communicator->send_target(sim_packet,"viewer");
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 	    
 	    //written by Alessandro Settimi
