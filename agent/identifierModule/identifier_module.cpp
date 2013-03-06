@@ -143,6 +143,7 @@ void identifier_module::run_plugin()
       std::cout << "Modulo Identificatore" << ncicli << std::endl;
     }
 
+    
   //Elimino gli agenti che non vedo più
 for ( auto & agent_name: sim_agents )
     {
@@ -169,7 +170,9 @@ for ( auto & agent_name: sim_agents )
             }
           //Evolvo il singolo dummy
           std::forward_list<dummy_state> tmp_states;
-          communicator->send ( &agent_packet );//TODO CONTROLLARE QUI
+	  
+	 
+          communicator->send ( &agent_packet );
           for ( auto dummystate = ( *dummy_ref )->getDummyStates().begin(); dummystate != ( *dummy_ref )->getDummyStates().end(); ++dummystate )
             {
               if ( ! ( ( ncicli % update_after ) == 0 ) )
@@ -280,10 +283,14 @@ for ( const auto & sensed_agent: sensed_state_agents )
       old_sensed_agents.bonus_variables.insert ( make_pair ( it->first, sensed_bonus_variables.at ( it->second ) ) );
     }
 
-  old_sensed_agents.state_agents.internal_map = sensed_state_agents;
   old_sensed_agents.time = sensed_time;
-
-}
+  old_sensed_agents.state_agents.internal_map = sensed_state_agents;
+  
+  agent_packet.state_agents.internal_map.clear();
+  for (auto agent= old_sensed_agents.state_agents.internal_map.begin();agent!=old_sensed_agents.state_agents.internal_map.end();agent++){
+  agent_packet.state_agents.internal_map[agent->first]=&(agent->second);
+    
+}}
 
 identifier_module::~identifier_module()
 {

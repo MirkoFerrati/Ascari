@@ -13,7 +13,7 @@ public zmq_communicator<receive_type,send_type,ZMQ_PUSH,ZMQ_SUB,ASK_SYNC>
 public:
 	void init(std::string agent_name)
 	{
-		this->init_full(agent_name,false,"tcp://127.0.0.1:5555","tcp://127.0.0.1:5556","tcp://127.0.0.1:5557",1,false,false);
+		this->init_full(agent_name,true,"tcp://127.0.0.1:5555","tcp://127.0.0.1:5556","tcp://127.0.0.1:5557",1,false,false);
 	}
 };
 
