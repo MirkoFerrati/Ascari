@@ -422,7 +422,10 @@ protected:
 
         if ( sock_recv_type == ZMQ_SUB )
         {
-            receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, "", 0 );
+           if (filter)
+            receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, owner_name.data(), strlen(owner_name.data()) );
+	  else
+	    receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, "", 0 );
         }
         int temp = 0;
         receiver_socket.setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );

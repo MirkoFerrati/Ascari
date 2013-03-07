@@ -45,9 +45,9 @@ class zmq_sniffer_simulator_communicator :
 public zmq_receive_communicator<receive_type,ZMQ_SUB>
 {
 public:
-	void init(std::string agent_name)
+	void init(std::string owner_name)
 	{
-		this->init_full(agent_name,false,"tcp://127.0.0.1:5559",1,false);
+		this->init_full(owner_name,true,"tcp://127.0.0.1:5559",1,false);
 	}
 };
 
