@@ -22,7 +22,7 @@ public:
     
     
     
-    agent_sim_packet_receiver receive_agents_status(){
+    const world_sim_packet& receive_agents_status(){
     
       if (buf_agents.time!=0)
 	  return buf_agents;
@@ -37,12 +37,12 @@ public:
     
     
     void send ( agent_sim_packet& infos) {
-
+      buf_agents.state_agents.internal_map.clear();
       buf_agents.bonus_variables=infos.bonus_variables;
       buf_agents.time=infos.time;
       
       for (auto agent=infos.state_agents.internal_map.begin();agent!=infos.state_agents.internal_map.end();agent++){
-	buf_agents.state_agents.internal_map[agent->first]=(agent->second);
+	buf_agents.state_agents.internal_map[agent->first]=*(agent->second);
       }
     };
     
@@ -65,7 +65,7 @@ public:
     
 public:
 
-  agent_sim_packet_receiver buf_agents;
+  world_sim_packet buf_agents;
   std::map<std::string, control_command_packet > buffer_control;
   
 };

@@ -20,7 +20,7 @@ udp_world_communicator::~udp_world_communicator()
 
 
 
-agent_sim_packet_receiver udp_world_communicator::receive_agents_status()
+const world_sim_packet& udp_world_communicator::receive_agents_status()
 {
 	return world_sim_receiver.receive();
 }

@@ -311,13 +311,13 @@ void agent::main_loop()
 {
 
     // 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
-    agent_sim_packet_receiver temp = world_comm->receive_agents_status();
+    world_sim_packet temp = world_comm->receive_agents_status();
     auto agent=state_other_agents.begin();
     while (agent!=state_other_agents.end())
     {
         if ( temp.state_agents.internal_map.find ( agent->first ) !=temp.state_agents.internal_map.end() )
         {
-            agent->second=*temp.state_agents.internal_map[agent->first];
+            agent->second=temp.state_agents.internal_map[agent->first];
             temp.state_agents.internal_map.erase ( temp.state_agents.internal_map.find ( agent->first ) );
 	    agent++;
         }
@@ -331,7 +331,7 @@ void agent::main_loop()
     
     for ( auto agent=temp.state_agents.internal_map.begin(); agent!=temp.state_agents.internal_map.end(); agent++ )
     {
-            state_other_agents[agent->first]=(*agent->second);
+            state_other_agents[agent->first]=(agent->second);
         
     }
     

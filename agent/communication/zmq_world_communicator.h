@@ -9,12 +9,12 @@ public zmq_agent_to_simulator_communicator<agent_sim_packet_receiver,control_com
 {
 public:
 zmq_world_communicator(std::string agent_name);
-agent_sim_packet_receiver receive_agents_status();
+const world_sim_packet& receive_agents_status();
 void send_control_command( control_command_packet& packet, const target_abstract& );
 ~zmq_world_communicator();
 
 private:
-
+world_sim_packet packet_received;
 
 };
 
