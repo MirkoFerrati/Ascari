@@ -55,7 +55,7 @@ agent::agent ( int agent_index,const Parsed_World& world, bool noStart ) :
     if ( world.agents.at ( agent_index ).monitoring )
     {
 
-        Plugin_module *monitor=new identifier_module ( world,bonusVariables,map_bonus_variables_to_id,state_other_agents,time,identifier );
+        Plugin_module *monitor=new identifier_module ( world,bonusVariables,map_bonus_variables_to_id,world_comm,time,identifier );
         plugins.push_back ( monitor );
     }
 
@@ -311,29 +311,8 @@ void agent::main_loop()
 {
 
     // 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
-    world_sim_packet temp = world_comm->receive_agents_status();
-    auto agent=state_other_agents.begin();
-    while (agent!=state_other_agents.end())
-    {
-        if ( temp.state_agents.internal_map.find ( agent->first ) !=temp.state_agents.internal_map.end() )
-        {
-            agent->second=temp.state_agents.internal_map[agent->first];
-            temp.state_agents.internal_map.erase ( temp.state_agents.internal_map.find ( agent->first ) );
-	    agent++;
-        }
-
-        else
-        {
-            agent=state_other_agents.erase ( agent );
-        }
-
-    }
+    const world_sim_packet& temp = world_comm->receive_agents_status();
     
-    for ( auto agent=temp.state_agents.internal_map.begin(); agent!=temp.state_agents.internal_map.end(); agent++ )
-    {
-            state_other_agents[agent->first]=(agent->second);
-        
-    }
     
     //state_other_agents.swap(temp.state_agents.internal_map);//TODO(Mirko): si possono evitare le copie e gli swap?
     time=temp.time;
@@ -346,8 +325,8 @@ void agent::main_loop()
 
 
     //TODO(Mirko): questo ciclo for copia informazioni che in teoria gia' abbiamo, forse non vale la pena di usare la variabile state
-    for ( map<int,double>::const_iterator it=state_other_agents.at ( identifier ).state.begin();
-            it!=state_other_agents.at ( identifier ).state.end(); ++it )
+    for ( map<int,double>::const_iterator it=temp.state_agents.internal_map.at ( identifier ).state.begin();
+            it!=temp.state_agents.internal_map.at ( identifier ).state.end(); ++it )
     {
         state.at ( it->first ) =it->second;
     }
@@ -361,7 +340,7 @@ void agent::main_loop()
     }
 
     sleep ( 0 );
-    encoder->computeSubEvents ( state_other_agents );
+    encoder->computeSubEvents ( temp.state_agents.internal_map );
     event_decoder.decode();
 
     /*!

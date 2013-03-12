@@ -20,7 +20,9 @@ public:
       
     };
     
-    
+     const world_sim_packet& get_last_received(){
+       throw "PERCHE? MI HAI CHIAMATO?";
+     }
     
     const world_sim_packet& receive_agents_status(){
     

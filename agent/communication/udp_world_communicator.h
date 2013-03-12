@@ -17,6 +17,7 @@ class udp_world_communicator: public agent_namespace::world_communicator_abstrac
 {
 public:
 	const world_sim_packet& receive_agents_status();
+	const world_sim_packet& get_last_received(){throw "NOT IMPLEMENTED"; };
 	void send_control_command(control_command_packet& command, const target_abstract& target);
 	udp_world_communicator();
 // 	~udp_world_communicator();

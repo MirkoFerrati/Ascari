@@ -6,13 +6,20 @@ using namespace std;
 
 
 identifier_module::identifier_module ( Parsed_World const& W, const std::map<int, double> & sensed_bonus_variables, const std::map<std::string, int> & map_bonus_variables_to_id,
-                                       const std::map<std::string, agent_state_packet> &sensed_state_agents, const simulation_time& sensed_time, std::string owner ) :
-  parsed_world ( W ),owner ( owner ), sensed_bonus_variables ( sensed_bonus_variables ), map_bonus_variables_to_id ( map_bonus_variables_to_id ), sensed_state_agents ( sensed_state_agents ), sensed_time ( sensed_time ), agent_packet(old_sensed_agents.bonus_variables,old_sensed_agents.time)
+                                       std::shared_ptr<agent_namespace::world_communicator_abstract>& comm, const simulation_time& sensed_time, std::string owner ) :
+  parsed_world ( W ),owner ( owner ),agent_world_comm(comm),  agent_packet(old_sensed_agents.bonus_variables,old_sensed_agents.time),sensed_bonus_variables ( sensed_bonus_variables ),
+  map_bonus_variables_to_id ( map_bonus_variables_to_id ),sensed_time ( sensed_time )
 {
   int i = 0;
   ncicli = 0;
+  
+ 
+  
+  
   communicator = std::make_shared<agent_to_dummy_communicator>();
+  
   viewer_comm = new identifierModule_communicator<monitor_packet> ( packet_viewer, owner );
+  
   packet_viewer.id = owner;
 
 for ( auto const & behavior: W.behaviors )
@@ -130,6 +137,10 @@ void identifier_module::run_plugin()
    * Aggiorno la struttura dati old_sensed_agents
    */
 
+  const std::map<std::string,agent_state_packet> &sensed_state_agents=agent_world_comm->get_last_received().state_agents.internal_map; 
+    
+  
+  
   //controllo il tempo
   assert ( sensed_time - old_sensed_agents.time > 0.001 );
   ncicli++;
@@ -142,7 +153,7 @@ void identifier_module::run_plugin()
       std::cout << "Modulo Identificatore" << ncicli << std::endl;
     }
 
-    
+   
   //Elimino gli agenti che non vedo più
 for ( auto & agent_name: sim_agents )
     {
@@ -294,7 +305,9 @@ for ( const auto & sensed_agent: sensed_state_agents )
   for (auto agent= old_sensed_agents.state_agents.internal_map.begin();agent!=old_sensed_agents.state_agents.internal_map.end();agent++){
   agent_packet.state_agents.internal_map[agent->first]=&(agent->second);
     
-}}
+}
+  
+}
 
 identifier_module::~identifier_module()
 {

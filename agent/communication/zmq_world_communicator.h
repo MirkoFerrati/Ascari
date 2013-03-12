@@ -11,6 +11,11 @@ public:
 zmq_world_communicator(std::string agent_name);
 const world_sim_packet& receive_agents_status();
 void send_control_command( control_command_packet& packet, const target_abstract& );
+inline const world_sim_packet& get_last_received()
+{
+  return packet_received;
+  
+}
 ~zmq_world_communicator();
 
 private:
