@@ -70,7 +70,7 @@ protected:
 	agent_state state;
 	index_map map_statename_to_id;
 	
-	std::map<std::string, agent_state_packet> state_other_agents;
+	//std::map<std::string, agent_state_packet> state_other_agents;
 	
 	
 	std::map<int,double> bonusVariables;
