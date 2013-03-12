@@ -380,7 +380,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
         {
 			painter.scale(2,2);
             painter.drawConvexPolygon(hourHand, 3);
-			if (view_type==2 || view_type==4)
+			if (view_type==2 || view_type==4 || view_type==5)
 			{
 				painter.save();
 				painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
@@ -394,10 +394,14 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 	    if ( view_type==5 && monitor )
             {
                 painter.save();
+		painter.setBrush(Qt::NoBrush);
+
                 QPen pen;
                 pen.setColor ( QColor ( "blue" ) );
                 pen.setStyle ( Qt::DashLine );
                 painter.setPen ( pen );
+		painter.drawEllipse(QPointF(it->second.x,it->second.y),RADIUS,RADIUS);
+
 		monitor_read_mutex->lock();
                 if ( monitor_read->count ( it->first ) )
                 {

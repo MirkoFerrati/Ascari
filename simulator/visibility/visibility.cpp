@@ -30,8 +30,10 @@ create(vis,map_statename);
 
 bool circle::isVisible ( const agent_state& me, const agent_state& other )
 {
-      return pow ( me.at ( first_axis )-other.at ( first_axis ),2 ) +pow ( me.at ( second_axis )-other.at ( second_axis ),2 ) <pow ( radius,2 );
-
+//   std::cout<<"x="<<me.at ( first_axis )<<" y="<<me.at ( second_axis )<<" other x="<<other.at ( first_axis )<<" other y="<<other.at ( second_axis );
+      bool temp= pow ( me.at ( first_axis )-other.at ( first_axis ),2 ) +pow ( me.at ( second_axis )-other.at ( second_axis ),2 ) <pow ( radius,2 );
+//    std::cout<<"visible="<<temp<<std::endl;
+   return temp;
 }
 
 
