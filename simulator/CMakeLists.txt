@@ -25,6 +25,7 @@ target_link_libraries(simulator zmq)
  find_package(Boost REQUIRED system thread serialization)
  
 target_link_libraries(simulator ${Boost_LIBRARIES} pthread)
+target_link_libraries(simulator ${Boost_LIBRARIES} boost_regex)
 target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
 
 

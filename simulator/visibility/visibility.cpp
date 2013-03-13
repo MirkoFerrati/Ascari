@@ -1,7 +1,22 @@
 #include "visibility.h"
+#include <boost/regex.hpp>
 
 std::shared_ptr< visibleArea > visibleArea::createVisibilityFromParsedVisibleArea ( std::string parsed_visibility, index_map map_statename_to_id )
 {
+  
+    
+     const boost::regex pattern("\\w+\\(\\w+,\\w+,(\\d+\\.{0,1}\\d*)\\)");
+     
+     
+    if(boost::regex_match(parsed_visibility.begin(),parsed_visibility.end(), pattern)==false){
+     
+	  ERR ( "VISIBLE AREA INCORRECTLY SPECIFIED",NULL );
+	  throw "VISIBLE AREA INCORRECTLY SPECIFIED";
+      
+    }
+    
+    
+  
     std::vector<std::string> result;
     std::stringstream  data ( parsed_visibility );
     std::string line;

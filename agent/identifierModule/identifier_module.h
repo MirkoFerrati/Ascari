@@ -10,9 +10,9 @@
 #include "identifierModule_communicator.hpp"
 #include "dummy_agent.hpp"
 
-#define tol 0.5
+#define tol 1
 #define mon_debug_mode 1
-#define update_after 5
+#define update_after 10
 
 
 class identifier_module: public Plugin_module

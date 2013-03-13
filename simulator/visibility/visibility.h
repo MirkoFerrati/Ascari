@@ -86,7 +86,7 @@ private:
         first_axis=map_statename.at ( result.at ( 0 ) );
         second_axis=map_statename.at ( result.at ( 1 ) );
         radius=atof ( result.at ( 2 ).c_str() ) ;
-	std::cout<<"x="<<first_axis<<" y="<<second_axis<<" r="<<radius;
+	
 
     }
 

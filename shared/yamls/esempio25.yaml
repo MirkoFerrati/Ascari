@@ -66,8 +66,8 @@
         v: 3
         w: '(sin(atan2(dim/2-y,dim/2-x)-theta)+0.01)%pi'
       - name: LEFT
-        v: 3
-        w: 0.5
+        v: 5
+        w: -0.5
       DISCRETE_STATES:
       - name: FAST
         controller: FAST
@@ -78,7 +78,7 @@
       ENCODER:
       - TOPOLOGY:
           - topology: [co]            
-            co: '0'
+            co: 'abs(atan2(yi-y,xi-x)%(2*pi)-theta%(2*pi))<angle and (x-xi)*(x-xi)+(y-yi)*(y-yi)<(dst+100)*(dst+100) '
         LAMBDA:
           - lambda: [L1,out]
             out: '(x>600 or x<0 or y>600 or y<0)'
