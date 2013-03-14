@@ -12,7 +12,7 @@
 
 #define tol 1
 #define mon_debug_mode 1
-#define update_after 10
+#define update_after 5
 
 
 class identifier_module: public Plugin_module

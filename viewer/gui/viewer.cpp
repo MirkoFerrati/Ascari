@@ -400,7 +400,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
                 pen.setColor ( QColor ( "blue" ) );
                 pen.setStyle ( Qt::DashLine );
                 painter.setPen ( pen );
-		painter.drawEllipse(QPointF(it->second.x,it->second.y),RADIUS,RADIUS);
+		//painter.drawEllipse(QPointF(it->second.x,it->second.y),RADIUS,RADIUS);
 
 		monitor_read_mutex->lock();
                 if ( monitor_read->count ( it->first ) )

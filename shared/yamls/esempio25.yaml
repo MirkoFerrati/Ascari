@@ -64,7 +64,7 @@
         w: 0
       - name: BACK
         v: 3
-        w: '(sin(atan2(dim/2-y,dim/2-x)-theta)+0.01)%pi'
+        w: '0.5+(sin(atan2(dim/2-y,dim/2-x)-theta)+0.01)%pi'
       - name: LEFT
         v: 5
         w: -0.5
@@ -107,10 +107,10 @@
   - bonus_variables: [dim,dst,angle]
     dim: 500
     dst: 50
-    angle: 1.5
+    angle: 1.1
   AGENTS:
   - agent: Agente01
-    VISIBLE_AREA: circle(x,y,100)
+    VISIBLE_AREA: circle(x,y,300)
     COMMUNICATION_AREA:  circle(10)
     MONITORING: 0
     #COLLABORATIVE = 1
@@ -119,14 +119,14 @@
     INITIAL:
     - &initial
       x: '42'
-      y: '24'
+      y: '124'
       theta: '-0.1'
     STATE_START: FAST
     BEHAVIOR: LGV-BAD
     
     
   - agent: Agente02
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,100)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]

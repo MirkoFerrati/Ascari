@@ -11,7 +11,7 @@
 #include <map>
 #include <fstream>
 
-#define max_visibility_radius 200
+#define max_visibility_radius 500
 
 class visibleArea
 {
