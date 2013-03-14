@@ -137,7 +137,9 @@ void identifier_module::run_plugin()
    * Aggiorno la struttura dati old_sensed_agents
    */
 
-  const std::map<std::string,agent_state_packet> &sensed_state_agents=agent_world_comm->get_last_received().state_agents.internal_map; 
+  
+  //semaforo di sincronizzazione sul comunicatore
+  const std::map<std::string,agent_state_packet> sensed_state_agents=agent_world_comm->get_last_received().state_agents.internal_map; 
     
   
   
@@ -145,8 +147,44 @@ void identifier_module::run_plugin()
   assert ( sensed_time - old_sensed_agents.time > 0.001 );
   ncicli++;
   if ( ncicli > 2 )
-    {//salto alcuni cicli iniziali. In fondo aggiorno le strutture dati che mi servono
-     
+    {
+      
+      //salto alcuni cicli iniziali. In fondo aggiorno le strutture dati che mi servono
+     simulate(sensed_state_agents);
+    }
+    
+  //Aggiorno la struttura dati old_sensed_agents
+  
+  //lock sul semaforo per le strutture dati 
+  
+  for ( auto it = map_bonus_variables_to_id.begin(); it != map_bonus_variables_to_id.end(); ++it )
+    {
+      old_sensed_agents.bonus_variables.insert ( make_pair ( it->first, sensed_bonus_variables.at ( it->second ) ) );
+    }
+
+  old_sensed_agents.time = sensed_time;
+  
+  //fine lock
+  
+  
+  old_sensed_agents.state_agents.internal_map = sensed_state_agents;
+  
+  
+  
+  
+  
+  
+  agent_packet.state_agents.internal_map.clear();
+  for (auto agent= old_sensed_agents.state_agents.internal_map.begin();agent!=old_sensed_agents.state_agents.internal_map.end();agent++){
+  agent_packet.state_agents.internal_map[agent->first]=&(agent->second);
+    
+}
+  
+}
+
+
+void identifier_module::simulate( const std::map<std::string,agent_state_packet> &sensed_state_agents){
+  
 
   if ( mon_debug_mode == 1 )
     {
@@ -290,23 +328,6 @@ for ( const auto & sensed_agent: sensed_state_agents )
         }
     }
     
-    }
-    
-  //Aggiorno la struttura dati old_sensed_agents
-  for ( auto it = map_bonus_variables_to_id.begin(); it != map_bonus_variables_to_id.end(); ++it )
-    {
-      old_sensed_agents.bonus_variables.insert ( make_pair ( it->first, sensed_bonus_variables.at ( it->second ) ) );
-    }
-
-  old_sensed_agents.time = sensed_time;
-  old_sensed_agents.state_agents.internal_map = sensed_state_agents;
-  
-  agent_packet.state_agents.internal_map.clear();
-  for (auto agent= old_sensed_agents.state_agents.internal_map.begin();agent!=old_sensed_agents.state_agents.internal_map.end();agent++){
-  agent_packet.state_agents.internal_map[agent->first]=&(agent->second);
-    
-}
-  
 }
 
 identifier_module::~identifier_module()

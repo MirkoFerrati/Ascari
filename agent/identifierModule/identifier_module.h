@@ -22,6 +22,7 @@ public:
     void addReservedVariables (exprtk::symbol_table< double >& arg1);
     void compileExpressions (exprtk::symbol_table< double >& arg1);
     void run_plugin();
+    void simulate( const std::map<std::string,agent_state_packet> &sensed_state_agents);
     identifier_module (Parsed_World const& W, const std::map<int,double> & sensed_bonus_variables, const std::map<std::string,int> & map_bonus_variables_to_id,
     std::shared_ptr<agent_namespace::world_communicator_abstract>& comm, const simulation_time & sensed_time,std::string owner);
     ~identifier_module();
@@ -29,8 +30,8 @@ public:
 
 private:
     void create_agents(std::string, const agent_state& );
-	const Parsed_World & parsed_world;
-    
+
+    const Parsed_World & parsed_world;
     std::string owner;
     std::shared_ptr<agent_to_dummy_communicator> communicator;
     std::shared_ptr<agent_namespace::world_communicator_abstract>& agent_world_comm;
