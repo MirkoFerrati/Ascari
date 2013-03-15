@@ -12,18 +12,15 @@ identifier_module::identifier_module ( Parsed_World const& W, const std::map<int
     map_bonus_variables_to_id ( map_bonus_variables_to_id ),sensed_time ( sensed_time )
 {
 
-
-
-    communicator = std::make_shared<agent_to_dummy_communicator>();
     cicli_plugin=0;
 
-
+    communicator = std::make_shared<agent_to_dummy_communicator>();
 
     mutex_sem1.lock();
-    simulate_thread=new std::thread ( &identifier_module::simulate,std::ref ( *this ),std::ref ( sensed_state_agents ), std::ref ( mutex_sem1 ), std::ref ( mutex_sem2 ), std::ref ( mutex_simulate_variable_access ),
-                                      std::ref ( parsed_world ),
-                                      std::ref ( communicator ),std::ref ( old_sensed_agents ), std::ref ( identifier_matrix ),std::ref ( owner ) );
 
+    simulate_thread=new std::thread ( &identifier_module::simulate,std::ref ( *this ),std::ref ( sensed_state_agents ), std::ref ( mutex_sem1 ), std::ref ( mutex_sem2 ),
+                                      std::ref ( mutex_simulate_variable_access ),std::ref ( parsed_world ),std::ref ( communicator ),std::ref ( old_sensed_agents ),
+                                      std::ref ( identifier_matrix ),std::ref ( owner ) );
 
 }
 
@@ -44,55 +41,19 @@ void identifier_module::compileExpressions ( exprtk::symbol_table< double >& /*s
 }
 
 
-void identifier_module::create_agents ( std::string agent_name, const agent_state& ref_state )
-{
-    /**
-     * Piu' o meno cosi':
-     * Creo la colonna della matrice relativa all'agente appena creato, se non esisteva gia'
-     * Se esisteva, vuol dire che ho gia' fatto un po' di identificazione, quindi ho gia' escluso qualche behavior
-     * for (behavior: World.behaviors)
-     * {
-     *  Se il behavior per l'agente appena creato non era gia' stato escluso, crea un nuovo dummy con quel behavior
-     *  Altrimenti vado al prossimo behavior
-     * }
-     *
-     */
 
-//     assert ( sim_agents[agent_name].empty() );
-//     if ( identifier_matrix[agent_name].empty() )
+
+// bool identifier_module::agentStatesAreConsistent ( const agent_state& first, const agent_state& second )
+// {
+//     for ( auto it = first.begin(); it != first.end(); it++ )
 //     {
-//         identifier_matrix[agent_name].resize ( index_behaviors.size(), true );
-//     }
-//
-// for ( auto const & behavior: parsed_world.behaviors )
-//     {
-//         if ( identifier_matrix[agent_name].at ( index_behaviors.at ( behavior.first ) ) )
-//         {
-//             dummy_agent* tmp_agent = new dummy_agent ( agent_name, behavior, index_behaviors.at ( behavior.first ), parsed_world, std::dynamic_pointer_cast<agent_namespace::world_communicator_abstract> ( communicator ), ref_state );
-//
-//             sim_agents[agent_name].push_front ( std::unique_ptr<dummy_agent> ( tmp_agent ) );
-//
-//
-//         }
+//         if ( abs ( it->second - second.at ( it->first ) ) > tol )
+//             return false;
 //
 //     }
-}
+//     return true;
+// }
 
-bool identifier_module::agentStatesAreConsistent ( const agent_state& first, const agent_state& second )
-{
-    for ( auto it = first.begin(); it != first.end(); it++ )
-    {
-        if ( abs ( it->second - second.at ( it->first ) ) > tol )
-            return false;
-
-    }
-    return true;
-}
-
-void identifier_module::printDebug()
-{
-
-}
 
 
 void identifier_module::run_plugin()
@@ -110,12 +71,16 @@ void identifier_module::run_plugin()
      */
 
     cicli_plugin++;
-    std::cout<<"Run_plugin: ciclo "<<cicli_plugin<<std::endl;
+    if ( mon_debug_mode == 1 )
+    {
+        std::cout<<"Run_plugin: ciclo "<<cicli_plugin<<std::endl;
+    }
 
-    if ( cicli_plugin<5 )
+
+    if ( cicli_plugin < 5 )
         return; //il primo e secondo pacchetto del simultaore sono uguali
 
-    
+
     //aggiorno il pacchetto con l'ultimo valore ricevuto dai sensori
     for ( auto it = map_bonus_variables_to_id.begin(); it != map_bonus_variables_to_id.end(); ++it )
     {
@@ -124,46 +89,46 @@ void identifier_module::run_plugin()
 
     last_sensed_agents.time = sensed_time;
     last_sensed_agents.state_agents.internal_map = agent_world_comm->get_last_received().state_agents.internal_map;
-   
-    
+
+
 
     if ( cicli_plugin > 5 )
     {
-        sensed_state_agents.push_back(last_sensed_agents.state_agents.internal_map);
-	mutex_simulate_variable_access.lock();
+        mutex_simulate_variable_access.lock();
+        sensed_state_agents.push_back ( last_sensed_agents.state_agents.internal_map );
         communicator->send ( agent_packet );
         mutex_simulate_variable_access.unlock();
 
         mutex_sem1.unlock();
 
     }
-    
+
 
 
     //creo il pacchatto che sara spedito al prossimo passo
-    
+
     agent_packet.state_agents.internal_map.clear();
     for ( auto agent= last_sensed_agents.state_agents.internal_map.begin(); agent!=last_sensed_agents.state_agents.internal_map.end(); agent++ )
     {
         agent_packet.state_agents.internal_map[agent->first]=& ( agent->second );
     }
 
-    
+
     //aggiorno old_state_agents
 
     mutex_simulate_variable_access.lock();
     old_sensed_agents.push_back ( last_sensed_agents );
     mutex_simulate_variable_access.unlock();
 
-   
 
-        
-     if ( old_sensed_agents.size() >10 )
+
+
+    if ( old_sensed_agents.size() >100 )
     {
-        ERR ( "IdentifierModule::Simulate troppo lenta" );
+        ERR ( "IdentifierModule::Simulate troppo lenta" , NULL );
         throw ( "IdentifierModule::Simulate troppo lenta" );
     }
-    
+
     mutex_sem2.unlock();
 
 }
@@ -225,7 +190,7 @@ for ( auto const & behavior: parsed_world.behaviors )
     unsigned ncicli=0;
     while ( 1 )
     {
-	mutex_sem1.lock();
+        mutex_sem1.lock();
         ncicli++;
 
 
@@ -233,13 +198,14 @@ for ( auto const & behavior: parsed_world.behaviors )
         {
             std::cout<<"Simulate:inizio ciclo "<<ncicli<<std::endl;
         }
-	  
-	 //TODO FACCIO LA COPIA. E' LA COSA GIUSTA?
-	 sensed_state_agents.clear();
-	 for (auto & agent: sensed_agents.front()
-	){
-	 sensed_state_agents[agent.first]=agent.second;
-	 }
+
+        //TODO FACCIO LA COPIA. E' LA COSA GIUSTA?
+        sensed_state_agents.clear();
+    for ( auto & agent: sensed_agents.front()
+            )
+        {
+            sensed_state_agents[agent.first]=agent.second;
+        }
         //Elimino gli agenti che non vedo più
     for ( auto & agent_name: sim_agents )
         {
@@ -261,10 +227,10 @@ for ( auto const & behavior: parsed_world.behaviors )
             {
                 if ( ( ncicli % update_after ) == 0 )
                 {
-		     mutex_simulate_variable_access.lock();
+                    mutex_simulate_variable_access.lock();
                     for ( unsigned i = 0; i < state_reference.size(); i++ )
                         state_reference[i] = old_sensed_agents.front().state_agents.internal_map.at ( agent->first ).state.at ( i );
-		    mutex_simulate_variable_access.unlock();
+                    mutex_simulate_variable_access.unlock();
                     ( *dummy_ref )->getDummyStates().sort();
                     ( *dummy_ref )->getDummyStates().unique();
                 }
@@ -287,13 +253,13 @@ for ( auto const & behavior: parsed_world.behaviors )
                         std::cout << "Riferimento : " << state_reference.at ( 0 ) << " " << state_reference.at ( 1 ) << " " << state_reference.at ( 2 ) << endl;
                     }
                     ( *dummy_ref )->dummy.setDiscreteState ( ( *dummystate ).automatonState );
-                  
-                  
-		     ( *dummy_ref )->dummy.main_loop();
-		     auto control_command_packet = communicator->receive_control_command ( ( *dummy_ref )->identifier );
+
+
+                    ( *dummy_ref )->dummy.main_loop();
+                    auto control_command_packet = communicator->receive_control_command ( ( *dummy_ref )->identifier );
                     for ( auto dstate = ( *dummy_ref )->dummy.getDiscreteStates().begin(); dstate != ( *dummy_ref )->dummy.getDiscreteStates().end(); ++dstate )
                     {
-		     
+
                         //preparo il comando relativo allo stato discreto iesimo
                         for ( unsigned i = 0; i < control_command_packet.commands.at ( *dstate ).size(); i++ )
                         {
@@ -301,7 +267,7 @@ for ( auto const & behavior: parsed_world.behaviors )
                         }
                         agent_state new_state = dynamics.at ( ( *dummy_ref )->behavior_identifier )->getNextState();
                         //controllo se l'evoluzione e' coerente
-		     if ( mon_debug_mode == 1 )
+                        if ( mon_debug_mode == 1 )
                         {
                             std::cout << "Agent:" << agent->first << " Behavior:" << ( *dummy_ref )->behavior_identifier << std::endl;
                             std::cout << ( *dstate ) << std::endl;
@@ -314,7 +280,7 @@ for ( auto const & behavior: parsed_world.behaviors )
                             if ( abs ( it->second - sensed_state_agents.at ( agent->first ).state.at ( it->first ) ) > tol )
                             {
                                 state_consistant=false;
-                                
+
                             }
 
                         }
@@ -330,9 +296,9 @@ for ( auto const & behavior: parsed_world.behaviors )
 
                 if ( tmp_states.empty() )
                 {
-		    mutex_simulate_variable_access.lock();
+                    mutex_simulate_variable_access.lock();
                     identifier_matrix.at ( agent->first ).at ( ( *dummy_ref )->behavior_identifier ) = false;
-		    mutex_simulate_variable_access.unlock();
+                    mutex_simulate_variable_access.unlock();
                     agent->second.erase_after ( old_dummy_ref );
                     dummy_ref = old_dummy_ref;
                 }
@@ -345,8 +311,8 @@ for ( auto const & behavior: parsed_world.behaviors )
         }
 
         if ( !identifier_matrix.empty() && mon_debug_mode == 1 )
-        {	
-	    std::cout << "Classifier " << std::endl;
+        {
+            std::cout << "Classifier " << std::endl;
             for ( auto agent = identifier_matrix.begin(); agent != identifier_matrix.end(); ++agent )
             {
                 std::cout << agent->first << ":";
@@ -357,7 +323,7 @@ for ( auto const & behavior: parsed_world.behaviors )
                 }
                 std::cout << std::endl;
             }
-           
+
         }
 
         //Creo i nuovi dummy per gli agenti appena entrati
@@ -371,9 +337,9 @@ for ( auto const & behavior: parsed_world.behaviors )
                 assert ( sim_agents[sensed_agent.first].empty() );
                 if ( identifier_matrix[sensed_agent.first].empty() )
                 {
-                 mutex_simulate_variable_access.lock();   
-		  identifier_matrix[sensed_agent.first].resize ( index_behaviors.size(), true );
-		  mutex_simulate_variable_access.unlock();
+                    mutex_simulate_variable_access.lock();
+                    identifier_matrix[sensed_agent.first].resize ( index_behaviors.size(), true );
+                    mutex_simulate_variable_access.unlock();
                 }
 
             for ( auto const & behavior: parsed_world.behaviors )
@@ -426,7 +392,7 @@ for ( auto const & behavior: parsed_world.behaviors )
         mutex_simulate_variable_access.lock();
         communicator->removeFront();
         old_sensed_agents.pop_front();
-	sensed_agents.pop_front();
+        sensed_agents.pop_front();
         mutex_simulate_variable_access.unlock();
 
         if ( mon_debug_mode == 1 )

@@ -26,7 +26,6 @@ public:
 
 	void send()
 	{
-		std::cout<<"dato inviato ";
 		this->identifier_to_viewer_communicator<send_type>::send(data_send);
 		
 	}

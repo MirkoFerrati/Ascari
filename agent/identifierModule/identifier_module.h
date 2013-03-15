@@ -31,7 +31,9 @@ public:
     
 
 private:
-    void create_agents(std::string, const agent_state& );
+    //void create_agents(std::string, const agent_state& );
+    //bool agentStatesAreConsistent(const agent_state& first, const agent_state& second);
+    
 
     const Parsed_World & parsed_world;
     std::string owner;
@@ -65,8 +67,7 @@ private:
     std::mutex mutex_sem2;
     std::mutex mutex_simulate_variable_access;
     
-    bool agentStatesAreConsistent(const agent_state& first, const agent_state& second);
-    void printDebug();
+    
     
 };
 

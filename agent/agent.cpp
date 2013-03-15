@@ -324,7 +324,7 @@ void agent::main_loop()
 
    
     if (temp.state_agents.internal_map.find( identifier )==temp.state_agents.internal_map.end()){
-       ERR("MANCA IL MIO STATO");
+       ERR("MANCA IL MIO STATO",NULL);
        throw("MANCA IL MIO STATO");
     }
 
