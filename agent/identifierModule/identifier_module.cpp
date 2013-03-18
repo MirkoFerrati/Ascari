@@ -19,7 +19,7 @@ identifier_module::identifier_module ( Parsed_World const& W, const std::map<int
     mutex_sem1.lock();
 
     simulate_thread=new std::thread ( &identifier_module::simulate,std::ref ( *this ),std::ref ( sensed_state_agents ), std::ref ( mutex_sem1 ), std::ref ( mutex_sem2 ),
-                                      std::ref ( mutex_simulate_variable_access ),std::ref ( parsed_world ),std::ref ( communicator ),std::ref ( old_sensed_agents ),
+                                      std::ref ( mutex_simulate_variable_access ),std::ref(condition_simulate),std::ref ( parsed_world ),std::ref ( communicator ),std::ref ( old_sensed_agents ),
                                       std::ref ( identifier_matrix ),std::ref ( owner ) );
 
 }
@@ -54,6 +54,17 @@ void identifier_module::compileExpressions ( exprtk::symbol_table< double >& /*s
 //     return true;
 // }
 
+void identifier_module::updateLastSensedAgents()
+{
+  	for ( auto it = map_bonus_variables_to_id.begin(); it != map_bonus_variables_to_id.end(); ++it )
+    {
+        last_sensed_agents.bonus_variables[it->first]=sensed_bonus_variables.at ( it->second ) ;
+    }
+
+    last_sensed_agents.time = sensed_time;
+    last_sensed_agents.state_agents.internal_map = agent_world_comm->get_last_received().state_agents.internal_map;
+
+}
 
 
 void identifier_module::run_plugin()
@@ -77,35 +88,17 @@ void identifier_module::run_plugin()
     }
 
 
-    if ( cicli_plugin < 5 )
-        return; //il primo e secondo pacchetto del simultaore sono uguali
-
-
-    //aggiorno il pacchetto con l'ultimo valore ricevuto dai sensori
-    for ( auto it = map_bonus_variables_to_id.begin(); it != map_bonus_variables_to_id.end(); ++it )
-    {
-        last_sensed_agents.bonus_variables[it->first]=sensed_bonus_variables.at ( it->second ) ;
+    if ( cicli_plugin < 5 ){
+	updateLastSensedAgents();
+        return; //parto dopo un po' ma leggo comunque dai sensori
     }
+    
+    //aggiorno old_state_agents con il pacchetto ricevuto al passo precedente
 
-    last_sensed_agents.time = sensed_time;
-    last_sensed_agents.state_agents.internal_map = agent_world_comm->get_last_received().state_agents.internal_map;
+    
+    
 
-
-
-    if ( cicli_plugin > 5 )
-    {
-        mutex_simulate_variable_access.lock();
-        sensed_state_agents.push_back ( last_sensed_agents.state_agents.internal_map );
-        communicator->send ( agent_packet );
-        mutex_simulate_variable_access.unlock();
-
-        mutex_sem1.unlock();
-
-    }
-
-
-
-    //creo il pacchatto che sara spedito al prossimo passo
+    //creo il pacchatto che sara spedito con le informazioni riferite al passo precedente
 
     agent_packet.state_agents.internal_map.clear();
     for ( auto agent= last_sensed_agents.state_agents.internal_map.begin(); agent!=last_sensed_agents.state_agents.internal_map.end(); agent++ )
@@ -113,36 +106,56 @@ void identifier_module::run_plugin()
         agent_packet.state_agents.internal_map[agent->first]=& ( agent->second );
     }
 
-
-    //aggiorno old_state_agents
-
     mutex_simulate_variable_access.lock();
     old_sensed_agents.push_back ( last_sensed_agents );
+
+    //aggiorno il pacchetto con l'ultimo valore ricevuto dai sensori
+    updateLastSensedAgents();
+
+    sensed_state_agents.push_back ( last_sensed_agents.state_agents.internal_map );
+    communicator->send ( agent_packet );
     mutex_simulate_variable_access.unlock();
 
+       
+	
+	condition_simulate.notify_one();
+	mutex_sem1.unlock();
 
 
 
+	if (mutex_sem2.try_lock()){
+	 mutex_sem2.unlock(); 
+	}
+	else
+	  std::cout<<"Simulate is Running"<<std::endl;
+
+    
+
+
+ mutex_simulate_variable_access.lock();
     if ( old_sensed_agents.size() >100 )
     {
         ERR ( "IdentifierModule::Simulate troppo lenta" , NULL );
         throw ( "IdentifierModule::Simulate troppo lenta" );
     }
 
-    mutex_sem2.unlock();
+mutex_simulate_variable_access.unlock();
+  
 
 }
 
 
-void identifier_module::simulate ( std::list<std::map<std::string,agent_state_packet>> &sensed_agents, std::mutex& mutex_sem1, std::mutex& mutex_sem2 , std::mutex& mutex_simulate_variable_access,
+void identifier_module::simulate ( std::list<std::map<std::string,agent_state_packet>> &sensed_agents, std::mutex& mutex_sem1, std::mutex& mutex_sem2 , 
+				   std::mutex& mutex_simulate_variable_access, std::condition_variable& condition_simulate,
                                    const Parsed_World & parsed_world, std::shared_ptr<agent_to_dummy_communicator> & communicator,
-                                   std::list<world_sim_packet> &old_sensed_agents, std::map <std::string,std::vector< bool >> &identifier_matrix,
+                                   std::list<world_sim_packet> &old_sensed, std::map <std::string,std::vector< bool >> &identifier_matrix,
                                    std::string& own )
 
 {
 
     const std::string owner=own;
     std::map<std::string,agent_state_packet> sensed_state_agents;
+    world_sim_packet old_sensed_agents;
     std::map<std::string,std::forward_list<std::unique_ptr<dummy_agent>>> sim_agents;
     std::map <std::string,int> index_behaviors;
     std::vector<dynamic*> dynamics;
@@ -190,7 +203,30 @@ for ( auto const & behavior: parsed_world.behaviors )
     unsigned ncicli=0;
     while ( 1 )
     {
-        mutex_sem1.lock();
+	
+	std::unique_lock<std::mutex> lock(mutex_sem1);
+	while(!sensed_agents.size()){
+       condition_simulate.wait(lock);
+	
+	}
+	mutex_sem1.unlock();
+	
+	mutex_sem2.lock();
+	
+	sleep(0.5);
+	
+	sensed_state_agents.clear();
+	mutex_simulate_variable_access.lock();
+	for (auto agent:sensed_agents.front() )
+	  sensed_state_agents[agent.first]=agent.second;
+	
+	sensed_agents.pop_front();
+        
+	old_sensed_agents=old_sensed.front();
+	old_sensed.pop_front();
+        mutex_simulate_variable_access.unlock();
+
+	
         ncicli++;
 
 
@@ -199,13 +235,8 @@ for ( auto const & behavior: parsed_world.behaviors )
             std::cout<<"Simulate:inizio ciclo "<<ncicli<<std::endl;
         }
 
-        //TODO FACCIO LA COPIA. E' LA COSA GIUSTA?
-        sensed_state_agents.clear();
-    for ( auto & agent: sensed_agents.front()
-            )
-        {
-            sensed_state_agents[agent.first]=agent.second;
-        }
+       
+        
         //Elimino gli agenti che non vedo più
     for ( auto & agent_name: sim_agents )
         {
@@ -227,10 +258,8 @@ for ( auto const & behavior: parsed_world.behaviors )
             {
                 if ( ( ncicli % update_after ) == 0 )
                 {
-                    mutex_simulate_variable_access.lock();
                     for ( unsigned i = 0; i < state_reference.size(); i++ )
-                        state_reference[i] = old_sensed_agents.front().state_agents.internal_map.at ( agent->first ).state.at ( i );
-                    mutex_simulate_variable_access.unlock();
+                        state_reference[i] = old_sensed_agents.state_agents.internal_map.at ( agent->first ).state.at ( i );
                     ( *dummy_ref )->getDummyStates().sort();
                     ( *dummy_ref )->getDummyStates().unique();
                 }
@@ -391,16 +420,15 @@ for ( auto const & behavior: parsed_world.behaviors )
 
         mutex_simulate_variable_access.lock();
         communicator->removeFront();
-        old_sensed_agents.pop_front();
-        sensed_agents.pop_front();
         mutex_simulate_variable_access.unlock();
 
         if ( mon_debug_mode == 1 )
         {
             std::cout<<"Simulate:fine ciclo "<<ncicli<<std::endl;
         }
-
-        mutex_sem2.lock();
+	
+	mutex_sem2.unlock();
+       
     }
 
     for ( unsigned int i = 0; i < dynamics.size(); i++ )

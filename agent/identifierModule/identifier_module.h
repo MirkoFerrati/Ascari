@@ -9,10 +9,13 @@
 #include "agent_to_dummy_communicator.hpp"
 #include "identifierModule_communicator.hpp"
 #include "dummy_agent.hpp"
+#include <condition_variable>
 
 #define tol 1
 #define mon_debug_mode 1
 #define update_after 5
+#define buffer_lenght 100
+#define buffer_refill
 
 
 class identifier_module: public Plugin_module
@@ -22,9 +25,11 @@ public:
     void addReservedVariables (exprtk::symbol_table< double >& arg1);
     void compileExpressions (exprtk::symbol_table< double >& arg1);
     void run_plugin();
-    void simulate(std::list<std::map<std::string,agent_state_packet>> &sensed_agents, std::mutex& mutex_sem1, std::mutex& mutex_sem2 , std::mutex& mutex_simulate_variable_access, 
+    void simulate(std::list<std::map<std::string,agent_state_packet>> &sensed_agents, std::mutex& mutex_sem1, std::mutex& mutex_sem2 ,
+		  std::mutex& mutex_simulate_variable_access, std::condition_variable &condition_simulate,
 		const Parsed_World & parsed_world, std::shared_ptr<agent_to_dummy_communicator> & communicator,std::list<world_sim_packet> &old_sensed_agents, 
 		std::map <std::string,std::vector< bool >> &identifier_matrix, std::string& owner);
+    void updateLastSensedAgents();
     identifier_module (Parsed_World const& W, const std::map<int,double> & sensed_bonus_variables, const std::map<std::string,int> & map_bonus_variables_to_id,
     std::shared_ptr<agent_namespace::world_communicator_abstract>& comm, const simulation_time & sensed_time,std::string owner);
     ~identifier_module();
@@ -66,6 +71,7 @@ private:
     std::mutex mutex_sem1;
     std::mutex mutex_sem2;
     std::mutex mutex_simulate_variable_access;
+    std::condition_variable condition_simulate;
     
     
     
