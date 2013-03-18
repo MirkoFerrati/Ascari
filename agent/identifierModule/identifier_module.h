@@ -10,6 +10,8 @@
 #include "identifierModule_communicator.hpp"
 #include "dummy_agent.hpp"
 #include <condition_variable>
+#include "named_semaphore.hpp"
+
 
 #define tol 1
 #define mon_debug_mode 1
@@ -25,8 +27,8 @@ public:
     void addReservedVariables (exprtk::symbol_table< double >& arg1);
     void compileExpressions (exprtk::symbol_table< double >& arg1);
     void run_plugin();
-    void simulate(std::list<std::map<std::string,agent_state_packet>> &sensed_agents, std::mutex& mutex_sem1, std::mutex& mutex_sem2 ,
-		  std::mutex& mutex_simulate_variable_access, std::condition_variable &condition_simulate,
+    void simulate(std::list<std::map<std::string,agent_state_packet>> &sensed_agents, named_semaphore& real_semaphore1,
+		  named_semaphore& real_semaphore2 , std::mutex& mutex_simulate_variable_access,
 		const Parsed_World & parsed_world, std::shared_ptr<agent_to_dummy_communicator> & communicator,std::list<world_sim_packet> &old_sensed_agents, 
 		std::map <std::string,std::vector< bool >> &identifier_matrix, std::string& owner);
     void updateLastSensedAgents();
@@ -68,6 +70,9 @@ private:
     
     std::list<std::map<std::string,agent_state_packet>> sensed_state_agents;
     std::thread* simulate_thread;
+    
+  named_semaphore real_semaphore1,real_semaphore2;
+  
     std::mutex mutex_sem1;
     std::mutex mutex_sem2;
     std::mutex mutex_simulate_variable_access;

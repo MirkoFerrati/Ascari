@@ -9,17 +9,16 @@ using namespace std;
 identifier_module::identifier_module ( Parsed_World const& W, const std::map<int, double> & sensed_bonus_variables, const std::map<std::string, int> & map_bonus_variables_to_id,
                                        std::shared_ptr<agent_namespace::world_communicator_abstract>& comm, const simulation_time& sensed_time, std::string owner ) :
     parsed_world ( W ),owner ( owner ),agent_world_comm ( comm ),  agent_packet ( last_sensed_agents.bonus_variables,last_sensed_agents.time ),sensed_bonus_variables ( sensed_bonus_variables ),
-    map_bonus_variables_to_id ( map_bonus_variables_to_id ),sensed_time ( sensed_time )
+    map_bonus_variables_to_id ( map_bonus_variables_to_id ),sensed_time ( sensed_time ),real_semaphore1(buffer_lenght),
+real_semaphore2(0)
 {
 
     cicli_plugin=0;
 
     communicator = std::make_shared<agent_to_dummy_communicator>();
 
-    mutex_sem1.lock();
-
-    simulate_thread=new std::thread ( &identifier_module::simulate,std::ref ( *this ),std::ref ( sensed_state_agents ), std::ref ( mutex_sem1 ), std::ref ( mutex_sem2 ),
-                                      std::ref ( mutex_simulate_variable_access ),std::ref(condition_simulate),std::ref ( parsed_world ),std::ref ( communicator ),std::ref ( old_sensed_agents ),
+    simulate_thread=new std::thread ( &identifier_module::simulate,std::ref ( *this ),std::ref ( sensed_state_agents ), std::ref ( real_semaphore1 ), std::ref ( real_semaphore2 ),
+                                      std::ref ( mutex_simulate_variable_access ),std::ref ( parsed_world ),std::ref ( communicator ),std::ref ( old_sensed_agents ),
                                       std::ref ( identifier_matrix ),std::ref ( owner ) );
 
 }
@@ -100,6 +99,12 @@ void identifier_module::run_plugin()
 
     //creo il pacchatto che sara spedito con le informazioni riferite al passo precedente
 
+    if (real_semaphore1.try_wait())
+    {
+      real_semaphore1.post();
+	throw "errore, simula e' troppo lento, ho riempito il buffer";
+    }
+    
     agent_packet.state_agents.internal_map.clear();
     for ( auto agent= last_sensed_agents.state_agents.internal_map.begin(); agent!=last_sensed_agents.state_agents.internal_map.end(); agent++ )
     {
@@ -116,20 +121,8 @@ void identifier_module::run_plugin()
     communicator->send ( agent_packet );
     mutex_simulate_variable_access.unlock();
 
-       
-	
-	condition_simulate.notify_one();
-	mutex_sem1.unlock();
 
-
-
-	if (mutex_sem2.try_lock()){
-	 mutex_sem2.unlock(); 
-	}
-	else
-	  std::cout<<"Simulate is Running"<<std::endl;
-
-    
+real_semaphore2.post();
 
 
  mutex_simulate_variable_access.lock();
@@ -145,8 +138,8 @@ mutex_simulate_variable_access.unlock();
 }
 
 
-void identifier_module::simulate ( std::list<std::map<std::string,agent_state_packet>> &sensed_agents, std::mutex& mutex_sem1, std::mutex& mutex_sem2 , 
-				   std::mutex& mutex_simulate_variable_access, std::condition_variable& condition_simulate,
+void identifier_module::simulate ( std::list<std::map<std::string,agent_state_packet>> &sensed_agents,named_semaphore& real_semaphore1  , 
+				named_semaphore& real_semaphore2,  std::mutex& mutex_simulate_variable_access, 
                                    const Parsed_World & parsed_world, std::shared_ptr<agent_to_dummy_communicator> & communicator,
                                    std::list<world_sim_packet> &old_sensed, std::map <std::string,std::vector< bool >> &identifier_matrix,
                                    std::string& own )
@@ -204,14 +197,7 @@ for ( auto const & behavior: parsed_world.behaviors )
     while ( 1 )
     {
 	
-	std::unique_lock<std::mutex> lock(mutex_sem1);
-	while(!sensed_agents.size()){
-       condition_simulate.wait(lock);
-	
-	}
-	mutex_sem1.unlock();
-	
-	mutex_sem2.lock();
+	real_semaphore2.wait();
 	
 	sleep(0.5);
 	
@@ -427,7 +413,7 @@ for ( auto const & behavior: parsed_world.behaviors )
             std::cout<<"Simulate:fine ciclo "<<ncicli<<std::endl;
         }
 	
-	mutex_sem2.unlock();
+	real_semaphore1.post();
        
     }
 
