@@ -14,7 +14,7 @@
 
 
 #define tol 1
-#define mon_debug_mode 1
+#define mon_debug_mode 0
 #define update_after 5
 #define buffer_lenght 100
 #define buffer_refill
@@ -73,10 +73,7 @@ private:
     
     named_semaphore real_semaphore1,real_semaphore2;
   
-    std::mutex mutex_sem1;
-    std::mutex mutex_sem2;
     std::mutex mutex_simulate_variable_access;
-    std::condition_variable condition_simulate;
     
     
     

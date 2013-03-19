@@ -86,7 +86,6 @@ void identifier_module::run_plugin()
         std::cout<<"Run_plugin: ciclo "<<cicli_plugin<<std::endl;
     }
 
-
     if ( cicli_plugin < 5 ){
 	updateLastSensedAgents();
         return; //parto dopo un po' ma leggo comunque dai sensori
@@ -111,7 +110,6 @@ void identifier_module::run_plugin()
         agent_packet.state_agents.internal_map[agent->first]=& ( agent->second );
     }
 
-    mutex_simulate_variable_access.lock();
     old_sensed_agents.push_back ( last_sensed_agents );
 
     //aggiorno il pacchetto con l'ultimo valore ricevuto dai sensori
@@ -119,21 +117,15 @@ void identifier_module::run_plugin()
 
     sensed_state_agents.push_back ( last_sensed_agents.state_agents.internal_map );
     communicator->send ( agent_packet );
-    mutex_simulate_variable_access.unlock();
+   
+    cout<<"Dimensione Buffer:"<<sensed_state_agents.size()<<endl;
 
-
+    
     real_semaphore2.post();
+    sleep(0);
 
 
- mutex_simulate_variable_access.lock();
-    if ( old_sensed_agents.size() >100 )
-    {
-        ERR ( "IdentifierModule::Simulate troppo lenta" , NULL );
-        throw ( "IdentifierModule::Simulate troppo lenta" );
-    }
-
-mutex_simulate_variable_access.unlock();
-  
+ 
 
 }
 
@@ -192,27 +184,34 @@ for ( auto const & behavior: parsed_world.behaviors )
         dynamics.push_back ( d );
     }
 
-
+    
+    usleep(1600000);
     unsigned ncicli=0;
+    unsigned timer_exe=0;
     while ( 1 )
     {
 	
 	real_semaphore2.wait();
 	
+	if (++timer_exe>10){
+	 timer_exe=0;
+	 usleep(10000);
+    
+	}
 	
 	sensed_state_agents.clear();
-	mutex_simulate_variable_access.lock();
+	
 	for (auto agent:sensed_agents.front() )
 	  sensed_state_agents[agent.first]=agent.second;
 	
 	sensed_agents.pop_front();
-        
+	        
 	old_sensed_agents=old_sensed.front();
 	old_sensed.pop_front();
-        mutex_simulate_variable_access.unlock();
-
+        
 	
         ncicli++;
+	
 
 
         if ( mon_debug_mode == 1 )
@@ -403,16 +402,15 @@ for ( auto const & behavior: parsed_world.behaviors )
         viewer_comm->send();
         packet_viewer.agents.clear();
 
-        mutex_simulate_variable_access.lock();
         communicator->removeFront();
-        mutex_simulate_variable_access.unlock();
-
+        
         if ( mon_debug_mode == 1 )
         {
             std::cout<<"Simulate:fine ciclo "<<ncicli<<std::endl;
         }
 	
 	real_semaphore1.post();
+	sleep(0);
        
     }
 
