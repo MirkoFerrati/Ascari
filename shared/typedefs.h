@@ -167,9 +167,10 @@ struct graph_informations
     bool isNegotiating;
     std::vector<int> lockedNode;
     std::vector<int> lockedArc;
-    unsigned int priority; //priorita' durante l'handshake
+   std::string priority; //priorita' durante l'handshake
     std::string id; //id dell'agente
     simulation_time timestamp; //Un giorno ci metteremo il tempo reale (dal 1970)
+    bool emergency;
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int /*version*/)
     {
@@ -178,6 +179,7 @@ struct graph_informations
         ar& lockedNode;
         ar& lockedArc;
         ar& id;
+	ar& emergency;
     }
     friend std::ostream& operator<< (std::ostream& os, const graph_informations& g)
     {

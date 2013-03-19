@@ -397,6 +397,9 @@ public:
     {
         assert ( sock_recv_type == ZMQ_SUB );
         receive_buffer.rebuild ( MAX_PACKET_LENGTH );
+	int temp=0;
+	receiver_socket.setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
+
     }
 
     ~zmq_receive_communicator()

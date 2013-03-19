@@ -60,7 +60,7 @@ private:
 	const std::map<std::string,transition>& events_to_index;
 	lemon::SmartDigraph::ArcMap<int> length;
 	lemon::SmartDigraph::NodeMap<int> coord_x, coord_y;
-	unsigned int priority;
+	std::string priority;
 	std::string identifier;
 	graph_packet info;
 	Udp_graph_communicator communicator;
@@ -68,17 +68,17 @@ private:
 	bool target_reached();
     void prepare_move_packet();
     bool detect_collision(lemon::SmartDigraph::ArcMap< bool >& useArc);
-	bool check_for_overtaking(graph_packet::const_iterator &it,int age,lemon::SmartDigraph::ArcMap<bool>& useArc);
+	bool check_for_overtaking(  );
 	void update_lock_packet();
 	void prepare_stop_packet();
 	bool isTimeToCheckForPathFree();
-	
+	bool emergency;
 	lemon::SmartDigraph::Node source, target, next;
     int graph_node_size;
 	simulation_time &time;
 	simulation_time last_time_updated;
     bool stop, next_target_reachable; 
-	int handshakeCounter;
+	unsigned int handshakeCounter;
 };
 
 #endif // AGENT_ROUTER_H

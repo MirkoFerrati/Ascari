@@ -43,6 +43,7 @@ MainWindow::MainWindow ( QWidget *parent ) :
 
 MainWindow::~MainWindow()
 {
+  s_interrupted=1;
     delete insideViewer;
     delete ui;
     if ( simulator )
