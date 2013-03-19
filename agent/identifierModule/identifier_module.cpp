@@ -99,7 +99,7 @@ void identifier_module::run_plugin()
 
     //creo il pacchatto che sara spedito con le informazioni riferite al passo precedente
 
-    if (real_semaphore1.try_wait())
+    if (!real_semaphore1.try_wait())
     {
       real_semaphore1.post();
 	throw "errore, simula e' troppo lento, ho riempito il buffer";
@@ -122,7 +122,7 @@ void identifier_module::run_plugin()
     mutex_simulate_variable_access.unlock();
 
 
-real_semaphore2.post();
+    real_semaphore2.post();
 
 
  mutex_simulate_variable_access.lock();
@@ -199,7 +199,6 @@ for ( auto const & behavior: parsed_world.behaviors )
 	
 	real_semaphore2.wait();
 	
-	sleep(0.5);
 	
 	sensed_state_agents.clear();
 	mutex_simulate_variable_access.lock();

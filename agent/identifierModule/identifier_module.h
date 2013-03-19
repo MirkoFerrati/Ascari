@@ -71,7 +71,7 @@ private:
     std::list<std::map<std::string,agent_state_packet>> sensed_state_agents;
     std::thread* simulate_thread;
     
-  named_semaphore real_semaphore1,real_semaphore2;
+    named_semaphore real_semaphore1,real_semaphore2;
   
     std::mutex mutex_sem1;
     std::mutex mutex_sem2;

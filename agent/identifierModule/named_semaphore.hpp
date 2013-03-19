@@ -1,6 +1,4 @@
-#include <boost/thread/condition_variable.hpp>
-#include <boost/thread/mutex.hpp>    
-//#include <boost/thread/lock_types.hpp>
+#include <condition_variable>
 
 
 class named_semaphore
@@ -11,10 +9,10 @@ class named_semaphore
     //mutex_ protects count_.
     //Any code that reads or writes the count_ data must hold a lock on
     //the mutex.
-    boost::mutex mutex_;
+    std::mutex mutex_;
 
     //Code that increments count_ must notify the condition variable.
-    boost::condition_variable condition_;
+    std::condition_variable condition_;
 
 public:
     explicit named_semaphore(unsigned int initial_count) 
@@ -28,13 +26,13 @@ public:
     {
         //The "lock" object locks the mutex when it's constructed,
         //and unlocks it when it's destroyed.
-        boost::unique_lock<boost::mutex> lock(mutex_);
+        std::unique_lock<std::mutex> lock(mutex_);
         return count_;
     }
 
     void post() //called "release" in Java
     {
-        boost::unique_lock<boost::mutex> lock(mutex_); //        boost::mutex::scoped_lock lock(mutex_);
+        std::unique_lock<std::mutex> lock(mutex_); //        boost::mutex::scoped_lock lock(mutex_);
 
 
         ++count_;
@@ -46,9 +44,9 @@ public:
         condition_.notify_one(); 
     }
 
-    void wait() //called "acquire" in Java
+    void wait() 
     {
-        boost::unique_lock<boost::mutex> lock(mutex_);
+        std::unique_lock<std::mutex> lock(mutex_);
         while (count_ == 0)
         {
              condition_.wait(lock);
@@ -56,9 +54,9 @@ public:
         --count_;
     }
 
-       bool try_wait() //called "acquire" in Java
+       bool try_wait() 
     {
-   boost::unique_lock<boost::mutex> lock(mutex_);
+   std::unique_lock<std::mutex> lock(mutex_);
         if(count_)
         {
             --count_;
