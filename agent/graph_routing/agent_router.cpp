@@ -119,48 +119,52 @@ void agent_router::run_plugin()
 
     handshakeCounter++;
 
-    if ( handshakeCounter < 15 )
+    if ( handshakeCounter < 5 )
     {
-        if (!detect_collision ( useArc )) 
-	{
-	    prepare_move_packet();
-	    update_lock_packet();
-	    communicator.send();
-	    handshakeCounter=15;
-	}
-	else{
-        next_target_reachable = findPath ( useArc );
-        std::cout << time << ": percorso calcolato:";
+        if ( !detect_collision ( useArc )  && handshakeCounter>2)
+        {
+            prepare_move_packet();
+            update_lock_packet();
+            communicator.send();
+            handshakeCounter=5;
+        }
+        else
+        {
+            next_target_reachable = findPath ( useArc );
+            std::cout << time << ": percorso calcolato:";
+            int j=0;
+            for ( int i=0;i<node_id.size();i++ )
+            {
+                j++;
+                if ( j>4 )
+                    break;
+                std::cout << node_id[i]  << "(" << node_id[i]  % graph_node_size << ")" << ">>";
+            }
+            std::cout << " next_time=" << next_time << " fine" << std::endl;
+        }
+    }
+
+
+    if ( handshakeCounter>=info.size() && handshakeCounter<10 )
+    {
+        if (check_for_overtaking()){
+//         prepare_move_packet();
+// 	  update_lock_packet();
+//             communicator.send();
+        std::cout << time << ": percorso calcolato dopo i sorpassi:";
         int j=0;
-        for ( PathNodeIt<Path<SmartDigraph> > i ( graph, p ); i != INVALID; ++i )
+        for (int i=0;i<node_id.size();i++   )
         {
             j++;
             if ( j>4 )
                 break;
-            std::cout << graph.id ( i ) << "(" << graph.id ( i ) % graph_node_size << ")" << ">>";
+            std::cout << node_id[i]  << "(" <<  node_id[i]  % graph_node_size << ")" << ">>";
         }
         std::cout << " next_time=" << next_time << " fine" << std::endl;
 	}
     }
 
-
-    if (  handshakeCounter>=info.size() )
-    {
-        check_for_overtaking ();
-        prepare_move_packet();
-        std::cout << time << ": percorso calcolato:";
-        int j=0;
-        for ( PathNodeIt<Path<SmartDigraph> > i ( graph, p ); i != INVALID; ++i )
-        {
-            j++;
-            if ( j>4 )
-                break;
-            std::cout << graph.id ( i ) << "(" << graph.id ( i ) % graph_node_size << ")" << ">>";
-        }
-        std::cout << " next_time=" << next_time << " fine" << std::endl;
-    }
-
-    if ( handshakeCounter > 15 && isTimeToCheckForPathFree() )
+    if ( handshakeCounter > 10 && isTimeToCheckForPathFree() )
     {
         isNegotiating = true;
         handshakeCounter = 0;
@@ -324,11 +328,11 @@ bool agent_router::findPath ( lemon::SmartDigraph::ArcMap<bool>& useArc )
     update_lock_packet();
     communicator.send();
     next = graph.target ( p.front() );
-    xtarget = ( coord_x ) [next];
-    ytarget = ( coord_y ) [next];
+    xtarget =  coord_x  [next];
+    ytarget =  coord_y  [next];
     double floor = graph.id ( next ) / graph_node_size;
-    //next_time = trunc ( trunc ( time + TIME_SLOT_FOR_3DGRAPH / 3.0 ) / TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor; //TODO bruttissimo
-    next_time = round(time/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH+TIME_SLOT_FOR_3DGRAPH+floor;
+   // next_time = trunc ( trunc ( time + TIME_SLOT_FOR_3DGRAPH / 3.0 ) / TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor; //TODO bruttissimo
+    next_time = round ( time/TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
     return true;
 }
 
