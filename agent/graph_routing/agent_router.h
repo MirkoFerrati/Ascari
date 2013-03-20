@@ -21,7 +21,8 @@ enum  class state
     LISTENING,
     HANDSHAKING,
     EMERGENCY,
-    STOPPED
+    STOPPED,
+    STARTING
 };
 
 class agent_router: public Plugin_module
@@ -49,7 +50,6 @@ private:
     bool target_reached();
     void prepare_move_packet();
     void prepare_emergency_packet();
-
     bool detect_collision();
     void filter_graph ( lemon::SmartDigraph::ArcMap< bool >& useArc );
     bool check_for_overtaking( );
@@ -67,10 +67,11 @@ private:
     const std::map<std::string,transition>& events_to_index;
 
     /**Informazioni del grafo*/
+        lemon::SmartDigraph graph; //grafo completo
+
     lemon::Path<lemon::SmartDigraph> computed_path;
     lemon::SmartDigraph::ArcMap<int> length;
     lemon::SmartDigraph::NodeMap<int> coord_x, coord_y;
-    lemon::SmartDigraph graph; //grafo completo
     int graph_node_size;
 
     /**Informazioni sullo stato attuale del grafo*/
@@ -86,12 +87,12 @@ private:
     simulation_time last_time_updated;
 
     /**Comunicatore*/
-    std::mutex _mutex;
+    std::mutex _mutex;  
+    std::string identifier;
+    graph_packet info;
     boost::asio::io_service _io_service;
     Udp_graph_communicator communicator;
     std::string priority;
-    std::string identifier;
-    graph_packet info;
 
 };
 

@@ -50,7 +50,7 @@ void agent_router::print_path()
         j++;
         if ( j>4 )
             break;
-        std::cout << node_id[i]  << "(" <<  node_id[i]  % graph_node_size << ")" << ">>";
+        std::cout<<"path calcolata:" << node_id[i]  << "(" <<  node_id[i]  % graph_node_size << ")" << ">>";
     }
     std::cout << " next_time=" << next_time << " fine" << std::endl;
 

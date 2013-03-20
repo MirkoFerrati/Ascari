@@ -29,9 +29,9 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
                              const std::map<std::string, transition>& events_to_index, string identifier,
                              simulation_time& time, std::string graphName
                            )
-    : targets ( tarlist ), events ( events ), events_to_index ( events_to_index ), length ( graph ),
-      coord_x ( graph ), coord_y ( graph ), identifier ( identifier ),
-      communicator ( _mutex, &info, _io_service,identifier ), time ( time )
+    :  events ( events ), events_to_index ( events_to_index ), length ( graph ),
+      coord_x ( graph ), coord_y ( graph ), 
+      targets ( tarlist ),time ( time ),identifier ( identifier ),communicator ( _mutex, &info, _io_service,identifier )
 {
     Graph_creator c ( graph, length, coord_x, coord_y );
     graph_node_size = c.createGraph ( MAXFLOORS, graphName );
@@ -50,7 +50,7 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
     communicator.startReceive();
     last_time_updated = time;
     negotiation_steps=0;
-    internal_state=state::STOPPED;
+    internal_state=state::STARTING;
     speed=0;
     priority=identifier;
 }
@@ -67,7 +67,7 @@ void agent_router::run_plugin()
         setNextTarget();
     }
 
-    if ( internal_state==state::MOVING || internal_state==state::EMERGENCY)
+    if ( internal_state==state::MOVING || internal_state==state::EMERGENCY || internal_state==state::STARTING)
     {
         if ( isTimeToNegotiate() )
         {
@@ -84,6 +84,7 @@ void agent_router::run_plugin()
         filter_graph ( useArc );
 
         next_target_reachable=findPath ( useArc );
+	print_path();
         if ( next_target_reachable )
         {
             prepare_move_packet();
@@ -95,7 +96,7 @@ void agent_router::run_plugin()
     
     if (internal_state==state::LISTENING || internal_state==state::HANDSHAKING)
     {
-	usleep(200000); //TODO: serve per dare tempo alla comunicazione di girare
+	usleep(2000); //TODO: serve per dare tempo alla comunicazione di girare
 	_io_service.poll();
 	_io_service.reset();
 	negotiation_steps++;
@@ -110,7 +111,7 @@ void agent_router::run_plugin()
      internal_state=state::HANDSHAKING; 
     }
 
-    if (negotiation_steps==15)
+    if (negotiation_steps==15)//devo aver finito per forza, per ipotesi!
     {
       if (next_target_reachable)
       {
@@ -190,7 +191,7 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
     {
         if ( identifier.compare ( it->first ) <0 ) continue;  //se il pacchetto ha priorita' piu' alta
         int age = round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
-        cout<<"filtro i nodi:"<<endl;
+        cout<<"filtro i nodi dell'agente:"<<it->first<<" ";
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
         {
             int id = ( *itt ) - age * graph_node_size;  //attualizzo il nodo
@@ -199,7 +200,9 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
             {
                 useArc[arc] = false;
             }
+            cout<<id;
         }
+        cout<<endl;
     }
     _mutex.unlock();
 }
@@ -214,7 +217,7 @@ bool agent_router::detect_collision ( )
         if ( identifier.compare ( it->first ) <0 ) continue;
         int age = round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         int my_age=round ( ( round ( time * 1000.0 ) - round ( last_time_updated * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
-        cout<<"filtro i nodi:"<<endl;
+        cout<<"ricerca collisione:"<<endl;
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )
         {
             int id = ( *itt ) - age * graph_node_size;
@@ -231,9 +234,8 @@ bool agent_router::detect_collision ( )
                     collision = true;
                 }
             }
-            cout<<" "<<id;
         }
-        cout<<endl;
+        cout<<"ricerca collisione completata"<<endl;
     }
     _mutex.unlock();
     return collision;
