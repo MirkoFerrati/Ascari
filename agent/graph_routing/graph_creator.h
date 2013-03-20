@@ -11,6 +11,10 @@
 #define VERTICAL_LENGTH 100000
 #define TOP_FLOOR_LENGTH 500
 
+#define MAXFLOORS 8
+#define FLOORS_SENT 6
+#define MAX_LENGTH 2*VERTICAL_LENGTH //TODO: questo numero e' fisso ma dovrebbe essere una variabile
+
 class Graph_creator
 {
 public:	

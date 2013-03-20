@@ -42,11 +42,30 @@ void agent_router::compileExpressions(exprtk::symbol_table< double >& symbol_tab
 	
 }
 
-
-void agent_router::setTargetStop(bool stop)
+void agent_router::print_path()
 {
-	events.at(events_to_index.at("STOPPED"))=(stop?Events::_TRUE:Events::_FALSE);
-	events.at(events_to_index.at("STARTED"))=(!stop?Events::_TRUE:Events::_FALSE);
+    int j=0;
+    for ( unsigned int i=0; i<node_id.size(); i++ )
+    {
+        j++;
+        if ( j>4 )
+            break;
+        std::cout << node_id[i]  << "(" <<  node_id[i]  % graph_node_size << ")" << ">>";
+    }
+    std::cout << " next_time=" << next_time << " fine" << std::endl;
+
+}
+
+void agent_router::stopAgent()
+{
+	events.at(events_to_index.at("STOPPED"))=(Events::_TRUE);
+	events.at(events_to_index.at("STARTED"))=(Events::_FALSE);
+}
+
+void agent_router::startAgent()
+{
+	events.at(events_to_index.at("STOPPED"))=(Events::_FALSE);
+	events.at(events_to_index.at("STARTED"))=(Events::_TRUE);
 }
 
 
@@ -78,16 +97,24 @@ void agent_router::setGraph(lemon::SmartDigraph& g)
 	lemon::digraphCopy<lemon::SmartDigraph,lemon::SmartDigraph>(g,graph); //graph=g;
 }
 
-ostream& agent_router::toFile(ostream& out) const
+void agent_router::setSpeed()
 {
-	using namespace lemon;
-	for (PathNodeIt<Path<SmartDigraph> > i(graph,p); i != INVALID; ++i)
-		out<<" "<<(coord_x)[i]<<" "<<(coord_y)[i];
-	if (target!=INVALID)
-		out<<" "<<(coord_x)[target]<<" "<<(coord_y)[target];
-	out<<endl;
-	return out;
+    simulation_time delta = next_time - time;
+    double floor = graph.id ( next ) / graph_node_size;
+    if ( floor < 0.000001 ) //floor==0 nei double
+        speed = 0;
+    else
+    {
+        double length = distance_to_target.value();
+        speed=length/delta;
+    }
 }
+
+bool agent_router::isTimeToNegotiate()
+{
+    return round ( time*1000-round ( time/TIME_SLOT_FOR_3DGRAPH ) *1000*TIME_SLOT_FOR_3DGRAPH ) ==-2000;
+}
+
 
 agent_router::~agent_router()
 {

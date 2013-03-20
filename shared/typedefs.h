@@ -166,7 +166,6 @@ struct graph_informations
 {
     bool isNegotiating;
     std::vector<int> lockedNode;
-    std::vector<int> lockedArc;
    std::string priority; //priorita' durante l'handshake
     std::string id; //id dell'agente
     simulation_time timestamp; //Un giorno ci metteremo il tempo reale (dal 1970)
@@ -177,13 +176,13 @@ struct graph_informations
         ar& timestamp;
         ar& isNegotiating;
         ar& lockedNode;
-        ar& lockedArc;
         ar& id;
+	ar& priority;
 	ar& emergency;
     }
     friend std::ostream& operator<< (std::ostream& os, const graph_informations& g)
     {
-        os<<g.timestamp<<" "<<g.lockedNode<<" "<<g.lockedArc<<" "<<g.id;
+        os<<g.timestamp<<" "<<g.lockedNode<<" "<<g.id;
         return os;
     }
 
