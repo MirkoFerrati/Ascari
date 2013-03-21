@@ -3,6 +3,7 @@
 
 int main(int argc, char *argv[])
 {
+
    LOGOG_INITIALIZE();
    {
     logog::Cout out;
@@ -11,5 +12,5 @@ int main(int argc, char *argv[])
     w.show();
 
     return a.exec();
-   }
+    }
 }

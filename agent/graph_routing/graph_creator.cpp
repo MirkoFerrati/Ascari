@@ -14,7 +14,7 @@
 #include "logog.hpp"
 
 #define sqr(a) (a)*(a)
-#define MAX_ARC_FLOORS 2
+#define MAX_ARC_FLOORS 4
 
 using namespace std;
 

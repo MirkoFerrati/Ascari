@@ -52,7 +52,7 @@
     GRAPH_NAME: 'test5.gml.lgf'
   AGENTS:
   - agent: Agente11
-    VISIBLE_AREA: circle(9)
+#     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
     #MONITORING = 0
     #COLLABORATIVE = 1
@@ -65,7 +65,7 @@
     BEHAVIOR: prova
   
   - agent: Agente17
-    VISIBLE_AREA: circle(9)
+#     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
     INITIAL:
     - x: '265'
@@ -76,7 +76,7 @@
     BEHAVIOR: prova
     
   - agent: Agente10
-    VISIBLE_AREA: circle(9)
+#     VISIBLE_AREA: circle(9)
     COMMUNICATION_AREA: =  circle(10)
     INITIAL:
     - x: '653'
