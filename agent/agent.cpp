@@ -322,11 +322,14 @@ void agent::main_loop()
         bonusVariables.at ( map_bonus_variables_to_id.at ( it->first ) ) =it->second;
     }
 
-
+   
+    if (temp.state_agents.internal_map.find( identifier )==temp.state_agents.internal_map.end()){
+       ERR("MANCA IL MIO STATO",NULL);
+       throw("MANCA IL MIO STATO");
+    }
 
     //TODO(Mirko): questo ciclo for copia informazioni che in teoria gia' abbiamo, forse non vale la pena di usare la variabile state
-    for ( map<int,double>::const_iterator it=temp.state_agents.internal_map.at ( identifier ).state.begin();
-            it!=temp.state_agents.internal_map.at ( identifier ).state.end(); ++it )
+    for ( auto it=temp.state_agents.internal_map.at ( identifier ).state.begin();it!=temp.state_agents.internal_map.at ( identifier ).state.end(); ++it )
     {
         state.at ( it->first ) =it->second;
     }

@@ -3,9 +3,10 @@
 
 int main(int argc, char *argv[])
 {
-     LOGOG_INITIALIZE();	
-    {
-        logog::Cout out;
+
+   LOGOG_INITIALIZE();
+   {
+    logog::Cout out;
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
