@@ -6,7 +6,7 @@
       DYNAMIC_MAP:
       - x: 'v*cos(w)'
         y: 'v*sin(w)'
-        theta: 'sin(w-theta)'
+        theta: '5*sin(w-theta)'
       CONTROLLERS:
       - name: go
         v: v_router

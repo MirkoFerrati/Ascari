@@ -30,8 +30,8 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
                              simulation_time& time, std::string graphName
                            )
     :  events ( events ), events_to_index ( events_to_index ), length ( graph ),
-      coord_x ( graph ), coord_y ( graph ), 
-      targets ( tarlist ),time ( time ),identifier ( identifier ),communicator ( _mutex, &info, _io_service,identifier )
+       coord_x ( graph ), coord_y ( graph ),
+       targets ( tarlist ),time ( time ),identifier ( identifier ),communicator ( _mutex, &info, _io_service,identifier )
 {
     Graph_creator c ( graph, length, coord_x, coord_y );
     graph_node_size = c.createGraph ( MAXFLOORS, graphName );
@@ -43,6 +43,7 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
     target = graph.nodeFromId ( targets[1] );
     target_counter = 2;
     next = source;
+    next_time=TIME_SLOT_FOR_3DGRAPH;
     xtarget = coord_x[next];
     ytarget = coord_y[next];
     my_LRP.timestamp = 0;
@@ -50,6 +51,7 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
     communicator.startReceive();
     last_time_updated = time;
     negotiation_steps=0;
+    next_target_reachable=false;
     internal_state=state::STARTING;
     speed=0;
     priority=identifier;
@@ -62,19 +64,26 @@ void agent_router::run_plugin()
         stopAgent();
         return;
     }
-    if ( target_reached() )
-    {
-        setNextTarget();
-    }
+//    if ( target_reached() )
+//    {
+//	internal_state=state::HANDSHAKING;
+//        setNextTarget();
+//    }
 
-    if ( internal_state==state::MOVING || internal_state==state::EMERGENCY || internal_state==state::STARTING)
+    if ( internal_state==state::MOVING || internal_state==state::EMERGENCY || internal_state==state::STARTING )
     {
-        if ( isTimeToNegotiate() )
+        if ( isTimeToNegotiate ( time ) )
         {
-            internal_state=state::HANDSHAKING;
-	    negotiation_steps=0;
+            internal_state=state::LISTENING;
         }
-        else return;
+        if ( isTimeToNegotiate ( next_time-2.0 ) )
+        {
+	  if (target_reached())
+            setNextTarget();
+            internal_state=state::HANDSHAKING;
+            negotiation_steps=0;
+        }
+
     }
 
     if ( internal_state==state::HANDSHAKING )
@@ -84,50 +93,47 @@ void agent_router::run_plugin()
         filter_graph ( useArc );
 
         next_target_reachable=findPath ( useArc );
-	print_path();
         if ( next_target_reachable )
         {
             prepare_move_packet();
             update_packet();
+            print_path();
             communicator.send ( my_LRP );
         }
-        
-    }
-    
-    if (internal_state==state::LISTENING || internal_state==state::HANDSHAKING)
-    {
-	usleep(2000); //TODO: serve per dare tempo alla comunicazione di girare
-	_io_service.poll();
-	_io_service.reset();
-	negotiation_steps++;
-    }
-    
-    if (!detect_collision())
-    {
-      internal_state=state::LISTENING;
-    }
-    else
-    {
-     internal_state=state::HANDSHAKING; 
+        else cout<<"path not found"<<endl;
+
     }
 
-    if (negotiation_steps==15)//devo aver finito per forza, per ipotesi!
+    if ( internal_state==state::LISTENING || internal_state==state::HANDSHAKING )
     {
-      if (next_target_reachable)
-      {
-	  check_for_overtaking(); 
-	  internal_state=state::MOVING;
-      }
-      else
-     {
-       internal_state=state::EMERGENCY;
-       prepare_emergency_packet();
-       update_packet();
-       communicator.send(my_LRP);
-     }
+        usleep ( 2000 ); //TODO: serve per dare tempo alla comunicazione di girare
+        _io_service.poll();
+        _io_service.reset();
+        negotiation_steps++;
     }
-    
-    
+
+    if (internal_state==state::HANDSHAKING && !detect_collision() )
+    {
+        internal_state=state::LISTENING;
+    }
+
+    if ( negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
+    {
+        if ( next_target_reachable )
+        {
+            check_for_overtaking();
+            internal_state=state::MOVING;
+        }
+        else
+        {
+            internal_state=state::EMERGENCY;
+            prepare_emergency_packet();
+            update_packet();
+            communicator.send ( my_LRP );
+        }
+    }
+
+
     if ( next_target_reachable )
     {
         startAgent();
@@ -136,7 +142,7 @@ void agent_router::run_plugin()
     {
         stopAgent();
     }
-    
+
     setSpeed();
 }
 
@@ -200,7 +206,7 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
             {
                 useArc[arc] = false;
             }
-            cout<<id;
+            cout<<id<<" ";
         }
         cout<<endl;
     }
@@ -211,13 +217,15 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
 bool agent_router::detect_collision ( )
 {
     bool collision = false;
+    cout<<"ricerca collisione:";
+
     _mutex.lock();
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
+        if ( identifier==it->first ) continue;
         if ( identifier.compare ( it->first ) <0 ) continue;
         int age = round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         int my_age=round ( ( round ( time * 1000.0 ) - round ( last_time_updated * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
-        cout<<"ricerca collisione:"<<endl;
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )
         {
             int id = ( *itt ) - age * graph_node_size;
@@ -229,15 +237,16 @@ bool agent_router::detect_collision ( )
                 if ( node_id[i]-my_age*graph_node_size == id )
                 {
                     {
-                        cout << time << " rilevata una collisione con "<<it->first<<" tra "<<node_id[i]-my_age*graph_node_size <<"("<<i <<") e "<<id << endl;
+                        cout << time << " rilevata una collisione con "<<it->first<<" tra "<<node_id[i]-my_age*graph_node_size <<"("<<i <<") e "<<id << ";    ";
                     }
                     collision = true;
                 }
             }
         }
-        cout<<"ricerca collisione completata"<<endl;
     }
     _mutex.unlock();
+    cout<<"ricerca collisione completata"<<endl;
+
     return collision;
 }
 

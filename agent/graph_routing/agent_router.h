@@ -54,7 +54,7 @@ private:
     void filter_graph ( lemon::SmartDigraph::ArcMap< bool >& useArc );
     bool check_for_overtaking( );
     void update_packet();
-    bool isTimeToNegotiate();
+    bool isTimeToNegotiate(simulation_time time);
     void print_path();
 
 private:

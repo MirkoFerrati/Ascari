@@ -41,13 +41,9 @@ int main(int argc, char *argv[])
 //         if (argc<2)
 //             std::cout<<"inserire il tipo di visualizzazione: 1-baseball 2-grafi 3-vuoto"<<std::endl;
         lemon::ArgParser ap(argc,argv);
-        std::string graphName;
 		int viewerType;
-        ap.refOption("f","Graph filename",graphName);
 	
-	//written by Alessandro Settimi
-	ap.refOption("f","Yaml filename",filename,true);
-	//written by Alessandro Settimi
+	ap.refOption("f","Yaml filename",filename);
 			
         ap.synonym("filename","f");
 	ap.refOption("t"," 1-baseball 2-grafi 3-vuoto 4-Task Assignment 5-monitor",viewerType,true);
@@ -66,12 +62,6 @@ int main(int argc, char *argv[])
             return 0;
         }
         
-	//written by Alessandro Settimi
-        if(viewerType == 4)
-	{
-	    graphName=filename;
-	}
-	//written by Alessandro Settimi
 
         QApplication app(argc,argv);
 	
@@ -82,7 +72,7 @@ int main(int argc, char *argv[])
 	std::shared_ptr<std::mutex> read_mutex(new std::mutex);
 	std::shared_ptr<std::mutex> monitor_read_mutex(new std::mutex);
 	buffer.resize(MAX_PACKET_LENGTH);
-        Viewer window(read,read_mutex,NULL,viewerType,graphName);
+        Viewer window(read,read_mutex,NULL,viewerType,filename);
 	
         udp_world_sniffer sniffer(buffer,io_service);
 	zmq_world_sniffer<world_sim_packet> sniffer_test(read,read_mutex);

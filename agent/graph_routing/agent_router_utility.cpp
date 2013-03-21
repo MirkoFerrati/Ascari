@@ -45,12 +45,13 @@ void agent_router::compileExpressions(exprtk::symbol_table< double >& symbol_tab
 void agent_router::print_path()
 {
     int j=0;
+     std::cout<<"path calcolata: ";
     for ( unsigned int i=0; i<node_id.size(); i++ )
     {
         j++;
         if ( j>4 )
             break;
-        std::cout<<"path calcolata:" << node_id[i]  << "(" <<  node_id[i]  % graph_node_size << ")" << ">>";
+       cout << node_id[i]  << "(" <<  node_id[i]  % graph_node_size << ")" << ">>";
     }
     std::cout << " next_time=" << next_time << " fine" << std::endl;
 
@@ -100,8 +101,8 @@ void agent_router::setGraph(lemon::SmartDigraph& g)
 void agent_router::setSpeed()
 {
     simulation_time delta = next_time - time;
-    double floor = graph.id ( next ) / graph_node_size;
-    if ( floor < 0.000001 ) //floor==0 nei double
+    int floor = trunc(graph.id ( next ) / graph_node_size);
+    if ( floor ==0 ) //floor==0 nei double
         speed = 0;
     else
     {
@@ -110,7 +111,7 @@ void agent_router::setSpeed()
     }
 }
 
-bool agent_router::isTimeToNegotiate()
+bool agent_router::isTimeToNegotiate( simulation_time time )
 {
     return round ( time*1000-round ( time/TIME_SLOT_FOR_3DGRAPH ) *1000*TIME_SLOT_FOR_3DGRAPH ) ==-2000;
 }
