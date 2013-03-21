@@ -67,7 +67,7 @@ int main ( int argc, char** argv )
         s_catch_signals();
         agent a1 ( myAgent, world );
         a1.start();
-        std::cout << agent_name <<" è terminato" << std::endl;
+        std::cout << agent_name <<" e' terminato" << std::endl;
     }
     LOGOG_SHUTDOWN();
 

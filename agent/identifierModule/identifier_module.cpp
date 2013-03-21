@@ -251,7 +251,7 @@ for ( auto const & behavior: parsed_world.behaviors )
                 std::forward_list<dummy_state> tmp_states;
 
 
-                //communicator->send ( &agent_packet ); lo porto fuori tanto è uguale per tutti
+                //communicator->send ( &agent_packet ); lo porto fuori tanto e' uguale per tutti
                 for ( auto dummystate = ( *dummy_ref )->getDummyStates().begin(); dummystate != ( *dummy_ref )->getDummyStates().end(); ++dummystate )
                 {
                     if ( ! ( ( ncicli % update_after ) == 0 ) )
