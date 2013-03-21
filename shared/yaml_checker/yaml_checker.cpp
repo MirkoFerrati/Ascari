@@ -3,7 +3,7 @@
 #include "../agent/agent.h"
 Yaml_checker::Yaml_checker()
 {
-
+failed=false;
 }
 
 void Yaml_checker::checkYaml (std::string filename)

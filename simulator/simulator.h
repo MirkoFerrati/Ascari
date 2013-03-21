@@ -29,6 +29,8 @@ public:
 	void setSleep(unsigned secSleep);
 	void setCheckCollision(bool checkCollision);
 	
+	simulator(const simulator&)=delete;
+	
 private:
 	int max_loops;
 	int secSleep;

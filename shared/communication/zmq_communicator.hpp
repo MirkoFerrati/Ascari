@@ -101,7 +101,7 @@ protected:
                 sync_socket->recv ( &message_tmp );
                 std::cout << "ricevuto un nuovo client" << std::endl;
             }
-            catch ( zmq::error_t ex )
+            catch ( zmq::error_t& ex )
             {
                 if ( zmq_errno() == EINTR )
                 {
