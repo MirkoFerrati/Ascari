@@ -3,6 +3,7 @@
 #include <QtGui/QApplication>
 #include <math.h>
 #include <QtCore/QLocale>
+#include <QSettings>
 #include <QtGui/QWidget>
 #include "typedefs.h"
 #include "debug_constants.h"
@@ -172,15 +173,26 @@ void Viewer::set_tasklist(const Parsed_World& wo)
 }
 //written by Alessandro Settimi
 
+ void Viewer::closeEvent(QCloseEvent *event)
+ {
+QSettings settings("K2BRobotics","Viewer");
+      settings.setValue("mainWindowGeometry", saveGeometry());
+     QWidget::closeEvent(event);
+ }
+
 
 Viewer::~Viewer()
 {
+  QSettings settings;
+      settings.setValue("mainWindowGeometry", this->saveGeometry());
+
     if ( length )
         delete length;
     if ( coord_x )
         delete coord_x;
     if ( coord_y )
         delete coord_y;
+ 
 }
 
 void Viewer::drawArrow(int x1,int y1, int x2, int y2, double sze, QPainter* painter )

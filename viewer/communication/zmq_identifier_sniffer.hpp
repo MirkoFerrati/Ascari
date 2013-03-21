@@ -14,6 +14,7 @@ public:
 	zmq_identifier_sniffer(std::map<std::string,monitor_packet>& data,std::shared_ptr<std::mutex>& data_mutex):data(data),data_mutex(data_mutex)
 	{
 		this->init();
+		receiver=0;
 	}
 	;
 	void start_receiving()
@@ -33,7 +34,7 @@ void receive_loop(std::map<std::string,monitor_packet>& data, std::shared_ptr<st
 		sleep(0);
 		temp=this->receive();//.front();//blocking call
 		std::cout<<"ricevuto un pacchetto"<<std::endl;
-		if (temp.size()>0)
+		if (!temp.empty())
 		{
 		data_mutex->lock();
 		data[temp.front().id]=temp.front();

@@ -19,6 +19,9 @@ MainWindow::MainWindow ( QWidget *parent ) :
     QCoreApplication::setOrganizationDomain ( "TODO" );
     QCoreApplication::setApplicationName ( "Launcher" );
     settings=new QSettings();
+        restoreGeometry(settings->value("mainWindowGeometry").toByteArray());
+    restoreState(settings->value("mainWindowState").toByteArray());
+
     agentPath=settings->value ( "paths/agent","" ).toString();
     simulatorPath=settings->value ( "paths/simulator","" ).toString();
     viewerPath=settings->value ( "paths/viewer","" ).toString();
@@ -39,6 +42,15 @@ MainWindow::MainWindow ( QWidget *parent ) :
     sizes.push_back ( 500 );
     ui->splitter->setSizes ( sizes );
 
+}
+
+
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    QSettings settings;
+    settings.setValue("mainWindowGeometry", saveGeometry());
+    settings.setValue("mainWindowState", saveState());
+    QWidget::closeEvent(event);
 }
 
 MainWindow::~MainWindow()

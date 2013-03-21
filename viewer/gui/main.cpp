@@ -7,7 +7,7 @@
 #include "logog.hpp"
 #include "../gml2lgf/graph.h"
 #include "../communication/zmq_identifier_sniffer.hpp"
-
+#include <QSettings>
 
 void center(QWidget &widget,int WIDTH=800,int HEIGHT=800)
 {
@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
 	//written by Alessandro Settimi
 
         QApplication app(argc,argv);
+	
         boost::asio::io_service io_service;
         std::vector<char> buffer;
         world_sim_packet read;
@@ -94,7 +95,14 @@ int main(int argc, char *argv[])
 	}	
 	window.setWindowTitle("Visualizer");
         window.show();
-        center(window);
+	
+	QSettings settings("K2BRobotics","Viewer");
+ 
+    window.restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+ 
+    // create docks, toolbars, etc...
+ 
+	
         sniffer_test.start_receiving();
 	window.start();
 
