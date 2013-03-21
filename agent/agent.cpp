@@ -334,10 +334,10 @@ void agent::main_loop()
 //    if ( ! ( inputs.identifier.size() >1 ) )
         // cout<<"AGENTE:"<< inputs.identifier<<"-";
         //else
-    {
-        cout<<"AGENTE:"<<identifier<<" -";
-        cout<<"stato: "<<state.at ( 0 ) <<" "<<state.at ( 1 ) <<" "<<state.at ( 2 ) <<endl<<endl;
-    }
+//     {
+//         cout<<"AGENTE:"<<identifier<<" -";
+//         cout<<"stato: "<<state.at ( 0 ) <<" "<<state.at ( 1 ) <<" "<<state.at ( 2 ) <<endl<<endl;
+//     }
 
     sleep ( 0 );
     encoder->computeSubEvents ( temp.state_agents.internal_map );

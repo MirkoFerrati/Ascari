@@ -1,8 +1,8 @@
 #include "udp_graph_communicator.h"
 
-Udp_graph_communicator::Udp_graph_communicator(boost::signals2::mutex& mutex,graph_packet* tp,boost::asio::io_service& io_service)
+Udp_graph_communicator::Udp_graph_communicator(std::mutex& mutex,graph_packet* tp,boost::asio::io_service& io_service,std::string identifier)
         :mutex(mutex),tp(tp),socket_(io_service),sender(io_service,boost::asio::ip::address::from_string(MULTICAST_ADDRESS),SIMULATOR_GRAPH_PORT)
-        ,listen_endpoint_(boost::asio::ip::address::from_string(SOCKET_BINDING), AGENT_GRAPH_PORT),_io_service(io_service)
+        ,listen_endpoint_(boost::asio::ip::address::from_string(SOCKET_BINDING), AGENT_GRAPH_PORT),_io_service(io_service),identifier(identifier)
 {
     mutex_is_mine=false;
 	printDebug=false;
@@ -41,12 +41,14 @@ Udp_graph_communicator::~Udp_graph_communicator()
  * Invece impostare i valori con un ciclo for crea solo i nuovi elementi, sovrascrive solo i valori di quelli
  * già esistenti, non distrugge i vecchi
  */
-void Udp_graph_communicator::send(bool printDebug)
+void Udp_graph_communicator::send(graph_informations infos, bool printDebug )
 {
-    mutex.lock();
+    
 	if (printDebug)
 		std::cout<<"sto inviando una comunicazione"<<std::endl;
-    output_map_tp=*tp;
+    output_map_tp.clear();
+    mutex.lock();
+    output_map_tp[identifier]=infos;
     mutex.unlock();
 	if (printDebug)
 		std::cout<<output_map_tp<<std::endl;

@@ -11,7 +11,6 @@ set(agent_SOURCES empty_plugin/empty_plugin.cpp
 	identifierModule/agent_to_dummy_communicator.hpp identifierModule/dummy_agent.hpp
 	identifierModule/identifier_module.cpp identifierModule/identifierModule_communicator.hpp
 	
-	
 )
 
 #add_definitions(-DZMQDEBUG)
