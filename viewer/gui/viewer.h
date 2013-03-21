@@ -41,7 +41,7 @@ protected:
 	void parse_graph(std::string graphName);
     void pause();
    void init(std::string graphName);
-
+void closeEvent(QCloseEvent *event);
   private:
     int timerId;
     int time;

@@ -42,6 +42,8 @@ private slots:
 
     void on_playall_clicked();
 
+    void closeEvent(QCloseEvent *event);
+    
     bool startViewer();
     void startAgents();
     void startSimulator();
