@@ -76,9 +76,9 @@ void agent_router::run_plugin()
         {
             internal_state=state::LISTENING;
         }
-        if ( isTimeToNegotiate ( next_time-2.0 ) )
+        if ( abs(next_time-(time+2.0))<0.001 )
         {
-	  if (target_reached())
+	  //if (target_reached())
             setNextTarget();
             internal_state=state::HANDSHAKING;
             negotiation_steps=0;
@@ -195,6 +195,7 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
     _mutex.lock();
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it ) //per ogni pacchetto ricevuto
     {
+      if (identifier==it->first) continue;
         if ( identifier.compare ( it->first ) <0 ) continue;  //se il pacchetto ha priorita' piu' alta
         int age = round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         cout<<"filtro i nodi dell'agente:"<<it->first<<" ";

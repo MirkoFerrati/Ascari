@@ -107,7 +107,8 @@ void agent_router::setSpeed()
     else
     {
         double length = distance_to_target.value();
-        speed=length/delta;
+	speed=length/delta;
+        cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
     }
 }
 
