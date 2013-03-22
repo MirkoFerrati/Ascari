@@ -17,7 +17,7 @@ class identifierModule_communicator: public identifier_to_viewer_communicator<se
 
 public:
 
-	identifierModule_communicator(send_type& data_send,std::string& my_id)
+	identifierModule_communicator(send_type& data_send,const std::string& my_id)
 			:data_send(data_send), my_id(my_id)
 	{
 		this->init(my_id);
@@ -26,7 +26,6 @@ public:
 
 	void send()
 	{
-		std::cout<<"dato inviato ";
 		this->identifier_to_viewer_communicator<send_type>::send(data_send);
 		
 	}

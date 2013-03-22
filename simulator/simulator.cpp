@@ -9,6 +9,7 @@
 
 #include "collisionchecker.h"
 #include "visibility/visibility.h"
+#include <time.h>
 
 using namespace std;
 
@@ -198,7 +199,12 @@ void simulator::main_loop()
 	    
 	    //communicator->send_broadcast(sim_packet);
 	    // sim_packet contiene tutte le informazioni che mi servono. Lo personalizzo per ogni agente
-	    
+	    struct timespec requestStart, requestEnd;
+    
+	    clock_gettime(CLOCK_REALTIME, &requestStart);
+    
+    
+    
 	    for (auto agent=sim_packet.state_agents.internal_map.begin();agent!=sim_packet.state_agents.internal_map.end();agent++){
 	    
 	     agent_packet.state_agents.internal_map.clear();
@@ -283,8 +289,22 @@ void simulator::main_loop()
                 }
             }
             collisionChecker->checkCollisions();
-            usleep(secSleep);
+         //   usleep(secSleep);
             vector<control_command_packet> temp=communicator->receive_control_commands();
+	    
+	    
+	    // Calculate time taken by a request
+	  clock_gettime(CLOCK_REALTIME, &requestEnd);
+
+    // Calculate time it took
+    double accum = ( requestEnd.tv_sec - requestStart.tv_sec )
+      + ( requestEnd.tv_nsec - requestStart.tv_nsec )
+      / 1E9;
+
+      cout<<endl<< "Tempo Necessario"<<endl;
+    printf( "%lf\n", accum );
+    
+    
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
             for (unsigned i=0; i< temp.size();i++) {
 

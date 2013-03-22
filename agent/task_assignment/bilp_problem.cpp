@@ -24,7 +24,7 @@ void bilp_problem::initialize_problem(std::string probl_name,int probl_type,int 
 
 void bilp_problem::initialize_matrices()
 {	
-	A_i.push_back(0);	 //negli array usati dal solver l'elemento 0 è riservato al solver
+	A_i.push_back(0);	 //negli array usati dal solver l'elemento 0 e' riservato al solver
 	A_j.push_back(0);
 	A_ij.push_back(0);
 
