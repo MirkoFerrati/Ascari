@@ -301,8 +301,8 @@ void simulator::main_loop()
       + ( requestEnd.tv_nsec - requestStart.tv_nsec )
       / 1E9;
 
-      cout<<endl<< "Tempo Necessario"<<endl;
-    printf( "%lf\n", accum );
+      //cout<<endl<< "tempo necessario:"<<endl;
+    printf( "%f\n", accum );
     
     
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;

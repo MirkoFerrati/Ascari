@@ -60,8 +60,8 @@ public:
         }
         else if ( sync == ASK_SYNC )
         {
-            sync_socket = new zmq::socket_t ( static_zmq::context, ZMQ_REQ );
-            sync_socket->setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
+            //sync_socket = new zmq::socket_t ( static_zmq::context, ZMQ_REQ );
+            //sync_socket->setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
         }
     }
 
@@ -177,7 +177,7 @@ protected:
     }
 
 
-    bool askSync()
+    bool askSync(std::string sync_protocol)
     {
         /** TODO(Mirko): implementare il modello qui sotto, e' più robusto
               * A more robust model could be:
@@ -186,43 +186,71 @@ protected:
                  Subscribers connect SUB socket and when they receive a Hello message they tell the publisher via a REQ/REP socket pair.
                  When the publisher has had all the necessary confirmations, it starts to send real data.
                */
-        std::cout << owner_name << " connecting to server..." << std::endl;
-	 agent_simulator_handshake_packet infos;
-       bool exit=false;
-	while(!exit){
-        zmq::message_t message ( owner_name.size() );
-        memcpy ( message.data(), owner_name.data(), owner_name.size() );
-        bool rc = sync_socket->send ( message );
-        assert ( rc );
-        message.rebuild ( MAX_PACKET_LENGTH );
-        try
-        {
-            //bool rc = sync_socket->recv ( &message,ZMQ_NOBLOCK );TODO(MIRKO). QUI HO RIPRISTINATO
-            bool rc = sync_socket->recv ( &message);
-	    if (rc)
-	    {
-            char* receive = reinterpret_cast<char*> ( message.data() );
-            //std::cout<<receive<<std::endl;
-            std::istringstream receive_stream (
-                std::string ( receive, receive_buffer.size() ) );
-            boost::archive::text_iarchive archive ( receive_stream );
-            archive >> infos;
-	    exit=true;
-	    }
-	    else 
-	    {
-	      usleep(250000);
-	      continue;
-	    }
-	   
-        }
-        catch ( zmq::error_t ex )
-        {
-            if ( zmq_errno() == EINTR )
-                WARN ( "programma terminato", NULL );
-            return false;
-        }
-	}
+		
+		std::cout << owner_name << " connecting to server...";
+		std::cout.flush();
+		agent_simulator_handshake_packet infos;
+		bool exit=false;
+		
+		int temp=0;
+		
+		
+		while ( !exit )
+		{
+			sync_socket = new zmq::socket_t ( static_zmq::context, ZMQ_REQ );
+			sync_socket->setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
+			sync_socket->connect ( !sync_protocol.compare ( "" ) ? SYNC_PROTOCOL : sync_protocol.c_str() );
+			std::cout  << ".";
+			zmq::message_t message ( owner_name.size() );
+			memcpy ( message.data(), owner_name.data(), owner_name.size() );
+			bool rc = sync_socket->send ( message );
+			assert ( rc );
+			message.rebuild ( MAX_PACKET_LENGTH );
+			try
+			{
+				zmq::pollitem_t items[] = { { *sync_socket, 0, ZMQ_POLLIN, 0 } };
+				zmq::poll ( &items[0], 1, 1 * 1000 );
+				//  If we got a reply, process it
+				if ( items[0].revents & ZMQ_POLLIN )
+				{
+					std::cout<<"ricevuto qualcosa"<<std::endl;
+					bool rc = sync_socket->recv ( &message );
+					if ( rc )
+					{
+						char* receive = reinterpret_cast<char*> ( message.data() );
+						//std::cout<<receive<<std::endl;
+						std::istringstream receive_stream (
+							std::string ( receive, receive_buffer.size() ) );
+						boost::archive::text_iarchive archive ( receive_stream );
+						try{
+						archive >> infos;
+						exit=true;
+						}
+						catch (std::exception &ex)
+						{
+							ERR("error while parsing sync response from server %s",ex.what());
+							throw ex;
+						}
+					}
+				}
+				else
+				{
+					sync_socket->close();
+					delete sync_socket;
+					usleep ( 250000 );
+					continue;
+				}
+				
+			}
+			catch ( zmq::error_t ex )
+			{
+				WARN("%s",ex.what());
+				if ( zmq_errno() == EINTR )
+					WARN ( "programma terminato", NULL );
+				return false;
+			}
+		}
+
         std::cout << infos.message << std::endl;
         if ( !infos.accepted )
         {
@@ -285,9 +313,9 @@ protected:
         {
 
             sleep ( 1 );
-            sync_socket->connect ( !sync_protocol.compare ( "" ) ? SYNC_PROTOCOL : sync_protocol.c_str() );
+            //sync_socket->connect ( !sync_protocol.compare ( "" ) ? SYNC_PROTOCOL : sync_protocol.c_str() );
 
-            if ( !askSync() )
+            if ( !askSync(sync_protocol) )
             {
                 ERR ( "sync refused, check configuration and previous messages", NULL );
                 abort();
