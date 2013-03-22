@@ -108,13 +108,13 @@ void agent_router::setSpeed()
     {
         double length = distance_to_target.value();
 	speed=length/delta;
-        cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
+        //cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
     }
 }
 
 bool agent_router::isTimeToNegotiate( simulation_time time )
 {
-    return round ( time*1000-round ( time/TIME_SLOT_FOR_3DGRAPH ) *1000*TIME_SLOT_FOR_3DGRAPH ) ==-2000;
+    return round ( time*1000-round ( time/TIME_SLOT_FOR_3DGRAPH ) *1000*TIME_SLOT_FOR_3DGRAPH ) ==-1700;
 }
 
 

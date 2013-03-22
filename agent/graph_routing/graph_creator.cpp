@@ -88,25 +88,9 @@ void Graph_creator::addFloor ( lemon::SmartDigraph::NodeMap<lemon::dim2::Point<i
                 {
                     source=_3Dgraph.nodeFromId ( i+ ( floorNumber-1-j ) *graph_node_size );
                     SmartDigraph::Arc a=_3Dgraph.addArc ( source,target );
-                    ( _3Dlength ) [a]= ( 1+j*1.1 ) *sqrt ( ( double ) sqr ( _3Dcoord_x[source]-_3Dcoord_x[target] ) + ( double ) sqr ( _3Dcoord_y[source]-_3Dcoord_y[target] ) ); //1; prendo la distanza reale invece dell'unità
+                    ( _3Dlength ) [a]= ( 1+j*1.1+0.1*floorNumber ) *sqrt ( ( double ) sqr ( _3Dcoord_x[source]-_3Dcoord_x[target] ) + ( double ) sqr ( _3Dcoord_y[source]-_3Dcoord_y[target] ) ); //1; prendo la distanza reale invece dell'unità
                     acolors[a]=floorNumber+1;
                 }
-                //archi a 2 piani inferiori
-
-// 			if (floorNumber>1)
-// 			{
-// 				a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-2)*graph_node_size),target);
-// 				(_3Dlength)[a]=2.1*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
-// 				acolors[a]=floorNumber+1;
-// 			}
-// 			//archi a 3 piani
-//
-// 			if (floorNumber>2)
-// 			{
-// 				a=_3Dgraph.addArc(_3Dgraph.nodeFromId(i+(floorNumber-3)*graph_node_size),target);
-// 				(_3Dlength)[a]=3.3*sqrt(sqr(_3Dcoord_x[source]-_3Dcoord_x[target])+sqr(_3Dcoord_y[source]-_3Dcoord_y[target]));//2;
-// 				acolors[a]=floorNumber+1;
-// 			}
             }
         }
 
@@ -123,26 +107,31 @@ void Graph_creator::finalizeFloor ( lemon::SmartDigraph::NodeMap<lemon::dim2::Po
     //Aggiungo un livello al grafo
     addNodes ( coords,ncolors,acolors,floorNumber );
     //TODO: attenzione, l'ipotesi e' che ogni nodo stia sopra il suo gemello con id aumentato del numero di nodi del grafo iniziale
-    SmartDigraph::Node source;
-    SmartDigraph::Node target;
+    SmartDigraph::Node target,source;
     for ( unsigned int i=0; i<graph_node_size; i++ )
     {
         for ( SmartDigraph::OutArcIt arcit ( graph,graph.nodeFromId ( i ) ); arcit!=INVALID; ++arcit )
         {
             SmartDigraph::Arc a=_3Dgraph.addArc ( _3Dgraph.nodeFromId ( i+floorNumber*graph_node_size ),_3Dgraph.nodeFromId ( graph.id ( graph.target ( arcit ) ) +floorNumber*graph_node_size ) );
-            ( _3Dlength ) [a]=TOP_FLOOR_LENGTH; //TODO: ogni numero e' fondamentale
+            ( _3Dlength ) [a]=TOP_FLOOR_LENGTH; 
             acolors[a]=floorNumber+1;
-            source=_3Dgraph.nodeFromId ( i+ ( floorNumber-1 ) *graph_node_size );
             target=_3Dgraph.nodeFromId ( graph.id ( graph.target ( arcit ) ) +floorNumber*graph_node_size );
-            a=_3Dgraph.addArc ( source,target );
-            ( _3Dlength ) [a]=sqrt ( ( double ) sqr ( _3Dcoord_x[source]-_3Dcoord_x[target] ) + ( double ) sqr ( _3Dcoord_y[source]-_3Dcoord_y[target] ) ); //1; prendo la distanza reale invece dell'unità;
+//             a=_3Dgraph.addArc ( source,target );
+//             ( _3Dlength ) [a]=sqrt ( ( double ) sqr ( _3Dcoord_x[source]-_3Dcoord_x[target] ) + ( double ) sqr ( _3Dcoord_y[source]-_3Dcoord_y[target] ) ); //1; prendo la distanza reale invece dell'unità;
+//             acolors[a]=floorNumber+1;
+//             a=_3Dgraph.addArc ( _3Dgraph.nodeFromId ( i+ ( floorNumber-2 ) *graph_node_size ),target );
+//             ( _3Dlength ) [a]=2.1*sqrt ( sqr ( _3Dcoord_x[source]-_3Dcoord_x[target] ) +sqr ( _3Dcoord_y[source]-_3Dcoord_y[target] ) ); //2;
+//             acolors[a]=floorNumber+1;
+//             a=_3Dgraph.addArc ( _3Dgraph.nodeFromId ( i+ ( floorNumber-3 ) *graph_node_size ),target );
+//             ( _3Dlength ) [a]=3.3*sqrt ( sqr ( _3Dcoord_x[source]-_3Dcoord_x[target] ) +sqr ( _3Dcoord_y[source]-_3Dcoord_y[target] ) ); //2;
+//             acolors[a]=floorNumber+1;
+	    for (int j=1;j<MAX_ARC_FLOORS;j++)
+	    {
+	    source=_3Dgraph.nodeFromId ( i+ ( floorNumber-j ) *graph_node_size );
+	    a=_3Dgraph.addArc (source,target );
+            ( _3Dlength ) [a]=(1+1.1*j+0.1*floorNumber)*sqrt ( sqr ( _3Dcoord_x[source]-_3Dcoord_x[target] ) +sqr ( _3Dcoord_y[source]-_3Dcoord_y[target] ) ); //2;
             acolors[a]=floorNumber+1;
-            a=_3Dgraph.addArc ( _3Dgraph.nodeFromId ( i+ ( floorNumber-2 ) *graph_node_size ),target );
-            ( _3Dlength ) [a]=2.1*sqrt ( sqr ( _3Dcoord_x[source]-_3Dcoord_x[target] ) +sqr ( _3Dcoord_y[source]-_3Dcoord_y[target] ) ); //2;
-            acolors[a]=floorNumber+1;
-            a=_3Dgraph.addArc ( _3Dgraph.nodeFromId ( i+ ( floorNumber-3 ) *graph_node_size ),target );
-            ( _3Dlength ) [a]=3.3*sqrt ( sqr ( _3Dcoord_x[source]-_3Dcoord_x[target] ) +sqr ( _3Dcoord_y[source]-_3Dcoord_y[target] ) ); //2;
-            acolors[a]=floorNumber+1;
+	    }
         }
     }
 }

@@ -76,7 +76,7 @@ void agent_router::run_plugin()
         {
             internal_state=state::LISTENING;
         }
-        if ( abs(next_time-(time+2.0))<0.001 )
+        if ( abs(next_time-(time+1.7))<0.001 )
         {
 	  //if (target_reached())
             setNextTarget();
@@ -86,6 +86,11 @@ void agent_router::run_plugin()
 
     }
 
+    if (time>95)
+    {
+	sleep(0);
+    }
+    
     if ( internal_state==state::HANDSHAKING )
     {
         lemon::SmartDigraph::ArcMap<bool> useArc ( graph, true );
@@ -117,7 +122,7 @@ void agent_router::run_plugin()
         internal_state=state::LISTENING;
     }
 
-    if ( negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
+    if ((internal_state==state::LISTENING || internal_state==state::HANDSHAKING) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
     {
         if ( next_target_reachable )
         {
@@ -148,6 +153,7 @@ void agent_router::run_plugin()
 
 
 //TODO(Mirko): implementare sorpassi multipli
+//TODO(Mirko): l'uso di next_time e' ridondante e sbagliato, dovrei ricavarmi tutto dalla path
 bool agent_router::check_for_overtaking ()
 {
     std::cout<<"check for overtakings";
@@ -155,37 +161,55 @@ bool agent_router::check_for_overtaking ()
     _mutex.lock();
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
+      if (identifier==it->first) continue;
         int age = round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         for ( unsigned int j = 1; j < ( *it ).second.lockedNode.size(); j++ )
         {
-            int id = ( *it ).second.lockedNode[j - 1] - age * graph_node_size;
-            int id1 = ( *it ).second.lockedNode[j] - age * graph_node_size;
+            int other_id = ( *it ).second.lockedNode[j - 1] - age * graph_node_size;
+            int other_id1 = ( *it ).second.lockedNode[j] - age * graph_node_size;
 
-            for ( unsigned int i = 1; i < node_id.size(); i++ )
+            for ( unsigned int i = 0; i < node_id.size(); i++ )
             {
-                if ( ( node_id[i - 1] - id ) % graph_node_size == 0 &&
-                        ( node_id[i] - id1 ) % graph_node_size == 0 )
+	      int my_id=0;
+		    int  my_id1= 0;
+	      if (i==0)
+	      {
+		 my_id=graph.id(source);
+		 my_id1= node_id[i];
+	      }
+		else
+		{
+	      	     my_id=node_id[i - 1];
+		      my_id1= node_id[i];
+		}
+                if ( ( my_id - other_id ) % graph_node_size == 0 &&
+                        (my_id1 - other_id1 ) % graph_node_size == 0 )
                 {
                     if (
-                        node_id[i - 1] > id &&
-                        node_id[i] < id1 )
+                       my_id > other_id &&
+                        my_id1< other_id1 )
                     {
                         overtaking = true;
-                        std::cout << time << ": sto rischiando di sorpassare l'agente " << ( *it ).second.id << " tra il nodo " << id << " e " << id1 << "passando da " << node_id[i - 1] << " e " << node_id[i] << "\n"; //<<std::endl;
-                        node_id[i]=id1;
+                        std::cout << time << ": sto rischiando di sorpassare l'agente " << ( *it ).second.id << " tra il nodo " << other_id << " e " 
+			<< other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
+                        node_id[i]=other_id1;
+			next_time+=TIME_SLOT_FOR_3DGRAPH;
                     }
-                    if ( node_id[i - 1] < id &&
-                            node_id[i] > id1 )
+                    if ( my_id < other_id &&
+                            my_id1 > other_id1 )
                     {
                         overtaking = true;
-                        std::cout << time << ": sto rischiando di essere sorpassato dall'agente " << ( *it ).second.id << " tra il nodo " << id << " e " << id1 << "passando da " << node_id[i - 1] << " e " << node_id[i] << "\n"; //<<std::endl;
-                        node_id[i]=id1;
+                        std::cout << time << ": sto rischiando di essere sorpassato dall'agente " << ( *it ).second.id 
+                        << " tra il nodo " << other_id << " e " << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
+                        node_id[i]=other_id1;
+			next_time-=TIME_SLOT_FOR_3DGRAPH;
                     }
                 }
             }
         }
     }
     _mutex.unlock();
+    cout<<endl;
     return overtaking;
 }
 
