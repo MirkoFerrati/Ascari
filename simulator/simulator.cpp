@@ -302,7 +302,7 @@ void simulator::main_loop()
       / 1E9;
 
       //cout<<endl<< "tempo necessario:"<<endl;
-    printf( "%f\n", accum );
+    //printf( "%f\n", accum );
     
     
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
