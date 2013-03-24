@@ -5,14 +5,13 @@
 #include "node.h"
 #include <vector>
 #include <fstream>
-
-using namespace std;
+#include <ostream>
 
 class graph
 {
   
-  vector<node> nodes;
-  vector<arc> arcs;
+  std::vector<node> nodes;
+  std::vector<arc> arcs;
 
 
 public:
@@ -20,8 +19,8 @@ public:
      virtual ~graph();
 
   
-    friend ostream &operator<<( ostream &out, const graph &g );
-    void readGraph(fstream* arg1);
+    friend std::ostream &operator<<( std::ostream &out, const graph &g );
+    void readGraph(std::fstream* arg1);
 
 };
 

@@ -5,6 +5,9 @@
 #include <sstream>
 #include "utils.h"
 
+using namespace std;
+
+
 node::node()
 {
 	x=y=0;
