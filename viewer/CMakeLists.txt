@@ -5,11 +5,12 @@ include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se ha
 include_directories(../shared/parserYAML/include)
 
 find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
+
 include(${QT_USE_FILE})
 
 set(viewer_HEADERS gui/Agent.h gui/viewer.h communication/udp_world_sniffer.h ../shared/communication/global.h)
 set(viewer_SOURCES gui/main.cpp gui/Agent.cpp gui/viewer.cpp communication/udp_world_sniffer.cpp communication/zmq_world_sniffer.hpp communication/zmq_identifier_sniffer.hpp 
-../shared/communication/global.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp)
+../shared/communication/global.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp osgviewerqt.cpp)
 
 #set(viewer_UIS myproject.ui)
 #set(viewer_RESOURCES myproject.qrc)
@@ -29,6 +30,7 @@ add_executable(viewer
 )
 
 target_link_libraries(viewer ${QT_LIBRARIES})
+target_link_libraries(viewer osgWidget osgQt osgDB osgGA osg OpenThreads osgViewer)
 target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
  find_package(Boost REQUIRED system thread serialization)
   
