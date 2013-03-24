@@ -2,25 +2,24 @@
 #define NODE_H
 
 #include <string>
-
-using namespace std;
-
+#include <fstream>
+#include <ostream>
 class node
 {
   
 int x,y;
-string name;
-string label;
-    void readGraphics(fstream* arg1);
-    void readTextGraphics(fstream* arg1);
+std::string name;
+std::string label;
+    void readGraphics(std::fstream* arg1);
+    void readTextGraphics(std::fstream* arg1);
 
 public:
     node();
     virtual ~node();
   
     
-    friend ostream &operator<<( ostream &out, const node &n );
-    void readNode(fstream *arg1);
+    friend std::ostream &operator<<( std::ostream &out, const node &n );
+    void readNode(std::fstream *arg1);
     
 };
 

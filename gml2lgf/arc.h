@@ -3,9 +3,8 @@
 
 #include <string>
 #include "node.h"
-
-
-using namespace std;
+#include <ostream>
+#include <fstream>
 
 class arc
 {
@@ -14,17 +13,17 @@ class arc
   int first;
   int second;
   double len;
-  void readLabelGraphics(fstream* arg1);
+  void readLabelGraphics(std::fstream* arg1);
   
   
 public:
-  string name;
+  std::string name;
     arc();
     
     virtual ~arc();
     
-    friend ostream &operator<<( ostream &out, const arc &a );
-    void readArc(fstream* arg1);
+    friend std::ostream &operator<<( std::ostream &out, const arc &a );
+    void readArc(std::fstream* arg1);
 
 };
 

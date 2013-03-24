@@ -5,6 +5,7 @@
 #include <sstream>
 #include "utils.h"
 
+using namespace std;
 
 graph::graph()
 {
