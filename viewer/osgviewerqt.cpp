@@ -52,7 +52,14 @@ public:
 		osg::ref_ptr<osg::Cone> agent_body=new osg::Cone(center,3,5);
 		osg::ref_ptr<osg::ShapeDrawable> draw_agent= new osg::ShapeDrawable();
 		draw_agent->setShape(agent_body);
+		
+		osg::Vec3f center1(6,7,8);
+		osg::ref_ptr<osg::Cone> agent_body1=new osg::Cone(center1,3,5);
+		osg::ref_ptr<osg::ShapeDrawable> draw_agent1= new osg::ShapeDrawable();
+		draw_agent1->setShape(agent_body1);
+		
 		agent->addDrawable(draw_agent);
+		agent->addDrawable(draw_agent1);
 		view->setSceneData(agent);
 		view->addEventHandler( new osgViewer::StatsHandler );
 		view->setCameraManipulator( new osgGA::TrackballManipulator );
