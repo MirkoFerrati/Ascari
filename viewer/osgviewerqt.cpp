@@ -10,7 +10,7 @@
 #include <osgDB/ReadFile>
 
 #include <osgQt/GraphicsWindowQt>
-
+#include <osg/ShapeDrawable>
 #include <iostream>
 
 
@@ -46,7 +46,14 @@ public:
 		view->setCamera( camera );
 		addView( view );
 		
-		view->setSceneData( scene );
+//		view->setSceneData( scene );
+		osg::ref_ptr<osg::Geode> agent = new osg::Geode;
+		osg::Vec3f center(3,4,5);
+		osg::ref_ptr<osg::Cone> agent_body=new osg::Cone(center,3,5);
+		osg::ref_ptr<osg::ShapeDrawable> draw_agent= new osg::ShapeDrawable();
+		draw_agent->setShape(agent_body);
+		agent->addDrawable(draw_agent);
+		view->setSceneData(agent);
 		view->addEventHandler( new osgViewer::StatsHandler );
 		view->setCameraManipulator( new osgGA::TrackballManipulator );
 		
