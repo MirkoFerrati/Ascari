@@ -44,6 +44,7 @@ void agent_router::compileExpressions(exprtk::symbol_table< double >& symbol_tab
 
 void agent_router::print_path()
 {
+
     int j=0;
      std::cout<<"path calcolata: ";
     for ( unsigned int i=0; i<node_id.size(); i++ )
@@ -98,19 +99,6 @@ void agent_router::setGraph(lemon::SmartDigraph& g)
 	lemon::digraphCopy<lemon::SmartDigraph,lemon::SmartDigraph>(g,graph); //graph=g;
 }
 
-void agent_router::setSpeed()
-{
-    simulation_time delta = next_time - time;
-    int floor = trunc(graph.id ( next ) / graph_node_size);
-    if ( floor ==0 ) //floor==0 nei double
-        speed = 0;
-    else
-    {
-        double length = distance_to_target.value();
-	speed=length/delta;
-        //cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
-    }
-}
 
 bool agent_router::isTimeToNegotiate( simulation_time time )
 {

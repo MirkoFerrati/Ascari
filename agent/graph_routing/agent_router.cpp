@@ -76,9 +76,9 @@ void agent_router::run_plugin()
         {
             internal_state=state::LISTENING;
         }
-        if ( abs(next_time-(time+1.7))<0.001 )
+        if ( abs ( next_time- ( time+1.7 ) ) <0.001 )
         {
-	  //if (target_reached())
+            //if (target_reached())
             setNextTarget();
             internal_state=state::HANDSHAKING;
             negotiation_steps=0;
@@ -86,11 +86,11 @@ void agent_router::run_plugin()
 
     }
 
-    if (time>95)
+    if ( time>95 )
     {
-	sleep(0);
+        sleep ( 0 );
     }
-    
+
     if ( internal_state==state::HANDSHAKING )
     {
         lemon::SmartDigraph::ArcMap<bool> useArc ( graph, true );
@@ -117,12 +117,12 @@ void agent_router::run_plugin()
         negotiation_steps++;
     }
 
-    if (internal_state==state::HANDSHAKING && !detect_collision() )
+    if ( internal_state==state::HANDSHAKING && !detect_collision() )
     {
         internal_state=state::LISTENING;
     }
 
-    if ((internal_state==state::LISTENING || internal_state==state::HANDSHAKING) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
+    if ( ( internal_state==state::LISTENING || internal_state==state::HANDSHAKING ) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
     {
         if ( next_target_reachable )
         {
@@ -161,7 +161,7 @@ bool agent_router::check_for_overtaking ()
     _mutex.lock();
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
-      if (identifier==it->first) continue;
+        if ( identifier==it->first ) continue;
         int age = round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         for ( unsigned int j = 1; j < ( *it ).second.lockedNode.size(); j++ )
         {
@@ -170,39 +170,39 @@ bool agent_router::check_for_overtaking ()
 
             for ( unsigned int i = 0; i < node_id.size(); i++ )
             {
-	      int my_id=0;
-		    int  my_id1= 0;
-	      if (i==0)
-	      {
-		 my_id=graph.id(source);
-		 my_id1= node_id[i];
-	      }
-		else
-		{
-	      	     my_id=node_id[i - 1];
-		      my_id1= node_id[i];
-		}
+                int my_id=0;
+                int  my_id1= 0;
+                if ( i==0 )
+                {
+                    my_id=graph.id ( source );
+                    my_id1= node_id[i];
+                }
+                else
+                {
+                    my_id=node_id[i - 1];
+                    my_id1= node_id[i];
+                }
                 if ( ( my_id - other_id ) % graph_node_size == 0 &&
-                        (my_id1 - other_id1 ) % graph_node_size == 0 )
+                        ( my_id1 - other_id1 ) % graph_node_size == 0 )
                 {
                     if (
-                       my_id > other_id &&
+                        my_id > other_id &&
                         my_id1< other_id1 )
                     {
                         overtaking = true;
-                        std::cout << time << ": sto rischiando di sorpassare l'agente " << ( *it ).second.id << " tra il nodo " << other_id << " e " 
-			<< other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
+                        std::cout << time << ": sto rischiando di sorpassare l'agente " << ( *it ).second.id << " tra il nodo " << other_id << " e "
+                                  << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
                         node_id[i]=other_id1;
-			next_time+=TIME_SLOT_FOR_3DGRAPH;
+                        next_time+=TIME_SLOT_FOR_3DGRAPH;
                     }
                     if ( my_id < other_id &&
                             my_id1 > other_id1 )
                     {
                         overtaking = true;
-                        std::cout << time << ": sto rischiando di essere sorpassato dall'agente " << ( *it ).second.id 
-                        << " tra il nodo " << other_id << " e " << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
+                        std::cout << time << ": sto rischiando di essere sorpassato dall'agente " << ( *it ).second.id
+                                  << " tra il nodo " << other_id << " e " << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
                         node_id[i]=other_id1;
-			next_time-=TIME_SLOT_FOR_3DGRAPH;
+                        next_time-=TIME_SLOT_FOR_3DGRAPH;
                     }
                 }
             }
@@ -219,7 +219,7 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
     _mutex.lock();
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it ) //per ogni pacchetto ricevuto
     {
-      if (identifier==it->first) continue;
+        if ( identifier==it->first ) continue;
         if ( identifier.compare ( it->first ) <0 ) continue;  //se il pacchetto ha priorita' piu' alta
         int age = round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         cout<<"filtro i nodi dell'agente:"<<it->first<<" ";
@@ -285,16 +285,19 @@ bool agent_router::findPath ( lemon::SmartDigraph::ArcMap<bool>& useArc )
         reached = false;
     if ( !reached )
     {
-        next = INVALID;
-        next_time=-1;
+//         next = INVALID;
+//         next_time=-1;
+        last_time_planned=-1;
         return false;
     }
-    next = graph.target ( computed_path.front() );
-    xtarget =  coord_x[next];
-    ytarget =  coord_y[next];
-    unsigned int floor = graph.id ( next ) / graph_node_size;
+//     next = graph.target ( computed_path.front() );
+//     xtarget =  coord_x[next];
+//     ytarget =  coord_y[next];
+//     unsigned int floor = graph.id ( next ) / graph_node_size;
     // next_time = trunc ( trunc ( time + TIME_SLOT_FOR_3DGRAPH / 3.0 ) / TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor; //TODO bruttissimo
-    next_time = round ( time/TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
+//     next_time = round ( time/TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
+    last_time_planned=time;
+    prepare_move_packet();
     return true;
 }
 
@@ -332,6 +335,31 @@ void agent_router::prepare_move_packet()
     last_time_updated = time;
 }
 
+
+void agent_router::setSpeed()
+{
+    if ( node_id.empty() )
+    {
+        speed=0;
+        return;
+    }
+    SmartDigraphBase::Node next=graph.nodeFromId ( node_id.front() );
+    xtarget =  coord_x[next];
+    ytarget =  coord_y[next];
+    unsigned int floor = graph.id ( next ) / graph_node_size;
+    // next_time = trunc ( trunc ( time + TIME_SLOT_FOR_3DGRAPH / 3.0 ) / TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor; //TODO bruttissimo
+    // next_time = round ( time/TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
+    next_time = round(last_time_planned/TIME_SLOT_FOR_3DGRAPH)*TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
+    simulation_time delta = next_time - time;
+    if ( floor ==0 ) //floor==0 nei double
+        speed = 0;
+    else
+    {
+        double length = distance_to_target.value();
+        speed=length/delta;
+        //cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
+    }
+}
 
 void agent_router::setNextTarget()
 {

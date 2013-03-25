@@ -85,6 +85,8 @@ private:
     simulation_time next_time;
     simulation_time &time;
     simulation_time last_time_updated;
+    simulation_time last_time_planned;
+
 
     /**Comunicatore*/
     std::mutex _mutex;  
