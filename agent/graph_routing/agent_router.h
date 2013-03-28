@@ -19,7 +19,8 @@ enum  class state
 {
     MOVING,
     LISTENING,
-    HANDSHAKING,
+    NODE_HANDSHAKING,
+    ARC_HANDSHAKING,
     EMERGENCY,
     STOPPED,
     STARTING
