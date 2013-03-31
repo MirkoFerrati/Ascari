@@ -39,12 +39,12 @@ public:
     void compileExpressions ( exprtk::symbol_table< double >& symbol_table );
     void setSource ( lemon::SmartDigraph::Node s );
     void setTarget ( lemon::SmartDigraph::Node t );
-    std::pair<int,int> getTargetCoords();
+    //std::pair<int,int> getTargetCoords();
     ~agent_router();
 
 private:
     bool findPath ( lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< bool >& useArc );
-    void setNextTarget();
+    bool setNextTarget();
     void setSpeed();
     void stopAgent ();
     void startAgent ();
@@ -80,13 +80,14 @@ private:
     std::vector<int> targets;  //lista dei targets
     unsigned int target_counter; //avanzamento dei target
     std::vector<int> node_id;  //nodi della path
-    lemon::SmartDigraph::Node source, target, next; //informazioni locali sui nodi
+    lemon::SmartDigraph::Node source, target;//, next; //informazioni locali sui nodi
 
     /**Informazioni temporali*/
     simulation_time next_time;
     simulation_time &time;
     simulation_time last_time_updated;
     simulation_time last_time_planned;
+    state old_state;
 
 
     /**Comunicatore*/

@@ -89,10 +89,10 @@ void agent_router::setTarget(lemon::SmartDigraphBase::Node t)
 }
 
 
-std::pair< int, int > agent_router::getTargetCoords()
-{
-	return std::pair<int,int> ((coord_x)[next] , (coord_y)[next]);
-}
+// std::pair< int, int > agent_router::getTargetCoords()
+// {
+// 	return std::pair<int,int> ((coord_x)[next] , (coord_y)[next]);
+// }
 
 void agent_router::setGraph(lemon::SmartDigraph& g)
 {

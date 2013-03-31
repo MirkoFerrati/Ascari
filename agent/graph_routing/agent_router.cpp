@@ -41,11 +41,11 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
         ERR ( "attenzione, la lista dei target e' troppo corta", 0 );
     source = graph.nodeFromId ( targets[0] );
     target = graph.nodeFromId ( targets[1] );
-    target_counter = 2;
-    next = source;
+	node_id.push_back(targets[0]); //next = source;
+	target_counter = 2;
     next_time=TIME_SLOT_FOR_3DGRAPH;
-    xtarget = coord_x[next];
-    ytarget = coord_y[next];
+    xtarget = 0;//coord_x[next];
+    ytarget = 0;//coord_y[next];
     my_LRP.timestamp = 0;
 //    setTargetStop(false);
     communicator.startReceive();
@@ -136,12 +136,19 @@ void agent_router::run_plugin()
         _io_service.poll();
         _io_service.reset();
         negotiation_steps++;
+		if (detect_collision())
+		{
+			internal_state=old_state;
+		}
+		else
+		{
+			old_state=internal_state;
+			internal_state=state::LISTENING;
+		}
+		
     }
 
-    if ( (internal_state==state::ARC_HANDSHAKING || internal_state==state::NODE_HANDSHAKING) && !detect_collision() )
-    {
-        internal_state=state::LISTENING;
-    }
+
 
     if ( ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING || internal_state==state::ARC_HANDSHAKING ) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
     {
@@ -347,7 +354,7 @@ void agent_router::prepare_move_packet()
 
 void agent_router::setSpeed()
 {
-    if ( node_id.empty() )
+    if ( !last_time_planned || last_time_planned==-1 )
     {
         speed=0;
         return;
@@ -372,8 +379,9 @@ void agent_router::setSpeed()
 
 bool agent_router::setNextTarget()
 {
-    source = graph.nodeFromId ( graph.id ( next ) % graph_node_size );
-    if ( graph.id ( next ) % graph_node_size == graph.id ( target ) )
+	assert(!node_id.empty());
+    source = graph.nodeFromId ( node_id.front() % graph_node_size );
+    if ( graph.id ( source ) == graph.id ( target ) )
     {
         if ( target_counter == targets.size() )
         {
@@ -389,4 +397,5 @@ bool agent_router::setNextTarget()
 	    return true;
         }
     }
+    return true;
 }
