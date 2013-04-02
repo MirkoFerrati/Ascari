@@ -44,7 +44,6 @@ void agent_router::compileExpressions(exprtk::symbol_table< double >& symbol_tab
 
 void agent_router::print_path()
 {
-
     int j=0;
      std::cout<<"path calcolata: ";
     for ( unsigned int i=0; i<node_id.size(); i++ )

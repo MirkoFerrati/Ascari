@@ -203,13 +203,13 @@ bool agent_router::check_for_overtaking ()
             int other_id = ( *it ).second.lockedNode[j - 1] - age * graph_node_size;
             int other_id1 = ( *it ).second.lockedNode[j] - age * graph_node_size;
 
-            for ( unsigned int i = 0; i < node_id.size(); i++ )
+            for ( unsigned int i = 1; i < node_id.size(); i++ )
             {
                 int my_id=0;
                 int  my_id1= 0;
-                if ( i==0 )
+                if ( i==1 )
                 {
-                    my_id=graph.id ( source )-myage*graph_node_size;//TODO: Attenzione!!
+                    my_id=node_id[i-1]-myage*graph_node_size;//TODO: Attenzione!!
                     my_id1= node_id[i];
                 }
                 else
@@ -228,7 +228,6 @@ bool agent_router::check_for_overtaking ()
                         std::cout << time << ": sto rischiando di sorpassare l'agente " << ( *it ).second.id << " tra il nodo " << other_id << " e "
                                   << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
                         node_id[i]=other_id1;
-                        next_time+=TIME_SLOT_FOR_3DGRAPH;
                     }
                     if ( my_id < other_id &&
                             my_id1 > other_id1 )
@@ -237,7 +236,6 @@ bool agent_router::check_for_overtaking ()
                         std::cout << time << ": sto rischiando di essere sorpassato dall'agente " << ( *it ).second.id
                                   << " tra il nodo " << other_id << " e " << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
                         node_id[i]=other_id1;
-                        next_time-=TIME_SLOT_FOR_3DGRAPH;
                     }
                 }
             }
@@ -376,7 +374,7 @@ void agent_router::setSpeed()
     unsigned int floor = graph.id ( next ) / graph_node_size;
     // next_time = trunc ( trunc ( time + TIME_SLOT_FOR_3DGRAPH / 3.0 ) / TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor; //TODO bruttissimo
     // next_time = round ( time/TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
-    next_time = round ( last_time_left_a_node/TIME_SLOT_FOR_3DGRAPH ) *TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
+    next_time = round ( last_time_updated/TIME_SLOT_FOR_3DGRAPH ) *TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
     simulation_time delta = next_time - time;
     if ( floor ==0 ) //floor==0 nei double
         speed = 0;
