@@ -289,7 +289,7 @@ void simulator::main_loop()
                 }
             }
             collisionChecker->checkCollisions();
-         //   usleep(secSleep);
+            usleep(secSleep);
             vector<control_command_packet> temp=communicator->receive_control_commands();
 	    
 	    
