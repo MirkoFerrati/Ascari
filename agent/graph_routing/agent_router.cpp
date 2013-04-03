@@ -192,16 +192,13 @@ bool agent_router::check_for_overtaking ()
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
         if ( identifier==it->first ) continue;
-        //int age = round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+        assert(0==round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH ));
+		assert ( ( *it ).second.lockedNode.size() >1 );
 		int age=round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.started_moving * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
-		//assert ( age==0 );jgfvtvfjhgbfjhgfbuh sbagliato, ci deve essere una age maggiore di zero in casi tipo 159 s
-        //TODO: check Questa riga qui sotto esclude il caso in cui ci sia un solo nodo prenotato, infatti mi devo mandare il nodo sorgente
-        //		oltre a quello successivo (e quelli dopo).
-        assert ( ( *it ).second.lockedNode.size() >1 );
         for ( unsigned int j = 1; j < ( *it ).second.lockedNode.size(); j++ )
         {
-            int other_id = ( *it ).second.lockedNode[j - 1] - age * graph_node_size;
-            int other_id1 = ( *it ).second.lockedNode[j] - age * graph_node_size;
+            int other_id = ( *it ).second.lockedNode[j - 1] - (j==1?age * graph_node_size:0);
+            int other_id1 = ( *it ).second.lockedNode[j];//TODO: Attenzione!! - age * graph_node_size;
 
             for ( unsigned int i = 1; i < node_id.size(); i++ )
             {
