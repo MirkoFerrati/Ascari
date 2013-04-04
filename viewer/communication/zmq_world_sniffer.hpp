@@ -24,12 +24,19 @@ public:
 		receiver=new std::thread(&zmq_world_sniffer::receive_loop,std::ref(*this),std::ref(data),std::ref(data_mutex),std::ref(is_running));
 	};
 
+    void stop_receiving()
+    {
+      	        std::cout<<"chiamato stop_receiving di world sniffer"<<std::endl;
+
+      is_running=false;
+    }
+	
 	~zmq_world_sniffer(){
+	        	        std::cout<<"chiamato distruttore di world sniffer"<<std::endl;
+
 		if (receiver)
 		{
-			is_running=false;
-			receiver->join();
-			delete receiver;
+			//delete(receiver);
 		}
 	};
 	
@@ -45,6 +52,8 @@ void receive_loop(receive_type& data, std::shared_ptr<std::mutex>& data_mutex,bo
 	{
 		sleep(0);
 		temp=this->receive();//.front();//blocking call
+				std::cout<<"ricevuto un pacchetto"<<std::endl;
+
 		if (!temp.empty())
 		{
 		data_mutex->lock();
@@ -52,6 +61,8 @@ void receive_loop(receive_type& data, std::shared_ptr<std::mutex>& data_mutex,bo
 		data_mutex->unlock();
 		}
 	}
+		      std::cout<<"fine loop di world sniffer thread"<<std::endl;
+
 }
 };
 

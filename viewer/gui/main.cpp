@@ -96,6 +96,14 @@ int main(int argc, char *argv[])
         sniffer_test.start_receiving();
 	window.start();
 
-        return app.exec();
+        app.exec();
+	std::cout<<"la main window si è chiusa"<<std::endl;
+	identifier_sniffer->stop_receiving();
+	sniffer_test.stop_receiving();
+	static_zmq::context.~context_t();
+    	std::cout<<"contesto chiuso"<<std::endl;
+
     }
+    	std::cout<<"la main program si è chiusa"<<std::endl;
+
 }

@@ -22,7 +22,7 @@
 #include <boost/serialization/map.hpp>
 #include <lemon/lgf_reader.h>
 #include <map>
-
+#include "../../shared/communication/global.h"
 #define BORDER 0.3+0.2
 
 using namespace std;
@@ -178,13 +178,17 @@ void Viewer::set_tasklist(const Parsed_World& wo)
 QSettings settings("K2BRobotics","Viewer");
       settings.setValue("mainWindowGeometry", saveGeometry());
      QWidget::closeEvent(event);
+
  }
 
 
 Viewer::~Viewer()
 {
+  {
   QSettings settings;
       settings.setValue("mainWindowGeometry", this->saveGeometry());
+  }
+  	std::cout<<"distruttore di viewer chiamato dopo il salvataggio dei setting"<<std::endl;
 
     if ( length )
         delete length;
@@ -192,7 +196,7 @@ Viewer::~Viewer()
         delete coord_x;
     if ( coord_y )
         delete coord_y;
- 
+
 }
 
 void Viewer::drawArrow(int x1,int y1, int x2, int y2, double sze, QPainter* painter )

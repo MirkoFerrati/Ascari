@@ -15,21 +15,36 @@ public:
 	{
 		this->init();
 		receiver=0;
+		isrunning=false;
 	}
 	;
 	void start_receiving()
 	{
-		receiver=new std::thread(&zmq_identifier_sniffer::receive_loop,std::ref(*this),std::ref(data),std::ref(data_mutex));
+	  isrunning=true;
+		receiver=new std::thread(&zmq_identifier_sniffer::receive_loop,std::ref(*this),std::ref(data),std::ref(data_mutex),std::ref(isrunning));
 	};
 
+	void stop_receiving()
+	{
+	        std::cout<<"chiamato stop_receiving di identifier sniffer"<<std::endl;
+
+	 isrunning=false; 
+	}
+	
+    ~zmq_identifier_sniffer()
+    {
+      std::cout<<"chiamato distruttore di identifier sniffer"<<std::endl;
+    };
+	
 private:
 std::map<std::string,monitor_packet>& data;
 std::shared_ptr<std::mutex>& data_mutex;
 std::thread* receiver;
-void receive_loop(std::map<std::string,monitor_packet>& data, std::shared_ptr<std::mutex> data_mutex)
+bool isrunning;
+void receive_loop(std::map<std::string,monitor_packet>& data, std::shared_ptr<std::mutex> data_mutex,bool & isrunning)
 {
 	std::vector<monitor_packet> temp;
-	while(!s_interrupted)
+	while(!s_interrupted && isrunning)
 	{
 		sleep(0);
 		temp=this->receive();//.front();//blocking call
@@ -41,6 +56,8 @@ void receive_loop(std::map<std::string,monitor_packet>& data, std::shared_ptr<st
 		data_mutex->unlock();
 		}
 	}
+	      std::cout<<"fine loop di identifier sniffer thread"<<std::endl;
+
 }
 };
 
