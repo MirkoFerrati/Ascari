@@ -170,6 +170,7 @@ struct graph_informations
     std::string id; //id dell'agente
     simulation_time timestamp; //Un giorno ci metteremo il tempo reale (dal 1970)
     bool emergency;
+    simulation_time started_moving;
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int /*version*/)
     {
@@ -179,6 +180,7 @@ struct graph_informations
         ar& id;
 	ar& priority;
 	ar& emergency;
+	ar& started_moving;
     }
     friend std::ostream& operator<< (std::ostream& os, const graph_informations& g)
     {

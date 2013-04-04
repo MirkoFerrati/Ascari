@@ -88,29 +88,16 @@ void agent_router::setTarget(lemon::SmartDigraphBase::Node t)
 }
 
 
-std::pair< int, int > agent_router::getTargetCoords()
-{
-	return std::pair<int,int> ((coord_x)[next] , (coord_y)[next]);
-}
+// std::pair< int, int > agent_router::getTargetCoords()
+// {
+// 	return std::pair<int,int> ((coord_x)[next] , (coord_y)[next]);
+// }
 
 void agent_router::setGraph(lemon::SmartDigraph& g)
 {
 	lemon::digraphCopy<lemon::SmartDigraph,lemon::SmartDigraph>(g,graph); //graph=g;
 }
 
-void agent_router::setSpeed()
-{
-    simulation_time delta = next_time - time;
-    int floor = trunc(graph.id ( next ) / graph_node_size);
-    if ( floor ==0 ) //floor==0 nei double
-        speed = 0;
-    else
-    {
-        double length = distance_to_target.value();
-	speed=length/delta;
-        //cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
-    }
-}
 
 bool agent_router::isTimeToNegotiate( simulation_time time )
 {

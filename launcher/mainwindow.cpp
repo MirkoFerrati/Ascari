@@ -353,8 +353,8 @@ bool MainWindow::startViewer()
 
 void MainWindow::on_playall_clicked()
 {
+      startAgents();
     startSimulator();
-    startAgents();
     startViewer();
 }
 
