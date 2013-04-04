@@ -8,7 +8,7 @@
 #include <typedefs.h>
 #include <boost/thread.hpp>
 #include <task_assignment_communicator.h>
-#include <bilp_problem.h>
+#include <assignment_problem.h>
 #include <random.hpp>
 
 class task_assignment: public Plugin_module
@@ -23,8 +23,8 @@ public:
 	void run_plugin();
 	void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
 	void compileExpressions(exprtk::symbol_table< double >& symbol_table);
-	void printTaskAssignmentMatrix();
-	void printTaskCostMatrix(task_assignment_namespace::task_cost_matrix& C_matrix);
+	void printTaskAssignmentVector();
+	void printTaskCostVector();
 
 	~task_assignment();
 
@@ -37,8 +37,13 @@ private:
 	task_assignment_namespace::agent_id my_id;
 	double x0,y0;
 	
+	unsigned int num_robot;
+	unsigned int num_task;
+	
 	task_assignment_namespace::task_list tasklist;
 	task_assignment_namespace::task current_task;
+	
+	task_assignment_namespace::task empty_task;
 	
 	std::vector<task_assignment_namespace::agent_id> agents_id;
 	
@@ -64,13 +69,13 @@ private:
 	
 	task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
 	
-	void convergence_control_routine(unsigned int w);
+	bool convergence_control_routine();
 	
-	void resolve_bilp_problem();
+	void resolve_assignment_problem();
 	
-	void update_costs_with_position();
+	void update_distance_vector();
 	
-	double distance_from_task(task_assignment_namespace::task_id task_id);
+	double euclidean_distance_from_task(task_assignment_namespace::task_id task_id);
 	
 	void update_costs_with_deadlines();
 	
@@ -80,12 +85,30 @@ private:
 	
 	bool check_expiring_task_selection(task_assignment_namespace::task_id task_id);
 	
+	void update_lagrange_multiplier_vector();
+	
 	//algorithms
 	task_assignment_namespace::task_id subgradient_algorithm();
 	
-	task_assignment_namespace::task_id solution_exchange_algorithm();
+		unsigned int passi=1;
+		
+		task_assignment_namespace::task_id selected_task;
+			
+		std::vector<double> mu_T;
+		
+		std::vector<double> subgradient;
+		
+		std::vector<double> total_subgradient;
+		
+		std::vector<double> assignment_vector;
+		
+		std::vector<bool> e_i;
+		
+		double alpha;
 	
-	task_assignment_namespace::task_id cost_exchange_algorithm();
+	
+	
+
 	//
 	
 	void setTaskStop(bool stop);
@@ -97,20 +120,22 @@ private:
 	bool fresh_data;
 	bool not_started;
 	
-	//algorithms packets ptr
-	std::shared_ptr<task_assignment_namespace::cost_exchange_packet> ptr_cost_exchange_packet;
+	unsigned int step;
 	
-	std::shared_ptr<task_assignment_namespace::solution_exchange_packet> ptr_solution_exchange_packet;
+	//algorithms packets ptr
+
 	
 	std::shared_ptr<task_assignment_namespace::subgradient_packet> ptr_subgradient_packet;
 	//
 	
-	bilp_problem ta_problem;
-	void initialize_bilp_problem();
+	assignment_problem ta_problem;
+	void initialize_assignment_problem();
 	std::vector<double> C;
-	void copy_solution_to_TA_matrix(std::vector<bool> solution);
-	void copy_cost_matrix_to_cost_vector(task_assignment_namespace::task_cost_matrix& C_matrix);
-
+	std::vector<double> D;
+	std::vector<double> F;
+	void copy_solution_to_TA_vector(std::vector<double>& solution);
+	void copy_cost_vector_to_C();
+	void control_print();
 };
 
 #endif // TASK_ASSIGNMENT_H
