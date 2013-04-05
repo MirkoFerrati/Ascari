@@ -51,6 +51,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     settings.setValue("mainWindowGeometry", saveGeometry());
     settings.setValue("mainWindowState", saveState());
     QWidget::closeEvent(event);
+    if (identifier_sniffer)
+      	identifier_sniffer->stop_receiving();
+    if (sniffer)
+	sniffer->stop_receiving();
 }
 
 MainWindow::~MainWindow()
