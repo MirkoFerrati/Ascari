@@ -1,5 +1,4 @@
-#ifndef ZMQ_WORLD_SNIFFER_HPP
-#define ZMQ_WORLD_SNIFFER_HPP
+
 #include "world_sniffer_abstract.h"
 #include "../shared/communication/zmq_full_communicator.hpp"
 #include <mutex>
@@ -16,6 +15,7 @@ public:
 	{
 		this->init("viewer");
 		receiver=0;
+		is_running=false;
 	}
 	;
 	void start_receiving()
@@ -26,17 +26,17 @@ public:
 
     void stop_receiving()
     {
-      	        std::cout<<"chiamato stop_receiving di world sniffer"<<std::endl;
+//       	        std::cout<<"chiamato stop_receiving di world sniffer"<<std::endl;
 
       is_running=false;
     }
 	
 	~zmq_world_sniffer(){
-	        	        std::cout<<"chiamato distruttore di world sniffer"<<std::endl;
+// 	        	        std::cout<<"chiamato distruttore di world sniffer"<<std::endl;
 
 		if (receiver)
 		{
-			//delete(receiver);
+			receiver->join();
 		}
 	};
 	
@@ -52,7 +52,7 @@ void receive_loop(receive_type& data, std::shared_ptr<std::mutex>& data_mutex,bo
 	{
 		sleep(0);
 		temp=this->receive();//.front();//blocking call
-				std::cout<<"ricevuto un pacchetto"<<std::endl;
+// 				std::cout<<"ricevuto un pacchetto"<<std::endl;
 
 		if (!temp.empty())
 		{
@@ -61,9 +61,9 @@ void receive_loop(receive_type& data, std::shared_ptr<std::mutex>& data_mutex,bo
 		data_mutex->unlock();
 		}
 	}
-		      std::cout<<"fine loop di world sniffer thread"<<std::endl;
+// 		      std::cout<<"fine loop di world sniffer thread"<<std::endl;
 
 }
 };
 
-#endif //ZMQ_WORLD_SNIFFER_HPP
+

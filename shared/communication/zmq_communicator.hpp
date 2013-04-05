@@ -37,27 +37,27 @@ template<typename receive_type, int sock_recv_type>
 class zmq_receive_communicator
 {
 public:
-    zmq_receive_communicator() : receiver_socket ( static_zmq::context, sock_recv_type )
+    zmq_receive_communicator() 
     {
+      	receiver_socket=std::unique_ptr<zmq::socket_t> (new zmq::socket_t(*static_zmq::context, sock_recv_type ));
         assert ( sock_recv_type == ZMQ_PULL || sock_recv_type == ZMQ_SUB );
         clientsNamed=false;
         initialized = false;
         receive_buffer.rebuild ( MAX_PACKET_LENGTH );
         int temp = 0;
-        receiver_socket.setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
+        receiver_socket->setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
 
     }
 
-//     void shutdown()
-//     {
-//       std::cout<<"chiamato shutdown di zmq_communicator"<<std::endl;
-//               receiver_socket.close();
-//     }
-    
     ~zmq_receive_communicator()
     {
-            std::cout<<"chiamato distruttore di zmq_communicator"<<std::endl;
-
+      if (receiver_socket)
+      {
+	  receiver_socket->close();
+	   delete(receiver_socket.release());
+      }
+//       std::cout<<"chiamato distruttore di zmq_communicator"<<std::endl;
+      
     }
 
 protected:
@@ -85,18 +85,18 @@ protected:
         }
         if ( bind_receiver )
         {
-            receiver_socket.bind ( receiver_protocol.c_str() );
+            receiver_socket->bind ( receiver_protocol.c_str() );
         }
         else
         {
-            receiver_socket.connect ( receiver_protocol.c_str() );
+            receiver_socket->connect ( receiver_protocol.c_str() );
         }
         if ( sock_recv_type == ZMQ_SUB )
         {
             if ( filter )
-                receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, owner_name.data(), strlen ( owner_name.data() ) );
+                receiver_socket->setsockopt ( ZMQ_SUBSCRIBE, owner_name.data(), strlen ( owner_name.data() ) );
             else
-                receiver_socket.setsockopt ( ZMQ_SUBSCRIBE, "", 0 );
+                receiver_socket->setsockopt ( ZMQ_SUBSCRIBE, "", 0 );
         }
 
         results.resize ( expected_senders );
@@ -133,7 +133,10 @@ public:
         {
             try
             {
-                bool rc=receiver_socket.recv ( &receive_buffer,flags );
+// 	      std::cout<<"mi sto per bloccare su una receive"<<std::endl;
+                bool rc=receiver_socket->recv ( &receive_buffer,flags );
+// 			      std::cout<<"sbloccato da una receive"<<std::endl;
+
                 if ( !rc )
                 {
                     ERR ( "brutte cose",NULL );
@@ -141,10 +144,13 @@ public:
             }
             catch ( zmq::error_t& ex )
             {
+// 	      	      std::cout<<"sbloccato da una receive"<<std::endl;
+
                 if ( zmq_errno () == ETERM )
                 {
                     WARN ( "programma terminato o qualcosa del genere",NULL );
-		    receiver_socket.close();
+		    receiver_socket->close();
+		    delete(receiver_socket.release());
 		    return results;
                 }
             }
@@ -167,7 +173,7 @@ public:
     };
 
 private:
-    zmq::socket_t  receiver_socket;
+    std::unique_ptr<zmq::socket_t>  receiver_socket;
     zmq::message_t receive_buffer;
     std::vector <receive_type> results;
     std::string owner_name;
@@ -181,18 +187,20 @@ template <typename send_type, int sock_send_type>
 class zmq_send_communicator
 {
 public:
-    zmq_send_communicator() : sender_socket ( static_zmq::context, sock_send_type )
+    zmq_send_communicator()// : sender_socket ( static_zmq::context, sock_send_type )
     {
+        sender_socket=std::unique_ptr<zmq::socket_t> (new zmq::socket_t(*static_zmq::context, sock_send_type ));
+
         assert ( sock_send_type == ZMQ_PUSH || sock_send_type == ZMQ_PUB );
         initialized = false;
         send_buffer.rebuild ( MAX_PACKET_LENGTH );
         int temp = 0;
-        sender_socket.setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
+        sender_socket->setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
     }
 
     ~zmq_send_communicator()
     {
-        sender_socket.close();
+      
     }
 
 protected:
@@ -200,11 +208,11 @@ protected:
     {
         if ( bind_sender )
         {
-            sender_socket.bind ( sender_protocol.c_str() );
+            sender_socket->bind ( sender_protocol.c_str() );
         }
         else
         {
-            sender_socket.connect ( sender_protocol.c_str() );
+            sender_socket->connect ( sender_protocol.c_str() );
         }
         this->owner_name = owner_name;
         initialized = true;
@@ -234,12 +242,12 @@ public:
         send_buffer.rebuild ( tmp.length() +1 );
         memcpy ( send_buffer.data(), tmp.c_str(),tmp.length() +1 );
         std::string temp=reinterpret_cast<char*> ( send_buffer.data() );
-        sender_socket.send ( send_buffer );
+        sender_socket->send ( send_buffer );
     };
 
 
 private:
-    zmq::socket_t sender_socket;
+    std::unique_ptr<zmq::socket_t> sender_socket;
     zmq::message_t send_buffer;
     std::string owner_name;
     bool initialized;
@@ -267,7 +275,7 @@ public:
         int temp = 0;
         if ( sync == WAIT_SYNC )
         {
-            sync_socket = new zmq::socket_t ( static_zmq::context, ZMQ_REP );
+            sync_socket = new zmq::socket_t ( *static_zmq::context, ZMQ_REP );
             sync_socket->setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
         }
         else if ( sync == ASK_SYNC )
@@ -400,7 +408,7 @@ protected:
 
         while ( !exit )
         {
-            sync_socket = new zmq::socket_t ( static_zmq::context, ZMQ_REQ );
+            sync_socket = new zmq::socket_t ( *static_zmq::context, ZMQ_REQ );
             sync_socket->setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
             sync_socket->connect ( !sync_protocol.compare ( "" ) ? SYNC_PROTOCOL : sync_protocol.c_str() );
             std::cout  << ".";

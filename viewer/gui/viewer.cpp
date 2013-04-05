@@ -42,6 +42,7 @@ Viewer::Viewer ( const world_sim_packet& read, std::shared_ptr<std::mutex>& read
     coord_y=0;
     init ( graphName );
     monitor=true;
+    time=0;
 }
 
 
@@ -188,7 +189,7 @@ Viewer::~Viewer()
   QSettings settings;
       settings.setValue("mainWindowGeometry", this->saveGeometry());
   }
-  	std::cout<<"distruttore di viewer chiamato dopo il salvataggio dei setting"<<std::endl;
+//   	std::cout<<"distruttore di viewer chiamato dopo il salvataggio dei setting"<<std::endl;
 
     if ( length )
         delete length;
@@ -295,9 +296,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
     f.setPointSizeF ( height() /25.0 );
     painter.setFont ( f );
     painter.setPen ( QColor ( "blue" ) );
-    QString s;
-    s.setNum ( time );
-    painter.drawText ( width() /2,1.1*painter.fontMetrics().height(),s );
+    painter.drawText ( width() /2,1.1*painter.fontMetrics().height(),"TODO");// QString("").setNum(time) );
     painter.restore();
 
     painter.setBrush ( hourColor );

@@ -6,7 +6,7 @@
 #include <iostream>
 namespace static_zmq
 {
-	extern zmq::context_t context;
+	extern zmq::context_t* context;
 }
 
 
