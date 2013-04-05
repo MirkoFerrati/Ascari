@@ -334,7 +334,7 @@ typedef std::string task_id;
 typedef std::string agent_id;
 typedef std::map<task_id,task_cost> task_cost_vector;
 typedef std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_cost_vector> task_cost_matrix;
-typedef std::map<task_id,bool> task_assignment_vector;
+typedef std::map<task_id,double> task_assignment_vector;
 typedef std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_assignment_vector> task_assignment_matrix;
 typedef int task_assignment_algorithm;
 
@@ -376,22 +376,9 @@ public:
     }
 };
 
-struct solution_cost_packet
-{
-      task_assignment_matrix ta_matrix;
-      task_cost_vector costs;
-      
-      template <typename Archive>
-      void serialize(Archive& ar,const unsigned int /*version*/)
-      {
-	ar& ta_matrix;
-        ar& costs;
-      }
-};
-
 struct subgradient_task_packet
 {
-      double subgradient;
+      std::vector<double> subgradient;
       
       template <typename Archive>
       void serialize(Archive& ar, const unsigned int /*version*/)
@@ -401,8 +388,6 @@ struct subgradient_task_packet
 };
 
 typedef task_assignment_packet<subgradient_task_packet> subgradient_packet;
-typedef task_assignment_packet<task_assignment_matrix> solution_exchange_packet;
-typedef task_assignment_packet<solution_cost_packet> cost_exchange_packet;
 
 }
 #ifndef GLP_MIN
@@ -416,8 +401,6 @@ typedef task_assignment_packet<solution_cost_packet> cost_exchange_packet;
 #define INF 1000000.0
 
 #define SUBGRADIENT 0
-#define SOLUTION_EXCHANGE 1
-#define COST_EXCHANGE 2
 //written by Alessandro Settimi
 
 #endif //TYPEDEFS_H

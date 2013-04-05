@@ -429,8 +429,7 @@ void operator>> ( const YAML::Node& node, Parsed_World& wo )
 		node[0]["WORLD"][0]["TASK_ASSIGNMENT_ALGORITHM"]>>algorithm;
 		
 		if (algorithm == "SUBGRADIENT" ) wo.task_assignment_algorithm = SUBGRADIENT; 
-		if (algorithm == "SOLUTION_EXCHANGE" ) wo.task_assignment_algorithm = SOLUTION_EXCHANGE;
-		if (algorithm == "COST_EXCHANGE") wo.task_assignment_algorithm = COST_EXCHANGE;
+
 		if (wo.task_assignment_algorithm == -1)
 		{
 		      ERR("UNDEFINED TASK ASSIGNMENT ALGORITHM",NULL);

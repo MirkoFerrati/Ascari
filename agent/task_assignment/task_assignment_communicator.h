@@ -27,17 +27,16 @@ class task_assignment_communicator: public agent_to_simulator_ta_communicator<re
 	
 	std::thread* receiver;
 	
-	const bool& converge;
 	unsigned int neighbour;
 	std::string my_id;
 	bool& fresh_data;
 	std::map< std::string, bool > received_from_agents;
 	
-	void receive_loop(std::vector<receive_type>& data_receive,std::shared_ptr<std::mutex>& ptr_data_mutex,const bool& converge,unsigned int neighbour,std::string my_id,bool& fresh_data)
+	void receive_loop(std::vector<receive_type>& data_receive,std::shared_ptr<std::mutex>& ptr_data_mutex,unsigned int neighbour,std::string my_id,bool& fresh_data)
 	{
 	      std::vector<receive_type> temp;
 
-	      while(!converge && !s_interrupted)
+	      while(!s_interrupted)
 	      {
 		      sleep(0);
 
@@ -79,8 +78,8 @@ class task_assignment_communicator: public agent_to_simulator_ta_communicator<re
 public:
 
 	task_assignment_communicator(std::shared_ptr<std::mutex>& data_receive_mutex,send_type* data_send,
-				     const bool& converge,unsigned int neighbour,std::string my_id,bool& fresh_data)
-	:data_receive_mutex(data_receive_mutex),data_send(*data_send),converge(converge),neighbour(neighbour),my_id(my_id),fresh_data(fresh_data)
+				     unsigned int neighbour,std::string my_id,bool& fresh_data)
+	:data_receive_mutex(data_receive_mutex),data_send(*data_send),neighbour(neighbour),my_id(my_id),fresh_data(fresh_data)
 	{
 		this->init(my_id);
 		this->start_threads();
@@ -93,7 +92,7 @@ public:
 
 	void start_threads()
 	{
-		receiver=new std::thread(&task_assignment_communicator::receive_loop,std::ref(*this),std::ref(data_receive),std::ref(data_receive_mutex),std::ref(converge),std::ref(neighbour),std::ref(my_id),std::ref(fresh_data));
+		receiver=new std::thread(&task_assignment_communicator::receive_loop,std::ref(*this),std::ref(data_receive),std::ref(data_receive_mutex),std::ref(neighbour),std::ref(my_id),std::ref(fresh_data));
 	}
 	
 	void* get_data()

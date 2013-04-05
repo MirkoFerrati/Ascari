@@ -5,38 +5,28 @@
 
 using namespace task_assignment_namespace;
 
-void task_assignment::convergence_control_routine(unsigned int w)
-{
-     if (w==agents_id.size()-1)
-     {
-       	    std::cout<<std::endl<<"---------------- STOP ----------------"<<std::endl<<std::endl;
-	    std::cout<<"Converge, ";
-	    converge=true;
-     }
-}
 
-void task_assignment::resolve_bilp_problem()
+void task_assignment::resolve_assignment_problem()
 {
-    std::vector<bool> solution;
+    std::vector<double> solution;
       
     ta_problem.solve(solution);
 
-    copy_solution_to_TA_matrix(solution);
+    copy_solution_to_TA_vector(solution);
 }
 
 
-double task_assignment ::distance_from_task(task_assignment_namespace::task_id task_id)
+double task_assignment :: euclidean_distance_from_task(task_assignment_namespace::task_id task_id)
 {
 	return sqrt((x0-tasklist.at(task_id).task_position[0])*(x0-tasklist.at(task_id).task_position[0])+(y0-tasklist.at(task_id).task_position[1])*(y0-tasklist.at(task_id).task_position[1]));
 }
 
 
-void task_assignment::update_costs_with_position()
+void task_assignment::update_distance_vector()
 {
     for (unsigned int i=0;i<tasks_id.size();i++)
     {
-	  if(task_cost_matrix.at(my_id).at(tasks_id.at(i))!=INF)
-	      task_cost_matrix.at(my_id).at(tasks_id.at(i)) += distance_from_task(tasks_id.at(i));
+	      D.at(i) = euclidean_distance_from_task(tasks_id.at(i));
     }
 }
 
@@ -63,8 +53,7 @@ void task_assignment::update_costs_with_deadlines()
 {
     for (unsigned int i=0;i<tasks_id.size();i++)
     {
-	  if(task_cost_matrix.at(my_id).at(tasks_id.at(i))!=INF)
-	      task_cost_matrix.at(my_id).at(tasks_id.at(i)) /= time_to_deadline(tasks_id.at(i));
+	  agent_task_cost_vector->at(tasks_id.at(i)) /= time_to_deadline(tasks_id.at(i));
     }
 }
 

@@ -41,33 +41,20 @@ bool task_assignment ::task_made()
 }
 
 
-void task_assignment ::copy_solution_to_TA_matrix(std::vector<bool> solution)
+void task_assignment ::copy_solution_to_TA_vector(std::vector<double>& solution)
 {
-    for(unsigned int i=0;i<agents_id.size();i++)
-    {
-
-	for(unsigned int j=0;j<tasks_id.size();j++)
+	for(unsigned int j=0;j<num_task;j++)
 	{
-	    task_assignment_matrix.at(agents_id[i]).at(tasks_id[j])=solution[i*tasks_id.size()+j];
+	    agent_task_assignment_vector->at(tasks_id.at(j))=solution.at(j);
 	}
-	
-    }
 }
  
  
- void task_assignment ::copy_cost_matrix_to_cost_vector(task_assignment_namespace::task_cost_matrix& C_matrix)
+ void task_assignment ::copy_cost_vector_to_C()
 {
-  	C.clear();
-	
-	int z=0;
-	
-	for (unsigned int i=0;i<agents_id.size();i++)
+	for (unsigned int j=0;j<num_task;j++)
 	{
-	    for (unsigned int j=0;j<tasks_id.size();j++)
-	    {
-		 C.push_back(C_matrix.at(agents_id[i]).at(tasks_id[j]));
-		 z++;
-	    }
+	      C.at(j)=agent_task_cost_vector->at(tasks_id.at(j));
 	}
 }
 
