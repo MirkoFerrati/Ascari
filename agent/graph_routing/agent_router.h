@@ -57,7 +57,7 @@ private:
     void update_packet();
     bool isTimeToNegotiate(simulation_time time);
     void print_path();
-
+	int findAge(simulation_time present_time, simulation_time old_time);
 private:
     state internal_state;
     bool next_target_reachable;
