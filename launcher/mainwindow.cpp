@@ -12,6 +12,9 @@ MainWindow::MainWindow ( QWidget *parent ) :
     ui ( new Ui::MainWindow )
 {
     ui->setupUi ( this );
+	
+	qout=new QDebugStream(std::cout, ui->ShellOutput);
+	qerr=new QDebugStream(std::cerr, ui->ShellOutput);
     insideViewer=0;
     sniffer=0;
     simulator=0;
@@ -62,7 +65,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     if (identifier_sniffer)
       	identifier_sniffer->stop_receiving();
     if (sniffer)
-	sniffer->stop_receiving();
+		sniffer->stop_receiving();
+	delete qout;
+	delete qerr;
+	
 }
 
 MainWindow::~MainWindow()
@@ -72,7 +78,7 @@ MainWindow::~MainWindow()
     delete ui;
     if ( simulator )
     {
-
+		QObject::disconnect(simulator, SIGNAL(finished(int)), this, SLOT(simulatorExited(int,QProcess::ExitStatus)));
         simulator->kill();
         delete ( simulator );
     }
@@ -82,7 +88,6 @@ MainWindow::~MainWindow()
         agents[i]->kill();
         delete ( agents[i] );
     }
-
 }
 
 void MainWindow::openFile()
@@ -226,6 +231,8 @@ void MainWindow::startSimulator()
         QMessageBox::warning ( this,"errore","il simulatore non si è avviato" );
         std::cout<<"errore, il simulatore non si è avviato"<<std::endl;
     };
+	QObject::connect(simulator, SIGNAL(finished(int,QProcess::ExitStatus)),
+					 this, SLOT(simulatorExited(int,QProcess::ExitStatus)));
 }
 
 void MainWindow::on_Updateshell_clicked()
@@ -385,3 +392,9 @@ void MainWindow::on_StartViewer_clicked()
     startViewer();
 }
 
+void MainWindow::simulatorExited ( int exitcode, QProcess::ExitStatus exitstatus )
+{
+	std::cout<<"SIMULATOR EXITED: exitcode:"<<exitcode<<(exitstatus==QProcess::NormalExit?"":"and crashed")<<std::endl;
+	std::cout<<QString(simulator->readAllStandardError()).toStdString();
+	std::cout<<QString(simulator->readAllStandardOutput()).toStdString();
+}

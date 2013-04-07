@@ -155,7 +155,8 @@ void agent_router::run_plugin()
 
 
 
-    if ( ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING || internal_state==state::ARC_HANDSHAKING ) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
+    if ( ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING
+		|| internal_state==state::ARC_HANDSHAKING ) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
     {
         if ( next_target_reachable )
         {
