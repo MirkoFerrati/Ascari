@@ -296,7 +296,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
     f.setPointSizeF ( height() /25.0 );
     painter.setFont ( f );
     painter.setPen ( QColor ( "blue" ) );
-    painter.drawText ( width() /2,1.1*painter.fontMetrics().height(),"TODO");// QString("").setNum(time) );
+    painter.drawText ( width() /2,1.1*painter.fontMetrics().height(), QString("").setNum(time) );
     painter.restore();
 
     painter.setBrush ( hourColor );

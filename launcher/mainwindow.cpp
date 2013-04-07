@@ -18,8 +18,19 @@ MainWindow::MainWindow ( QWidget *parent ) :
     QCoreApplication::setOrganizationName ( "TODO" );
     QCoreApplication::setOrganizationDomain ( "TODO" );
     QCoreApplication::setApplicationName ( "Launcher" );
-    settings=new QSettings();
-        restoreGeometry(settings->value("mainWindowGeometry").toByteArray());
+	
+	QList<int> sizes;
+	sizes.push_back ( 500 );
+	sizes.push_back ( 500 );
+	ui->HorizSplitter->setSizes(sizes);
+	sizes.clear();
+	sizes.push_back ( 300 );
+	sizes.push_back ( 300 );
+	sizes.push_back ( 300 );
+	ui->VertSplitter->setSizes ( sizes );
+	
+	settings=new QSettings();
+    restoreGeometry(settings->value("mainWindowGeometry").toByteArray());
     restoreState(settings->value("mainWindowState").toByteArray());
 
     agentPath=settings->value ( "paths/agent","" ).toString();
@@ -37,10 +48,7 @@ MainWindow::MainWindow ( QWidget *parent ) :
             std::cerr<<"impossibile aprire il file "<<fileName.toStdString() <<std::endl;
         }
     }
-    QList<int> sizes;
-    sizes.push_back ( 500 );
-    sizes.push_back ( 500 );
-    ui->splitter->setSizes ( sizes );
+ 
 
 }
 
@@ -318,7 +326,7 @@ bool MainWindow::startViewer()
         }
         if ( insideViewer )
         {
-            ui->asdf->removeWidget ( insideViewer );
+            ui->ViewerContainer->removeWidget ( insideViewer );
             delete insideViewer;
         }
 
@@ -346,7 +354,7 @@ bool MainWindow::startViewer()
         {
             insideViewer->setMonitor ( &monitor_buffer,monitor_mutex );
         }
-        ui->asdf->addWidget ( insideViewer );
+        ui->ViewerContainer->addWidget ( insideViewer );
         insideViewer->start();
 
         return true;
