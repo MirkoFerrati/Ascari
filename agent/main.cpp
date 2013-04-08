@@ -1,16 +1,21 @@
 #include <time.h>
 #include <iostream>
 #include <string>
+#include <thread>
 #include "agent.h"
 #include "../shared/logog/include/logog.hpp"
 #include "../shared/typedefs.h"
 #include "../shared/communication/global.h"
 #include "lemon/arg_parser.h"
-
+#include "../shared/communication/global.h"
 int main ( int argc, char** argv )
 {
     srand ( time ( NULL ) );
     LOGOG_INITIALIZE();
+	std::thread exiting;
+	
+	static_zmq::context=new zmq::context_t(1);
+	
     {
         std::cout << argc << argv[0] << argv[1] << argv[2] << std::endl;
         logog::Cout out;
@@ -68,8 +73,11 @@ int main ( int argc, char** argv )
         agent a1 ( myAgent, world );
         a1.start();
         std::cout << agent_name <<" e' terminato" << std::endl;
+		exiting=std::thread ( []() {  delete(static_zmq::context);    }     );
+		
     }
     LOGOG_SHUTDOWN();
-
+	exiting.join();
+	
     return 0;
 }

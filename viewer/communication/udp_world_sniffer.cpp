@@ -21,5 +21,10 @@ void udp_world_sniffer::start_receiving()
 	
 }
 
+void udp_world_sniffer::stop_receiving()
+{
+	
+	
+}
 
 

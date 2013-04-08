@@ -42,6 +42,11 @@ void agent_router::compileExpressions(exprtk::symbol_table< double >& symbol_tab
 	
 }
 
+int agent_router::findAge(simulation_time present_time, simulation_time old_time)
+{
+	return round ( ( round ( present_time * 1000.0 ) - round ( old_time * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+}
+
 void agent_router::print_path()
 {
     int j=0;

@@ -22,7 +22,7 @@
 #include <boost/serialization/map.hpp>
 #include <lemon/lgf_reader.h>
 #include <map>
-
+#include "../../shared/communication/global.h"
 #define BORDER 0.3+0.2
 
 using namespace std;
@@ -42,6 +42,7 @@ Viewer::Viewer ( const world_sim_packet& read, std::shared_ptr<std::mutex>& read
     coord_y=0;
     init ( graphName );
     monitor=true;
+    time=0;
 }
 
 
@@ -184,13 +185,17 @@ void Viewer::set_tasklist(const Parsed_World& wo)
 QSettings settings("K2BRobotics","Viewer");
       settings.setValue("mainWindowGeometry", saveGeometry());
      QWidget::closeEvent(event);
+
  }
 
 
 Viewer::~Viewer()
 {
+  {
   QSettings settings;
       settings.setValue("mainWindowGeometry", this->saveGeometry());
+  }
+//   	std::cout<<"distruttore di viewer chiamato dopo il salvataggio dei setting"<<std::endl;
 
     if ( length )
         delete length;
@@ -198,7 +203,7 @@ Viewer::~Viewer()
         delete coord_x;
     if ( coord_y )
         delete coord_y;
- 
+
 }
 
 void Viewer::drawArrow(int x1,int y1, int x2, int y2, double sze, QPainter* painter )
@@ -297,9 +302,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
     f.setPointSizeF ( height() /25.0 );
     painter.setFont ( f );
     painter.setPen ( QColor ( "blue" ) );
-    QString s;
-    s.setNum ( time );
-    painter.drawText ( width() /2,1.1*painter.fontMetrics().height(),s );
+    painter.drawText ( width() /2,1.1*painter.fontMetrics().height(), QString("").setNum(time) );
     painter.restore();
 
     painter.setBrush ( hourColor );

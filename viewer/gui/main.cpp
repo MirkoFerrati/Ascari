@@ -31,6 +31,8 @@ void center(QWidget &widget,int WIDTH=800,int HEIGHT=800)
 int main(int argc, char *argv[])
 {
     LOGOG_INITIALIZE();
+    std::thread exiting;
+    static_zmq::context=new zmq::context_t(1);
     {
 	//written by Alessandro Settimi
 
@@ -41,7 +43,7 @@ int main(int argc, char *argv[])
 //         if (argc<2)
 //             std::cout<<"inserire il tipo di visualizzazione: 1-baseball 2-grafi 3-vuoto"<<std::endl;
         lemon::ArgParser ap(argc,argv);
-		int viewerType;
+		int viewerType=0;
 	
 	ap.refOption("f","Yaml filename",filename);
 			
@@ -75,12 +77,12 @@ int main(int argc, char *argv[])
         Viewer window(read,read_mutex,NULL,viewerType,filename);
 	
         udp_world_sniffer sniffer(buffer,io_service);
-	zmq_world_sniffer<world_sim_packet> sniffer_test(read,read_mutex);
+ 	zmq_world_sniffer<world_sim_packet> sniffer_test(read,read_mutex);
 	std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
 	if (viewerType==5)
 	{
 		identifier_sniffer=std::unique_ptr<zmq_identifier_sniffer>( new zmq_identifier_sniffer(monitor_read,monitor_read_mutex));
-		identifier_sniffer->start_receiving();
+   		identifier_sniffer->start_receiving();
 		window.setMonitor(&monitor_read,monitor_read_mutex);
 	}	
 	window.setWindowTitle("Visualizer");
@@ -90,12 +92,22 @@ int main(int argc, char *argv[])
  
     window.restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
  
-    // create docks, toolbars, etc...
- 
-	
-        sniffer_test.start_receiving();
+         sniffer_test.start_receiving();
 	window.start();
 
-        return app.exec();
+        app.exec();
+// 	std::cout<<"la main window si è chiusa"<<std::endl;
+  	identifier_sniffer->stop_receiving();
+	sniffer_test.stop_receiving();
+	
+	exiting=std::thread ( []() {  delete(static_zmq::context);    }     );
+ //	delete(static_zmq::context);//.~context_t();
+ 	
+ 	
+//     	std::cout<<"contesto chiuso"<<std::endl;
+
     }
+//     	std::cout<<"la main program si è chiusa"<<std::endl;
+exiting.join();
+return 0;
 }

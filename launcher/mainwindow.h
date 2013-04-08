@@ -5,6 +5,7 @@
 #include <QSettings>
 #include "yaml_parser.h"
 #include <QProcess>
+#include "QDebugStream.hpp"
 #include <boost/asio.hpp>
 #include <viewer.h>
 #include <udp_world_sniffer.h>
@@ -44,12 +45,15 @@ private slots:
 
     void closeEvent(QCloseEvent *event);
     
+	void simulatorExited(int exitcode,QProcess::ExitStatus exitstatus);
+	
     bool startViewer();
     void startAgents();
     void startSimulator();
 
 private:
     Ui::MainWindow *ui;
+	QDebugStream *qout,*qerr;
     QProcess *simulator;
     boost::asio::io_service io_service;
     //std::vector<char> buffer;
@@ -61,9 +65,7 @@ private:
     Parsed_World world;
     Viewer * insideViewer;
     std::unique_ptr<world_sniffer_abstract> sniffer;
-
     std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
-
     std::vector<QProcess*> agents;
     QString fileName,simulatorPath,agentPath,viewerPath;
 };

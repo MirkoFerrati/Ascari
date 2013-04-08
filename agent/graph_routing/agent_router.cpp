@@ -144,7 +144,10 @@ void agent_router::run_plugin()
         }
         else
         {
-            old_state=internal_state;
+			if (internal_state!=state::LISTENING)
+			{
+				old_state=internal_state;
+			}
             internal_state=state::LISTENING;
         }
 
@@ -152,7 +155,8 @@ void agent_router::run_plugin()
 
 
 
-    if ( ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING || internal_state==state::ARC_HANDSHAKING ) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
+    if ( ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING
+		|| internal_state==state::ARC_HANDSHAKING ) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
     {
         if ( next_target_reachable )
         {
@@ -187,36 +191,37 @@ bool agent_router::check_for_overtaking ()
 {
     std::cout<<"check for overtakings";
     bool overtaking = false;
-    int myage=round ( ( round ( time * 1000.0 ) - round ( last_time_left_a_node * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+    int myage=findAge(time,last_time_left_a_node);//round ( ( round ( time * 1000.0 ) - round ( last_time_left_a_node * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
     _mutex.lock();
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
         if ( identifier==it->first ) continue;
-        assert(0==round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH ));
+        assert(findAge(time, it->second.timestamp)==0);//0==round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH ));
 		assert ( ( *it ).second.lockedNode.size() >1 );
-		int age=round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.started_moving * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+		int age=findAge(time, it->second.started_moving);//round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.started_moving * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         for ( unsigned int j = 1; j < ( *it ).second.lockedNode.size(); j++ )
         {
             int other_id = ( *it ).second.lockedNode[j - 1] - (j==1?age * graph_node_size:0);
             int other_id1 = ( *it ).second.lockedNode[j];//TODO: Attenzione!! - age * graph_node_size;
-
+			if (other_id1<other_id) //Impossibile almeno che other_id1 sia al piano terra
+			{
+				break;
+			}
             for ( unsigned int i = 1; i < node_id.size(); i++ )
             {
-                int my_id=0;
-                int  my_id1= 0;
-                if ( i==1 )
-                {
-                    my_id=node_id[i-1]-myage*graph_node_size;//TODO: Attenzione!!
-                    my_id1= node_id[i];
-                }
-                else
-                {
-                    my_id=node_id[i - 1];
-                    my_id1= node_id[i];
-                }
+                int my_id=node_id[i-1]-(i==1?myage*graph_node_size:0);//TODO: Attenzione!!
+                int my_id1= node_id[i];
+				if (my_id1<my_id || my_id>other_id1) //Impossibile almeno che my_id1 sia al piano terra
+				{										//se my_id>other_id1 inutile controllare i sorpassi
+					break;
+				}
                 if ( ( my_id - other_id ) % graph_node_size == 0 &&
                         ( my_id1 - other_id1 ) % graph_node_size == 0 )
                 {
+					if(my_id==other_id)
+						WARN("collisione durante il controllo sorpassi? %d %d",my_id,other_id);
+					if(my_id1==other_id1)
+						WARN("collisione durante il controllo sorpassi? %d %d",my_id1,other_id1);
                     if (
                         my_id > other_id &&
                         my_id1< other_id1 )
@@ -251,7 +256,7 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
     {
         if ( identifier==it->first ) continue;
         if ( identifier.compare ( it->first ) <0 ) continue;  //se il pacchetto ha priorita' piu' alta
-        int age = round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+        int age = findAge(time, it->second.timestamp);//round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         cout<<"filtro i nodi dell'agente:"<<it->first<<" ";
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
         {
@@ -272,15 +277,16 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
 bool agent_router::detect_collision ( )
 {
     bool collision = false;
-    cout<<"ricerca collisione:";
-
+	std::ostringstream out;
+    out<<"ricerca collisione:";
+	int my_age=findAge(time, last_time_updated);//round ( ( round ( time * 1000.0 ) - round ( last_time_updated * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+	
     _mutex.lock();
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
         if ( identifier==it->first ) continue;
         if ( identifier.compare ( it->first ) <0 ) continue;
-        int age = round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
-        int my_age=round ( ( round ( time * 1000.0 ) - round ( last_time_updated * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+        int age = findAge(time, it->second.timestamp);//round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )
         {
             int id = ( *itt ) - age * graph_node_size;
@@ -295,7 +301,7 @@ bool agent_router::detect_collision ( )
                 if ( node_id[i]-my_age*graph_node_size == id )
                 {
                     {
-                        cout << time << " rilevata una collisione con "<<it->first<<" tra "<<node_id[i]-my_age*graph_node_size <<"("<<i <<") e "<<id << ";    ";
+                        out << time << " rilevata una collisione con "<<it->first<<" tra "<<node_id[i]-my_age*graph_node_size <<"("<<i <<") e "<<id << ";    ";
                     }
                     collision = true;
                 }
@@ -303,8 +309,9 @@ bool agent_router::detect_collision ( )
         }
     }
     _mutex.unlock();
-    cout<<"ricerca collisione completata"<<endl;
-
+    out<<"ricerca collisione completata"<<endl;
+if (collision)
+	cout<<out.str();
     return collision;
 }
 
@@ -347,10 +354,9 @@ void agent_router::prepare_move_packet()
     node_id.clear();
     for ( PathNodeIt<Path<SmartDigraph> > i ( graph, computed_path ); i != INVALID; ++i )
     {
-        //Il nodo al piano zero (quello iniziale ) e quello al piano finale non vanno inclusi
-        //TODO: check Invece il nodo iniziale va incluso, e la collision detection lo ignorera', mentre i sorpassi no
-        if ( graph.id ( i ) / graph_node_size > FLOORS_SENT ) // || graph.id ( i ) < graph_node_size )
-            continue;
+        //Il nodo al piano finale non va incluso e posso uscire
+        if ( graph.id ( i ) / graph_node_size >= FLOORS_SENT ) // || graph.id ( i ) < graph_node_size )
+            break;
         node_id.push_back ( graph.id ( i ) );
     }
     last_time_updated = time;
@@ -369,8 +375,6 @@ void agent_router::setSpeed()
     xtarget =  coord_x[next];
     ytarget =  coord_y[next];
     unsigned int floor = graph.id ( next ) / graph_node_size;
-    // next_time = trunc ( trunc ( time + TIME_SLOT_FOR_3DGRAPH / 3.0 ) / TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor; //TODO bruttissimo
-    // next_time = round ( time/TIME_SLOT_FOR_3DGRAPH ) * TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
     next_time = round ( last_time_updated/TIME_SLOT_FOR_3DGRAPH ) *TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
     simulation_time delta = next_time - time;
     if ( floor ==0 ) //floor==0 nei double
