@@ -153,6 +153,27 @@ void MainWindow::on_actionExit_triggered()
     close();
 }
 
+void MainWindow::on_stopall_clicked()
+{
+	if ( !agents.empty() )
+	{
+		for ( unsigned int i=0; i<agents.size(); i++ )
+		{
+			agents[i]->kill();
+			delete ( agents[i] );
+		}
+		agents.clear();
+	}
+	if ( simulator )
+	{
+		
+		simulator->kill();
+		delete ( simulator );
+		simulator=0;
+	}
+}
+
+
 void MainWindow::on_actionAgent_triggered()
 {
     QFileDialog openApp ( this );
@@ -219,6 +240,7 @@ void MainWindow::startSimulator()
 
         simulator->kill();
         delete ( simulator );
+		simulator=0;
     }
     simulator=new QProcess ( this );
     QFile file ( fileName );

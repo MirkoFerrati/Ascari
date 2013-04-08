@@ -42,6 +42,8 @@ private slots:
     void on_StartViewer_clicked();
 
     void on_playall_clicked();
+	
+	void on_stopall_clicked();
 
     void closeEvent(QCloseEvent *event);
     
