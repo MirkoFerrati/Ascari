@@ -37,6 +37,8 @@ private slots:
 
     void on_StartSimulator_clicked();
 
+	void on_PauseSimulator_clicked();
+	
     void on_Updateshell_clicked();
 
     void on_StartViewer_clicked();
