@@ -6,14 +6,16 @@
 using namespace task_assignment_namespace;
 
 
-void task_assignment::resolve_assignment_problem()
-{
-    std::vector<double> solution;
-      
-    ta_problem.solve(solution);
-
-    copy_solution_to_TA_vector(solution);
-}
+// void task_assignment::resolve_assignment_problem()
+// {
+//     std::vector<double> solution;
+//       
+//     ta_problem.solve(solution);
+// 
+//     copy_solution_to_TA_vector(solution);
+//
+//     solution.clear();
+// }
 
 
 double task_assignment :: euclidean_distance_from_task(task_assignment_namespace::task_id task_id)

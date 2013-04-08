@@ -1,5 +1,8 @@
 #include <condition_variable>
-
+//written by Alessandro Settimi
+#ifndef NAMED_SEMAPHORE_HPP
+#define NAMED_SEMAPHORE_HPP
+//written by Alessandro Settimi
 
 class named_semaphore
 {
@@ -69,3 +72,7 @@ public:
     }
     
 };
+
+//written by Alessandro Settimi
+#endif //NAMED_SEMAPHORE_HPP
+//written by Alessandro Settimi

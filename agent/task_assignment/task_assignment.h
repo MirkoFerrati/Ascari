@@ -11,6 +11,9 @@
 #include <assignment_problem.h>
 #include <random.hpp>
 
+//TODO (Alessandro): che semafori uso? per ora quelli di simone
+#include "../identifierModule/named_semaphore.hpp"
+
 class task_assignment: public Plugin_module
 {
 	
@@ -25,14 +28,27 @@ public:
 	void compileExpressions(exprtk::symbol_table< double >& symbol_table);
 	void printTaskAssignmentVector();
 	void printTaskCostVector();
-
+	void reset_TA_vector();
+	unsigned int count_undone_task();
+	unsigned int count_free_robots();
+	
+	void solve_assignment_problem(assignment_problem& p, task_assignment_namespace::task_assignment_vector& a, std::vector<task_assignment_namespace::task_id>& t,unsigned int n);
+	
 	~task_assignment();
 
 	
 private:
-	rndom<double> rndom_double;
+	double charge;
+  
+	std::map<task_assignment_namespace::task_id,double> periodic_tasks_time;
+	std::map<task_assignment_namespace::task_id,double> elapsed_times;
+	
+  	rndom<double> rndom_double;
+	std::map<task_assignment_namespace::task_id,bool> done_task;
+	std::map<task_assignment_namespace::agent_id,bool> busy_robots;
 	
 	simulation_time& time;
+	simulation_time initial_time;
     
 	task_assignment_namespace::agent_id my_id;
 	double x0,y0;
@@ -41,7 +57,9 @@ private:
 	unsigned int num_task;
 	
 	task_assignment_namespace::task_list tasklist;
-	task_assignment_namespace::task current_task;
+	task_assignment_namespace::task_id my_task;
+	
+	double my_task_x,my_task_y;
 	
 	task_assignment_namespace::task empty_task;
 	
@@ -53,11 +71,14 @@ private:
 	
 	task_assignment_namespace::task_assignment_matrix task_assignment_matrix;
 	
+	task_assignment_namespace::task_cost_vector base_cost_vector;
+	
 	task_assignment_namespace::task_cost_vector* agent_task_cost_vector;
 	
 	task_assignment_namespace::task_assignment_vector* agent_task_assignment_vector;
 	
 	bool task_assigned;
+	bool task_started;
 	bool stop;
 	
 	double speed;
@@ -99,9 +120,7 @@ private:
 		std::vector<double> subgradient;
 		
 		std::vector<double> total_subgradient;
-		
-		std::vector<double> assignment_vector;
-		
+				
 		std::vector<bool> e_i;
 		
 		double alpha;
@@ -136,6 +155,11 @@ private:
 	void copy_solution_to_TA_vector(std::vector<double>& solution);
 	void copy_cost_vector_to_C();
 	void control_print();
+	
+	
+	std::thread* assignment_problem_resolution_thread;
+    
+	named_semaphore prepare_data_semaphore,solve_semaphore;
 };
 
 #endif // TASK_ASSIGNMENT_H

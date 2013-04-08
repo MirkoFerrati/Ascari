@@ -75,6 +75,8 @@ void closeEvent(QCloseEvent *event);
     //written by Alessandro Settimi
     task_assignment_namespace::task_list tasklist;
     std::vector<task_assignment_namespace::task_id> tasks_id;
+    std::vector<simulation_time> times;
+    std::vector<bool> executing;
     //written by Alessandro Settimi
    
 };

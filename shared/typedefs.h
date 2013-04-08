@@ -340,10 +340,12 @@ typedef int task_assignment_algorithm;
 
 struct task
 {
+    task_id id;
     double task_position[3];
     int task_type;
     double task_execution_time;
     double task_deadline;
+    bool executing;
 };
 typedef std::map<task_id,task> task_list;
 
@@ -353,6 +355,8 @@ class task_assignment_packet
 public:
     
     std::string agent_id;
+    bool busy;
+    task_id taken_task;
     data_type data;
     
     task_assignment_packet()
@@ -372,6 +376,8 @@ public:
     void serialize(Archive& ar,const unsigned int /*version*/)
     {
 	ar& agent_id;
+	ar& busy;
+	ar& taken_task;
         ar& data;
     }
 };

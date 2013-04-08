@@ -11,17 +11,28 @@ bool task_assignment::convergence_control_routine()
      unsigned int iter=0;
      unsigned int control=0;
      
-     if (num_robot < num_task) control=num_robot;
-     else control=num_task;
+     unsigned int fr = count_free_robots();
+     unsigned int ut = count_undone_task();
+     
+     std::cout<<"FREE ROBOTS: "<<fr<<std::endl;
+     std::cout<<"UNDONE TASK: "<<ut<<std::endl;
+     
+     if ( fr < ut ) control=fr;
+     else control=ut;
+
+     std::cout<<"TASK DONE or ASSIGNED: "<<num_task-ut-1<<" CONTROL :"<<control<<std::endl; //TODO:-1 se c'è recharge
      
      for (unsigned int i=0;i<num_task;i++)
      {
-	    if (fabs(total_subgradient.at(i)) < 0.0001) iter++;
+	    if (fabs(total_subgradient.at(i)) < 0.01) iter++;
      }
 
+     std::cout<<"zeri in SIGMA: "<<iter<<std::endl;
+     
      if(iter==control)
      {
 	  step++;
+	  std::cout<<"passi stabili: "<<step<<std::endl;
      }
      
      if(!(iter==control))
@@ -84,8 +95,6 @@ task_id task_assignment ::subgradient_algorithm()
 		ptr_subgradient_packet.get()->agent_id=my_id;
 	    
 		std::vector<subgradient_packet>& data_receive = *(std::vector<subgradient_packet>*)ta_communicator->get_data();
-	      
-		assignment_vector.clear();
 		
 		std::cout<<"----------------PASSO "<<passi<<"----------------"<<std::endl<<std::endl;
 
@@ -98,9 +107,19 @@ task_id task_assignment ::subgradient_algorithm()
 		      F.at(i) = C.at(i) + D.at(i) + mu_T.at(i);
 		}
 		
+// 		std::cout<<"VADO A PREPARARE I DATI"<<std::endl;
+		//prepare_data_semaphore.wait();
+		
+		if (!prepare_data_semaphore.try_wait())
+		{
+			prepare_data_semaphore.post();
+		}
+		
 		ta_problem.set_cost_vector(F);
-
-		resolve_assignment_problem();
+// 		std::cout<<"SI PUO' RISOLVERE IL PROBLEMA"<<std::endl;
+// 		resolve_assignment_problem();
+		
+		solve_semaphore.post();
 		
 		selected_task="";
 		
@@ -112,8 +131,6 @@ task_id task_assignment ::subgradient_algorithm()
 		      subgradient.at(i) = -(agent_task_assignment_vector->at(tasks_id.at(i)));
 		      total_subgradient.at(i) = subgradient.at(i) + e_i.at(i);
 		}
-		
-		assignment_vector.clear();
 		
 		ptr_receive_mutex->lock();
 		
@@ -131,7 +148,25 @@ task_id task_assignment ::subgradient_algorithm()
 			  for (unsigned int i=0;i<num_task;i++)
 			  {
 				total_subgradient.at(i) +=  temp.subgradient.at(i);
-			  }	    
+			  }
+			  
+			  if (data_receive.at(i).taken_task!="")
+			  {
+				done_task.at(data_receive.at(i).taken_task)=true;
+				agent_task_cost_vector->at(data_receive.at(i).taken_task)=INF;
+				std::cout<<"task "<<data_receive.at(i).taken_task<<" e' preso"<<std::endl;
+			  }
+			  
+			  if (data_receive.at(i).busy)
+			  {
+				busy_robots.at(name)=true;
+				std::cout<<"robot "<<name<<" e' occupato, "<<data_receive.at(i).busy<<std::endl;
+			  }
+			  else
+			  {
+				busy_robots.at(name)=false;
+				std::cout<<"robot "<<name<<" e' libero, "<<data_receive.at(i).busy<<std::endl;
+			  }
 		    }
 		    
 
@@ -149,13 +184,13 @@ task_id task_assignment ::subgradient_algorithm()
 		std::cout<<std::endl;
 		
 		double min=INF;
-		
+ 		
 		for (unsigned int i=0;i<num_task;i++)
-		{
+ 		{
 		      min=std::min(min,F.at(i));
-		}
-		      
-		alpha= -1;
+ 		}
+		
+		alpha= -( fabs(0.1*min)+0.01 );
 		
 		for (unsigned int i=0;i<num_task;i++)
 		{
@@ -167,15 +202,11 @@ task_id task_assignment ::subgradient_algorithm()
 			
 		ta_communicator->send();
 		
+		//std::cout<<"MANDO "<<((ptr_subgradient_packet.get()->busy)?("occupato"):("libero"))<<std::endl;
+		
 		control_print();
 		
 		converge=convergence_control_routine();
-		
-		for( unsigned int i=0;i<num_task;i++)
-		{
-		    subgradient.at(i)=0;
-		    total_subgradient.at(i)=0;
-		}
 		
 		passi++;
 	}

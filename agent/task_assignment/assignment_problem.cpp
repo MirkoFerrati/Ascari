@@ -97,9 +97,18 @@ void assignment_problem::set_cost_vector(std::vector<double>& cost_vector)
 {
 	for (int i=1;i<num_var+1;i++)
 	{
-		glp_set_obj_coef(problem, i, cost_vector[i-1]); //settaggio del coefficiente del funzionale di costo relativo alla variabile (c)
+		glp_set_obj_coef(problem, i, cost_vector.at(i-1)); //settaggio del coefficiente del funzionale di costo relativo alla variabile (c)
 	}
 }
+
+void assignment_problem::get_cost_vector(std::vector<double>& cost_vector)
+{
+	for (int i=1;i<num_var+1;i++)
+	{
+		cost_vector.at(i-1) = glp_get_obj_coef(problem, i);
+	}
+}
+
 
 void assignment_problem::create_problem(std::vector<double>& cost_vector)
 {

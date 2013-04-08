@@ -170,6 +170,12 @@ void Viewer::set_tasklist(const Parsed_World& wo)
 {
      tasklist=wo.task_list;
      tasks_id=wo.tasks_id;
+     
+     for (unsigned int i=0;i<tasks_id.size();i++)
+     {
+	  times.push_back(0);
+	  executing.push_back(false);
+     }
 }
 //written by Alessandro Settimi
 
@@ -346,26 +352,75 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
     //written by Alessandro Settimi
     if (view_type==4)
     { 
+	std::stringstream app(std::stringstream::out);
+	app.str("");
+	
 	for (unsigned int i=0;i<tasks_id.size();i++)
 	{
 		painter.save();
 		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
-		painter.setBrush(QColor("blue"));
-		painter.drawRect(-7,-7,14,14);
+		
+		if (tasklist.at(tasks_id.at(i)).task_type==0)
+		{
+			painter.setBrush(QColor("lightgreen"));
+		}
+		else
+		{
+			painter.setBrush(QColor("cyan"));
+		}
+		
+		painter.drawRect(-1,-1,2,2);
 		painter.restore();
 		
-		painter.save();
-		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
-		painter.setBrush(QColor("white"));
-		painter.drawRect(-6.5,-6.5,12.5,12.5);
-		painter.restore();
+// 		painter.save();
+// 		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+// 		painter.setBrush(QColor("white"));
+// 		painter.drawRect(-0.5,-0.5,1,1);
+// 		painter.restore();
+		
+		
+		for ( map<string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
+		{
+			if(app.str()=="")
+			{
+				if (sqrt( (it->second.x-tasklist.at(tasks_id.at(i)).task_position[0])*(it->second.x-tasklist.at(tasks_id.at(i)).task_position[0]) + (it->second.y-tasklist.at(tasks_id.at(i)).task_position[1])*(it->second.y-tasklist.at(tasks_id.at(i)).task_position[1]) ) < 0.15)
+				{
+					app << tasks_id.at(i).c_str() << " (" << ((tasklist.at(tasks_id.at(i)).task_execution_time-(time-times.at(i)) >= 0)?tasklist.at(tasks_id.at(i)).task_execution_time-(time-times.at(i)):(0)) << ")";
+
+					if(!executing.at(i)) times.at(i)=time;
+					executing.at(i)=true;
+				}
+			}
+		}
+		
+		if(app.str()=="")
+		{
+			executing.at(i)=false;
+			app << tasks_id.at(i).c_str() << " (" << tasklist.at(tasks_id.at(i)).task_execution_time << ")";
+		}
 		
 		painter.save();
 		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
 		painter.setBrush(QColor("black"));
-		painter.scale(painter.fontMetrics().height()/100.0,-painter.fontMetrics().height()/100.0);
-		painter.drawText(10,30,QString(tasks_id.at(i).c_str()));
+		painter.scale(painter.fontMetrics().height()/1000.0,-painter.fontMetrics().height()/1000.0);
+		painter.drawText(0,75,QString(app.str().c_str()));
 		painter.restore();
+		
+		app.str("");
+		
+		if (tasklist.at(tasks_id.at(i)).task_deadline != 0)
+		{
+			app << "[" << (((tasklist.at(tasks_id.at(i)).task_deadline-time)>=0)?(tasklist.at(tasks_id.at(i)).task_deadline-time):(0)) << "]";
+		  
+			painter.save();
+			painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+			painter.setPen(QColor("red"));
+			painter.scale(painter.fontMetrics().height()/1000.0,-painter.fontMetrics().height()/1000.0);
+			painter.drawText(0,-65,QString(app.str().c_str()));
+			painter.restore();
+			
+			app.str("");
+		}
 	}
     }
     //written by Alessandro Settimi
@@ -390,13 +445,29 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
         }
         else
         {
-			painter.scale(2,2);
+			if (view_type==4)//written by Alessandro Settimi
+			{
+			    painter.scale(0.2,0.2);
+			}
+			else
+			{
+			    painter.scale(2,2);
+			}
             painter.drawConvexPolygon(hourHand, 3);
-			if (view_type==2 || view_type==4 || view_type==5)
+			if (view_type==2 || view_type==5)
 			{
 				painter.save();
 				painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
 				painter.scale(painter.fontMetrics().height()/70.0,-painter.fontMetrics().height()/70.0);
+				painter.drawText(0,0,QString(it->first.substr(6).c_str()));
+				painter.restore();
+			}
+			
+			if (view_type==4)
+			{
+				painter.save();
+				painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
+				painter.scale(painter.fontMetrics().height()/10.0,-painter.fontMetrics().height()/10.0);
 				painter.drawText(0,0,QString(it->first.substr(6).c_str()));
 				painter.restore();
 			}
@@ -470,7 +541,7 @@ void Viewer::timerEvent ( QTimerEvent */*event*/ )
     {
 	for(unsigned int i=0;i<tasks_id.size();i++)
 	{
-	    setScalingAndTranslateFactor(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[0]-7,tasklist.at(tasks_id.at(i)).task_position[1],tasklist.at(tasks_id.at(i)).task_position[1]-7);
+	    setScalingAndTranslateFactor(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[0]-2,tasklist.at(tasks_id.at(i)).task_position[1],tasklist.at(tasks_id.at(i)).task_position[1]-2);
 	}
     }
     //written by Alessandro Settimi

@@ -15,6 +15,7 @@ public:
     void add_structural_variables();
     void create_problem(std::vector<double>& cost_vector);
     void set_cost_vector(std::vector<double>& cost_vector);
+    void get_cost_vector(std::vector<double>& cost_vector);
     void solve(std::vector<double>&);
     double get_function_value();
     

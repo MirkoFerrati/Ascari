@@ -8,8 +8,8 @@ using namespace task_assignment_namespace;
  
 void task_assignment ::addReservedVariables(exprtk::symbol_table< double >& symbol_table)
 {
-	symbol_table.add_variable("X_TASK",current_task.task_position[0],false);
-	symbol_table.add_variable("Y_TASK",current_task.task_position[1],false);
+	symbol_table.add_variable("X_TASK",my_task_x,false);
+	symbol_table.add_variable("Y_TASK",my_task_y,false);
 	symbol_table.add_variable("V_T",speed,false);
 }
 
@@ -37,17 +37,21 @@ void task_assignment ::setTaskStop(bool stop)
  
 bool task_assignment ::task_made()
 {
-	return events.at(events_to_index.at("REACHED"))==Events::_TRUE;
+	bool a;
+	
+	a = (tasklist.at(my_task).task_execution_time < (time-initial_time));
+	
+	return (a && (events.at(events_to_index.at("REACHED"))==Events::_TRUE));
 }
 
 
-void task_assignment ::copy_solution_to_TA_vector(std::vector<double>& solution)
-{
-	for(unsigned int j=0;j<num_task;j++)
-	{
-	    agent_task_assignment_vector->at(tasks_id.at(j))=solution.at(j);
-	}
-}
+// void task_assignment ::copy_solution_to_TA_vector(std::vector<double>& solution)
+// {
+// 	for(unsigned int j=0;j<num_task;j++)
+// 	{
+// 	    agent_task_assignment_vector->at(tasks_id.at(j))=solution.at(j);
+// 	}
+// }
  
  
  void task_assignment ::copy_cost_vector_to_C()

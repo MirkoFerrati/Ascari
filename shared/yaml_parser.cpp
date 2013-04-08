@@ -199,12 +199,15 @@ void createTaskList ( const YAML::Node& node, task_assignment_namespace::task_li
 
         task_assignment_namespace::task temp2;
 
+	node[i] >> temp2.id;
         node[i+1] >> temp2.task_position[0];
         node[i+2] >> temp2.task_position[1];
         node[i+3] >> temp2.task_position[2];
         node[i+4] >> temp2.task_type;
         node[i+5] >> temp2.task_execution_time;
         node[i+6] >> temp2.task_deadline;
+	
+	temp2.executing=false;
 
         task_list.insert ( make_pair ( temp1,temp2 ) );
 
