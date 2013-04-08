@@ -134,6 +134,15 @@ void MainWindow::on_actionOpen_triggered()
         openFile();
 }
 
+void MainWindow::on_PauseSimulator_clicked()
+{
+if (simulator)
+{
+	simulator->putChar('p');
+}
+}
+
+
 void MainWindow::on_actionSimulator_triggered()
 {
     QFileDialog openApp ( this );
