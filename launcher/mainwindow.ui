@@ -66,7 +66,7 @@
         </property>
        </widget>
        <widget class="QWidget" name="horizontalLayoutWidget">
-        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
          <property name="sizeConstraint">
           <enum>QLayout::SetMaximumSize</enum>
          </property>
@@ -74,7 +74,7 @@
           <number>0</number>
          </property>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1,1,1,1">
+          <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1,1,1,1,0,0">
            <property name="sizeConstraint">
             <enum>QLayout::SetMaximumSize</enum>
            </property>
@@ -126,25 +126,25 @@
             </widget>
            </item>
            <item>
-				   <widget class="QPushButton" name="PauseSimulator">
-					   <property name="sizePolicy">
-						   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-							   <horstretch>0</horstretch>
-							   <verstretch>0</verstretch>
-						   </sizepolicy>
-					   </property>
-					   <property name="maximumSize">
-						   <size>
-							   <width>200</width>
-							   <height>16777215</height>
-						   </size>
-					   </property>
-					   <property name="text">
-						   <string>Pause simulator</string>
-					   </property>
-				   </widget>
-			   </item>
-			   <item>
+            <widget class="QPushButton" name="PauseSimulator">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>200</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Pause simulator</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="StartViewer">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -176,19 +176,19 @@
              </property>
             </widget>
            </item>
-		   <item>
-			   <widget class="QPushButton" name="stopall">
-				   <property name="sizePolicy">
-					   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-						   <horstretch>0</horstretch>
-						   <verstretch>0</verstretch>
-					   </sizepolicy>
-				   </property>
-				   <property name="text">
-					   <string>STOP</string>
-				   </property>
-			   </widget>
-		   </item>
+           <item>
+            <widget class="QPushButton" name="stopall">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>STOP</string>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QPushButton" name="Updateshell">
              <property name="sizePolicy">
@@ -217,51 +217,62 @@
           </layout>
          </item>
          <item>
-          <widget class="QListWidget" name="selectViewType">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>1</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>500000</width>
-             <height>100</height>
-            </size>
-           </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
            <item>
-            <property name="text">
-             <string>Baseball</string>
-            </property>
+            <widget class="QCheckBox" name="collisionEnabler">
+             <property name="text">
+              <string>Collision Checker?</string>
+             </property>
+            </widget>
            </item>
            <item>
-            <property name="text">
-             <string>Grafo</string>
-            </property>
+            <widget class="QListWidget" name="selectViewType">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>1</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>500000</width>
+               <height>100</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>Baseball</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Grafo</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Vuoto</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>TaskAssignment</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Monitor</string>
+              </property>
+             </item>
+            </widget>
            </item>
-           <item>
-            <property name="text">
-             <string>Vuoto</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>TaskAssignment</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Monitor</string>
-            </property>
-           </item>
-          </widget>
+          </layout>
          </item>
         </layout>
        </widget>

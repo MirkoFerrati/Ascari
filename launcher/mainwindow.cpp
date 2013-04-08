@@ -243,7 +243,8 @@ void MainWindow::startSimulator()
 {
     QStringList arguments;
     arguments<< "-f"<< fileName;
-    arguments<< "-check_collision";
+	if (ui->collisionEnabler->isChecked())
+		arguments<< "-check_collision";
     if ( simulator )
     {
 
