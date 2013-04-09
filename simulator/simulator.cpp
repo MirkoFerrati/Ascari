@@ -118,6 +118,11 @@ void simulator::initialize ( const Parsed_World& wo )
 }
 
 
+void simulator::createObjects ( const Parsed_World& world )
+{
+  throw("TODO");
+}
+
 
 void simulator::initialize_agents ( const vector<Parsed_Agent>& ag )
 {
@@ -322,6 +327,12 @@ void simulator::main_loop()
                     }
                 }
             }
+            
+            for ( auto object=objects.begin();object!=objects.end();++object ) 
+            {
+                object->second->updateState(sim_packet.time,sim_packet.state_agents);
+            }
+            
             collisionChecker->checkCollisions();
             usleep ( secSleep );
             vector<control_command_packet> temp=communicator->receive_control_commands();
