@@ -9,6 +9,7 @@
 #include "communication/udp_agent_router.hpp"
 #include "collisioncheckerabstract.h"
 #include "random.hpp"
+#include <objects/abstract_object.h>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
@@ -60,6 +61,8 @@ private:
 	std::map<std::string,int> map_bonus_variables;
 	Udp_agent_router<topology_packet> topology_router;
 	Udp_agent_router<graph_packet> graph_router;
+	std::map<std::string,abstract_object*> objects;
+	void createObjects(const Parsed_World& world);
 	
 	//written by Alessandro Settimi
 
