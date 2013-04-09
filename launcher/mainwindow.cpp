@@ -164,6 +164,8 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_stopall_clicked()
 {
+	on_Updateshell_clicked();
+  
 	if ( !agents.empty() )
 	{
 		for ( unsigned int i=0; i<agents.size(); i++ )

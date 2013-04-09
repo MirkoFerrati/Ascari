@@ -33,21 +33,27 @@ void task_assignment::update_distance_vector()
 }
 
 
+void task_assignment ::update_remaining_times()
+{
+      for(unsigned int i=0;i<num_task;i++)
+      {
+		if(tasklist.at(tasks_id.at(i)).task_deadline!=0)remaining_times_to_deadline.at(tasks_id.at(i))=time_to_deadline(tasks_id.at(i));
+      }
+}
+
 double task_assignment ::time_to_deadline(task_assignment_namespace::task_id task_id)
 {
 	double temp = tasklist.at(task_id).task_deadline-time;
-	
-	if (temp==-time) return 1;
 	
 	if (temp > 0) return temp;
 	  
 	if (temp < 0) 
 	{
 	    std::cout<<"Deadline per il task "<<task_id<<" superata!";
-	    return 1;
+	    return 0;
 	}
 	
-	return 1;
+	return 0;
 }
 
 

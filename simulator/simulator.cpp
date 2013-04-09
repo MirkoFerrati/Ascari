@@ -213,7 +213,7 @@ void simulator::main_loop()
         std::mutex input_mutex;
         std::condition_variable input_cond;
         volatile bool input_exit=false;
-        volatile bool paused=true;
+        volatile bool paused=false;
         std::thread input_thread ( &simulator::input_loop,this,std::ref ( input_mutex ),std::ref ( input_cond ),std::ref ( paused ),std::ref ( input_exit ) );
 
         sim_packet.time=0;
@@ -225,7 +225,7 @@ void simulator::main_loop()
                 std::unique_lock<std::mutex> lock ( input_mutex );
                 while ( paused )
                 {
-                    cout<<"sono dentro il while della condition_variable"<<endl;
+                    //cout<<"sono dentro il while della condition_variable"<<endl;
                     input_cond.wait ( lock );
                    // cout<<paused<<endl;
                 }

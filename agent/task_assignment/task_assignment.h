@@ -31,6 +31,7 @@ public:
 	void reset_TA_vector();
 	unsigned int count_undone_task();
 	unsigned int count_free_robots();
+	void update_remaining_times();
 	
 	void solve_assignment_problem(assignment_problem& p, task_assignment_namespace::task_assignment_vector& a, std::vector<task_assignment_namespace::task_id>& t,unsigned int n);
 	
@@ -42,9 +43,10 @@ private:
   
 	std::map<task_assignment_namespace::task_id,double> periodic_tasks_time;
 	std::map<task_assignment_namespace::task_id,double> elapsed_times;
+	std::map<task_assignment_namespace::task_id,double> remaining_times_to_deadline;
 	
   	rndom<double> rndom_double;
-	std::map<task_assignment_namespace::task_id,bool> done_task;
+	std::map<task_assignment_namespace::task_id,bool> done_task; //done and prenotated
 	std::map<task_assignment_namespace::agent_id,bool> busy_robots;
 	
 	simulation_time& time;
@@ -125,7 +127,7 @@ private:
 		
 		double alpha;
 	
-	
+		std::vector<double> solution;
 	
 
 	//
@@ -152,14 +154,10 @@ private:
 	std::vector<double> C;
 	std::vector<double> D;
 	std::vector<double> F;
+	std::vector<double> DL;
 	void copy_solution_to_TA_vector(std::vector<double>& solution);
 	void copy_cost_vector_to_C();
 	void control_print();
-	
-	
-	std::thread* assignment_problem_resolution_thread;
-    
-	named_semaphore prepare_data_semaphore,solve_semaphore;
 };
 
 #endif // TASK_ASSIGNMENT_H

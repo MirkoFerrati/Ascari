@@ -90,36 +90,39 @@ void task_assignment ::control_print()
  
 task_id task_assignment ::subgradient_algorithm()
 {
-	if(!converge)
+	if(1)//!converge)
 	{
 		ptr_subgradient_packet.get()->agent_id=my_id;
 	    
 		std::vector<subgradient_packet>& data_receive = *(std::vector<subgradient_packet>*)ta_communicator->get_data();
 		
-		std::cout<<"----------------PASSO "<<passi<<"----------------"<<std::endl<<std::endl;
+		std::cout<<"----------------PASSO "<<passi<<" ("<<time<<") ----------------"<<std::endl<<std::endl;
 
-		sleep(1);
-		
-		update_distance_vector();
 		
 		for (unsigned int i=0;i<num_task;i++)
 		{
 		      F.at(i) = C.at(i) + D.at(i) + mu_T.at(i);
+		      
+		      if(tasks_id.at(i)!="RECHARGE" && (((!tasklist.at(tasks_id.at(i)).executing && !done_task.at(tasks_id.at(i)))) || my_task==tasks_id.at(i))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
 		}
 		
-// 		std::cout<<"VADO A PREPARARE I DATI"<<std::endl;
-		//prepare_data_semaphore.wait();
-		
-		if (!prepare_data_semaphore.try_wait())
-		{
-			prepare_data_semaphore.post();
-		}
-		
+
+		  
 		ta_problem.set_cost_vector(F);
-// 		std::cout<<"SI PUO' RISOLVERE IL PROBLEMA"<<std::endl;
-// 		resolve_assignment_problem();
+
 		
-		solve_semaphore.post();
+		
+		ta_problem.solve(solution);
+	
+	      
+		for(unsigned int j=0;j<num_task;j++)//copy_solution_to_TA_vector
+		{
+			agent_task_assignment_vector->at(tasks_id.at(j))=solution.at(j);
+		}
+
+		
+		solution.clear();
+		
 		
 		selected_task="";
 		
@@ -131,6 +134,9 @@ task_id task_assignment ::subgradient_algorithm()
 		      subgradient.at(i) = -(agent_task_assignment_vector->at(tasks_id.at(i)));
 		      total_subgradient.at(i) = subgradient.at(i) + e_i.at(i);
 		}
+		
+		
+		
 		
 		ptr_receive_mutex->lock();
 		
@@ -154,6 +160,7 @@ task_id task_assignment ::subgradient_algorithm()
 			  {
 				done_task.at(data_receive.at(i).taken_task)=true;
 				agent_task_cost_vector->at(data_receive.at(i).taken_task)=INF;
+				copy_cost_vector_to_C();
 				std::cout<<"task "<<data_receive.at(i).taken_task<<" e' preso"<<std::endl;
 			  }
 			  
@@ -190,7 +197,9 @@ task_id task_assignment ::subgradient_algorithm()
 		      min=std::min(min,F.at(i));
  		}
 		
-		alpha= -( fabs(0.1*min)+0.01 );
+		//alpha= -( fabs(0.1*min)+0.01 );
+		
+		alpha=-0.1;
 		
 		for (unsigned int i=0;i<num_task;i++)
 		{

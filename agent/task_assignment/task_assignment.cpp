@@ -7,7 +7,7 @@ using namespace task_assignment_namespace;
 
   
 task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index)
-:time(time),my_id(agent.name),x0(agent.initial_states.at("X")),y0(agent.initial_states.at("Y")),events(events),events_to_index(events_to_index),prepare_data_semaphore(1),solve_semaphore(0)
+:time(time),my_id(agent.name),x0(agent.initial_states.at("X")),y0(agent.initial_states.at("Y")),events(events),events_to_index(events_to_index)
 {        
     std::shared_ptr<std::mutex> temp(new std::mutex);
     ptr_receive_mutex.swap(temp);
@@ -27,9 +27,12 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     my_task="";
     
     charge=100;
+    if(my_id=="AGENTE1") charge=100;
+    if(my_id=="AGENTE2") charge=100;
+    if(my_id=="AGENTE3") charge=50;
     
     task_assigned=false;
-    task_started=0;
+    task_started=false;
     stop=false;
     speed=0;
     
@@ -80,52 +83,6 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     
     alpha=-1;
     
-    assignment_problem_resolution_thread = new std::thread ( &task_assignment::solve_assignment_problem, std::ref ( *this ), std::ref(ta_problem),std::ref(*agent_task_assignment_vector),std::ref(tasks_id),num_task);
-}
-
-void task_assignment::solve_assignment_problem(assignment_problem& p, task_assignment_namespace::task_assignment_vector& a, std::vector<task_assignment_namespace::task_id>& t,unsigned int n)
-{
-	std::vector<task_assignment_namespace::task_id>& tasks_id=t;
-	assignment_problem& problem=p;
-	task_assignment_vector& agent_assignment_vector = a;
-	unsigned int num_task=n;
-	std::vector<double> c;
-	
-	for (unsigned int i=0;i<num_task;i++) c.push_back(0);
-	
-	std::vector<double> solution;
-// 	  std::cout<<".......SONO PARTITO!"<<std::endl;
-	while(1)
-	{	
-// 		std::cout<<".......WAIT..."<<std::endl;
-		solve_semaphore.wait();
-		
-// 		std::cout<<".......POSSO RISOLVERE!"<<std::endl;
-// 		std::cout<<".......COEFF: [ ";
-		
-		problem.get_cost_vector(c);
-		
-// 		for(unsigned int j=0;j<num_task;j++)
-// 		{
-// 			std::cout<<c.at(j)<<' ';
-// 		}
-// 		std::cout<<']'<<std::endl;
-		
-		problem.solve(solution);
-		
-// 		std::cout<<".......SOLUZIONE TROVATA: [ ";
-		
-		for(unsigned int j=0;j<num_task;j++)//copy_solution_to_TA_vector
-		{
-// 			std::cout<<solution.at(j)<<' ';
-			agent_assignment_vector.at(tasks_id.at(j))=solution.at(j);
-		}
-// 		std::cout<<']'<<std::endl;
-		
-		solution.clear();
-		
-		prepare_data_semaphore.post();
-	}
 }
 
  
@@ -167,6 +124,9 @@ void task_assignment ::createTaskListFromParsedWorld(const Parsed_World& wo)
 		  periodic_tasks_time.insert(std::make_pair(tasks_id.at(i),0));
 		  elapsed_times.insert(std::make_pair(tasks_id.at(i),0));
 	    }
+	    
+	    DL.push_back(tasklist.at(tasks_id.at(i)).task_deadline);
+	    remaining_times_to_deadline.insert(std::make_pair(tasks_id.at(i),0));
     }
 }
 
@@ -329,6 +289,9 @@ void task_assignment ::run_plugin()
 			std::cout<<"BATTERIA SCARICA... SHUTDOWN..."<<std::endl;
 			stop=true;
 		    }
+		    
+		    update_distance_vector();
+		    update_remaining_times();
 	      }
 	      
 	      
@@ -381,7 +344,7 @@ void task_assignment ::run_plugin()
 		      ptr_subgradient_packet.get()->busy=false;
 		      
 		      busy_robots.at(my_id)=false;
-		      if (count_undone_task()==0) stop=true;
+// 		      if (count_undone_task()==0) stop=true;
 		      
 		      converge=false;
 		      my_task="";
@@ -407,7 +370,7 @@ void task_assignment ::run_plugin()
 	      
 	      for(std::map<std::string,double>::const_iterator it=periodic_tasks_time.begin(); it!=periodic_tasks_time.end(); ++it)
 	      {
-		  if(elapsed_times.at(it->first)==0)
+		  if(elapsed_times.at(it->first)<=0)
 		  {
 		      agent_task_cost_vector->at(it->first)=base_cost_vector.at(it->first); //costo base
 		      done_task.at(it->first)=false;
@@ -418,53 +381,9 @@ void task_assignment ::run_plugin()
 		      elapsed_times.at(it->first)=100-(time-periodic_tasks_time.at(it->first)); //periodo 50
 		  }
 	      }
-	      
-	      if(converge)
-	      {
-		      std::vector<subgradient_packet>& data_receive = *(std::vector<subgradient_packet>*)ta_communicator->get_data();
-		      
-		      ptr_receive_mutex->lock();
-			  
-		      fresh_data=false;
-		      
-		      
-		      for (unsigned int i=0;i<data_receive.size();i++)
-		      {
-			  subgradient_task_packet temp = *(subgradient_task_packet*)data_receive.at(i).get_data();
-			  agent_id name = data_receive.at(i).agent_id;
-			  
-			  if (!(name ==""))
-			  {     
-				if (data_receive.at(i).taken_task!="")
-				{
-				      done_task.at(data_receive.at(i).taken_task)=true;
-				      agent_task_cost_vector->at(data_receive.at(i).taken_task)=INF;
-				      copy_cost_vector_to_C();
-				      std::cout<<"task "<<data_receive.at(i).taken_task<<" e' preso"<<std::endl;
-				}
-				
-				if (data_receive.at(i).busy)
-				{
-				      busy_robots.at(name)=true;
-				      std::cout<<"robot "<<name<<" e' occupato, "<<data_receive.at(i).busy<<std::endl;
-				}
-				else
-				{
-				      busy_robots.at(name)=false;
-				      std::cout<<"robot "<<name<<" e' libero, "<<data_receive.at(i).busy<<std::endl;
-				}
-			  }
-			  
-
-		      }
-		      
-		      data_receive.clear();
-		      
-		      ptr_receive_mutex->unlock();
-	      }
 		
 	      
-	      if (!converge && count_undone_task()!=0)
+	      if (/*!converge &&*/ count_undone_task()!=0)
 	      {
 		      if(task_assignment_algorithm==SUBGRADIENT)
 		      {
@@ -485,6 +404,12 @@ void task_assignment ::run_plugin()
 			  task_assigned=true;
 			  speed=0.1;
 		      }
+	      }
+	      
+	      if(count_undone_task()==0)
+	      {
+			my_task_x=x0;
+			my_task_y=y0;
 	      }
       }
 }
