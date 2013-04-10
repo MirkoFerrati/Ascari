@@ -431,6 +431,17 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 
     for ( map<string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
     {
+      
+	if(time==0)
+	{
+	      std::vector<double> app;
+	      
+	      app.push_back(it->second.x);
+	      app.push_back(it->second.y);
+	      
+	      initial_pos[it->first]=app;
+	}
+      
         painter.save();
         painter.setBrush ( QColor ( "red" ) );
         painter.translate ( it->second.x,it->second.y );
@@ -477,6 +488,15 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 
         }
         painter.restore();
+	
+	if (view_type==4)
+	{
+		painter.save();
+		painter.translate(initial_pos.at(it->first).at(0),initial_pos.at(it->first).at(1));
+		painter.drawArc(-1,-1,2,2,0,16*360);
+		painter.restore();
+	}
+				
 	    if ( view_type==5 && monitor )
             {
                 painter.save();

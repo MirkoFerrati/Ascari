@@ -65,6 +65,15 @@ void task_assignment ::control_print()
 	}
 	std::cout<<std::endl<<std::endl;
 	
+	std::cout<<"D: |";
+	for (unsigned int i=0;i<num_task;i++)
+	{
+	      std::cout<<D.at(i)<<'|';
+	}
+	std::cout<<std::endl<<std::endl;
+	
+	
+	
 	std::cout<<"SELECTED TASK: "<<selected_task<<std::endl<<std::endl;
 	
 	printTaskCostVector();
@@ -103,7 +112,7 @@ task_id task_assignment ::subgradient_algorithm()
 		{
 		      F.at(i) = C.at(i) + D.at(i) + mu_T.at(i);
 		      
-		      if(tasks_id.at(i)!="RECHARGE" && (((!tasklist.at(tasks_id.at(i)).executing && !done_task.at(tasks_id.at(i)))) || my_task==tasks_id.at(i))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
+		      if(tasks_id.at(i)!="RECHARGE" && (((!tasklist.at(tasks_id.at(i)).executing && !done_task.at(tasks_id.at(i)))))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
 		}
 		
 
@@ -156,12 +165,15 @@ task_id task_assignment ::subgradient_algorithm()
 				total_subgradient.at(i) +=  temp.subgradient.at(i);
 			  }
 			  
+			  taken_tasks.at(name)="";
+			  
 			  if (data_receive.at(i).taken_task!="")
 			  {
 				done_task.at(data_receive.at(i).taken_task)=true;
 				agent_task_cost_vector->at(data_receive.at(i).taken_task)=INF;
 				copy_cost_vector_to_C();
 				std::cout<<"task "<<data_receive.at(i).taken_task<<" e' preso"<<std::endl;
+				taken_tasks.at(name)=data_receive.at(i).taken_task;
 			  }
 			  
 			  if (data_receive.at(i).busy)
@@ -179,6 +191,14 @@ task_id task_assignment ::subgradient_algorithm()
 
 		}
 		
+		
+		for (unsigned int i=0;i<num_robot;i++)
+		{
+			if (previous_taken_tasks.at(agents_id.at(i))=="RECHARGE" && taken_tasks.at(agents_id.at(i))=="") done_task.at("RECHARGE")=false;
+			previous_taken_tasks.at(agents_id.at(i))=taken_tasks.at(agents_id.at(i));
+		}
+		
+		
 		data_receive.clear();
 		
 		ptr_receive_mutex->unlock();
@@ -190,22 +210,15 @@ task_id task_assignment ::subgradient_algorithm()
 		}
 		std::cout<<std::endl;
 		
-		double min=INF;
- 		
-		for (unsigned int i=0;i<num_task;i++)
- 		{
-		      min=std::min(min,F.at(i));
- 		}
-		
-		//alpha= -( fabs(0.1*min)+0.01 );
-		
 		alpha=-0.1;
 		
-		for (unsigned int i=0;i<num_task;i++)
+		if(!converge) //TODO: RIFLETTERE SUL FATTO CHE MU_T NON CONVERGE SE CI SONO PIU' TASKS
 		{
-		      mu_T.at(i) = mu_T.at(i) + alpha* total_subgradient.at(i);
+			for (unsigned int i=0;i<num_task;i++)
+			{
+			      mu_T.at(i) = mu_T.at(i) + alpha* total_subgradient.at(i);
+			}
 		}
-		
 			
 		ptr_subgradient_packet.get()->data.subgradient=subgradient;
 			

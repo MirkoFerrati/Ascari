@@ -20,7 +20,7 @@ using namespace task_assignment_namespace;
 
 double task_assignment :: euclidean_distance_from_task(task_assignment_namespace::task_id task_id)
 {
-	return sqrt((x0-tasklist.at(task_id).task_position[0])*(x0-tasklist.at(task_id).task_position[0])+(y0-tasklist.at(task_id).task_position[1])*(y0-tasklist.at(task_id).task_position[1]));
+	return sqrt((x.value()-tasklist.at(task_id).task_position[0])*(x.value()-tasklist.at(task_id).task_position[0])+(y.value()-tasklist.at(task_id).task_position[1])*(y.value()-tasklist.at(task_id).task_position[1]));
 }
 
 
@@ -49,7 +49,7 @@ double task_assignment ::time_to_deadline(task_assignment_namespace::task_id tas
 	  
 	if (temp < 0) 
 	{
-	    std::cout<<"Deadline per il task "<<task_id<<" superata!";
+	    if(!done_task.at(task_id) && !tasklist.at(task_id).executing) std::cout<<"Deadline per il task "<<task_id<<" superata!";
 	    return 0;
 	}
 	

@@ -77,6 +77,8 @@ void closeEvent(QCloseEvent *event);
     std::vector<task_assignment_namespace::task_id> tasks_id;
     std::vector<simulation_time> times;
     std::vector<bool> executing;
+    
+    std::map<task_assignment_namespace::agent_id,std::vector<double>> initial_pos;
     //written by Alessandro Settimi
    
 };

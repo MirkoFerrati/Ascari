@@ -25,6 +25,19 @@ void task_assignment ::compileExpressions(exprtk::symbol_table< double >& symbol
 		throw "impossibile creare l'espressione";
 	}
 	
+	x.register_symbol_table(symbol_table);
+	if (!parser.compile("X",x))
+	{
+		ERR("impossibile creare l'espressione: %s","X");
+		throw "impossibile creare l'espressione";
+	}
+	
+	y.register_symbol_table(symbol_table);
+	if (!parser.compile("Y",y))
+	{
+		ERR("impossibile creare l'espressione: %s","Y");
+		throw "impossibile creare l'espressione";
+	}
 }
 
  

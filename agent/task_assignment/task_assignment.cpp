@@ -59,13 +59,15 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
 	C.push_back(0);
 	D.push_back(0);
 	F.push_back(0);
-	if(tasks_id.at(i)!="RECHARGE")done_task.insert(std::make_pair(tasks_id.at(i),false));
+	done_task.insert(std::make_pair(tasks_id.at(i),false));
     }
     //std::cout<<std::endl;
     
     for(unsigned int i=0;i<num_robot;i++)
     {
 	busy_robots.insert(std::make_pair(agents_id.at(i),false));
+	taken_tasks.insert(std::make_pair(agents_id.at(i),""));
+	previous_taken_tasks.insert(std::make_pair(agents_id.at(i),""));
     }
     
     copy_cost_vector_to_C();
@@ -225,6 +227,15 @@ void task_assignment::reset_TA_vector()
 }
 
 
+void task_assignment::reset_mu_T()
+{
+	for (unsigned int i=0;i<num_task;i++)
+	{
+		mu_T.at(i)=0;
+	}
+}
+
+
 unsigned int task_assignment::count_undone_task()
 {
 	unsigned int a=num_task-1; //TODO:se c'è il RECHARGE ci vuole il -1, sennò no
@@ -322,7 +333,8 @@ void task_assignment ::run_plugin()
 		      
 		      if(my_task=="RECHARGE")
 		      {
-			  std::cout<<"RICARICA EFFETTUATA"<<std::endl;
+			  std::cout<<"RICARICA EFFETTUATA"<<" T:"<<tasklist.at("RECHARGE").task_execution_time<<std::endl;
+			  done_task.at("RECHARGE")=false;
 			  charge=100;
 		      }
 		      else
@@ -335,7 +347,10 @@ void task_assignment ::run_plugin()
 		      tasklist.at(my_task).executing=false;
 		      
 		      agent_task_cost_vector->at(my_task)=INF;
+		      
 		      copy_cost_vector_to_C();
+		      
+		
 		      
 		      task_assigned=false;
 		      speed=0;
@@ -351,9 +366,11 @@ void task_assignment ::run_plugin()
 		      step=0;
 		      passi=0;
 		      reset_TA_vector();
+		      task_started=false;
+		      
+		      reset_mu_T();
 		  }
-		  
-		  ta_communicator->send();
+
 	      }
 	      
 	      if (stop)
@@ -362,7 +379,7 @@ void task_assignment ::run_plugin()
 		  return;
 	      }
 	      
-	      if(charge <= 30)
+	      if(!busy_robots.at(my_id) && !done_task.at("RECHARGE") && charge <= 30)
 	      {
 		  agent_task_cost_vector->at("RECHARGE")=-100; //così da farlo per forza
 		  copy_cost_vector_to_C();
@@ -370,20 +387,18 @@ void task_assignment ::run_plugin()
 	      
 	      for(std::map<std::string,double>::const_iterator it=periodic_tasks_time.begin(); it!=periodic_tasks_time.end(); ++it)
 	      {
+		  elapsed_times.at(it->first)=100-(time-periodic_tasks_time.at(it->first)); //periodo 100
+		
 		  if(elapsed_times.at(it->first)<=0)
 		  {
 		      agent_task_cost_vector->at(it->first)=base_cost_vector.at(it->first); //costo base
 		      done_task.at(it->first)=false;
 		      copy_cost_vector_to_C();
 		  }
-		  else
-		  {
-		      elapsed_times.at(it->first)=100-(time-periodic_tasks_time.at(it->first)); //periodo 50
-		  }
 	      }
 		
 	      
-	      if (/*!converge &&*/ count_undone_task()!=0)
+	      if (/*!converge &&*/ !busy_robots.at(my_id) && count_undone_task()!=0)
 	      {
 		      if(task_assignment_algorithm==SUBGRADIENT)
 		      {
@@ -394,7 +409,9 @@ void task_assignment ::run_plugin()
 		      {
 			  std::cout<<"NO TASK HAS BEEN ASSIGNED TO ME"<<std::endl;
 			  task_assigned=false;
-			  speed=0;
+			  my_task_x=x0;
+			my_task_y=y0;
+			speed=((sqrt((x.value()-x0)*(x.value()-x0)+(y.value()-y0)*(y.value()-y0)) > 0.5)?0.1:0);
 		      }    
 		      else
 		      {
@@ -405,11 +422,13 @@ void task_assignment ::run_plugin()
 			  speed=0.1;
 		      }
 	      }
+	      else ta_communicator->send();
 	      
 	      if(count_undone_task()==0)
 	      {
 			my_task_x=x0;
 			my_task_y=y0;
+			speed=((sqrt((x.value()-x0)*(x.value()-x0)+(y.value()-y0)*(y.value()-y0)) > 0.5)?0.1:0);
 	      }
       }
 }

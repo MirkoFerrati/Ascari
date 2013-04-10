@@ -29,6 +29,7 @@ public:
 	void printTaskAssignmentVector();
 	void printTaskCostVector();
 	void reset_TA_vector();
+	void reset_mu_T();
 	unsigned int count_undone_task();
 	unsigned int count_free_robots();
 	void update_remaining_times();
@@ -40,6 +41,9 @@ public:
 	
 private:
 	double charge;
+	
+	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_id> taken_tasks;
+	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_id> previous_taken_tasks;
   
 	std::map<task_assignment_namespace::task_id,double> periodic_tasks_time;
 	std::map<task_assignment_namespace::task_id,double> elapsed_times;
@@ -85,6 +89,8 @@ private:
 	
 	double speed;
 	exprtk::expression<double> distance_to_target;
+	exprtk::expression<double> x;
+	exprtk::expression<double> y;
 	std::map< transition, Events >& events;
 	const std::map<std::string,transition>& events_to_index;
 	
