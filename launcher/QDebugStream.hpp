@@ -50,7 +50,7 @@
 		{
 			m_string.append(p, p + n);
 			//m_old_buf->sputn(m_string.c_str(),m_string.size());
-			unsigned int pos = 0;
+			int pos = 0;
 			while (pos != std::string::npos)
 			{
 				pos = m_string.find('\n');
