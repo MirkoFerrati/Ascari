@@ -3,9 +3,9 @@
 #include "abstract_object.h"
 #include "typedefs.h"
 
-#define RADIUS 5
+#define TA_RADIUS 5
 
-class task_assignment_task 
+class task_assignment_task :public abstract_object
 {
 public:
     inline bool canCollide()
@@ -14,7 +14,7 @@ public:
     }
     inline double getRadius()
     {
-      return RADIUS;
+      return TA_RADIUS;
     }
       inline bool isMovable()
     {
@@ -26,16 +26,20 @@ public:
      return &state; 
     }
   
-    inline virtual std::string getObjectType()
+    inline  std::string getObjectType()
     {
      return "TA_task"; 
     }
     
-    void updateState ( const simulation_time& time, const agents_name_to_states& agent_states );
+    void updateState ( const simulation_time& time, const agents_name_to_states& agents, const index_map& indexes );
   
-    task_assignment_task(TODO);
+    task_assignment_task( const task_assignment_namespace::task& me );
   
+    ~task_assignment_task();
+    
     //TODO: metodi propri del task_assignment_task
+    
+    
     
 private:
   task_assignment_namespace::task state;

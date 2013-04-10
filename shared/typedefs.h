@@ -346,6 +346,7 @@ struct task
     double task_execution_time;
     double task_deadline;
     bool executing;
+    simulation_time time;
 };
 typedef std::map<task_id,task> task_list;
 
