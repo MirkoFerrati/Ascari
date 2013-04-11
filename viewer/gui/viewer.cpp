@@ -43,6 +43,7 @@ Viewer::Viewer ( const world_sim_packet& read, std::shared_ptr<std::mutex>& read
     init ( graphName );
     monitor=true;
     time=0;
+    started=false;
 }
 
 
@@ -176,6 +177,7 @@ void Viewer::set_tasklist(const Parsed_World& wo)
      {
 	  times.push_back(0);
 	  executing.push_back(false);
+	  if (tasklist.at(tasks_id.at(i)).task_type==2) periodic_wait[tasks_id.at(i)]=false;
      }
 }
 //written by Alessandro Settimi
@@ -360,6 +362,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 	
 	for (unsigned int i=0;i<tasks_id.size();i++)
 	{
+
 		painter.save();
 		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
 		
@@ -367,7 +370,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 		{
 			painter.setBrush(QColor("lightgreen"));
 		}
-		else
+		else			
 		{
 			painter.setBrush(QColor("cyan"));
 		}
@@ -383,17 +386,55 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 		
 		
 		for ( map<string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
-		{
+		{	
 			if(app.str()=="")
 			{
 				if (sqrt( (it->second.x-tasklist.at(tasks_id.at(i)).task_position[0])*(it->second.x-tasklist.at(tasks_id.at(i)).task_position[0]) + (it->second.y-tasklist.at(tasks_id.at(i)).task_position[1])*(it->second.y-tasklist.at(tasks_id.at(i)).task_position[1]) ) < 0.15)
 				{
 					app << tasks_id.at(i).c_str() << " (" << ((tasklist.at(tasks_id.at(i)).task_execution_time-(time-times.at(i)) >= 0)?tasklist.at(tasks_id.at(i)).task_execution_time-(time-times.at(i)):(0)) << ")";
 
-					if(!executing.at(i)) times.at(i)=time;
+					if(!executing.at(i))
+					{
+					      times.at(i)=time;
+					}
 					executing.at(i)=true;
+					
 				}
 			}
+		}
+		
+		
+		if(times.at(i)!=0)
+		{
+			if(tasklist.at(tasks_id.at(i)).task_type!=0)
+			{
+			    if(tasklist.at(tasks_id.at(i)).task_type!=2)
+			    {  
+				if(time-times.at(i)>tasklist.at(tasks_id.at(i)).task_execution_time)
+				{
+					painter.save();
+					painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+					
+					painter.setBrush(QColor("white"));
+					
+					painter.drawRect(-1,-1,2,2);
+					painter.restore();
+				}
+			    }
+			    else if (time-times.at(i) < 150+tasklist.at(tasks_id.at(i)).task_execution_time)
+			    {
+				    painter.save();
+				    painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+				    
+				    painter.setBrush(QColor("white"));
+				    
+				    painter.drawRect(-1,-1,2,2);
+				    painter.restore();
+			    }
+			}
+			
+			if(!executing.at(i) && tasklist.at(tasks_id.at(i)).task_type==2 && ((time-(times.at(i)+tasklist.at(tasks_id.at(i)).task_execution_time)) < 150)) periodic_wait.at(tasks_id.at(i))=true;
+			else if (tasklist.at(tasks_id.at(i)).task_type==2) periodic_wait.at(tasks_id.at(i))=false;
 		}
 		
 		if(app.str()=="")
@@ -426,21 +467,27 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 		}
 	}
     }
-    //written by Alessandro Settimi
-
-
+    
+    if(!agents.empty() && (!started || old_time>time))
+    {
+	      for ( map<string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
+	      {
+			std::vector<double> app;
+	      
+			app.push_back(it->second.x);
+			app.push_back(it->second.y);
+			
+			initial_pos[it->first]=app;
+	      }
+	      
+	      started=true;
+    }
+    
+    old_time=time;
+     //written by Alessandro Settimi 
+    
     for ( map<string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
     {
-      
-	if(time==0)
-	{
-	      std::vector<double> app;
-	      
-	      app.push_back(it->second.x);
-	      app.push_back(it->second.y);
-	      
-	      initial_pos[it->first]=app;
-	}
       
         painter.save();
         painter.setBrush ( QColor ( "red" ) );
@@ -489,7 +536,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
         }
         painter.restore();
 	
-	if (view_type==4)
+	if (view_type==4 && time>0)
 	{
 		painter.save();
 		painter.translate(initial_pos.at(it->first).at(0),initial_pos.at(it->first).at(1));

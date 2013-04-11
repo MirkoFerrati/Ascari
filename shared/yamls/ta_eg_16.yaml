@@ -61,7 +61,7 @@
       theta: '3'
     STATE_START: GO
     BEHAVIOR: prova
-    TASK_COST_VECTOR: [T1,4,T2,2,T3,4,T4,1,RECHARGE,INF]
+    TASK_COST_VECTOR: [T1,15,T2,2,T3,6,T4,1,RECHARGE,INF]
     
   - agent: Agente2
     VISIBLE_AREA: circle(x,y,200)
@@ -72,7 +72,7 @@
       theta: '1'
     STATE_START: GO
     BEHAVIOR: prova
-    TASK_COST_VECTOR: [T1,8,T2,2,T3,1,T4,5,RECHARGE,INF]
+    TASK_COST_VECTOR: [T1,8,T2,2,T3,1,T4,15,RECHARGE,INF]
     
   - agent: Agente3
     VISIBLE_AREA: circle(x,y,200)

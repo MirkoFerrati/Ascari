@@ -105,47 +105,50 @@ task_id task_assignment ::subgradient_algorithm()
 	    
 		std::vector<subgradient_packet>& data_receive = *(std::vector<subgradient_packet>*)ta_communicator->get_data();
 		
-		std::cout<<"----------------PASSO "<<passi<<" ("<<time<<") ----------------"<<std::endl<<std::endl;
-
-		
-		for (unsigned int i=0;i<num_task;i++)
+		if(!busy_robots.at(my_id))
 		{
-		      F.at(i) = C.at(i) + D.at(i) + mu_T.at(i);
-		      
-		      if(tasks_id.at(i)!="RECHARGE" && (((!tasklist.at(tasks_id.at(i)).executing && !done_task.at(tasks_id.at(i)))))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
-		}
-		
-
 		  
-		ta_problem.set_cost_vector(F);
+			std::cout<<"----------------PASSO "<<passi<<" ("<<time<<") ----------------"<<std::endl<<std::endl;
 
-		
-		
-		ta_problem.solve(solution);
-	
-	      
-		for(unsigned int j=0;j<num_task;j++)//copy_solution_to_TA_vector
-		{
-			agent_task_assignment_vector->at(tasks_id.at(j))=solution.at(j);
-		}
+			
+			for (unsigned int i=0;i<num_task;i++)
+			{
+			      F.at(i) = C.at(i) + D.at(i) + mu_T.at(i);
+			      
+			      if(tasks_id.at(i)!="RECHARGE" && (((!tasklist.at(tasks_id.at(i)).executing && !done_task.at(tasks_id.at(i)))))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
+			}
+			
 
+			  
+			ta_problem.set_cost_vector(F);
+
+			
+			
+			ta_problem.solve(solution);
 		
-		solution.clear();
-		
-		
-		selected_task="";
-		
-		for (unsigned int i=0;i<num_task;i++)
-		{
-		      if (agent_task_assignment_vector->at(tasks_id.at(i)) > 0.5)
-			  selected_task = tasks_id.at(i);
 		      
-		      subgradient.at(i) = -(agent_task_assignment_vector->at(tasks_id.at(i)));
-		      total_subgradient.at(i) = subgradient.at(i) + e_i.at(i);
+			for(unsigned int j=0;j<num_task;j++)//copy_solution_to_TA_vector
+			{
+				agent_task_assignment_vector->at(tasks_id.at(j))=solution.at(j);
+			}
+
+			
+			solution.clear();
+			
+			
+			selected_task="";
+			
+			for (unsigned int i=0;i<num_task;i++)
+			{
+			      if (agent_task_assignment_vector->at(tasks_id.at(i)) > 0.5)
+				  selected_task = tasks_id.at(i);
+			      
+			      subgradient.at(i) = -(agent_task_assignment_vector->at(tasks_id.at(i)));
+			      total_subgradient.at(i) = subgradient.at(i) + e_i.at(i);
+			}
+		
+		
 		}
-		
-		
-		
 		
 		ptr_receive_mutex->lock();
 		
@@ -174,6 +177,11 @@ task_id task_assignment ::subgradient_algorithm()
 				copy_cost_vector_to_C();
 				std::cout<<"task "<<data_receive.at(i).taken_task<<" e' preso"<<std::endl;
 				taken_tasks.at(name)=data_receive.at(i).taken_task;
+				
+				if (tasklist.at(taken_tasks.at(name)).task_type==2)
+				{
+					periodic_tasks_time.at(taken_tasks.at(name))=time;
+				}
 			  }
 			  
 			  if (data_receive.at(i).busy)
@@ -203,6 +211,8 @@ task_id task_assignment ::subgradient_algorithm()
 		
 		ptr_receive_mutex->unlock();
 		
+		
+		
 		std::cout<<"SIGMA = |"; 
 		for (unsigned int i=0;i<num_task;i++)
 		{
@@ -212,7 +222,7 @@ task_id task_assignment ::subgradient_algorithm()
 		
 		alpha=-0.1;
 		
-		if(!converge) //TODO: RIFLETTERE SUL FATTO CHE MU_T NON CONVERGE SE CI SONO PIU' TASKS
+		if(1) //TODO: RIFLETTERE SUL FATTO CHE MU_T NON CONVERGE SE CI SONO PIU' TASKS
 		{
 			for (unsigned int i=0;i<num_task;i++)
 			{
@@ -220,17 +230,23 @@ task_id task_assignment ::subgradient_algorithm()
 			}
 		}
 			
-		ptr_subgradient_packet.get()->data.subgradient=subgradient;
 			
+			
+		if(!busy_robots.at(my_id))
+		{
+				
+			ptr_subgradient_packet.get()->data.subgradient=subgradient;
+						
+			control_print();
+			
+			converge=convergence_control_routine();
+			
+			passi++;
+		}
+		
 		ta_communicator->send();
-		
 		//std::cout<<"MANDO "<<((ptr_subgradient_packet.get()->busy)?("occupato"):("libero"))<<std::endl;
-		
-		control_print();
-		
-		converge=convergence_control_routine();
-		
-		passi++;
+
 	}
 
 	if (selected_task=="") return "TASK_ASSIGNMENT_FAILED";
