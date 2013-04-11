@@ -2,16 +2,27 @@
 #include <math.h>
 #include <iostream>
 #include <sstream>
+
+
+task_assignment_task::task_assignment_task()
+{
+
+}
+
+
 task_assignment_task::task_assignment_task (task_assignment_namespace::task const& me )
 {
   state=me;
   state.time=0;
   state.executing=false;
+  object_type="TA_task";
 }
 
 task_assignment_task::~task_assignment_task()
 {
-
+  state.time=0;
+  state.executing=false;
+  object_type="TA_task";
 }
 
 
@@ -46,3 +57,11 @@ for ( std::map<std::string,agent_state_packet>::const_iterator it=agents.interna
 			app << state.id << " (" << state.task_execution_time << ")";
 		}
 }
+
+//     	template <typename Archive>
+// 	void task_assignment_task::serialize(Archive& ar, const unsigned int /*version*/)
+// 	{
+// 		ar& object_type;
+// 		ar& state;
+// 	}
+

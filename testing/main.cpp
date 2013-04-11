@@ -7,14 +7,15 @@
 #include "testClass.h"
 #include "testsimulator.hpp"
 #include "testrandom.hpp"
-#include "time.h"
+ #include "time.h"
 #include "testagentudpcommunicator.hpp"
 #include "testserialize.hpp"
 #include "testregex.hpp"
 #include "testvisibility.hpp"
-
+//#include "testobjectserialization.hpp"
 // #include "testgeometry.hpp"
 #include <forward_list>
+#include <logog.hpp>
 /**
  * @author MirkoF
  * Questo progetto e' ancora troppo piccolo per avere un vero framework di unit testing, per adesso
@@ -66,6 +67,7 @@ int main ( int /*argc*/, char** /*argv*/ )
         tests.push_back ( make_pair ( new testSerialize(),"Serialize" ) );
         tests.push_back ( make_pair ( new testRegex(),"Regex" ) );
         tests.push_back ( make_pair ( new testVisibility(),"Visibility" ) );
+	//tests.push_back(make_pair(new testobjectserialization(),"object serialization"));
         //tests.push_back(make_pair(new testAgentUDPCommunicator(),"Agent Udp Communicator"));
 // 	tests.push_back(make_pair(new testGeometry(),"Geometry"));
 

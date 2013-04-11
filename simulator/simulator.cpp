@@ -128,8 +128,9 @@ void simulator::createObjects ( const Parsed_World& world )
      
      for (unsigned int i=0;i<tasks_id.size();i++)
      {
-	objects[tasks_id.at(i)];
-	objects[tasks_id.at(i)]=new task_assignment_task(world.task_list.at(tasks_id.at(i)));
+       	task_assignment_task tmp(world.task_list.at(tasks_id.at(i)));
+
+	sim_packet.objects[tasks_id.at(i)]=tmp;
      }
 }
 
@@ -324,6 +325,8 @@ void simulator::main_loop()
              *
              */
 
+	    
+	    
             agent_state state_tmp;
             for ( int i=0; i<10; i++ ) //TODO(Mirko): this is 1 second/(sampling time of dynamic)
             {
@@ -338,11 +341,11 @@ void simulator::main_loop()
                 }
             }
             
-            for ( auto object=objects.begin();object!=objects.end();++object ) 
+            for ( auto object=sim_packet.objects.begin();object!=sim_packet.objects.end();++object ) 
             {
-                object->second->updateState(sim_packet.time,sim_packet.state_agents,agent_states_to_index);
+                object->second.updateState(sim_packet.time,sim_packet.state_agents,agent_states_to_index);
             }
-            
+       
             collisionChecker->checkCollisions();
             usleep ( secSleep );
             vector<control_command_packet> temp=communicator->receive_control_commands();
