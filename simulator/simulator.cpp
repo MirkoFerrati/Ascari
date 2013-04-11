@@ -3,6 +3,7 @@
 #include "typedefs.h"
 #include "logog.hpp"
 #include "debug_constants.h"
+#include <objects/task_assignment_task.h>
 #include <udp_agent_router.hpp>
 #include <zmq_agent_communicator.h>
 #include <zmq_viewer_communicator.hpp>
@@ -10,6 +11,7 @@
 #include "collisionchecker.h"
 #include "visibility/visibility.h"
 #include <time.h>
+
 
 using namespace std;
 
@@ -121,6 +123,15 @@ void simulator::initialize ( const Parsed_World& wo )
 void simulator::createObjects ( const Parsed_World& world )
 {
   throw("TODO");
+  auto tasklist=world.task_list;
+  auto tasks_id=world.tasks_id;
+     
+     for (unsigned int i=0;i<tasks_id.size();i++)
+     {
+       	task_assignment_task tmp(world.task_list.at(tasks_id.at(i)));
+
+	sim_packet.objects[tasks_id.at(i)]=tmp;
+     }
 }
 
 
@@ -314,6 +325,8 @@ void simulator::main_loop()
              *
              */
 
+	    
+	    
             agent_state state_tmp;
             for ( int i=0; i<10; i++ ) //TODO(Mirko): this is 1 second/(sampling time of dynamic)
             {
@@ -328,11 +341,11 @@ void simulator::main_loop()
                 }
             }
             
-            for ( auto object=objects.begin();object!=objects.end();++object ) 
+            for ( auto object=sim_packet.objects.begin();object!=sim_packet.objects.end();++object ) 
             {
-                object->second->updateState(sim_packet.time,sim_packet.state_agents);
+                object->second.updateState(sim_packet.time,sim_packet.state_agents,agent_states_to_index);
             }
-            
+       
             collisionChecker->checkCollisions();
             usleep ( secSleep );
             vector<control_command_packet> temp=communicator->receive_control_commands();

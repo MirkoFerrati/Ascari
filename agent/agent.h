@@ -122,6 +122,8 @@ protected:
 	
 	decoder event_decoder;
 	
+	    std::map<std::string,task_assignment_task> objects;
+
 	//in dummy we will not use this, since it is used for inter-agent communication
 	//Note that we need two versions, one for net and one for shared memory
 	//Communications for now are only used by plugins, so agent_comm is useless here
