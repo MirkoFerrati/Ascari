@@ -33,7 +33,7 @@ void simulator::create_communicator ( int communicator_type )
     }
 }
 
-simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.time ),
+simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.time,sim_packet.objects ),
     topology_router ( SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT ),graph_router ( SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT )
 {
     viewer_communicator=new zmq_viewer_communicator();
@@ -81,6 +81,7 @@ void simulator::initialize ( const Parsed_World& wo )
     //written by Alessandro Settimi
 
     initialize_agents ( wo.agents );
+    createObjects(wo);
     bonus_symbol_table.add_constants();
     int i=0;
     for ( map<bonusVariable,bonus_expression>::const_iterator it=wo.bonus_expressions.begin(); it!=wo.bonus_expressions.end(); ++it )
@@ -122,13 +123,13 @@ void simulator::initialize ( const Parsed_World& wo )
 
 void simulator::createObjects ( const Parsed_World& world )
 {
-  throw("TODO");
   auto tasklist=world.task_list;
   auto tasks_id=world.tasks_id;
      
      for (unsigned int i=0;i<tasks_id.size();i++)
      {
-       	task_assignment_task tmp(world.task_list.at(tasks_id.at(i)));
+        	task_assignment_task tmp(world.task_list.at(tasks_id.at(i)));
+	
 
 	sim_packet.objects[tasks_id.at(i)]=tmp;
      }

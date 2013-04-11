@@ -71,7 +71,7 @@ agent::agent ( int agent_index,const Parsed_World& world, bool noStart ) :
     //written by Alessandro Settimi
     if ( !world.task_list.empty() )
     {
-        Plugin_module* plugin=new task_assignment ( world,world.agents.at ( agent_index ),time,events,events_to_index );
+        Plugin_module* plugin=new task_assignment ( world,world.agents.at ( agent_index ),time,events,events_to_index,objects );
         plugins.push_back ( plugin );
     }
     //written by Alessandro Settimi

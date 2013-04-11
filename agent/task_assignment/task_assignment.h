@@ -18,7 +18,7 @@ class task_assignment: public Plugin_module
 {
 	
 public:
-	task_assignment(const Parsed_World& world, const Parsed_Agent& agent,simulation_time& time, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index);
+	task_assignment(const Parsed_World& world, const Parsed_Agent& agent,simulation_time& time, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index, const std::map<std::string,task_assignment_task>& tasks);
 	void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
 	void createTaskListFromParsedWorld(const Parsed_World& wo);
 	void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
@@ -62,6 +62,8 @@ private:
 	unsigned int num_robot;
 	unsigned int num_task;
 	
+	
+	
 	task_assignment_namespace::task_list tasklist;
 	task_assignment_namespace::task_id my_task;
 	
@@ -93,6 +95,8 @@ private:
 	exprtk::expression<double> y;
 	std::map< transition, Events >& events;
 	const std::map<std::string,transition>& events_to_index;
+	
+	const std::map<std::string,task_assignment_task>& tasks;
 	
 	task_assignment_communicator_base* ta_communicator;
 	

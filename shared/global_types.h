@@ -4,6 +4,8 @@
 #include "types.h"
 #include "streams_utils.h"
 
+#include "task_assignment_types.h"
+
 class task_assignment_task;
 
 enum class Sub_events
@@ -195,9 +197,10 @@ struct agent_sim_packet{
   const std::map<std::string,double>& bonus_variables;
    agents_name_to_ref_states state_agents;
   const simulation_time& time;
+  const std::map<std::string, task_assignment_task>& objects;
     
-    agent_sim_packet(const std:: map<std::string,double>& bonus, const simulation_time& t)
-    :bonus_variables(bonus),time(t)
+    agent_sim_packet(const std:: map<std::string,double>& bonus, const simulation_time& t, const std::map<std::string, task_assignment_task>& objects)
+    :bonus_variables(bonus),time(t),objects(objects)
     {
 	
     }
@@ -208,6 +211,7 @@ struct agent_sim_packet{
 		ar& time;
         ar& bonus_variables;
         ar& state_agents;
+	ar& objects;
     }
     
 };
@@ -217,6 +221,7 @@ struct agent_sim_packet_receiver{
   std::map<std::string,double> bonus_variables;
    agents_name_to_ref_states state_agents;
   simulation_time time;
+   std::map<std::string, task_assignment_task> objects;
     
     
     template <typename Archive>
@@ -225,6 +230,7 @@ struct agent_sim_packet_receiver{
 		ar& time;
         ar& bonus_variables;
         ar& state_agents;
+	ar& objects;
     }
     
 };

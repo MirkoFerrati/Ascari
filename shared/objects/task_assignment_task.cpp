@@ -64,4 +64,3 @@ for ( std::map<std::string,agent_state_packet>::const_iterator it=agents.interna
 // 		ar& object_type;
 // 		ar& state;
 // 	}
-

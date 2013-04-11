@@ -6,9 +6,10 @@
 using namespace task_assignment_namespace;
 
   
-task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index)
-:time(time),my_id(agent.name),x0(agent.initial_states.at("X")),y0(agent.initial_states.at("Y")),events(events),events_to_index(events_to_index)
-{        
+task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events, const std::map< std::string, transition >& events_to_index, const std::map< std::string, task_assignment_task >& tasks)
+:time(time),my_id(agent.name),x0(agent.initial_states.at("X")),y0(agent.initial_states.at("Y")),events(events),events_to_index(events_to_index), tasks(tasks)
+{
+    
     std::shared_ptr<std::mutex> temp(new std::mutex);
     ptr_receive_mutex.swap(temp);
     
@@ -265,6 +266,8 @@ unsigned int task_assignment::count_free_robots()
 
 void task_assignment ::run_plugin()
 {
+  
+      std::cout<<tasks;
       int int_time=(int)time;
       double dec=time-int_time;
       

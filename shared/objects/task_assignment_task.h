@@ -42,6 +42,17 @@ public:
   
     ~task_assignment_task();
     
+    friend std::ostream& operator<<( std::ostream& os,const task_assignment_task& t)
+    {
+	os << std::endl << "TASK " << t.state.id <<':'<< std::endl;
+	os << "- posizione: " << t.state.task_position[0] <<' '<< t.state.task_position[1]<<' '<< t.state.task_position[2] << std::endl;
+	os << "- tipo: " << t.state.task_type << std::endl;
+	os << "- execution time: " << t.state.task_execution_time << std::endl;
+	os << "- deadline: " << t.state.task_deadline << std::endl << std::endl;
+	os<<std::endl;
+	return os;
+    }
+    
     //TODO: metodi propri del task_assignment_task
     
     	template <typename Archive>

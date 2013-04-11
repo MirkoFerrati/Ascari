@@ -11,8 +11,6 @@
 #include "boost/serialization/deque.hpp"
 #include <exprtk.hpp>
 #include "objects/abstract_object.h"
-#include "objects/task_assignment_task.h"
-#include "objects/task_assignment_task.h"
 #include <iostream>
 #include <fstream>
 #include <forward_list>

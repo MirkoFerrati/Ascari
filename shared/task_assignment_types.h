@@ -56,6 +56,7 @@ struct task
 };
 typedef std::map<task_id,task> task_list;
 
+
 template <typename data_type>
 class task_assignment_packet
 {
