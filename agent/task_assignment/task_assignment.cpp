@@ -73,7 +73,7 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     
     copy_cost_vector_to_C();
     
-    initialize_assignment_problem();
+//     initialize_assignment_problem();
     
     empty_task.task_position[0]=0;
     empty_task.task_position[1]=0;
@@ -270,7 +270,7 @@ void task_assignment ::run_plugin()
       std::cout<<tasks;
       int int_time=(int)time;
       double dec=time-int_time;
-      
+      return;
       if (not_started)
       {
 	    

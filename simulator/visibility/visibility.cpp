@@ -52,3 +52,21 @@ bool circle::isVisible ( const agent_state& me, const agent_state& other )
 }
 
 
+void polygon::create()
+{
+
+}
+
+
+polygon::polygon()
+{
+pol.push_back(wykobi::make_point(5.0,4.0));
+pol.push_back(wykobi::make_point(7.0,9.0));
+pol.push_back(wykobi::make_point(9.0,7.0));
+
+
+}
+
+
+
+

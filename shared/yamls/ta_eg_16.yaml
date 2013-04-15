@@ -10,13 +10,13 @@
     control_commands: [v,w]
     
     DYNAMIC_MAP:
-    - x: 'v*cos(w)'
-      y: 'v*sin(w)'
-      theta: 'sin(w-theta)'
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
     CONTROLLERS:
     - name: go
       v: v_t
-      w: atan2(y_task-y,x_task-x)
+      w: 4*sin(atan2(y_task-y,x_task-x)-theta)
     - name: wait
       v: 0
       w: 0

@@ -10,6 +10,7 @@
 #include <vector>
 #include <map>
 #include <fstream>
+#include "../shared/wykobi/wykobi.hpp"
 
 #define max_visibility_radius 500
 
@@ -31,11 +32,32 @@ class visibleArea
     
 };
 
+
+class polygon: public visibleArea
+{
+  wykobi::polygon<double,2> pol;
+  
+public:
+  
+    polygon();
+    bool isVisible ( const agent_state& me, const agent_state& other )
+    {return true;}
+    
+private:
+  void create();
+  
+};
+
+
+
+
+
 class circle:public visibleArea
 {
     double radius;
     int first_axis;
     int second_axis;
+    polygon test;
 public:
     bool isVisible (const agent_state& me,const agent_state& other );
 

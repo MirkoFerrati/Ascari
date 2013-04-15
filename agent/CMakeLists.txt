@@ -17,7 +17,7 @@ set(agent_SOURCES empty_plugin/empty_plugin.cpp
 
 FIND_PACKAGE(GLPK 4.33)
 
-set(GLPK_FOUND 1)
+set(GLPK_FOUND 0)
 if (${GLPK_FOUND})
 add_definitions(-DGLPK_FOUND)
 #written by Alessandro Settimi
