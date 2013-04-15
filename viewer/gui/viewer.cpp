@@ -467,7 +467,9 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 			{
 			    painter.scale(2,2);
 			}
-            painter.drawConvexPolygon(hourHand, 3);
+			//painter.drawConvexPolygon(hourHand, 3);
+			QPixmap img("car.jpg");
+			painter.drawPixmap(0,0,4,8,img);
 			if (view_type==2 || view_type==5)
 			{
 				painter.save();

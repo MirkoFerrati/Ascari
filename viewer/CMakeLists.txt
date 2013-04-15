@@ -40,3 +40,12 @@ configure_file(../shared/graphs/test2.gml.lgf test2.gml.lgf COPYONLY)
 configure_file(../shared/graphs/test3.gml.lgf test3.gml.lgf COPYONLY)
 configure_file(../shared/graphs/test4.gml.lgf test4.gml.lgf COPYONLY)
 configure_file(../shared/graphs/test5.gml.lgf test5.gml.lgf COPYONLY)
+add_subdirectory(img)
+
+
+message("Configurazione di ${CMAKE_BUILD_TYPE}")
+file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/viewer" "../viewer/img/*.*")
+FOREACH(infileName ${yaml_files})
+MESSAGE(STATUS "Process file: ${infileName}")
+configure_file(${infileName} ./ COPYONLY)
+endforeach(${infileName})
