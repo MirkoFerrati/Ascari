@@ -270,7 +270,6 @@ void task_assignment ::run_plugin()
       std::cout<<tasks;
       int int_time=(int)time;
       double dec=time-int_time;
-      return;
       if (not_started)
       {
 	    
@@ -304,8 +303,7 @@ void task_assignment ::run_plugin()
 	  std::cout<<"BATTERIA SCARICA... SHUTDOWN..."<<std::endl;
 	  stop=true;
       }
-      
-      
+      return;
       if(dec==0 || dec==0.5)
       {
 		std::cout<<"[TA - "<<time<<']'<<std::endl;
