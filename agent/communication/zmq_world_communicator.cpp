@@ -19,6 +19,7 @@ const world_sim_packet& zmq_world_communicator::receive_agents_status()
     packet_received.state_agents.internal_map[agent->first]=*(agent->second);
       
     }
+    
 return  packet_received;
   }
    catch (zmq::error_t ex)

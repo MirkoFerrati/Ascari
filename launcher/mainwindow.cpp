@@ -428,7 +428,7 @@ void MainWindow::on_StartViewer_clicked()
 
 void MainWindow::simulatorExited ( int exitcode, QProcess::ExitStatus exitstatus )
 {
-	std::cout<<"SIMULATOR EXITED: exitcode:"<<exitcode<<(exitstatus==QProcess::NormalExit?"":"and crashed")<<std::endl;
+	std::cout<<"SIMULATOR EXITED: exitcode:"<<exitcode<<(exitstatus==QProcess::NormalExit?"":" and crashed")<<std::endl;
 	std::cout<<QString(simulator->readAllStandardError()).toStdString();
 	std::cout<<QString(simulator->readAllStandardOutput()).toStdString();
 }
