@@ -394,6 +394,7 @@ bool MainWindow::startViewer()
         if ( viewerType==5 )
         {
             insideViewer->setMonitor ( &monitor_buffer,monitor_mutex );
+	    insideViewer->setBackImage("prato.jpg");
         }
         ui->ViewerContainer->addWidget ( insideViewer );
         insideViewer->start();

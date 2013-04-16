@@ -249,8 +249,8 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
     {
         painter.drawPixmap ( 0,0,sidex,sidey,pixmap );
     }
-    painter.setBrush ( Qt::white );
-    painter.drawRect ( 0,0,10000,10000 );
+//     painter.setBrush ( Qt::white );
+//     painter.drawRect ( 0,0,10000,10000 );
     if ( view_type==1 )
     {
         painter.save();
@@ -468,8 +468,8 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 			    painter.scale(2,2);
 			}
 			//painter.drawConvexPolygon(hourHand, 3);
-			QPixmap img("car.jpg");
-			painter.drawPixmap(0,0,4,8,img);
+			QPixmap img("testa.png");
+			painter.drawPixmap(0,0,1,1,img);
 			if (view_type==2 || view_type==5)
 			{
 				painter.save();
