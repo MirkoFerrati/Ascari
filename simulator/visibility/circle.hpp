@@ -4,6 +4,9 @@
 
 #include "visibility.h" 
 
+
+#define max_circle_visibility_radius 500
+
 class circle:public visibleArea
 {
     double radius;
@@ -62,7 +65,7 @@ private:
             throw "UNKNOWN SPECIFIED SECOND AXIS";
         }
 
-        if ( atof ( result.at ( 2 ).c_str() ) <=0 || atof ( result.at ( 2 ).c_str() ) >max_visibility_radius )
+        if ( atof ( result.at ( 2 ).c_str() ) <=0 || atof ( result.at ( 2 ).c_str() ) >max_circle_visibility_radius )
         {
             ERR ( "INVALID VALUE FOR RADIUS",NULL );
             throw "INVALID VALUE FOR RADIUS";

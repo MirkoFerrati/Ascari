@@ -12,7 +12,7 @@
 #include <fstream>
 #include "../shared/wykobi/wykobi.hpp"
 
-#define max_visibility_radius 500
+
 
 class visibleArea
 {
