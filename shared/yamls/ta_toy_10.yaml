@@ -1,0 +1,174 @@
+- WORLD:
+  - TASK_ASSIGNMENT_ALGORITHM: SUBGRADIENT #choose SUBGRADIENT or add another algorithm
+    TASK_NUMBER: 10
+    TASK_LIST: [T1,2,2,0,1,100,0,T2,8,2,0,1,100,0,T3,2,10,0,1,100,0,T4,10,15,0,1,100,0,T5,12,3,0,1,100,0,T6,4,17,0,1,100,0,T7,15,15,0,1,100,0,T8,16,6,0,1,100,0,T9,1,15,0,1,100,0,T10,9,11,0,1,100,0]
+    #id,position(x,y,z),type,execution time,deadline TODO fare TASK_LIST T1 T2 T3 e poi a capo i parametri per ognuno (T1: . . etc)
+    #tipo 1 generico, tipo 0 recharge, tipo 2 periodico, appare ogni 150
+    
+  BEHAVIORS:
+  - name: prova
+    states: [x,y,theta,charge]
+    control_commands: [v,w,c]
+    
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+      charge: 'c'
+    CONTROLLERS:
+    - name: go
+      v: v_t
+      w: w_t_diff
+      c: set_charge
+    - name: wait
+      v: 0
+      w: 0
+      c: set_charge
+    DISCRETE_STATES:
+    - name: go
+      controller: go
+    - name: wait
+      controller: wait
+    - name: wait_for_target
+      controller: wait
+    ENCODER:
+    - TOPOLOGY:
+        - topology: [t1]
+          t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+      LAMBDA:
+        - lambda: [Lreached] 
+          Lreached: 'abs(x-x_task)<0.1 and abs(y-y_task)<0.1'
+    EVENTS:
+    - events: [reached, new_target, stopped, started]
+      reached: 'Lreached'
+      new_target: '!Lreached'
+      stopped: ''
+      started: ''
+    AUTOMATON:
+    - name: aut_machine
+      GO:
+        - WAIT: [stopped]
+          WAIT_FOR_TARGET: [reached]
+      WAIT:
+        - GO: [started]
+      WAIT_FOR_TARGET:
+        - GO: [new_target]
+    
+  AGENTS:
+    
+  - agent: Agente2
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - &initial
+      x: '18'
+      y: '4'
+      theta: '3'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,1,T2,3,T3,4,T4,3,T5,6,T6,6,T7,3,T8,9,T9,12,T10,1]
+    
+  - agent: Agente3
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - &initial
+      x: '19'
+      y: '6'
+      theta: '3'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,3,T2,1,T3,5,T4,6,T5,9,T6,1,T7,1,T8,12,T9,4,T10,3]
+    
+  - agent: Agente4
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - &initial
+      x: '19'
+      y: '8'
+      theta: '3'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,5,T2,7,T3,3,T4,7,T5,6,T6,7,T7,12,T8,8,T9,2,T10,2]
+    
+  - agent: Agente5
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - &initial
+      x: '19'
+      y: '10'
+      theta: '3'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,1,T2,6,T3,6,T4,8,T5,3,T6,4,T7,5,T8,7,T9,2,T10,1]
+    
+  - agent: Agente6
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - &initial
+      x: '19'
+      y: '12'
+      theta: '3'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,9,T2,4,T3,7,T4,5,T5,2,T6,8,T7,7,T8,1,T9,2,T10,3]
+    
+  - agent: Agente7
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - &initial
+      x: '19'
+      y: '14'
+      theta: '3'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,5,T2,9,T3,1,T4,8,T5,9,T6,7,T7,5,T8,3,T9,5,T10,3]
+    
+  - agent: Agente8
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - &initial
+      x: '19'
+      y: '16'
+      theta: '3'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,10,T2,1,T3,8,T4,7,T5,3,T6,1,T7,3,T8,7,T9,1,T10,9]
+    
+  - agent: Agente9
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - &initial
+      x: '5'
+      y: '5'
+      theta: '3'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,8,T2,3,T3,3,T4,6,T5,3,T6,9,T7,5,T8,3,T9,7,T10,4]
+    
+  - agent: Agente10
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - &initial
+      x: '6'
+      y: '6'
+      theta: '3'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,3,T2,5,T3,4,T4,12,T5,3,T6,4,T7,6,T8,7,T9,7,T10,9]

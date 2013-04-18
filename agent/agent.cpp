@@ -325,7 +325,7 @@ void agent::main_loop()
      for ( std::map<std::string,task_assignment_task>::const_iterator it=temp.objects.begin(); it!=temp.objects.end(); ++it )
     {
         objects[it->first] =it->second;
-	std::cout<<"task ricevuto:"<<it->second<<std::endl;
+// 	std::cout<<"task ricevuto:"<<it->second<<std::endl;
     }
 
    

@@ -10,6 +10,7 @@
 #include <task_assignment_communicator.h>
 #include <assignment_problem.h>
 #include <random.hpp>
+#include "../shared/objects/task_assignment_task.h"
 
 //TODO (Alessandro): che semafori uso? per ora quelli di simone
 #include "../identifierModule/named_semaphore.hpp"
@@ -20,7 +21,6 @@ class task_assignment: public Plugin_module
 public:
 	task_assignment(const Parsed_World& world, const Parsed_Agent& agent,simulation_time& time, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index, const std::map<std::string,task_assignment_task>& tasks);
 	void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
-	void createTaskListFromParsedWorld(const Parsed_World& wo);
 	void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
 	void inizializeTaskAssignmentMatrix();
 	void run_plugin();
@@ -33,14 +33,22 @@ public:
 	unsigned int count_undone_task();
 	unsigned int count_free_robots();
 	void update_remaining_times();
-	
+	bool recharge_is_present();
+	double dubins_dist(double Ax,double Ay, double theta, double Tx, double Ty, double r);
 	void solve_assignment_problem(assignment_problem& p, task_assignment_namespace::task_assignment_vector& a, std::vector<task_assignment_namespace::task_id>& t,unsigned int n);
-	
+	double norm2(double x1,double y1,double x2,double y2);
+	void receive_from_others();
 	~task_assignment();
+	void avoid_collision();
+	void compute_speeds(double x_t, double y_t);
+	void createAusiliarVariables();
 
 	
 private:
-	double charge;
+  
+	std::map<task_assignment_namespace::agent_id,std::vector<double>> positions;
+  
+	double set_charge;
 	
 	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_id> taken_tasks;
 	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_id> previous_taken_tasks;
@@ -62,9 +70,6 @@ private:
 	unsigned int num_robot;
 	unsigned int num_task;
 	
-	
-	
-	task_assignment_namespace::task_list tasklist;
 	task_assignment_namespace::task_id my_task;
 	
 	double my_task_x,my_task_y;
@@ -90,15 +95,22 @@ private:
 	bool stop;
 	
 	double speed;
+	double omega;
+	double omega_dubins;
+	double max_omega=0.2;
 	exprtk::expression<double> distance_to_target;
 	exprtk::expression<double> x;
 	exprtk::expression<double> y;
+	exprtk::expression<double> theta;
+	exprtk::expression<double> charge_;
 	std::map< transition, Events >& events;
 	const std::map<std::string,transition>& events_to_index;
+	
 	
 	const std::map<std::string,task_assignment_task>& tasks;
 	
 	task_assignment_communicator_base* ta_communicator;
+	
 	
 	task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
 	
@@ -110,13 +122,7 @@ private:
 	
 	double euclidean_distance_from_task(task_assignment_namespace::task_id task_id);
 	
-	void update_costs_with_deadlines();
-	
 	double time_to_deadline(task_assignment_namespace::task_id task_id);
-	
-	void update_costs_with_expiring_deadlines(task_assignment_namespace::task_cost_vector& basic_values);
-	
-	bool check_expiring_task_selection(task_assignment_namespace::task_id task_id);
 	
 	void update_lagrange_multiplier_vector();
 	
@@ -168,6 +174,8 @@ private:
 	void copy_solution_to_TA_vector(std::vector<double>& solution);
 	void copy_cost_vector_to_C();
 	void control_print();
+
+	std::map<task_assignment_namespace::agent_id,std::vector< double >> others_subgradient;
 };
 
 #endif // TASK_ASSIGNMENT_H

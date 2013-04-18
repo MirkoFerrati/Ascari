@@ -4,6 +4,7 @@
 //written by Alessandro Settimi
 #include "yaml_parser.h"
 #include <typedefs.h>
+#include <boost/circular_buffer.hpp>
 //written by Alessandro Settimi
 
 #include "Agent.h"
@@ -30,7 +31,7 @@ class Viewer : public QWidget
     int view_type;
 
     //written by Alessandro Settimi
-    void set_tasklist(const Parsed_World& wo);
+    void initialize_tasks(const std::map<std::string,task_assignment_task>& obj_tasks);
     //written by Alessandro Settimi
 
    
@@ -72,16 +73,12 @@ void closeEvent(QCloseEvent *event);
     lemon::SmartDigraph::ArcMap<int> *length;
     lemon::SmartDigraph::NodeMap<int> *coord_x, *coord_y;
     
-    //written by Alessandro Settimi
-    task_assignment_namespace::task_list tasklist;
-    std::vector<task_assignment_namespace::task_id> tasks_id;
-    std::vector<simulation_time> times;
-    std::vector<bool> executing;
-    std::map<task_assignment_namespace::task_id,bool> periodic_wait;
-    
+    //written by Alessandro Settimi    
     std::map<task_assignment_namespace::agent_id,std::vector<double>> initial_pos;
     bool started;
     double old_time;
+    std::map<task_assignment_namespace::agent_id,boost::circular_buffer<double>> positions;
+    std::map<std::string,task_assignment_task>* tasks;
     //written by Alessandro Settimi
    
 };

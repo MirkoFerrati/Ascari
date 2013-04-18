@@ -20,7 +20,7 @@ bool task_assignment::convergence_control_routine()
      if ( fr < ut ) control=fr;
      else control=ut;
 
-     std::cout<<"TASK DONE or ASSIGNED: "<<num_task-ut-1<<" CONTROL :"<<control<<std::endl; //TODO:-1 se c'è recharge
+     std::cout<<"TASK DONE or ASSIGNED: "<<num_task-ut-recharge_is_present()<<" CONTROL :"<<control<<std::endl; //TODO:-1 se c'è recharge
      
      for (unsigned int i=0;i<num_task;i++)
      {
@@ -102,8 +102,6 @@ task_id task_assignment ::subgradient_algorithm()
 	if(1)//!converge)
 	{
 		ptr_subgradient_packet.get()->agent_id=my_id;
-	    
-		std::vector<subgradient_packet>& data_receive = *(std::vector<subgradient_packet>*)ta_communicator->get_data();
 		
 		if(!busy_robots.at(my_id))
 		{
@@ -115,7 +113,7 @@ task_id task_assignment ::subgradient_algorithm()
 			{
 			      F.at(i) = C.at(i) + D.at(i) + mu_T.at(i);
 			      
-			      if(tasks_id.at(i)!="RECHARGE" && (((!tasklist.at(tasks_id.at(i)).executing && !done_task.at(tasks_id.at(i)))))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
+			      if(tasks_id.at(i)!="RECHARGE" && (((!reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i)).getState())->executing && !done_task.at(tasks_id.at(i)))))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
 			}
 			
 
@@ -134,69 +132,29 @@ task_id task_assignment ::subgradient_algorithm()
 
 			
 			solution.clear();
-			
-			
-			selected_task="";
-			
-			for (unsigned int i=0;i<num_task;i++)
-			{
-			      if (agent_task_assignment_vector->at(tasks_id.at(i)) > 0.5)
-				  selected_task = tasks_id.at(i);
-			      
-			      subgradient.at(i) = -(agent_task_assignment_vector->at(tasks_id.at(i)));
-			      total_subgradient.at(i) = subgradient.at(i) + e_i.at(i);
-			}
-		
-		
 		}
 		
-		ptr_receive_mutex->lock();
-		
-		fresh_data=false;
-		
-		
-		for (unsigned int i=0;i<data_receive.size();i++)
-		{
-		    subgradient_task_packet temp = *(subgradient_task_packet*)data_receive.at(i).get_data();
-		    agent_id name = data_receive.at(i).agent_id;
-		    
-		    if (!(name ==""))
-		    {
+		selected_task="";
 			
-			  for (unsigned int i=0;i<num_task;i++)
-			  {
-				total_subgradient.at(i) +=  temp.subgradient.at(i);
-			  }
-			  
-			  taken_tasks.at(name)="";
-			  
-			  if (data_receive.at(i).taken_task!="")
-			  {
-				done_task.at(data_receive.at(i).taken_task)=true;
-				agent_task_cost_vector->at(data_receive.at(i).taken_task)=INF;
-				copy_cost_vector_to_C();
-				std::cout<<"task "<<data_receive.at(i).taken_task<<" e' preso"<<std::endl;
-				taken_tasks.at(name)=data_receive.at(i).taken_task;
-				
-				if (tasklist.at(taken_tasks.at(name)).task_type==2)
-				{
-					periodic_tasks_time.at(taken_tasks.at(name))=time;
-				}
-			  }
-			  
-			  if (data_receive.at(i).busy)
-			  {
-				busy_robots.at(name)=true;
-				std::cout<<"robot "<<name<<" e' occupato, "<<data_receive.at(i).busy<<std::endl;
-			  }
-			  else
-			  {
-				busy_robots.at(name)=false;
-				std::cout<<"robot "<<name<<" e' libero, "<<data_receive.at(i).busy<<std::endl;
-			  }
-		    }
-		    
-
+		for (unsigned int i=0;i<num_task;i++)
+		{
+		      if (agent_task_assignment_vector->at(tasks_id.at(i)) > 0.5)
+			  selected_task = tasks_id.at(i);
+		      
+		      subgradient.at(i) = -(agent_task_assignment_vector->at(tasks_id.at(i)));
+		      total_subgradient.at(i) = subgradient.at(i) + e_i.at(i);
+		}
+		
+		
+		receive_from_others();
+		
+		
+		for (unsigned int j=0;j<num_task;j++)
+		{
+		      for (unsigned int h=0;h<num_robot;h++)
+		      {
+			    total_subgradient.at(j) +=  others_subgradient.at(agents_id.at(h)).at(j);
+		      }
 		}
 		
 		
@@ -205,11 +163,6 @@ task_id task_assignment ::subgradient_algorithm()
 			if (previous_taken_tasks.at(agents_id.at(i))=="RECHARGE" && taken_tasks.at(agents_id.at(i))=="") done_task.at("RECHARGE")=false;
 			previous_taken_tasks.at(agents_id.at(i))=taken_tasks.at(agents_id.at(i));
 		}
-		
-		
-		data_receive.clear();
-		
-		ptr_receive_mutex->unlock();
 		
 		
 		
@@ -231,7 +184,6 @@ task_id task_assignment ::subgradient_algorithm()
 		}
 			
 			
-			
 		if(!busy_robots.at(my_id))
 		{
 				
@@ -244,8 +196,12 @@ task_id task_assignment ::subgradient_algorithm()
 			passi++;
 		}
 		
+		ptr_subgradient_packet.get()->x=x.value();
+		ptr_subgradient_packet.get()->y=y.value();
+		ptr_subgradient_packet.get()->theta=theta.value();
 		ta_communicator->send();
 		//std::cout<<"MANDO "<<((ptr_subgradient_packet.get()->busy)?("occupato"):("libero"))<<std::endl;
+// 		std::cout<<"MANDO x:"<<x.value()<<" y:"<<y.value()<<std::endl;
 
 	}
 

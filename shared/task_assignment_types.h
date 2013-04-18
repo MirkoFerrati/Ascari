@@ -38,9 +38,11 @@ struct task
     double task_position[3];
     int task_type;
     double task_execution_time;
+    double period;
     double task_deadline;
     bool executing;
     simulation_time time;
+    agent_id owner;
     
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int /*version*/)
@@ -49,9 +51,11 @@ struct task
       ar& task_position;
       ar& task_type;
       ar& task_execution_time;
+      ar& period;
       ar& task_deadline;
       ar& executing;
       ar& time;
+      ar& owner;
     }
 };
 typedef std::map<task_id,task> task_list;
@@ -63,6 +67,9 @@ class task_assignment_packet
 public:
     
     std::string agent_id;
+    double x;
+    double y;
+    double theta;
     bool busy;
     task_id taken_task;
     data_type data;
@@ -84,6 +91,9 @@ public:
     void serialize(Archive& ar,const unsigned int /*version*/)
     {
 	ar& agent_id;
+	ar& x;
+	ar& y;
+	ar& theta;
 	ar& busy;
 	ar& taken_task;
         ar& data;

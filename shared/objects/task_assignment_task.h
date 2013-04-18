@@ -24,7 +24,7 @@ public:
      return false; 
     }
     
-    inline const void* getState()
+    inline const void* getState() const
     {
     return &state; 
     }

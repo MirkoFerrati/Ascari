@@ -21,7 +21,7 @@ set(GLPK_FOUND 1)
 if (${GLPK_FOUND})
 add_definitions(-DGLPK_FOUND)
 #written by Alessandro Settimi
-set (agent_SOURCES ${agent_SOURCES} task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/algorithms_utility.cpp task_assignment/subgradient_algorithm.cpp task_assignment/assignment_problem.cpp)
+set (agent_SOURCES ${agent_SOURCES} task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/algorithms_utility.cpp task_assignment/subgradient_algorithm.cpp task_assignment/assignment_problem.cpp task_assignment/dubins.cpp)
 #written by Alessandro Settimi
 endif (${GLPK_FOUND})
 

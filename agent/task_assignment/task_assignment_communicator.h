@@ -45,7 +45,11 @@ class task_assignment_communicator: public agent_to_simulator_ta_communicator<re
 			    temp=this->receive();//blocking call
 
 			    ptr_data_mutex->lock();
+			    
+			    data_receive.clear();
 
+			    std::cout<<"Ricevo da ";
+			    
 			    for (unsigned int i=0;i<temp.size();i++)
 			    {
 				if(temp[i].agent_id!=my_id )
@@ -53,9 +57,11 @@ class task_assignment_communicator: public agent_to_simulator_ta_communicator<re
 				    if (!(received_from_agents.count(temp[i].agent_id)))
 					  received_from_agents.insert(std::make_pair(temp[i].agent_id,true));
 				    data_receive.push_back(temp[i]);
-				    std::cout<<"Ricevo da "<<temp[i].agent_id<<std::endl;
+				    std::cout<<temp[i].agent_id<<',';
 				}
 			    }
+			    
+			    std::cout<<std::endl;
 
 			    if (received_from_agents.size()<neighbour)
 			    {

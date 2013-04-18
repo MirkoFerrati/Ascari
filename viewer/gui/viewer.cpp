@@ -74,14 +74,6 @@ void Viewer::init ( std::string graphName )
 
     }
     
-    //written by Alessandro Settimi
-    if (view_type==4)
-    {
-	 Parsed_World World=parse_file(graphName); //scambiato col filename
-	 set_tasklist(World);
-    }
-    //written by Alessandro Settimi
-    
     for (lemon::SmartDigraph::NodeIt n(graph);n!=lemon::INVALID;++n)
 	{
 		if (maxX<(*coord_x)[n]) maxX=(*coord_x)[n]*1.1;
@@ -168,17 +160,9 @@ void Viewer::setBackImage ( string path )
 }
 
 //written by Alessandro Settimi
-void Viewer::set_tasklist(const Parsed_World& wo)
+void Viewer::initialize_tasks(const std::map<std::string,task_assignment_task>& obj_tasks)
 {
-     tasklist=wo.task_list;
-     tasks_id=wo.tasks_id;
-     
-     for (unsigned int i=0;i<tasks_id.size();i++)
-     {
-	  times.push_back(0);
-	  executing.push_back(false);
-	  if (tasklist.at(tasks_id.at(i)).task_type==2) periodic_wait[tasks_id.at(i)]=false;
-     }
+	*tasks = obj_tasks;
 }
 //written by Alessandro Settimi
 
@@ -357,16 +341,19 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
     //written by Alessandro Settimi
     if (view_type==4)
     { 
+      
 	std::stringstream app(std::stringstream::out);
 	app.str("");
 	
-	for (unsigned int i=0;i<tasks_id.size();i++)
+	for (auto i=tasks->begin(); i!=tasks->end(); ++i)
 	{
+	  
+		auto task = reinterpret_cast<const task_assignment_namespace::task*>(i->second.getState());
 
 		painter.save();
-		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+		painter.translate(task->task_position[0],task->task_position[1]);
 		
-		if (tasklist.at(tasks_id.at(i)).task_type==0)
+		if (task->task_type == 0)
 		{
 			painter.setBrush(QColor("lightgreen"));
 		}
@@ -378,42 +365,22 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 		painter.drawRect(-1,-1,2,2);
 		painter.restore();
 		
-// 		painter.save();
-// 		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
-// 		painter.setBrush(QColor("white"));
-// 		painter.drawRect(-0.5,-0.5,1,1);
-// 		painter.restore();
 		
-		
-		for ( map<string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
-		{	
-			if(app.str()=="")
-			{
-				if (sqrt( (it->second.x-tasklist.at(tasks_id.at(i)).task_position[0])*(it->second.x-tasklist.at(tasks_id.at(i)).task_position[0]) + (it->second.y-tasklist.at(tasks_id.at(i)).task_position[1])*(it->second.y-tasklist.at(tasks_id.at(i)).task_position[1]) ) < 0.15)
-				{
-					app << tasks_id.at(i).c_str() << " (" << ((tasklist.at(tasks_id.at(i)).task_execution_time-(time-times.at(i)) >= 0)?tasklist.at(tasks_id.at(i)).task_execution_time-(time-times.at(i)):(0)) << ")";
-
-					if(!executing.at(i))
-					{
-					      times.at(i)=time;
-					}
-					executing.at(i)=true;
-					
-				}
-			}
+		if (task->executing)
+		{
+			app <<  task->id.c_str() << " (" << ((task->task_execution_time-(time-task->time) >= 0)? task->task_execution_time-(time-task->time):(0)) << ")";
 		}
 		
-		
-		if(times.at(i)!=0)
+		if(task->time!=0)
 		{
-			if(tasklist.at(tasks_id.at(i)).task_type!=0)
+			if(task->task_type!=0)
 			{
-			    if(tasklist.at(tasks_id.at(i)).task_type!=2)
+			    if(task->task_type!=2)
 			    {  
-				if(time-times.at(i)>tasklist.at(tasks_id.at(i)).task_execution_time)
+				if(time-task->time > task->task_execution_time)
 				{
 					painter.save();
-					painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+					painter.translate(task->task_position[0],task->task_position[1]);
 					
 					painter.setBrush(QColor("white"));
 					
@@ -421,10 +388,10 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 					painter.restore();
 				}
 			    }
-			    else if (time-times.at(i) < 150+tasklist.at(tasks_id.at(i)).task_execution_time)
+			    else if (!task->executing && time-task->time < task->period + task->task_execution_time)
 			    {
 				    painter.save();
-				    painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+				    painter.translate(task->task_position[0],task->task_position[1]);
 				    
 				    painter.setBrush(QColor("white"));
 				    
@@ -432,19 +399,15 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 				    painter.restore();
 			    }
 			}
-			
-			if(!executing.at(i) && tasklist.at(tasks_id.at(i)).task_type==2 && ((time-(times.at(i)+tasklist.at(tasks_id.at(i)).task_execution_time)) < 150)) periodic_wait.at(tasks_id.at(i))=true;
-			else if (tasklist.at(tasks_id.at(i)).task_type==2) periodic_wait.at(tasks_id.at(i))=false;
 		}
 		
 		if(app.str()=="")
 		{
-			executing.at(i)=false;
-			app << tasks_id.at(i).c_str() << " (" << tasklist.at(tasks_id.at(i)).task_execution_time << ")";
+			app << task->id.c_str() << " (" << task->task_execution_time << ")";
 		}
 		
 		painter.save();
-		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+		painter.translate(task->task_position[0],task->task_position[1]);
 		painter.setBrush(QColor("black"));
 		painter.scale(painter.fontMetrics().height()/1000.0,-painter.fontMetrics().height()/1000.0);
 		painter.drawText(0,75,QString(app.str().c_str()));
@@ -452,12 +415,12 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 		
 		app.str("");
 		
-		if (tasklist.at(tasks_id.at(i)).task_deadline != 0)
+		if (task->task_deadline != 0)
 		{
-			app << "[" << (((tasklist.at(tasks_id.at(i)).task_deadline-time)>=0)?(tasklist.at(tasks_id.at(i)).task_deadline-time):(0)) << "]";
+			app << "[" << (((task->task_deadline-time)>=0)?(task->task_deadline-time):(0)) << "]";
 		  
 			painter.save();
-			painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
+			painter.translate(task->task_position[0],task->task_position[1]);
 			painter.setPen(QColor("red"));
 			painter.scale(painter.fontMetrics().height()/1000.0,-painter.fontMetrics().height()/1000.0);
 			painter.drawText(0,-65,QString(app.str().c_str()));
@@ -487,7 +450,8 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
      //written by Alessandro Settimi 
     
     for ( map<string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
-    {
+    { 
+      
       
         painter.save();
         painter.setBrush ( QColor ( "red" ) );
@@ -537,11 +501,36 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
         painter.restore();
 	
 	if (view_type==4 && time>0)
-	{
+	{ 
 		painter.save();
 		painter.translate(initial_pos.at(it->first).at(0),initial_pos.at(it->first).at(1));
 		painter.drawArc(-1,-1,2,2,0,16*360);
 		painter.restore();
+		
+		std::stringstream tm(std::stringstream::out);
+		tm << (int)it->second.charge << "%";
+		
+		painter.save();
+		painter.translate(it->second.x,it->second.y);
+		painter.setPen(QColor("green"));
+		painter.scale(painter.fontMetrics().height()/1000.0,-painter.fontMetrics().height()/1000.0);
+		painter.drawText(-20,-20,QString(tm.str().c_str()));
+		painter.restore();
+		
+		//per la scia
+
+		positions[it->first].set_capacity(600);
+		positions[it->first].push_back(it->second.x);
+		positions[it->first].push_back(it->second.y);
+		
+		for (unsigned int i=0;i<positions[it->first].size();i=i+2)
+		{
+			painter.save();
+			painter.translate(positions[it->first].at(i),positions[it->first].at(i+1));
+			painter.setPen(QColor("black"));
+			painter.drawPoint(0,0);
+			painter.restore();
+		}
 	}
 				
 	    if ( view_type==5 && monitor )
@@ -609,9 +598,10 @@ void Viewer::timerEvent ( QTimerEvent */*event*/ )
     //written by Alessandro Settimi
     if (view_type==4)
     {
-	for(unsigned int i=0;i<tasks_id.size();i++)
+	for(auto i=tasks->begin(); i!=tasks->end(); ++i)
 	{
-	    setScalingAndTranslateFactor(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[0]-2,tasklist.at(tasks_id.at(i)).task_position[1],tasklist.at(tasks_id.at(i)).task_position[1]-2);
+	    auto task = reinterpret_cast<const task_assignment_namespace::task*>(i->second.getState());
+	    setScalingAndTranslateFactor(task->task_position[0],task->task_position[0]-2,task->task_position[1],task->task_position[1]-2);
 	}
     }
     //written by Alessandro Settimi
