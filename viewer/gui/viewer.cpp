@@ -159,13 +159,6 @@ void Viewer::setBackImage ( string path )
     pixmap.convertFromImage ( immagine );
 }
 
-//written by Alessandro Settimi
-void Viewer::initialize_tasks(const std::map<std::string,task_assignment_task>& obj_tasks)
-{
-	*tasks = obj_tasks;
-}
-//written by Alessandro Settimi
-
  void Viewer::closeEvent(QCloseEvent *event)
  {
 QSettings settings("K2BRobotics","Viewer");
@@ -345,15 +338,14 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 	std::stringstream app(std::stringstream::out);
 	app.str("");
 	
-	for (auto i=tasks->begin(); i!=tasks->end(); ++i)
+	for (auto i=tasks.begin(); i!=tasks.end(); ++i)
 	{
-	  
-		auto task = reinterpret_cast<const task_assignment_namespace::task*>(i->second.getState());
-
-		painter.save();
-		painter.translate(task->task_position[0],task->task_position[1]);
+		task_assignment_namespace::task task=i->second;
 		
-		if (task->task_type == 0)
+		painter.save();
+		painter.translate(task.task_position[0],task.task_position[1]);
+
+		if (task.task_type == 0)
 		{
 			painter.setBrush(QColor("lightgreen"));
 		}
@@ -361,26 +353,26 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 		{
 			painter.setBrush(QColor("cyan"));
 		}
-		
+
 		painter.drawRect(-1,-1,2,2);
 		painter.restore();
-		
-		
-		if (task->executing)
+
+
+		if (task.executing)
 		{
-			app <<  task->id.c_str() << " (" << ((task->task_execution_time-(time-task->time) >= 0)? task->task_execution_time-(time-task->time):(0)) << ")";
+			app <<  task.id.c_str() << " (" << ((task.task_execution_time-(time-task.time) >= 0)? task.task_execution_time-(time-task.time):(0)) << ")";
 		}
-		
-		if(task->time!=0)
+
+		if(task.time!=0)
 		{
-			if(task->task_type!=0)
+			if(task.task_type!=0)
 			{
-			    if(task->task_type!=2)
+			    if(task.task_type!=2)
 			    {  
-				if(time-task->time > task->task_execution_time)
+				if(time-task.time > task.task_execution_time)
 				{
 					painter.save();
-					painter.translate(task->task_position[0],task->task_position[1]);
+					painter.translate(task.task_position[0],task.task_position[1]);
 					
 					painter.setBrush(QColor("white"));
 					
@@ -388,10 +380,10 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 					painter.restore();
 				}
 			    }
-			    else if (!task->executing && time-task->time < task->period + task->task_execution_time)
+			    else if (!task.executing && time-task.time < task.period + task.task_execution_time)
 			    {
 				    painter.save();
-				    painter.translate(task->task_position[0],task->task_position[1]);
+				    painter.translate(task.task_position[0],task.task_position[1]);
 				    
 				    painter.setBrush(QColor("white"));
 				    
@@ -400,27 +392,27 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 			    }
 			}
 		}
-		
+
 		if(app.str()=="")
 		{
-			app << task->id.c_str() << " (" << task->task_execution_time << ")";
+			app << task.id.c_str() << " (" << task.task_execution_time << ")";
 		}
-		
+
 		painter.save();
-		painter.translate(task->task_position[0],task->task_position[1]);
+		painter.translate(task.task_position[0],task.task_position[1]);
 		painter.setBrush(QColor("black"));
 		painter.scale(painter.fontMetrics().height()/1000.0,-painter.fontMetrics().height()/1000.0);
 		painter.drawText(0,75,QString(app.str().c_str()));
 		painter.restore();
-		
+
 		app.str("");
-		
-		if (task->task_deadline != 0)
+
+		if (task.task_deadline != 0)
 		{
-			app << "[" << (((task->task_deadline-time)>=0)?(task->task_deadline-time):(0)) << "]";
+			app << "[" << (((task.task_deadline-time)>=0)?(task.task_deadline-time):(0)) << "]";
 		  
 			painter.save();
-			painter.translate(task->task_position[0],task->task_position[1]);
+			painter.translate(task.task_position[0],task.task_position[1]);
 			painter.setPen(QColor("red"));
 			painter.scale(painter.fontMetrics().height()/1000.0,-painter.fontMetrics().height()/1000.0);
 			painter.drawText(0,-65,QString(app.str().c_str()));
@@ -598,10 +590,10 @@ void Viewer::timerEvent ( QTimerEvent */*event*/ )
     //written by Alessandro Settimi
     if (view_type==4)
     {
-	for(auto i=tasks->begin(); i!=tasks->end(); ++i)
+	for(auto i=infos.objects.begin(); i!=infos.objects.end(); ++i)
 	{
-	    auto task = reinterpret_cast<const task_assignment_namespace::task*>(i->second.getState());
-	    setScalingAndTranslateFactor(task->task_position[0],task->task_position[0]-2,task->task_position[1],task->task_position[1]-2);
+	    tasks[i->first]=*(reinterpret_cast<const task_assignment_namespace::task*>(i->second.getState()));
+	    setScalingAndTranslateFactor(tasks[i->first].task_position[0],tasks[i->first].task_position[0]-2,tasks[i->first].task_position[1],tasks[i->first].task_position[1]-2);
 	}
     }
     //written by Alessandro Settimi

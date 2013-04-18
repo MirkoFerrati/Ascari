@@ -133,6 +133,8 @@ void simulator::createObjects ( const Parsed_World& world )
 
 	sim_packet.objects[tasks_id.at(i)]=tmp;
      }
+     
+     std::cout<<sim_packet.objects<<std::endl;
 }
 
 

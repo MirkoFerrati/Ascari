@@ -18,10 +18,6 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     num_robot=agents_id.size();
     num_task=tasks_id.size();
     
-    createAusiliarVariables();    
-    
-    std::cout<<tasks<<std::endl;
-    
     createTaskCostMatrixFromParsedWorld(agent);
     inizializeTaskAssignmentMatrix();
     
@@ -346,6 +342,7 @@ void task_assignment::receive_from_others()
 			std::cout<<"task "<<data_receive.at(i).taken_task<<" e' preso"<<std::endl;
 			taken_tasks.at(name)=data_receive.at(i).taken_task;
 			
+			if (!tasks.empty())
 			if (reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(taken_tasks.at(name)).getState())->task_type==2)
 			{
 				periodic_tasks_time.at(taken_tasks.at(name))=time;
@@ -390,217 +387,221 @@ void task_assignment::receive_from_others()
 
 void task_assignment ::run_plugin()
 {
-      double dec=time-floor(time);
-
-      if (not_started)
+      if(!tasks.empty())
       {
-	    
-	    if(task_assignment_algorithm==SUBGRADIENT)
-	    {
-		    std::shared_ptr<subgradient_packet> temp(new subgradient_packet);
-		    ptr_subgradient_packet.swap(temp);
-		    ptr_subgradient_packet.get()->busy=false;
-		    ptr_subgradient_packet.get()->taken_task="";
-		    ta_communicator = new task_assignment_communicator<subgradient_packet,subgradient_packet>(ptr_receive_mutex,ptr_subgradient_packet.get(),num_robot-1,my_id,fresh_data);
-	    
-		    std::cout<<"TASK ASSIGNMENT ALGORITHM: SUBGRADIENT"<<std::endl;
-		    //start thread
-		    not_started=false;
-	    }
-	      
-	    if(task_assignment_algorithm==-1)
-	    {
-		  std::cout<<"attenzione, algoritmo per il task assignment non selezionato"<<std::endl;;
-	    }
-      }
+		double dec=time-floor(time);
 
-      
-      std::cout<<"CARICA: "<<charge_.value()<<'%'<<std::endl;
-
-      if(charge_.value() <= 0)
-      {
-	  std::cout<<"BATTERIA SCARICA... SHUTDOWN..."<<std::endl;
-	  set_charge=0;
-	  speed=0;
-	  omega=0;
-	  omega_dubins=0;
-	  stop=true;
-      }
-            
-      bool a=(fabs(dec-0.0) < 0.001)||(fabs(dec-0.5) < 0.001);
-      if(a)
-      {
-		std::cout<<"[TA - "<<time<<']'<<std::endl;
-		if(!stop)
+		if (not_started)
 		{
-			update_distance_vector();
-			update_remaining_times();
-		      
-			if (task_assigned)
-			{
-			    if (events.at(events_to_index.at("REACHED"))==Events::_TRUE)
-			    {
-				if(!task_started)
-				{
-					ptr_subgradient_packet.get()->busy=true;
-					busy_robots.at(my_id)=true;
-					ptr_subgradient_packet.get()->taken_task=my_task;
-					task_started=true;
-					//executing=true
-					initial_time=time;
-					std::cout<<"TASK "<<my_task<<" INIZIATO A "<<initial_time<<std::endl;
-				
-					speed=0;
-					omega=0;
-					omega_dubins=0;
-				}
-				
-				if(my_task=="RECHARGE")
-				{
-				    if(charge_.value()>=100)set_charge=0;
-				    else if(charge_.value()>=97)set_charge=0.1;
-				         else set_charge=2;
-				}
-				else set_charge=-0.1;
-			    }
-			    else set_charge=-0.05;
-			    
-			    if(task_made())
-			    {
-			      
-				if(reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_type==2)
-				{
-				    periodic_tasks_time.at(my_task)=time;
-				}
-				
-				if(my_task=="RECHARGE")
-				{
-				    std::cout<<"RICARICA EFFETTUATA"<<" T:"<<reinterpret_cast<const task_assignment_namespace::task*>(tasks.at("RECHARGE").getState())->task_execution_time<<std::endl;
-				    done_task.at("RECHARGE")=false;
-				}
-				else
-				{
-				    std::cout<<"TASK "<<my_task<<" FINITO A "<<time<<std::endl;
-				    
-				    done_task.at(my_task)=true;
-				}
-				
-				//executing=false;
-				
-				agent_task_cost_vector->at(my_task)=INF;
-		      
-				copy_cost_vector_to_C();
-				
-				task_assigned=false;
-				speed=0;
-				omega=0;
-				omega_dubins=0;
-				
-				ptr_subgradient_packet.get()->taken_task="";
-				ptr_subgradient_packet.get()->busy=false;
-				
-				busy_robots.at(my_id)=false;
-	  // 		      if (count_undone_task()==0) stop=true;
-				
-				converge=false;
-				
-				step=0;
-				passi=0;
-				reset_TA_vector();
-				task_started=false;
-		      
-		      reset_mu_T();
-
-				my_task="";
-				reset_mu_T();
-			    }
-			}
-			else
-			{
-				if (events.at(events_to_index.at("REACHED"))==Events::_TRUE)
-				{
-					converge=false;
-				}
-			}
-			
-			if (stop)
-			{
-			    setTaskStop(true);
-			    return;
-			}
-			
-			if(recharge_is_present() && my_task!="RECHARGE")
-			{
-				if(!busy_robots.at(my_id) && !done_task.at("RECHARGE") && charge_.value() <= 30)
-				{
-				    agent_task_cost_vector->at("RECHARGE")=-INF; //così da farlo per forza
-				    copy_cost_vector_to_C();
-				    converge=false;
-				}
-			}
-			
-			for(std::map<std::string,double>::const_iterator it=periodic_tasks_time.begin(); it!=periodic_tasks_time.end(); ++it)
-			{
-			    elapsed_times.at(it->first)=150-(time-periodic_tasks_time.at(it->first)); //periodo 150
-			    
-			    if(elapsed_times.at(it->first)<=0)
-			    {
-				agent_task_cost_vector->at(it->first)=base_cost_vector.at(it->first); //costo base
-				done_task.at(it->first)=false;
-				copy_cost_vector_to_C();
-			    }
-			    else std::cout<<it->first<<" RITORNA TRA "<<elapsed_times.at(it->first)<<std::endl;
-			}
+		      createAusiliarVariables(); 
 			  
+		      if(task_assignment_algorithm==SUBGRADIENT)
+		      {
+			      std::shared_ptr<subgradient_packet> temp(new subgradient_packet);
+			      ptr_subgradient_packet.swap(temp);
+			      ptr_subgradient_packet.get()->busy=false;
+			      ptr_subgradient_packet.get()->taken_task="";
+			      ta_communicator = new task_assignment_communicator<subgradient_packet,subgradient_packet>(ptr_receive_mutex,ptr_subgradient_packet.get(),num_robot-1,my_id,fresh_data);
+		      
+			      std::cout<<"TASK ASSIGNMENT ALGORITHM: SUBGRADIENT"<<std::endl;
+			      //start thread
+			      not_started=false;
+		      }
 			
-			if (!converge)
-			{
-				if(task_assignment_algorithm==SUBGRADIENT)
-				{
-				    my_task=subgradient_algorithm();
-				}
-				
-				if((my_task=="TASK_ASSIGNMENT_FAILED") || (my_task==""))
-				{
-				    set_charge=-0.05;
-				    std::cout<<"NO TASK HAS BEEN ASSIGNED TO ME"<<std::endl;
-				    task_assigned=false;
-				    my_task_x=x0;
-				    my_task_y=y0;
-
-				}    
-				else
-				{
-				    my_task_x=reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_position[0];
-				    my_task_y=reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_position[1];
-				    std::cout<<"CURRENT TASK: "<<reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->id<<", position: ["<<reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_position[0]<<' '<<reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_position[1]<<' '<<reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_position[2]<<"], cost: "<<agent_task_cost_vector->at(reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->id)<<std::endl;
-				    task_assigned=true;
-
-				}
-			}
-			else ta_communicator->send();
-			
-			if(my_task!="RECHARGE" && count_undone_task()==0)
-			{
-				  std::cout<<"TASK ESAURITI"<<std::endl;
-				  my_task="";
-				  task_assigned=false;
-				  my_task_x=x0;
-				  my_task_y=y0;
-
-				  reset_mu_T();
-			}
+		      if(task_assignment_algorithm==-1)
+		      {
+			    std::cout<<"attenzione, algoritmo per il task assignment non selezionato"<<std::endl;;
+		      }
 		}
+
+		
+		std::cout<<"CARICA: "<<charge_.value()<<'%'<<std::endl;
+
+		if(charge_.value() <= 0)
+		{
+		    std::cout<<"BATTERIA SCARICA... SHUTDOWN..."<<std::endl;
+		    set_charge=0;
+		    speed=0;
+		    omega=0;
+		    omega_dubins=0;
+		    stop=true;
+		}
+		      
+		bool a=(fabs(dec-0.0) < 0.001)||(fabs(dec-0.5) < 0.001);
+		if(a)
+		{
+			  std::cout<<"[TA - "<<time<<']'<<std::endl;
+			  if(!stop)
+			  {
+				  update_distance_vector();
+				  update_remaining_times();
+				
+				  if (task_assigned)
+				  {
+				      if (events.at(events_to_index.at("REACHED"))==Events::_TRUE)
+				      {
+					  if(!task_started)
+					  {
+						  ptr_subgradient_packet.get()->busy=true;
+						  busy_robots.at(my_id)=true;
+						  ptr_subgradient_packet.get()->taken_task=my_task;
+						  task_started=true;
+						  //executing=true
+						  initial_time=time;
+						  std::cout<<"TASK "<<my_task<<" INIZIATO A "<<initial_time<<std::endl;
+					  
+						  speed=0;
+						  omega=0;
+						  omega_dubins=0;
+					  }
+					  
+					  if(my_task=="RECHARGE")
+					  {
+					      if(charge_.value()>=100)set_charge=0;
+					      else if(charge_.value()>=97)set_charge=0.1;
+						  else set_charge=2;
+					  }
+					  else set_charge=-0.1;
+				      }
+				      else set_charge=-0.05;
+				      
+				      if(task_made())
+				      {
+					  
+					  if(reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_type==2)
+					  {
+					      periodic_tasks_time.at(my_task)=time;
+					  }
+					  
+					  if(my_task=="RECHARGE")
+					  {
+					      std::cout<<"RICARICA EFFETTUATA"<<" T:"<<reinterpret_cast<const task_assignment_namespace::task*>(tasks.at("RECHARGE").getState())->task_execution_time<<std::endl;
+					      done_task.at("RECHARGE")=false;
+					  }
+					  else
+					  {
+					      std::cout<<"TASK "<<my_task<<" FINITO A "<<time<<std::endl;
+					      
+					      done_task.at(my_task)=true;
+					  }
+					  
+					  //executing=false;
+					  
+					  agent_task_cost_vector->at(my_task)=INF;
+				
+					  copy_cost_vector_to_C();
+					  
+					  task_assigned=false;
+					  speed=0;
+					  omega=0;
+					  omega_dubins=0;
+					  
+					  ptr_subgradient_packet.get()->taken_task="";
+					  ptr_subgradient_packet.get()->busy=false;
+					  
+					  busy_robots.at(my_id)=false;
+		    // 		      if (count_undone_task()==0) stop=true;
+					  
+					  converge=false;
+					  
+					  step=0;
+					  passi=0;
+					  reset_TA_vector();
+					  task_started=false;
+				
+				reset_mu_T();
+
+					  my_task="";
+					  reset_mu_T();
+				      }
+				  }
+				  else
+				  {
+					  if (events.at(events_to_index.at("REACHED"))==Events::_TRUE)
+					  {
+						  converge=false;
+					  }
+				  }
+				  
+				  if (stop)
+				  {
+				      setTaskStop(true);
+				      return;
+				  }
+				  
+				  if(recharge_is_present() && my_task!="RECHARGE")
+				  {
+					  if(!busy_robots.at(my_id) && !done_task.at("RECHARGE") && charge_.value() <= 30)
+					  {
+					      agent_task_cost_vector->at("RECHARGE")=-INF; //così da farlo per forza
+					      copy_cost_vector_to_C();
+					      converge=false;
+					  }
+				  }
+				  
+				  for(std::map<std::string,double>::const_iterator it=periodic_tasks_time.begin(); it!=periodic_tasks_time.end(); ++it)
+				  {
+				      elapsed_times.at(it->first)=150-(time-periodic_tasks_time.at(it->first)); //periodo 150
+				      
+				      if(elapsed_times.at(it->first)<=0)
+				      {
+					  agent_task_cost_vector->at(it->first)=base_cost_vector.at(it->first); //costo base
+					  done_task.at(it->first)=false;
+					  copy_cost_vector_to_C();
+				      }
+				      else std::cout<<it->first<<" RITORNA TRA "<<elapsed_times.at(it->first)<<std::endl;
+				  }
+				    
+				  
+				  if (!converge)
+				  {
+					  if(task_assignment_algorithm==SUBGRADIENT)
+					  {
+					      my_task=subgradient_algorithm();
+					  }
+					  
+					  if((my_task=="TASK_ASSIGNMENT_FAILED") || (my_task==""))
+					  {
+					      set_charge=-0.05;
+					      std::cout<<"NO TASK HAS BEEN ASSIGNED TO ME"<<std::endl;
+					      task_assigned=false;
+					      my_task_x=x0;
+					      my_task_y=y0;
+
+					  }    
+					  else
+					  {
+					      my_task_x=reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_position[0];
+					      my_task_y=reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_position[1];
+					      std::cout<<"CURRENT TASK: "<<reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->id<<", position: ["<<reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_position[0]<<' '<<reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_position[1]<<' '<<reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_position[2]<<"], cost: "<<agent_task_cost_vector->at(reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->id)<<std::endl;
+					      task_assigned=true;
+
+					  }
+				  }
+				  else ta_communicator->send();
+				  
+				  if(my_task!="RECHARGE" && count_undone_task()==0)
+				  {
+					    std::cout<<"TASK ESAURITI"<<std::endl;
+					    my_task="";
+					    task_assigned=false;
+					    my_task_x=x0;
+					    my_task_y=y0;
+
+					    reset_mu_T();
+				  }
+			  }
+		}
+		else
+		{
+			receive_from_others();
+			ptr_subgradient_packet.get()->x=x.value();
+			ptr_subgradient_packet.get()->y=y.value();
+			ptr_subgradient_packet.get()->theta=theta.value();
+			ta_communicator->send();
+			//std::cout<<"MANDO x:"<<x.value()<<" y:"<<y.value()<<std::endl;
+		}
+		
+		compute_speeds(my_task_x,my_task_y);
       }
-      else
-      {
-	      receive_from_others();
-	      ptr_subgradient_packet.get()->x=x.value();
-	      ptr_subgradient_packet.get()->y=y.value();
-	      ptr_subgradient_packet.get()->theta=theta.value();
-	      ta_communicator->send();
-	      //std::cout<<"MANDO x:"<<x.value()<<" y:"<<y.value()<<std::endl;
-      }
-      
-      compute_speeds(my_task_x,my_task_y);
 }

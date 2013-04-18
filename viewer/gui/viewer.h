@@ -78,7 +78,7 @@ void closeEvent(QCloseEvent *event);
     bool started;
     double old_time;
     std::map<task_assignment_namespace::agent_id,boost::circular_buffer<double>> positions;
-    std::map<std::string,task_assignment_task>* tasks;
+    std::map<task_assignment_namespace::task_id,task_assignment_namespace::task> tasks;
     //written by Alessandro Settimi
    
 };

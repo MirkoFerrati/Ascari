@@ -76,13 +76,13 @@ int main(int argc, char *argv[])
 	buffer.resize(MAX_PACKET_LENGTH);
         Viewer window(read,read_mutex,NULL,viewerType,filename);
 	
-        //udp_world_sniffer sniffer(buffer,io_service);
- 	//zmq_world_sniffer<world_sim_packet> sniffer_test(read,read_mutex);
-	//std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
+        udp_world_sniffer sniffer(buffer,io_service);
+ 	zmq_world_sniffer<world_sim_packet> sniffer_test(read,read_mutex);
+	std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
 	if (viewerType==5)
 	{
-		//identifier_sniffer=std::unique_ptr<zmq_identifier_sniffer>( new zmq_identifier_sniffer(monitor_read,monitor_read_mutex));
-   		//identifier_sniffer->start_receiving();
+		identifier_sniffer=std::unique_ptr<zmq_identifier_sniffer>( new zmq_identifier_sniffer(monitor_read,monitor_read_mutex));
+   		identifier_sniffer->start_receiving();
 		window.setMonitor(&monitor_read,monitor_read_mutex);
 	}	
 	window.setWindowTitle("Visualizer");
@@ -92,13 +92,13 @@ int main(int argc, char *argv[])
  
     window.restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
  
-         //sniffer_test.start_receiving();
+         sniffer_test.start_receiving();
 	window.start();
 
         app.exec();
 // 	std::cout<<"la main window si è chiusa"<<std::endl;
-  	//identifier_sniffer->stop_receiving();
-	//sniffer_test.stop_receiving();
+  	identifier_sniffer->stop_receiving();
+	sniffer_test.stop_receiving();
 	
 	exiting=std::thread ( []() {  delete(static_zmq::context);    }     );
  //	delete(static_zmq::context);//.~context_t();

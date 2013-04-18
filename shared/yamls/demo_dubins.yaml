@@ -2,9 +2,9 @@
 - WORLD:
   - TASK_ASSIGNMENT_ALGORITHM: SUBGRADIENT #choose SUBGRADIENT or add another algorithm
     TASK_NUMBER: 5
-    TASK_LIST: [T1,1,1,0,2,35,0,T2,12,10,0,1,50,140,T3,3,10,0,1,45,0,T4,12,4,0,1,40,0,RECHARGE,7,7,0,0,100,0]
-    #id,position(x,y,z),type,execution time,deadline TODO fare TASK_LIST T1 T2 T3 e poi a capo i parametri per ognuno (T1: . . etc)
-    #tipo 1 generico, tipo 0 recharge, tipo 2 periodico, appare ogni 150
+    TASK_LIST: [T1,1,1,0,2,35,150,0,T2,12,10,0,1,50,0,140,T3,3,10,0,1,45,0,0,T4,12,4,0,1,40,0,0,RECHARGE,7,7,0,0,100,0,0]
+    #id,position(x,y,z),type,execution time,period,deadline TODO fare TASK_LIST T1 T2 T3 e poi a capo i parametri per ognuno (T1: . . etc)
+    #tipo 1 generico, tipo 0 recharge, tipo 2 periodico
   BEHAVIORS:
   - name: prova
     states: [x,y,theta,charge]

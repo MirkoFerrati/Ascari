@@ -191,7 +191,7 @@ void createTaskList ( const YAML::Node& node, task_assignment_namespace::task_li
 {
     unsigned int j=0;
 
-    for ( unsigned int i=0; i<task_number*7; )
+    for ( unsigned int i=0; i<task_number*8; )
     {
         task_assignment_namespace::task_id temp1;
         node[i] >> temp1;
@@ -205,13 +205,16 @@ void createTaskList ( const YAML::Node& node, task_assignment_namespace::task_li
         node[i+3] >> temp2.task_position[2];
         node[i+4] >> temp2.task_type;
         node[i+5] >> temp2.task_execution_time;
-        node[i+6] >> temp2.task_deadline;
+	node[i+6] >> temp2.period;
+        node[i+7] >> temp2.task_deadline;
 	
 	temp2.executing=false;
+	temp2.owner="";
+	temp2.time=0;
 
         task_list.insert ( make_pair ( temp1,temp2 ) );
 
-        i=i+7;
+        i=i+8;
         j++;
     }
 }
