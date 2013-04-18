@@ -62,6 +62,7 @@ void closeEvent(QCloseEvent *event);
 	//boost::asio::io_service& io_service;
     void setScalingAndTranslateFactor(double maxX,double minX,double maxY,double minY);
     void drawArrow( int x1, int y1, int x2, int y2, double sze, QPainter* painter );
+    void drawRectNotFilled(int startx,int starty, double width, double height, QPainter* painter );
 	double maxX;
 	double minX;
 	double maxY;

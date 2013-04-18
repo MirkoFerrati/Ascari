@@ -72,7 +72,7 @@ void identifier_module::run_plugin()
     /**in linea generica:
      * Controllo agenti nel vicinato
      * Elimino gli agenti che non vedo più
-     * Evolvo gli agenti che già vedevo
+     * Evolvo gli agenti che gia' vedevo
      * Controllo se l'evoluzione e' coerente
      * Elimino i dummy non coerenti
      * Controllo se ci sono nuovi agenti

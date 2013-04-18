@@ -26,7 +26,7 @@
       ENCODER:
       - TOPOLOGY:
           - topology: [co]            
-            co: 'abs(atan2(yi-y,xi-x)%(2*pi)-theta%(2*pi))<angle and (x-xi)*(x-xi)+(y-yi)*(y-yi)<dst*dst '
+            co: 'abs((atan2(yi-y,xi-x))%(2*pi)-theta%(2*pi))<angle and (x-xi)*(x-xi)+(y-yi)*(y-yi)<dst*dst '
         LAMBDA:
           - lambda: [L1,out]
             out: '(x>500 or x<0 or y>500 or y<0)'
@@ -63,11 +63,11 @@
         v: 3
         w: 0
       - name: BACK
-        v: 3
-        w: '0.5+(sin(atan2(dim/2-y,dim/2-x)-theta)+0.01)%pi'
-      - name: LEFT
         v: 5
-        w: -0.5
+        w: '(sin(atan2(dim/2-y,dim/2-x)-theta)+0.01)%pi'
+      - name: LEFT
+        v: 3
+        w: 0.5
       DISCRETE_STATES:
       - name: FAST
         controller: FAST
@@ -78,10 +78,10 @@
       ENCODER:
       - TOPOLOGY:
           - topology: [co]            
-            co: 'abs(atan2(yi-y,xi-x)%(2*pi)-theta%(2*pi))<(angle+1) and (x-xi)*(x-xi)+(y-yi)*(y-yi)<(dst+100)*(dst+100) '
+            co: 'abs((atan2(yi-y,xi-x))%(2*pi)-theta%(2*pi))<angle and (x-xi)*(x-xi)+(y-yi)*(y-yi)<dst*dst '
         LAMBDA:
           - lambda: [L1,out]
-            out: '(x>600 or x<0 or y>600 or y<0)'
+            out: '(x>600 or x<-100 or y>600 or y<-100)'
             L1: '1'
       EVENTS:
       - events: [out,in, co,free]
@@ -107,10 +107,10 @@
   - bonus_variables: [dim,dst,angle]
     dim: 500
     dst: 50
-    angle: 1.5
+    angle: 1.1
   AGENTS:
   - agent: Agente01
-    VISIBLE_AREA: circle(x,y,300)
+    VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA:  circle(10)
     MONITORING: 0
     #COLLABORATIVE = 1
@@ -119,14 +119,14 @@
     INITIAL:
     - &initial
       x: '42'
-      y: '124'
-      theta: '-0.1'
+      y: '424'
+      theta: '0.5'
     STATE_START: FAST
     BEHAVIOR: LGV-BAD
     
     
   - agent: Agente02
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -140,7 +140,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente03
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -154,7 +154,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente04
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -168,35 +168,35 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente05
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
     - x: '291'
-      y: '151'
+      y: '251'
       theta: '-0.5'
     STATE_START: FAST
     BEHAVIOR: LGV
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente06
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
     - x: '151'
-      y: '231'
+      y: '331'
       theta: '0.6'
     STATE_START: FAST
     BEHAVIOR: LGV
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente07
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -210,21 +210,21 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente08
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
     - x: '331'
-      y: '41'
+      y: '410'
       theta: '0.8'
     STATE_START: FAST
     BEHAVIOR: LGV
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente09
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -238,7 +238,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente10
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]

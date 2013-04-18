@@ -231,6 +231,31 @@ void Viewer::drawArrow(int x1,int y1, int x2, int y2, double sze, QPainter* pain
     
 }
 
+void Viewer::drawRectNotFilled(int startx,int starty, double width, double height, QPainter* painter )
+{
+    QPoint pa, pb;
+    
+    pa.setX(startx);
+    pa.setY(starty);
+    pb.setX(startx+width);
+    pb.setY(starty);
+    
+    painter->drawLine (pa.x() , pa.y(),pb.x(),pb.y() );
+    pa=pb;
+    pb.setY(starty+height);
+    painter->drawLine (pa.x() , pa.y(),pb.x(),pb.y() );
+    pa=pb;
+    pb.setX(startx);
+    painter->drawLine (pa.x() , pa.y(),pb.x(),pb.y() );
+    pa=pb;
+    pb.setY(starty);
+    painter->drawLine (pa.x() , pa.y(),pb.x(),pb.y() );
+
+    
+}
+
+
+
 void Viewer::paintEvent ( QPaintEvent */*event*/ )
 {
     static const QPoint hourHand[3] =
@@ -468,8 +493,10 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 			    painter.scale(2,2);
 			}
 			//painter.drawConvexPolygon(hourHand, 3);
+			
 			QPixmap img("testa.png");
-			painter.drawPixmap(0,0,1,1,img);
+			painter.drawPixmap(0,0,6,12,img);
+			
 			if (view_type==2 || view_type==5)
 			{
 				painter.save();
@@ -487,6 +514,8 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 				painter.drawText(0,0,QString(it->first.substr(6).c_str()));
 				painter.restore();
 			}
+			
+			
 
         }
         painter.restore();
@@ -498,6 +527,21 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 		painter.drawArc(-1,-1,2,2,0,16*360);
 		painter.restore();
 	}
+	if (view_type==5){
+		painter.save();
+		painter.setBrush(Qt::NoBrush);
+                
+		QPen pen;
+                pen.setWidth(5);
+                pen.setColor ( QColor ( "yellow" ) );
+		painter.setPen ( pen );
+		drawRectNotFilled (0,0,500,500,&painter );
+		pen.setColor ( QColor ( "red" ) );
+		painter.setPen ( pen );
+		drawRectNotFilled (-100,-100,700,700,&painter );
+		painter.restore();
+		
+		}
 				
 	    if ( view_type==5 && monitor )
             {
