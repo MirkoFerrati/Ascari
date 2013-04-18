@@ -2,7 +2,8 @@
 #define ENCODER_ABSTRACT_H
 
 #include <map>
-#include "typedefs.h"
+#include <types/agent_state_packet.h>
+
 
 class encoderAbstract
 {

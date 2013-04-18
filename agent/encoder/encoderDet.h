@@ -2,8 +2,9 @@
 #define ENCODERDET_H
 
 #include "encoderAbstract.h"
-#include <typedefs.h>
 #include <exprtk.hpp>
+#include <types/events.h>
+#include <types.h>
 #include <vector>
 #include <map>
 

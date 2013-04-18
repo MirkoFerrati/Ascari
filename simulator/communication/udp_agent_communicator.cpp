@@ -1,6 +1,6 @@
 #include "udp_agent_communicator.h"
 
-#include "typedefs.h"
+
 
 udp_agent_communicator::udp_agent_communicator(int num_agents):
         agent_communicator_abstract(),num_agents(num_agents),

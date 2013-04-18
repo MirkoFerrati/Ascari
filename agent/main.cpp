@@ -4,7 +4,6 @@
 #include <thread>
 #include "agent.h"
 #include "../shared/logog/include/logog.hpp"
-#include "../shared/typedefs.h"
 #include "../shared/communication/global.h"
 #include "lemon/arg_parser.h"
 #include "../shared/communication/global.h"

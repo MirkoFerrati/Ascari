@@ -1,7 +1,7 @@
 #ifndef WORLD_COMMUNICATOR_H
 #define WORLD_COMMUNICATOR_H
 
-#include "typedefs.h"
+
 
 
 

@@ -4,6 +4,7 @@
 
 #include <async_udp_receiver.hpp>
 #include "world_sniffer_abstract.h"
+#include <types/world_sim_packet.h>
 #include <boost/asio.hpp>
 
 struct udp_target

@@ -8,7 +8,7 @@
 #include <vector>
 #include <map>
 #include <string>
-#include "typedefs.h"
+
 #include <typedefs_topology.h>
 
 typedef boost::shared_ptr<boost::thread> thread_ptr;

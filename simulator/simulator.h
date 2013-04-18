@@ -10,6 +10,7 @@
 #include "collisioncheckerabstract.h"
 #include "random.hpp"
 #include <objects/abstract_object.h>
+#include <types/graph_informations.h>
 #include <mutex>
 #include <condition_variable>
 #include <thread>

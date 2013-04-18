@@ -6,7 +6,7 @@
 #include <agent.h>
 #include <lemon/adaptors.h>
 #include <cassert>
-#include "typedefs.h"
+
 #include <lemon/smart_graph.h>
 #include <lemon/lgf_reader.h>
 #include <lemon/lgf_writer.h>

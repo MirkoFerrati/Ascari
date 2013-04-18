@@ -8,7 +8,8 @@
 
 #include <lemon/random.h>
 #include "plugin_module.h"
-#include <typedefs.h>
+#include "../../shared/types/graph_informations.h"
+#include <types/events.h>
 #include "udp_graph_communicator.h"
 #include <boost/thread.hpp>
 

@@ -1,7 +1,6 @@
 #ifndef TASK_ASSIGNMENT_TYPES_H
 #define TASK_ASSIGNMENT_TYPES_H
 
-#include "types.h"
 #include "streams_utils.h"
 
 #include <map>
@@ -12,9 +11,7 @@
 #include "boost/serialization/vector.hpp"
 #include "boost/serialization/deque.hpp"
 #include <exprtk.hpp>
-#include "objects/abstract_object.h"
-#include "objects/task_assignment_task.h"
-#include "objects/task_assignment_task.h"
+#include "types.h"
 #include <iostream>
 #include <fstream>
 #include <forward_list>
@@ -27,9 +24,9 @@ typedef double task_cost;
 typedef std::string task_id;
 typedef std::string agent_id;
 typedef std::map<task_id,task_cost> task_cost_vector;
-typedef std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_cost_vector> task_cost_matrix;
+typedef std::map<agent_id,task_cost_vector> task_cost_matrix;
 typedef std::map<task_id,double> task_assignment_vector;
-typedef std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_assignment_vector> task_assignment_matrix;
+typedef std::map<agent_id,task_assignment_vector> task_assignment_matrix;
 typedef int task_assignment_algorithm;
 
 struct task

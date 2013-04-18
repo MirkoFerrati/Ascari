@@ -6,8 +6,9 @@
 #include <map>
 #include <string>
 #include <boost/concept_check.hpp>
-#include "typedefs.h"
+
 #include "testClass.h"
+#include <types/agent_sim_packet.h>
 
 
 using namespace std;

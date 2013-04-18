@@ -5,12 +5,13 @@
 
 #include "plugin_module.h"
 #include <yaml_parser.h>
-#include <typedefs.h>
+ 
 #include <boost/thread.hpp>
 #include <task_assignment_communicator.h>
 #include <assignment_problem.h>
 #include <random.hpp>
 #include "../shared/objects/task_assignment_task.h"
+#include <types/events.h>
 
 //TODO (Alessandro): che semafori uso? per ora quelli di simone
 #include "../identifierModule/named_semaphore.hpp"

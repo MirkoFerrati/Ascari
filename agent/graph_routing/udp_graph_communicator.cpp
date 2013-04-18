@@ -1,4 +1,5 @@
 #include "udp_graph_communicator.h"
+#include <types/graph_informations.h>
 
 Udp_graph_communicator::Udp_graph_communicator(std::mutex& mutex,graph_packet* tp,boost::asio::io_service& io_service,std::string identifier)
 	:identifier(identifier),mutex(mutex),tp(tp),socket_(io_service),sender(io_service,boost::asio::ip::address::from_string(MULTICAST_ADDRESS),SIMULATOR_GRAPH_PORT)

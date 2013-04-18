@@ -2,7 +2,7 @@
 #define ZMQ_COMMUNICATOR_HPP
 #include <zmq.hpp>
 #include <vector>
-#include "typedefs.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -20,6 +20,9 @@
 #include <boost/iostreams/stream.hpp>
 #include <logog.hpp>
 #include "global.h"
+#include "../../types/agent_simulator_handshake_packet.h"
+#include "../define.h"
+#include <types.h>
 
 enum Synctypes
 {

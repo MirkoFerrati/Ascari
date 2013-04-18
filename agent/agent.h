@@ -4,7 +4,7 @@
 #include <list>
 #include <vector>
 #include <forward_list>
-#include <typedefs.h>
+ 
 #include "automaton/automatonabstract.h"
 #include "controller/controller.h"
 #include "communication/agent_communicator_abstract.h"

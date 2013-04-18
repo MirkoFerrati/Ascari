@@ -2,6 +2,9 @@
 #define COLLISIONCHECKER_H
 
 #include "collisioncheckerabstract.h"
+#include <types/agents_name_to_states.h>
+#include <types/agent_state_packet.h>
+#include <vector>
 
 class CollisionChecker : public CollisionCheckerAbstract
 {

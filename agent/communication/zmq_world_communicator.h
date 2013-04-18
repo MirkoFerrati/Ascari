@@ -2,6 +2,7 @@
 #define ZMQ_WORLD_COMMUNICATOR_H
 #include "world_communicator_abstract.h"
 #include "../shared/communication/zmq_full_communicator.hpp"
+#include <types/agent_sim_packet.h>
 
 
 class zmq_world_communicator : public agent_namespace::world_communicator_abstract,

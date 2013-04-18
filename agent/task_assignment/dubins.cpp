@@ -1,7 +1,7 @@
 //written by Alessandro Settimi
 #include "task_assignment.h"
 #include <agent.h>
-#include "typedefs.h"
+
 
 double task_assignment::dubins_dist(double Ax,double Ay, double theta, double Tx, double Ty, double r)
 {

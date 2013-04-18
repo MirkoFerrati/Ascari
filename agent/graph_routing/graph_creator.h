@@ -5,7 +5,6 @@
 #include <lemon/path.h>
 #include <vector>
 #include <lemon/random.h>
-#include <typedefs.h>
 
 #define XYOFFSET 80
 #define VERTICAL_LENGTH 100000

@@ -1,6 +1,9 @@
 #include "empty_plugin.h"
-#include "typedefs.h"
+
 #include "logog.hpp"
+#include <types/empty_packet.h>
+#include <types.h>
+#include <types/events.h>
 
 
 

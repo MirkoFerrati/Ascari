@@ -1,7 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-struct graph_informations;
+#include <map>
 
 typedef std::map<int,double> map_int_double;
 typedef std::map<int,double> agent_state;
@@ -38,7 +38,6 @@ typedef double simulation_time;
 
 
 
-typedef std::map<std::string,graph_informations> graph_packet;
 
 
 #endif

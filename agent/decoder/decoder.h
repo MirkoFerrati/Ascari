@@ -3,7 +3,9 @@
 
 #include <map>
 #include <string>
-#include <typedefs.h>
+#include <types/events.h>
+#include <types.h>
+ 
 
 class decoder
 {
