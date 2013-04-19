@@ -89,7 +89,7 @@ void Viewer::init ( std::string graphName )
         if ( minY< ( *coord_y ) [n] ) minY= ( *coord_y ) [n]*1.1;
 
     }
-    setScalingAndTranslateFactor ( 0,0,0,0 );
+    setScalingAndTranslateFactor ( 500,-100,500,-100 );
 
 }
 
@@ -164,10 +164,11 @@ void Viewer::setBackImage ( string path )
                                    Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation );
     }
     pixmap.convertFromImage ( immagine );
-    immagine1=QImage ( QString ( "testa.png" ) );
-    immagine1=immagine1.scaled ( QSize ( width(),height() ),
-                                 Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation );
-
+    
+        immagine1=QImage ( QString ( "tutto.png" ) );
+        immagine1=immagine1.scaled ( QSize ( width(),height() ),
+                                   Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation );
+    
     pixmap_car.convertFromImage ( immagine1 );
 
 }
@@ -264,278 +265,52 @@ void Viewer::drawRectNotFilled ( int startx,int starty, double width, double hei
 
 void Viewer::paintEvent ( QPaintEvent */*event*/ )
 {
-    static const QPoint hourHand[3] =
-    {
-        QPoint ( 2, -2 ),
-        QPoint ( -2, -2 ),
-        QPoint ( 0, 2 )
-    };
     QColor hourColor ( 127, 0, 127 );
-
+    QMatrix rm;rm.scale(1/10.0,1/10.0);
+    QImage image= QImage("tutto.png").transformed(rm);
     double sidex=width();
     double sidey=height();
     QPainter painter ( this );
 
-    if ( backImage.compare ( "" ) )
-    {
-        painter.drawPixmap ( 0,0,sidex,sidey,pixmap );
-    }
-//     painter.setBrush ( Qt::white );
-//     painter.drawRect ( 0,0,10000,10000 );
-    if ( view_type==1 )
-    {
-        painter.save();
-        painter.setBrush ( QColor ( "lightgreen" ) );
-        painter.drawRect ( 0,0,sidex,sidey );
-        painter.restore();
-
-
-        painter.save();
-        painter.setBrush ( hourColor );
-        painter.translate ( sidex/2,sidey/2 );
-        painter.scale ( sidex/scalingFactorX,-sidey/scalingFactorY );
-        painter.setBrush ( QColor ( "green" ) );
-        painter.translate ( -translateX,-translateY );
-        painter.rotate ( 45 );
-        painter.drawRect ( 0,0,20,20 );
-        painter.restore();
-    }
-
-    if ( view_type==2 )
-    {
-        painter.save();
-        painter.setBrush ( QColor ( "lightgreen" ) );
-        painter.translate ( sidex/2,sidey/2 );
-        painter.scale ( sidex/scalingFactorX,-sidey/scalingFactorY );
-        painter.translate ( -translateX,-translateY );
-
-        for ( lemon::SmartDigraph::NodeIt n ( graph ); n!=lemon::INVALID; ++n )
-        {
-            painter.save();
-            painter.translate ( ( *coord_x ) [n], ( *coord_y ) [n] );
-            painter.drawEllipse ( QPoint ( 0,0 ),1,1 );
-            painter.scale ( painter.fontMetrics().height() /20.0,-painter.fontMetrics().height() /20.0 );
-            painter.drawText ( -1,-1,QString ( "" ).setNum ( graph.id ( n ) ) );
-            painter.restore();
-        }
-
-        painter.setBrush ( QColor ( "black" ) );
-        for ( lemon::SmartDigraph::ArcIt a ( graph ); a!=lemon::INVALID; ++a )
-        {
-            painter.drawLine ( ( *coord_x ) [graph.source ( a )], ( *coord_y ) [graph.source ( a )], ( *coord_x ) [graph.target ( a )], ( *coord_y ) [graph.target ( a )] );
-        }
-
-        painter.restore();
-    }
-
-    painter.save();
-    QFont f = painter.font();
-    f.setPointSizeF ( height() /25.0 );
-    painter.setFont ( f );
-    painter.setPen ( QColor ( "blue" ) );
-    painter.drawText ( width() /2,1.1*painter.fontMetrics().height(), QString ( "" ).setNum ( time ) );
-    painter.restore();
-
+    painter.drawPixmap ( 0,0,sidex,sidey,pixmap );
     painter.setBrush ( hourColor );
     painter.translate ( sidex/2,sidey/2 );
     painter.scale ( sidex/scalingFactorX,-sidey/scalingFactorY );
     painter.translate ( -translateX,-translateY );
-    if ( view_type==1 )
-    {
-        painter.save();
-        painter.translate ( 0,0 );
-        painter.rotate ( 45 );
-        painter.setBrush ( QColor ( "white" ) );
-        painter.drawRect ( -1,-1,2,2 );
-        painter.restore();
-
-        painter.save();
-        painter.setBrush ( QColor ( "red" ) );
-        painter.translate ( 0,5 );
-        painter.rotate ( 180 );
-        painter.scale ( ( scalingFactorX*3.0/sidex ), ( scalingFactorY*3.0/sidey ) );
-        painter.drawConvexPolygon ( hourHand,3 );
-        painter.restore();
-
-        painter.save();
-        painter.setBrush ( QColor ( "white" ) );
-        painter.translate ( 10,10 );
-        painter.rotate ( 45 );
-        painter.scale ( ( scalingFactorX*4.0/sidex ), ( scalingFactorY*4.0/sidey ) );
-        painter.drawRect ( -2,-2,5,5 );
-        painter.restore();
-
-        painter.save();
-        painter.setBrush ( QColor ( "white" ) );
-        painter.translate ( -10,10 );
-        painter.rotate ( 45 );
-        painter.scale ( ( scalingFactorX*4.0/sidex ), ( scalingFactorY*4.0/sidey ) );
-        painter.drawRect ( -2,-2,5,5 );
-        painter.restore();
-
-        painter.save();
-        painter.setBrush ( QColor ( "white" ) );
-        painter.translate ( 0,20 );
-        painter.rotate ( 45 );
-        painter.scale ( ( scalingFactorX*4.0/sidex ), ( scalingFactorY*4.0/sidey ) );
-        painter.drawRect ( -2,-2,5,5 );
-        painter.restore();
-    }
-
-
-    //written by Alessandro Settimi
-    if ( view_type==4 )
-    {
-        std::stringstream app ( std::stringstream::out );
-        app.str ( "" );
-
-        for ( unsigned int i=0; i<tasks_id.size(); i++ )
-        {
-            painter.save();
-            painter.translate ( tasklist.at ( tasks_id.at ( i ) ).task_position[0],tasklist.at ( tasks_id.at ( i ) ).task_position[1] );
-
-            if ( tasklist.at ( tasks_id.at ( i ) ).task_type==0 )
-            {
-                painter.setBrush ( QColor ( "lightgreen" ) );
-            }
-            else
-            {
-                painter.setBrush ( QColor ( "cyan" ) );
-            }
-
-            painter.drawRect ( -1,-1,2,2 );
-            painter.restore();
-
-// 		painter.save();
-// 		painter.translate(tasklist.at(tasks_id.at(i)).task_position[0],tasklist.at(tasks_id.at(i)).task_position[1]);
-// 		painter.setBrush(QColor("white"));
-// 		painter.drawRect(-0.5,-0.5,1,1);
-// 		painter.restore();
-
-
-            for ( map<string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
-            {
-                if ( app.str() =="" )
-                {
-                    if ( sqrt ( ( it->second.x-tasklist.at ( tasks_id.at ( i ) ).task_position[0] ) * ( it->second.x-tasklist.at ( tasks_id.at ( i ) ).task_position[0] ) + ( it->second.y-tasklist.at ( tasks_id.at ( i ) ).task_position[1] ) * ( it->second.y-tasklist.at ( tasks_id.at ( i ) ).task_position[1] ) ) < 0.15 )
-                    {
-                        app << tasks_id.at ( i ).c_str() << " (" << ( ( tasklist.at ( tasks_id.at ( i ) ).task_execution_time- ( time-times.at ( i ) ) >= 0 ) ?tasklist.at ( tasks_id.at ( i ) ).task_execution_time- ( time-times.at ( i ) ) : ( 0 ) ) << ")";
-
-                        if ( !executing.at ( i ) ) times.at ( i ) =time;
-                        executing.at ( i ) =true;
-                    }
-                }
-            }
-
-            if ( app.str() =="" )
-            {
-                executing.at ( i ) =false;
-                app << tasks_id.at ( i ).c_str() << " (" << tasklist.at ( tasks_id.at ( i ) ).task_execution_time << ")";
-            }
-
-            painter.save();
-            painter.translate ( tasklist.at ( tasks_id.at ( i ) ).task_position[0],tasklist.at ( tasks_id.at ( i ) ).task_position[1] );
-            painter.setBrush ( QColor ( "black" ) );
-            painter.scale ( painter.fontMetrics().height() /1000.0,-painter.fontMetrics().height() /1000.0 );
-            painter.drawText ( 0,75,QString ( app.str().c_str() ) );
-            painter.restore();
-
-            app.str ( "" );
-
-            if ( tasklist.at ( tasks_id.at ( i ) ).task_deadline != 0 )
-            {
-                app << "[" << ( ( ( tasklist.at ( tasks_id.at ( i ) ).task_deadline-time ) >=0 ) ? ( tasklist.at ( tasks_id.at ( i ) ).task_deadline-time ) : ( 0 ) ) << "]";
-
-                painter.save();
-                painter.translate ( tasklist.at ( tasks_id.at ( i ) ).task_position[0],tasklist.at ( tasks_id.at ( i ) ).task_position[1] );
-                painter.setPen ( QColor ( "red" ) );
-                painter.scale ( painter.fontMetrics().height() /1000.0,-painter.fontMetrics().height() /1000.0 );
-                painter.drawText ( 0,-65,QString ( app.str().c_str() ) );
-                painter.restore();
-
-                app.str ( "" );
-            }
-        }
-    }
-    //written by Alessandro Settimi
-
 
     for ( map<string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
     {
-
-        if ( time==0 )
-        {
-            std::vector<double> app;
-
-            app.push_back ( it->second.x );
-            app.push_back ( it->second.y );
-
-            initial_pos[it->first]=app;
-        }
-
         painter.save();
         painter.setBrush ( QColor ( "red" ) );
-        painter.translate ( it->second.x,it->second.y );
+        //painter.translate ( it->second.x,it->second.y );
         //TODO: Pessimo: lo zero degli angoli parte dall'asse y invece che da x
         double tmp=it->second.angle;
         while ( tmp>M_PI )
             tmp=tmp-2*M_PI;
-         painter.rotate ( ( tmp*180/M_PI )-90 );
-
-//         painter.scale((scalingFactorX*3.0/sidex),(scalingFactorY*3.0/sidey));
-        if ( it->first.compare ( "BALL" ) ==0 )
-        {
-            painter.setBrush ( QColor ( "white" ) );
-            painter.drawEllipse ( 0,0,5,5 );
-        }
-        else
-        {
-            if ( view_type==4 ) //written by Alessandro Settimi
-            {
-                painter.scale ( 0.2,0.2 );
-            }
-            else
-            {
-                painter.scale ( 2,2 );
-            }
-            //painter.drawConvexPolygon(hourHand, 3);
-
-            //QPixmap img("testa.png");
-
-            if ( view_type==2 || view_type==5 )
-            {
-                painter.save();
-                painter.scale ( ( scalingFactorX*3.0/sidex ), ( scalingFactorY*3.0/sidey ) );
-                painter.scale ( painter.fontMetrics().height() /70.0,-painter.fontMetrics().height() /70.0 );
-                //painter.drawText(0,0,QString(it->first.substr(6).c_str()));
-                painter.restore();
-            }
-
-            if ( view_type==4 )
-            {
-                painter.save();
-                painter.scale ( ( scalingFactorX*3.0/sidex ), ( scalingFactorY*3.0/sidey ) );
-                painter.scale ( painter.fontMetrics().height() /10.0,-painter.fontMetrics().height() /10.0 );
-                painter.drawText ( 0,0,QString ( it->first.substr ( 6 ).c_str() ) );
-                painter.restore();
-            }
-
-
-
-        }
-        
-        painter.scale(12.0/pixmap_car.width(),24.0/pixmap_car.height());
+	
+	//painter.translate(-pixmap_car.width()/48.0,-pixmap_car.height()/48.0);
+        //painter.rotate ( ( tmp*180/M_PI )-90 );
+	//painter.rotate(-90);
+	
+	   //painter.translate(pixmap_car.width()/48.0,pixmap_car.height()/48.0);
+        //painter.scale(50.0/pixmap_car.width(),50.0/pixmap_car.height());
         //painter.drawPixmap ( 0,0,pixmap_car );
-		painter.drawImage(0,0,QImage("testa.png"));
-        painter.restore();
+	painter.save();
+	QMatrix rm;
+	  rm.rotate(tmp*180/M_PI-90);
+	//rm.rotate(tmp*180/M_PI);
+	//rm.translate(QImage("tutto.png").width()/2.0,QImage("tutto.png").height()/2.0);
+	//rm.scale(10.0,10.0);
 
-        if ( view_type==4 )
-        {
-            painter.save();
-            painter.translate ( initial_pos.at ( it->first ).at ( 0 ),initial_pos.at ( it->first ).at ( 1 ) );
-            painter.drawArc ( -1,-1,2,2,0,16*360 );
-            painter.restore();
-        }
+	painter.translate(it->second.x,it->second.y);
+
+	auto temp=image.transformed(rm);
+	painter.drawImage(-temp.width()/2.0,-temp.height()/2.0,temp);
+
+        painter.restore();
+	painter.restore();
+	painter.drawRect(it->second.x-2,it->second.y-2,4,4);
+	
         if ( view_type==5 )
         {
             painter.save();
@@ -548,7 +323,7 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
             drawRectNotFilled ( 0,0,500,500,&painter );
             pen.setColor ( QColor ( "red" ) );
             painter.setPen ( pen );
-            drawRectNotFilled ( -100,-100,700,700,&painter );
+            drawRectNotFilled ( -75,-75,650,650,&painter );
             painter.restore();
 
         }

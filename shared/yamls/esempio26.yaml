@@ -106,11 +106,11 @@
   WORLD:
   - bonus_variables: [dim,dst,angle]
     dim: 500
-    dst: 50
-    angle: 1.1
+    dst: 150
+    angle: 1.5
   AGENTS:
   - agent: Agente01
-    VISIBLE_AREA: circle(x,y,400)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA:  circle(10)
     MONITORING: 0
     #COLLABORATIVE = 1
@@ -125,22 +125,22 @@
     BEHAVIOR: LGV-BAD
     
     
-  - agent: Agente02
-    VISIBLE_AREA: circle(x,y,400)
-    COMMUNICATION_AREA: =  circle(10)
-    MONITORING: 1
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - x: '171'
-      y: '151'
-      theta: '0.2'
-    STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
+#   - agent: Agente02
+#     VISIBLE_AREA: circle(x,y,800)
+#     COMMUNICATION_AREA: =  circle(10)
+#     MONITORING: 1
+#     states: [x,y,theta]
+#     control_commands: [v,w]
+#     INITIAL:
+#     - x: '171'
+#       y: '151'
+#       theta: '0.2'
+#     STATE_START: FAST
+#     BEHAVIOR: LGV
+#     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente03
-    VISIBLE_AREA: circle(x,y,400)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -154,7 +154,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente04
-    VISIBLE_AREA: circle(x,y,400)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -168,13 +168,13 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente05
-    VISIBLE_AREA: circle(x,y,400)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
-    - x: '291'
+    - x: '341'
       y: '251'
       theta: '-0.5'
     STATE_START: FAST
@@ -182,7 +182,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente06
-    VISIBLE_AREA: circle(x,y,400)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -196,7 +196,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente07
-    VISIBLE_AREA: circle(x,y,400)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -209,36 +209,36 @@
     BEHAVIOR: LGV
     KNOWN_BEHAVIORS:    [LGV]
     
-  - agent: Agente08
-    VISIBLE_AREA: circle(x,y,400)
-    COMMUNICATION_AREA: =  circle(10)
-    MONITORING: 1
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - x: '331'
-      y: '410'
-      theta: '0.8'
-    STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
-    
-  - agent: Agente09
-    VISIBLE_AREA: circle(x,y,400)
-    COMMUNICATION_AREA: =  circle(10)
-    MONITORING: 1
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - x: '341'
-      y: '451'
-      theta: '-0.9'
-    STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
-    
+#   - agent: Agente08
+#     VISIBLE_AREA: circle(x,y,800)
+#     COMMUNICATION_AREA: =  circle(10)
+#     MONITORING: 1
+#     states: [x,y,theta]
+#     control_commands: [v,w]
+#     INITIAL:
+#     - x: '331'
+#       y: '410'
+#       theta: '0.8'
+#     STATE_START: FAST
+#     BEHAVIOR: LGV
+#     KNOWN_BEHAVIORS:    [LGV]
+#     
+#   - agent: Agente09
+#     VISIBLE_AREA: circle(x,y,800)
+#     COMMUNICATION_AREA: =  circle(10)
+#     MONITORING: 1
+#     states: [x,y,theta]
+#     control_commands: [v,w]
+#     INITIAL:
+#     - x: '341'
+#       y: '451'
+#       theta: '-0.9'
+#     STATE_START: FAST
+#     BEHAVIOR: LGV
+#     KNOWN_BEHAVIORS:    [LGV]
+#     
   - agent: Agente10
-    VISIBLE_AREA: circle(x,y,400)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
