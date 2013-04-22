@@ -67,11 +67,7 @@ void task_assignment ::setTaskStop(bool stop)
  
 bool task_assignment ::task_made()
 {
-	bool a;
-	
-	a = (reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->task_execution_time < (time-initial_time));
-	
-	return (a && (events.at(events_to_index.at("REACHED"))==Events::_TRUE));
+	return (reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->done);
 }
 
 

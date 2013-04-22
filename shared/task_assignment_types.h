@@ -42,6 +42,8 @@ struct task
     bool executing;
     simulation_time time;
     agent_id owner;
+    bool available;
+    bool done;
     
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int /*version*/)
@@ -55,6 +57,8 @@ struct task
       ar& executing;
       ar& time;
       ar& owner;
+      ar& available;
+      ar& done;
     }
 };
 typedef std::map<task_id,task> task_list;

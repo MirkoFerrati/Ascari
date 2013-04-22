@@ -345,13 +345,22 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 		painter.save();
 		painter.translate(task.task_position[0],task.task_position[1]);
 
+
 		if (task.task_type == 0)
 		{
 			painter.setBrush(QColor("lightgreen"));
-		}
-		else			
+		}	
+		else 			
 		{
-			painter.setBrush(QColor("cyan"));
+			if(task.available)
+			{
+				
+				painter.setBrush(QColor("cyan"));
+			}
+			else
+			{
+				painter.setBrush(QColor("white"));
+			}
 		}
 
 		painter.drawRect(-1,-1,2,2);
@@ -360,40 +369,9 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 
 		if (task.executing)
 		{
-			app <<  task.id.c_str() << " (" << ((task.task_execution_time-(time-task.time) >= 0)? task.task_execution_time-(time-task.time):(0)) << ")";
+			app <<  task.id.c_str() << " (" << ((task.task_execution_time-time+floor(task.time))>0?(task.task_execution_time-time+floor(task.time)):0) << ")";
 		}
-
-		if(task.time!=0)
-		{
-			if(task.task_type!=0)
-			{
-			    if(task.task_type!=2)
-			    {  
-				if(time-task.time > task.task_execution_time)
-				{
-					painter.save();
-					painter.translate(task.task_position[0],task.task_position[1]);
-					
-					painter.setBrush(QColor("white"));
-					
-					painter.drawRect(-1,-1,2,2);
-					painter.restore();
-				}
-			    }
-			    else if (!task.executing && time-task.time < task.period + task.task_execution_time)
-			    {
-				    painter.save();
-				    painter.translate(task.task_position[0],task.task_position[1]);
-				    
-				    painter.setBrush(QColor("white"));
-				    
-				    painter.drawRect(-1,-1,2,2);
-				    painter.restore();
-			    }
-			}
-		}
-
-		if(app.str()=="")
+		else
 		{
 			app << task.id.c_str() << " (" << task.task_execution_time << ")";
 		}

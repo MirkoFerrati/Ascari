@@ -211,6 +211,7 @@ void createTaskList ( const YAML::Node& node, task_assignment_namespace::task_li
 	temp2.executing=false;
 	temp2.owner="";
 	temp2.time=0;
+	temp2.available=true;
 
         task_list.insert ( make_pair ( temp1,temp2 ) );
 

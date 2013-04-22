@@ -37,7 +37,7 @@
           t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
       LAMBDA:
         - lambda: [Lreached] 
-          Lreached: 'abs(x-x_task)<0.2 and abs(y-y_task)<0.2'
+          Lreached: 'abs(x-x_task)<0.1 and abs(y-y_task)<0.1'
     EVENTS:
     - events: [reached, new_target, stopped, started]
       reached: 'Lreached'

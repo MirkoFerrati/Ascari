@@ -5,10 +5,14 @@
 
 using namespace task_assignment_namespace;
 
+double task_assignment::norm2(double x1,double y1,double x2,double y2)
+{
+	return sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+}
 
 double task_assignment :: euclidean_distance_from_task(task_assignment_namespace::task_id task_id)
 {
-	return sqrt((x.value()-reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(task_id).getState())->task_position[0])*(x.value()-reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(task_id).getState())->task_position[0])+(y.value()-reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(task_id).getState())->task_position[1])*(y.value()-reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(task_id).getState())->task_position[1]));
+	return norm2(x.value(),y.value(),reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(task_id).getState())->task_position[0],reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(task_id).getState())->task_position[1]);
 }
 
 
@@ -37,7 +41,7 @@ double task_assignment ::time_to_deadline(task_assignment_namespace::task_id tas
 	  
 	if (temp < 0) 
 	{
-	    if(!done_task.at(task_id) && !reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(task_id).getState())->executing) std::cout<<"Deadline per il task "<<task_id<<" superata!";
+	    if( reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(task_id).getState())->available && !reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(task_id).getState())->executing) std::cout<<"Deadline per il task "<<task_id<<" superata!";
 	    return 0;
 	}
 	

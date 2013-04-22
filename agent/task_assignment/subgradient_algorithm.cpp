@@ -113,7 +113,7 @@ task_id task_assignment ::subgradient_algorithm()
 			{
 			      F.at(i) = C.at(i) + D.at(i) + mu_T.at(i);
 			      
-			      if(tasks_id.at(i)!="RECHARGE" && (((!reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i)).getState())->executing && !done_task.at(tasks_id.at(i)))))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
+			      if(tasks_id.at(i)!="RECHARGE" && (((!reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i)).getState())->executing && reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i)).getState())->available)))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
 			}
 			
 
@@ -160,7 +160,6 @@ task_id task_assignment ::subgradient_algorithm()
 		
 		for (unsigned int i=0;i<num_robot;i++)
 		{
-			if (previous_taken_tasks.at(agents_id.at(i))=="RECHARGE" && taken_tasks.at(agents_id.at(i))=="") done_task.at("RECHARGE")=false;
 			previous_taken_tasks.at(agents_id.at(i))=taken_tasks.at(agents_id.at(i));
 		}
 		
@@ -190,7 +189,7 @@ task_id task_assignment ::subgradient_algorithm()
 			ptr_subgradient_packet.get()->data.subgradient=subgradient;
 						
 			control_print();
-			
+						
 			converge=convergence_control_routine();
 			
 			passi++;

@@ -48,7 +48,9 @@ public:
 	os << "- posizione: " << t.state.task_position[0] <<' '<< t.state.task_position[1]<<' '<< t.state.task_position[2] << std::endl;
 	os << "- tipo: " << t.state.task_type << std::endl;
 	os << "- execution time: " << t.state.task_execution_time << std::endl;
+	os << "- period: " << t.state.period<< std::endl;
 	os << "- deadline: " << t.state.task_deadline << std::endl << std::endl;
+
 	os<<std::endl;
 	return os;
     }

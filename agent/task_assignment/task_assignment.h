@@ -53,16 +53,12 @@ private:
 	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_id> taken_tasks;
 	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_id> previous_taken_tasks;
   
-	std::map<task_assignment_namespace::task_id,double> periodic_tasks_time;
-	std::map<task_assignment_namespace::task_id,double> elapsed_times;
 	std::map<task_assignment_namespace::task_id,double> remaining_times_to_deadline;
 	
   	rndom<double> rndom_double;
-	std::map<task_assignment_namespace::task_id,bool> done_task; //done and prenotated
 	std::map<task_assignment_namespace::agent_id,bool> busy_robots;
 	
 	simulation_time& time;
-	simulation_time initial_time;
     
 	task_assignment_namespace::agent_id my_id;
 	double x0,y0;
