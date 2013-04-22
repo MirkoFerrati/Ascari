@@ -1,7 +1,7 @@
 #ifndef VISIBILITY
 #define VISIBILITY
 
-#include <typedefs.h>
+ 
 #include <exprtk.hpp>
 #include <iostream>
 #include "logog.hpp"
@@ -10,7 +10,9 @@
 #include <vector>
 #include <map>
 #include <fstream>
+#include <memory>
 #include "../shared/wykobi/wykobi.hpp"
+#include <types.h>
 
 
 

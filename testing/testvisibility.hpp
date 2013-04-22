@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 #include <boost/concept_check.hpp>
-#include "typedefs.h"
+
 #include "testClass.h"
 #include <boost/regex.hpp>
 #include "../simulator/visibility/visibility.h"

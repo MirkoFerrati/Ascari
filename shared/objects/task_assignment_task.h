@@ -1,10 +1,8 @@
 #ifndef TASK_ASSIGNMENT_TASK_H
 #define TASK_ASSIGNMENT_TASK_H
-#include "abstract_object.h"
-#include "types.h"
-#include "task_assignment_types.h"
-#include "global_types.h"
 #include "streams_utils.h"
+#include "types/agents_name_to_states.h"
+#include "../../task_assignment_types.h"
 #define TA_RADIUS 5
 
 

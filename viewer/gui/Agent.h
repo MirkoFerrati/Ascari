@@ -4,7 +4,8 @@
 
 #include <vector>
 #include <string>
-#include <typedefs.h>
+#include <map>
+#include <types/agent_state_packet.h>
 
 
 class Agent

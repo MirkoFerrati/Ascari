@@ -9,11 +9,9 @@
 #include "logog.hpp"
 #include <map>
 #include <yaml-cpp/yaml.h>
+#include "task_assignment_types.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/strong_typedef.hpp>
-//written by Alessandro Settimi
-#include "typedefs.h"
-//written by Alessandro Settimi
 
 // using namespace std;
 

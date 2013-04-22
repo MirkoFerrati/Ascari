@@ -4,7 +4,7 @@
 #include "agent.h"
 #include "dummy_agent.hpp"
 #include "../agent/communication/world_communicator_abstract.h"
-#include "typedefs.h"
+#include "types/agent_sim_packet.h"
 
 
 class agent_to_dummy_communicator : public agent_namespace::world_communicator_abstract

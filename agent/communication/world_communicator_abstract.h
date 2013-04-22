@@ -1,9 +1,12 @@
 #ifndef WORLD_COMMUNICATOR_H
 #define WORLD_COMMUNICATOR_H
 
-#include "typedefs.h"
+
 
 #include <vector>
+#include "../../types/world_sim_packet.h"
+#include "../../types/control_command_packet.h"
+
 namespace agent_namespace
 {
 

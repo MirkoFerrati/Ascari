@@ -1,5 +1,7 @@
 //written by Alessandro Settimi
 #include "assignment_problem.h"
+#include <iostream>
+
 
 assignment_problem::assignment_problem()
 {

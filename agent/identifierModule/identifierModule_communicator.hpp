@@ -4,7 +4,7 @@
 
 #include <mutex>
 #include <thread>
-#include <typedefs.h>
+ 
 #include <utility>
 
 template <class send_type>

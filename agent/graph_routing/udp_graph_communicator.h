@@ -2,7 +2,7 @@
 #define UDP_GRAPH_COMMUNICATOR_H
 #include "../communication/agent_communicator_abstract.h"
 #include <mutex>
-#include "typedefs.h"
+
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
@@ -10,7 +10,9 @@
 #include <typedefs_topology.h>
 #include <communication/udp_sender.hpp>
 #include <boost/thread.hpp>
-
+#include "define.h"
+#include <types.h>
+#include <types/graph_informations.h>
 typedef boost::shared_ptr<boost::thread> thread_ptr;
 
 

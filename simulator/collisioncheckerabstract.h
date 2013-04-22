@@ -1,6 +1,8 @@
 #ifndef COLLISIONCHECKERABSTRACT_H
 #define COLLISIONCHECKERABSTRACT_H
-#include <typedefs.h>
+#include <types/agents_name_to_states.h>
+#include <types.h>
+ 
 
 class CollisionCheckerAbstract
 {

@@ -5,6 +5,7 @@
 #include <mutex>
 #include "agent_to_dummy_communicator.hpp"
 #include "../agent/agent.h"
+#include <types/dummy_state.h>
 #include <string>
 
 struct dummy_agent

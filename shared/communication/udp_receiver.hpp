@@ -1,7 +1,7 @@
 #ifndef TCP_RECEIVER_H
 #define TCP_RECEIVER_H
 
-#include "typedefs.h"
+
 
 #include <iostream>
 #include <sstream>
@@ -15,8 +15,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <iomanip>
 #include <boost/serialization/vector.hpp>
-#include "logog.hpp"
-
+#include "define.h"
 #include <logog.hpp>
 
 template <class T>

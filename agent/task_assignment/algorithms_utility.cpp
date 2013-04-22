@@ -1,7 +1,7 @@
 //written by Alessandro Settimi
 #include "task_assignment.h"
 #include <agent.h>
-#include "typedefs.h"
+
 
 using namespace task_assignment_namespace;
 

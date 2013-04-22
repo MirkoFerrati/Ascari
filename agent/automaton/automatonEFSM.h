@@ -2,7 +2,6 @@
 #define AUTOMATONEFSM_H
 
 #include "automatonabstract.h"
-#include "typedefs.h"
 class automatonEFSM:public automatonAbstract
 {
 public:

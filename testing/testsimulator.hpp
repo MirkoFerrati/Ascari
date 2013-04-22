@@ -4,6 +4,8 @@
 #include <map>
 #include <communication/udp_receiver.hpp>
 #include <communication/udp_sender.hpp>
+#include <types/control_command_packet.h>
+#include <types/world_sim_packet.h>
 
 
 using namespace std;

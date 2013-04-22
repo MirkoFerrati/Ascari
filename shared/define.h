@@ -1,23 +1,23 @@
-#ifndef TYPEDEFS_H
-#define TYPEDEFS_H
-
-#include <map>
-#include <string>
-#include <vector>
-#include <list>
-#include "boost/serialization/map.hpp"
-#include "boost/serialization/vector.hpp"
-#include "boost/serialization/deque.hpp"
-#include <exprtk.hpp>
-#include "objects/abstract_object.h"
-#include "objects/task_assignment_task.h"
-#include "objects/task_assignment_task.h"
-#include <iostream>
-#include <fstream>
-#include <forward_list>
-#include "global_types.h"
-#include "task_assignment_types.h"
-#include "types.h"
+#ifndef DEFINE_H
+#define DEFINE_H
+// 
+// #include <map>
+// #include <string>
+// #include <vector>
+// #include <list>
+// #include "boost/serialization/map.hpp"
+// #include "boost/serialization/vector.hpp"
+// #include "boost/serialization/deque.hpp"
+// #include <exprtk.hpp>
+// #include "objects/abstract_object.h"
+// #include "objects/task_assignment_task.h"
+// #include "objects/task_assignment_task.h"
+// #include <iostream>
+// #include <fstream>
+// #include <forward_list>
+// #include "global_types.h"
+// #include "task_assignment_types.h"
+// #include "types.h"
 //if we are debugging we want a strong typedef, if we are releasing we want the code to be optimized
 //we are going to remove all strong_typedef during the code writing
 #ifndef NDEBUG
@@ -50,4 +50,4 @@
 
 
 
-#endif //TYPEDEFS_H
+#endif //DEFINE_H

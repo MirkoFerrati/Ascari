@@ -1,9 +1,9 @@
 #ifndef DYNAMIC_H
 #define DYNAMIC_H
-#include "typedefs.h"
 
 #include "exprtk.hpp"
-
+#include "types.h"
+#include "define.h"
 #include <vector>
 #include <map>
 #include <string>

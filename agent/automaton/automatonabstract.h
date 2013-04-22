@@ -1,10 +1,11 @@
 #ifndef AUTOMATONABSTRACT_H
 #define AUTOMATONABSTRACT_H
-#include <typedefs.h>
 #include <vector>
 #include <string>
 #include <map>
 #include <forward_list>
+#include <types.h>
+#include <types/events.h>
 
 
 struct transitionTable

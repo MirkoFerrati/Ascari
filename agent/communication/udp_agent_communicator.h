@@ -2,14 +2,13 @@
 #define UDP_AGENT_COMMUNICATOR_H
 #include "agent_communicator_abstract.h"
 #include <boost/signals2/mutex.hpp>
-#include "typedefs.h"
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
 #include "boost/bind.hpp"
 #include <typedefs_topology.h>
 #include <communication/udp_sender.hpp>
-
+#include "../../shared/define.h"
 
 class udp_agent_communicator : public agent_namespace::agent_communicator_abstract
 {

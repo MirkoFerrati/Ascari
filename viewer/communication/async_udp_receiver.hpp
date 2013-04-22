@@ -1,6 +1,6 @@
 #ifndef ASYNC_UDP_RECEIVER_HPP
 #define ASYNC_UDP_RECEIVER_HPP
-#include "typedefs.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -14,7 +14,7 @@
 #include <iomanip>
 #include <boost/serialization/vector.hpp>
 
-
+#include <define.h>
 
 class async_udp_receiver
 {

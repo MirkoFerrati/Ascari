@@ -1,7 +1,8 @@
 //written by Alessandro Settimi
 #include <glpk.h>
 #include <stdio.h>
-#include <typedefs.h>
+#include <vector>
+#include <string>
 #include <sstream>
 
 class assignment_problem

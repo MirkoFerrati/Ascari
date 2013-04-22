@@ -3,13 +3,14 @@
 
 //written by Alessandro Settimi
 #include "yaml_parser.h"
-#include <typedefs.h>
 #include <boost/circular_buffer.hpp>
 //written by Alessandro Settimi
 
 #include "Agent.h"
 #include <lemon/smart_graph.h>
 #include <lemon/path.h>
+#include <types/monitor_packet.h>
+#include <types/world_sim_packet.h>
 #include <QtGui/QWidget>
 #include <QtGui/QKeyEvent>
 #include <boost/asio.hpp>

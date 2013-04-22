@@ -5,7 +5,7 @@
 #include <QtCore/QLocale>
 #include <QSettings>
 #include <QtGui/QWidget>
-#include "typedefs.h"
+
 #include "debug_constants.h"
 #include <iostream>
 #include <sstream>

@@ -1,5 +1,7 @@
 #include "identifier_module.h"
 #include "../shared/debug_constants.h"
+#include <types/monitor_packet.h>
+#include <types/monitor_result.h>
 #include <thread>
 
 using namespace std;
