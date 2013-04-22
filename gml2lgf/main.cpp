@@ -1,14 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include "graph.h"
-
+#include "gmlreader.hpp"
 using namespace std;
 
 int main(int argc, char **argv) {
   if (true)
   {
-      graph g;
-      char s[256];
       fstream f;
 	  if (argc<2)
 	  {
@@ -17,23 +15,16 @@ int main(int argc, char **argv) {
 	  }
       string filename=argv[1];
       cout<<filename<<endl;
-      f.open(filename.c_str(),ios::in);
-      string tmp;
-      while (!f.eof())
-      {
-	f.getline(s,256);
-	tmp=s;
-	if (tmp.compare("graph")==0) //inizia il testo interessante
-	{
-	   g.readGraph(&f);
-	}
+      gmlreader reader;
       
-      }
+      f.open(filename.c_str(),ios::in);
+      graph g=reader.read(&f);
+
       
       f.close();
       
       f.open(filename.append(".lgf").c_str(),ios::out);
-      f<<g;
+      f<<g.tolgf();
       f.close();
   }
   
