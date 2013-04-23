@@ -9,12 +9,12 @@
 
 class graph
 {
-  
+  public:
+
   std::vector<node> nodes;
   std::vector<arc> arcs;
 
 
-public:
      graph();
      virtual ~graph();
 

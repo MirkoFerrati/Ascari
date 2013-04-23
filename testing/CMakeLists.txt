@@ -3,7 +3,8 @@
 
 add_executable(test testrandom.hpp main.cpp ../agent/controller/controller.cpp ../agent/decoder/decoder.cpp 
 ../shared/dynamic.cpp ../agent/encoder/encoderDet.cpp ../agent/automaton/automatonFSM.cpp ../simulator/visibility/visibility.cpp
-../simulator/visibility/map2d.cpp
+../simulator/visibility/map2d.cpp ../gml2lgf/graph.cpp ../gml2lgf/node.cpp ../gml2lgf/arc.cpp ../gml2lgf/gmlreader.hpp
+
 	../shared/objects/task_assignment_task.cpp)
 
 add_executable(test_udp_agent fake_agent_for_udp_tester.cpp ../agent/communication/udp_agent_communicator.cpp)

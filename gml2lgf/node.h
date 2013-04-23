@@ -7,13 +7,13 @@
 class node
 {
   
-int x,y;
-std::string name;
 std::string label;
     void readGraphics(std::fstream* arg1);
     void readTextGraphics(std::fstream* arg1);
 
 public:
+  int x,y;
+  std::string name;
     node();
     virtual ~node();
   
