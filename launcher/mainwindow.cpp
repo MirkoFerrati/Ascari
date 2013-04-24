@@ -351,6 +351,10 @@ bool MainWindow::startViewer()
             QFile file ( fileName );
             QDir d = QFileInfo ( file ).absoluteDir();
             graphname= ( d.absolutePath().append ( "/" ).append ( QString::fromStdString ( world.graphName ).toLower() ) ).toStdString();
+	    viewer_plugin* temp=new agent_router_viewer();
+	    temp->setfather(insideViewer);
+	    insideViewer->addPlugin(temp);
+	    plugins.push_back(temp);
         }
 
         case 4:
