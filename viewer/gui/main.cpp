@@ -138,6 +138,8 @@ int main ( int argc, char *argv[] )
 
         window.restoreGeometry ( settings.value ( "mainWindowGeometry" ).toByteArray() );
 
+		window.setMinimumSize(200,200);
+		
         sniffer_world.start_receiving();
         window.start();
 

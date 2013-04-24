@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
     logog::Cout out;
     QApplication a(argc, argv);
     MainWindow w;
+	w.setMinimumSize(200,200);
     w.show();
 
     a.exec();
