@@ -9,6 +9,7 @@
 #include <boost/asio.hpp>
 #include <viewer.h>
 #include <udp_world_sniffer.h>
+#include "../shared/types/monitor_packet.h"
 namespace Ui
 {
 class MainWindow;
@@ -68,6 +69,7 @@ private:
     QSettings *settings;
     Parsed_World world;
     Viewer * insideViewer;
+    std::vector<viewer_plugin*> plugins;
     std::unique_ptr<world_sniffer_abstract> sniffer;
     std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
     std::vector<QProcess*> agents;

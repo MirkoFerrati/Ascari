@@ -102,7 +102,7 @@ int main ( int argc, char *argv[] )
         }
         case 4:
         {
-		viewer_plugin* ta_viewer = new task_assignment_viewer(time,read_mutex,read);
+		viewer_plugin* ta_viewer = new task_assignment_viewer(window.getTime(),read_mutex,read);
 		plugins.push_back(ta_viewer);
 		ta_viewer->setfather(&window);
 		ta_viewer->setAgentSize(0.2);

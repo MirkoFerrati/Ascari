@@ -44,5 +44,9 @@ MESSAGE(STATUS "Process file: ${infileName}")
 configure_file(${infileName} ./ COPYONLY)
 endforeach(${infileName})
 
+configure_file(../shared/graphs/museum.gml museum.gml COPYONLY)
 configure_file(../shared/graphs/test2.gml.lgf test2.gml.lgf COPYONLY)
+configure_file(../shared/graphs/test3.gml.lgf test3.gml.lgf COPYONLY)
+configure_file(../shared/graphs/test4.gml.lgf test4.gml.lgf COPYONLY)
+configure_file(../shared/graphs/test5.gml.lgf test5.gml.lgf COPYONLY)
 

@@ -1,7 +1,7 @@
 //written by Alessandro Settimi
 #include "task_assignment_viewer.h"
 
-task_assignment_viewer::task_assignment_viewer(std::shared_ptr<std::mutex> mutex,const world_sim_packet& infos):time(this->getTime()),mutex(mutex),infos(infos)
+task_assignment_viewer::task_assignment_viewer(const int* time ,std::shared_ptr<std::mutex>& mutex,const world_sim_packet& infos):time(*time),mutex(mutex),infos(infos)
 {
     started=false;
     old_time=0;
@@ -150,4 +150,9 @@ void task_assignment_viewer::paintAgents(QPainter& painter, std::map<std::string
 			}
 		}		
 	}
+}
+
+task_assignment_viewer::~task_assignment_viewer()
+{
+
 }

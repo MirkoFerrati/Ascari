@@ -46,9 +46,9 @@ public:
       
     }
   };
-  virtual void paintBackground(QPainter &painter)=0;
+  virtual void paintBackground(QPainter &painter){};
   virtual void timerEvent(){};
-  virtual void init(std::string)=0;
+  virtual void init(std::string){};
   virtual void keypress(){};
   virtual void setAgentShape(QPolygon shape)
   {
