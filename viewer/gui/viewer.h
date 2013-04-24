@@ -23,7 +23,7 @@ public:
 
 void addPlugin(viewer_plugin* plugin);
 
-const int * getTime(){return &simulation_time;}
+ int * getTime(){return &simulation_time;}
 
 private:
 

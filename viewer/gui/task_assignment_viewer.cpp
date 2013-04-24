@@ -1,7 +1,7 @@
 //written by Alessandro Settimi
 #include "task_assignment_viewer.h"
 
-task_assignment_viewer::task_assignment_viewer(const int* time ,std::shared_ptr<std::mutex>& mutex,const world_sim_packet& infos):time(*time),mutex(mutex),infos(infos)
+task_assignment_viewer::task_assignment_viewer( int* time ,std::shared_ptr<std::mutex>& mutex,const world_sim_packet& infos):time(time),mutex(mutex),infos(infos)
 {
     started=false;
     old_time=0;
@@ -61,7 +61,7 @@ void task_assignment_viewer::paintBackground (QPainter& painter)
 
 		if (task.executing)
 		{
-			app <<  task.id.c_str() << " (" << ((task.task_execution_time-time+floor(task.time))>0?(task.task_execution_time-time+floor(task.time)):0) << ")";
+			app <<  task.id.c_str() << " (" << ((task.task_execution_time-*time+floor(task.time))>0?(task.task_execution_time-*time+floor(task.time)):0) << ")";
 		}
 		else
 		{
@@ -79,7 +79,7 @@ void task_assignment_viewer::paintBackground (QPainter& painter)
 
 		if (task.task_deadline != 0)
 		{
-			app << "[" << (((task.task_deadline-time)>=0)?(task.task_deadline-time):(0)) << "]";
+			app << "[" << (((task.task_deadline-*time)>=0)?(task.task_deadline-*time):(0)) << "]";
 		  
 			painter.save();
 			painter.translate(task.task_position[0],task.task_position[1]);
@@ -99,7 +99,7 @@ void task_assignment_viewer::paintAgents(QPainter& painter, std::map<std::string
 	for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
 	{
     
-		if(!agents.empty() && (!started || old_time>time))
+		if(!agents.empty() && (!started || old_time>*time))
 		{
 			  for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
 			  {
@@ -114,10 +114,10 @@ void task_assignment_viewer::paintAgents(QPainter& painter, std::map<std::string
 			  started=true;
 		}
 	    
-		old_time=time;
+		old_time=*time;
 		
 		
-		if (time>0)
+		if (*time>0)
 		{ 
 			painter.save();
 			painter.translate(initial_pos.at(it->first).at(0),initial_pos.at(it->first).at(1));
@@ -156,3 +156,4 @@ task_assignment_viewer::~task_assignment_viewer()
 {
 
 }
+
