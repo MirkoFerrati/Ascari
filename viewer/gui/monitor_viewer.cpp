@@ -1,17 +1,15 @@
-// #include "monitor_viewer.h"
-// 
-// 
-// monitor_viewer::monitor_viewer()
-// {
-//      monitor=true; 
-// }
-// 
-// void monitor_viewer::setMonitor ( std::map< std::string, monitor_packet >* monitor_read, shared_ptr< std::mutex > monitor_read_mutex )
-// {
-//     this->monitor_read=monitor_read;
-//     this->monitor_read_mutex=monitor_read_mutex;
-// }
-// 
+ #include "monitor_viewer.h"
+
+#include <mutex>
+#include <memory>
+ 
+ monitor_viewer::monitor_viewer(std::map< std::string, monitor_packet >* monitor_read, std::shared_ptr< std::mutex > monitor_read_mutex)
+ {
+      monitor=true; 
+      this->monitor_read=monitor_read;
+      this->monitor_read_mutex=monitor_read_mutex;
+
+ }
 // 
 // void monitor_viewer::drawArrow(int x1,int y1, int x2, int y2, double sze, QPainter* painter )
 // {
