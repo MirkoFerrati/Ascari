@@ -5,6 +5,7 @@
 #include <thread>
 #include <map>
 #include <vector>
+#include "../shared/types/monitor_packet.h"
 
 class zmq_identifier_sniffer: public world_sniffer_abstract,
 public viewer_from_identifier_sniffer<monitor_packet>

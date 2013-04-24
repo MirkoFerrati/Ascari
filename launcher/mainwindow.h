@@ -9,6 +9,7 @@
 #include <boost/asio.hpp>
 #include <viewer.h>
 #include <udp_world_sniffer.h>
+#include "../shared/types/monitor_packet.h"
 namespace Ui
 {
 class MainWindow;

@@ -2,6 +2,8 @@
 #define MONITOR_PACKET_H
 #include "monitor_result.h"
 
+#include <deque>
+#include <string>
 
 struct monitor_packet
 {

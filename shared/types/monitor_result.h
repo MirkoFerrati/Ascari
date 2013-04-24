@@ -1,6 +1,7 @@
 #ifndef MONITOR_RESULT_H
 #define MONITOR_RESULT_H
 
+#include <string>
 
 struct monitor_result
 {
