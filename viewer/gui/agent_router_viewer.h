@@ -8,7 +8,7 @@
 class agent_router_viewer:public viewer_plugin
 {
 public:
-    agent_router_viewer ( );
+    agent_router_viewer (std::string graphname );
 
     void init(std::string);
     void paintBackground ( QPainter& painter );

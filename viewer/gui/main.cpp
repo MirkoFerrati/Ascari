@@ -89,7 +89,7 @@ int main ( int argc, char *argv[] )
         break;
         case 2:
         {
-	    viewer_plugin* router_viewer = new agent_router_viewer();
+	    viewer_plugin* router_viewer = new agent_router_viewer(filename);
 	    plugins.push_back(router_viewer);
 	    router_viewer->setfather(&window);
 	    window.addPlugin(router_viewer);

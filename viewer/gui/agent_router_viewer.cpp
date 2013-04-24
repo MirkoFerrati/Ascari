@@ -4,7 +4,7 @@
 
 using namespace std;
 
-agent_router_viewer::agent_router_viewer()
+agent_router_viewer::agent_router_viewer(std::string graphname):graphname(graphname)
 {
   father=0;
      length=0;
@@ -16,7 +16,7 @@ void agent_router_viewer::init(std::string filename)
 {
   assert(father);
   Viewer* temp_father=reinterpret_cast<Viewer*>(father);
-    parseGraph (filename);
+    parseGraph (graphname);
 	lemon::SmartDigraph::NodeIt n ( graph );
 	double maxx=( *coord_x ) [n],maxy=( *coord_y ) [n],minx=( *coord_x ) [n],miny=( *coord_y ) [n];
     for ( lemon::SmartDigraph::NodeIt n ( graph ); n!=lemon::INVALID; ++n )
@@ -42,7 +42,7 @@ void agent_router_viewer::paintBackground ( QPainter& painter )
 			
 			painter.scale(4,4);
             painter.drawEllipse ( QPoint ( 0,0 ),1,1 );
-			painter.scale(1/4.0,1/4.0);
+			painter.scale(1/8.0,1/8.0);
             painter.scale ( painter.fontMetrics().height() /10.0,-painter.fontMetrics().height() /10.0 );
             painter.drawText ( -1,-1,QString ( "" ).setNum ( graph.id ( n ) ) );
             painter.restore();
