@@ -11,10 +11,9 @@
 class task_assignment_viewer:public viewer_plugin
 {
 public:
-task_assignment_viewer();
+    task_assignment_viewer();
     task_assignment_viewer(const int* time,std::shared_ptr< std::mutex >& mutex, const world_sim_packet& infos);
     
-    void init(std::string);
     void timerEvent();
     void paintBackground(QPainter& painter);
     void paintAgents(QPainter& painter, std::map<std::string,Agent>& agents);
