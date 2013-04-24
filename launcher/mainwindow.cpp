@@ -6,7 +6,7 @@
 #include <udp_world_sniffer.h>
 #include <zmq_world_sniffer.hpp>
 #include <zmq_identifier_sniffer.hpp>
-
+#include "../viewer/gui/agent_router_viewer.h"
 
 MainWindow::MainWindow ( QWidget *parent ) :
     QMainWindow ( parent ),
