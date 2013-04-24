@@ -1,26 +1,34 @@
+//written by Alessandro Settimi
 #ifndef TASK_ASSIGNMENT_VIEWER_H
 #define TASK_ASSIGNMENT_VIEWER_H
-
-//written by Alessandro Settimi
 #include "yaml_parser.h"
 #include <boost/circular_buffer.hpp>
-//written by Alessandro Settimi
+#include "objects/task_assignment_task.h"
+#include "viewer.h"
 
-class task_assignment_viewer
+
+class task_assignment_viewer:public viewer_plugin
 {
 public:
-  
-      //written by Alessandro Settimi
+    task_assignment_viewer(std::shared_ptr< std::mutex > mutex, const world_sim_packet& infos);
+    
+    void init(std::string);
+    void timerEvent();
+    void paintBackground(QPainter& painter);
+    void paintAgents(QPainter& painter, std::map<std::string,Agent>& agents);
     void initialize_tasks(const std::map<std::string,task_assignment_task>& obj_tasks);
-    //written by Alessandro Settimi
+    
+    ~task_assignment_viewer();
+
 private:
-      //written by Alessandro Settimi    
     std::map<task_assignment_namespace::agent_id,std::vector<double>> initial_pos;
     bool started;
     double old_time;
+    const int& time;
     std::map<task_assignment_namespace::agent_id,boost::circular_buffer<double>> positions;
     std::map<task_assignment_namespace::task_id,task_assignment_namespace::task> tasks;
-    //written by Alessandro Settimi
+    const std::shared_ptr< std::mutex >& mutex;
+    const world_sim_packet& infos;
   
 };
 

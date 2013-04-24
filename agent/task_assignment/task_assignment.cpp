@@ -92,6 +92,8 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     alpha=-1;
     
     set_charge=-0.05;
+    
+    lambda_u=0;
 }
 
  
@@ -264,7 +266,7 @@ bool task_assignment::recharge_is_present()
 
 void task_assignment::compute_speeds(double x_t,double y_t)
 {
-	 omega=-1*sin(theta.value()-atan2(y_t-y.value(),x_t-x.value()));
+	 omega=-1*sin(theta.value()-atan2(y_t-y.value(),x_t-x.value())) + lambda_u;
 	 	 
 	 if((my_task!="TASK_ASSIGNMENT_FAILED") && (my_task!=""))
 	 {
@@ -276,13 +278,20 @@ void task_assignment::compute_speeds(double x_t,double y_t)
 	 }
 	 	 
 // 	 if(distance_to_target()>0.1) avoid_collision();
+	 
+	 avoid_collision(omega_tilde);
+	 
+	 beta_p=-0.1;
+	 
+	 lambda_u += beta_p* (omega-omega_tilde);
 	 	 
 	 if(fabs(omega)>max_omega) omega_dubins=copysign(max_omega,omega);
 	 else omega_dubins=omega;
 }
 
-void task_assignment::avoid_collision()
+void task_assignment::avoid_collision(double& a)
 {
+	a=0;
 	double min_d=INF;
 	for(unsigned int i=0;i<num_robot;i++)
 	{
@@ -290,9 +299,11 @@ void task_assignment::avoid_collision()
 	      {
 		      double d=norm2(x.value(),y.value(),positions.at(agents_id.at(i)).at(0),positions.at(agents_id.at(i)).at(1));
 		      min_d=std::min(d,min_d);
-		      omega += ((2)/(d))*sin(theta.value()-atan2(positions.at(agents_id.at(i)).at(1)-y.value(),positions.at(agents_id.at(i)).at(0)-x.value()));
+		      a += ((2)/(d))*sin(theta.value()-atan2(positions.at(agents_id.at(i)).at(1)-y.value(),positions.at(agents_id.at(i)).at(0)-x.value()));
 	      }
 	}
+	
+	a -= lambda_u;
 	
 	speed = speed-((min_d<1.2)?0.15:0);
 }
@@ -469,9 +480,10 @@ void task_assignment ::run_plugin()
 				  }
 				  else
 				  {
-					  if (events.at(events_to_index.at("REACHED"))==Events::_TRUE)
+					  if (my_task=="" && events.at(events_to_index.at("REACHED"))==Events::_TRUE)
 					  {
 						  converge=false;
+						  reset_mu_T();
 					  }
 				  }
 				  
@@ -533,7 +545,7 @@ void task_assignment ::run_plugin()
 				  }
 				  else ta_communicator->send();
 				  
-				  if(!busy_robots.at(my_id) && my_task!="RECHARGE" && count_undone_task()==0)
+				  if(!busy_robots.at(my_id) && my_task!="RECHARGE" && count_undone_task()==0 && events.at(events_to_index.at("REACHED"))==Events::_TRUE)
 				  {
 					    std::cout<<"TASK ESAURITI"<<std::endl;
 					    my_task="";

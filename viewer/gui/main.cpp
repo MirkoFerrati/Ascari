@@ -10,6 +10,7 @@
 #include "../communication/zmq_identifier_sniffer.hpp"
 #include <QSettings>
 #include "../../shared/types/monitor_packet.h"
+#include "task_assignment_viewer.h"
 
 void center ( QWidget &widget,int WIDTH=800,int HEIGHT=800 )
 {
@@ -101,8 +102,13 @@ int main ( int argc, char *argv[] )
         }
         case 4:
         {
-
+		viewer_plugin* ta_viewer = new task_assignment_viewer(time,read_mutex,read);
+		plugins.push_back(ta_viewer);
+		ta_viewer->setfather(&window);
+		ta_viewer->setAgentSize(0.2);
+		window.addPlugin(ta_viewer);
         }
+        break;
         case 5:
         {
             std::map<std::string,monitor_packet> monitor_read;

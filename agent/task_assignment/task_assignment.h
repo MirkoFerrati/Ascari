@@ -40,7 +40,7 @@ public:
 	double norm2(double x1,double y1,double x2,double y2);
 	void receive_from_others();
 	~task_assignment();
-	void avoid_collision();
+	void avoid_collision(double& a);
 	void compute_speeds(double x_t, double y_t);
 	void createAusiliarVariables();
 
@@ -50,6 +50,10 @@ private:
 	std::map<task_assignment_namespace::agent_id,std::vector<double>> positions;
   
 	double set_charge;
+	
+	double lambda_u;
+	double omega_tilde;
+	double beta_p;
 	
 	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_id> taken_tasks;
 	std::map<task_assignment_namespace::agent_id,task_assignment_namespace::task_id> previous_taken_tasks;

@@ -3,6 +3,11 @@
 #include <QPainter>
 #include "Agent.h"
 #include <assert.h>
+#include "types.h"
+#include <types/world_sim_packet.h>
+#include <mutex>
+#include <memory>
+
 class viewer_plugin
 {
 public:
