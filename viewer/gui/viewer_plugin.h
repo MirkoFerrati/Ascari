@@ -16,17 +16,19 @@ public:
   {
    setAgentShape();
    setAgentSize();
+   setPainterScale();
   }
   void setfather ( void* father )
     {
         assert ( father );
         this->father=father;
     };
+
   virtual void paintAgents(QPainter &painter,const std::map<std::string,Agent>& agents)
   {
   for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
     {
-          painter.save();
+        painter.save();
         painter.setBrush ( QColor ( "red" ) );
         painter.translate ( it->second.x,it->second.y );
         //TODO: Pessimo: lo zero degli angoli parte dall'asse y invece che da x
@@ -35,12 +37,13 @@ public:
             tmp=tmp-2*M_PI;
         painter.rotate ( ( tmp*180/M_PI )-90 );
 
-			    painter.scale(agentsize,agentsize);
-            painter.drawConvexPolygon(agentshape);
-				painter.restore();
-				painter.save();
-				painter.scale(painter.fontMetrics().height()/70.0,-painter.fontMetrics().height()/70.0);
-				painter.drawText(0,0,QString(it->first.substr(6).c_str()));
+	painter.scale(agentsize,agentsize);
+	painter.drawConvexPolygon(agentshape);
+	painter.restore();
+	painter.save();
+	painter.translate ( it->second.x,it->second.y );
+	painter.scale(painter.fontMetrics().height()/painterscale,-painter.fontMetrics().height()/painterscale);
+	painter.drawText(0,0,QString(it->first.substr(6).c_str()));
 				
         painter.restore();
       
@@ -68,6 +71,10 @@ public:
    agentsize=size; 
   }
   
+  virtual void setPainterScale(double scale=70.0)
+  {
+    painterscale=scale;
+  }
   virtual ~viewer_plugin()
   {
   };
@@ -76,6 +83,7 @@ public:
 private:
     QPolygon agentshape;
     double agentsize;
+    double painterscale;
 
 };
 

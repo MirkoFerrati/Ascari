@@ -11,6 +11,7 @@
 #include <QSettings>
 #include "../../shared/types/monitor_packet.h"
 #include "task_assignment_viewer.h"
+#include "monitor_viewer.h"
 
 void center ( QWidget &widget,int WIDTH=800,int HEIGHT=800 )
 {
@@ -74,6 +75,9 @@ int main ( int argc, char *argv[] )
         std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
 	std::vector<viewer_plugin*> plugins;
 	world_sim_packet read;
+	 std::map<std::string,monitor_packet> monitor_read;
+	             std::shared_ptr<std::mutex> monitor_read_mutex ( new std::mutex );
+
         std::shared_ptr<std::mutex> read_mutex ( new std::mutex );
         Viewer window ( read,read_mutex,NULL );
         switch ( viewerType )
@@ -85,10 +89,6 @@ int main ( int argc, char *argv[] )
         break;
         case 2:
         {
-            boost::asio::io_service io_service;
-            std::vector<char> buffer;
-            buffer.resize ( MAX_PACKET_LENGTH );
-            udp_world_sniffer sniffer ( buffer,io_service );
 	    viewer_plugin* router_viewer = new agent_router_viewer();
 	    plugins.push_back(router_viewer);
 	    router_viewer->setfather(&window);
@@ -111,14 +111,14 @@ int main ( int argc, char *argv[] )
         break;
         case 5:
         {
-            std::map<std::string,monitor_packet> monitor_read;
-            std::shared_ptr<std::mutex> monitor_read_mutex ( new std::mutex );
+           
 
             identifier_sniffer=std::unique_ptr<zmq_identifier_sniffer> ( new zmq_identifier_sniffer ( monitor_read,monitor_read_mutex ) );
             identifier_sniffer->start_receiving();
-
-            //TODO:window.setMonitor(&monitor_read,monitor_read_mutex);
-
+	         viewer_plugin* temp=new monitor_viewer(&monitor_read,monitor_read_mutex);
+	    temp->setfather(&window);
+	    window.addPlugin(temp);
+	    plugins.push_back(temp);
         }
         break;
         default:

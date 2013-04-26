@@ -7,6 +7,7 @@
 #include <zmq_world_sniffer.hpp>
 #include <zmq_identifier_sniffer.hpp>
 #include "../viewer/gui/agent_router_viewer.h"
+#include "../viewer/gui/task_assignment_viewer.h"
 
 MainWindow::MainWindow ( QWidget *parent ) :
     QMainWindow ( parent ),
@@ -334,8 +335,23 @@ bool MainWindow::startViewer()
             ui->ViewerContainer->removeWidget ( insideViewer );
             delete insideViewer;
         }
-        for (auto plugin:plugins)
-	  delete plugin;
+    for ( auto plugin:plugins )
+            delete plugin;
+        if ( !mutex )
+        {
+            std::shared_ptr<std::mutex> temp ( new std::mutex );
+            mutex.swap ( temp );
+
+        }
+        else
+        {
+            mutex->unlock();
+        }
+        if ( !sniffer )
+        {
+            sniffer=std::unique_ptr<zmq_world_sniffer<world_sim_packet> > ( new zmq_world_sniffer<world_sim_packet> ( buffer,mutex ) );
+            sniffer->start_receiving();
+        }
         insideViewer=new Viewer ( buffer,mutex,NULL );
         QString a;
         // arguments <<"-t"<< a.setNum ( viewerType );
@@ -351,16 +367,22 @@ bool MainWindow::startViewer()
             QFile file ( fileName );
             QDir d = QFileInfo ( file ).absoluteDir();
             graphname= ( d.absolutePath().append ( "/" ).append ( QString::fromStdString ( world.graphName ).toLower() ) ).toStdString();
-	    viewer_plugin* temp=new agent_router_viewer();
-	    temp->setfather(insideViewer);
-	    insideViewer->addPlugin(temp);
-	    plugins.push_back(temp);
+            viewer_plugin* temp=new agent_router_viewer();
+            temp->setfather ( insideViewer );
+            insideViewer->addPlugin ( temp );
+            plugins.push_back ( temp );
         }
 
         case 4:
         {
-            graphname=fileName.toStdString();
+            viewer_plugin* temp=new task_assignment_viewer(insideViewer->getTime(),mutex,buffer);
+            temp->setfather ( insideViewer );
+	    temp->setAgentSize(0.2);
+	    temp->setPainterScale(1000.0);
+            insideViewer->addPlugin ( temp );
+            plugins.push_back ( temp );
         }
+        break;
 
         case 5:
         {
@@ -378,37 +400,25 @@ bool MainWindow::startViewer()
                 identifier_sniffer= std::unique_ptr<zmq_identifier_sniffer> ( new zmq_identifier_sniffer ( monitor_buffer,monitor_mutex ) );
                 identifier_sniffer->start_receiving();
             }
-            viewer_plugin* temp=new monitor_viewer(&monitor_buffer,monitor_mutex);
-	    temp->setfather(insideViewer);
-	    insideViewer->addPlugin(temp);
-	    plugins.push_back(temp);
+            viewer_plugin* temp=new monitor_viewer ( &monitor_buffer,monitor_mutex );
+            temp->setfather ( insideViewer );
+            insideViewer->addPlugin ( temp );
+            plugins.push_back ( temp );
         }
 
         default:
         {
-            if ( !mutex )
-            {
-                std::shared_ptr<std::mutex> temp ( new std::mutex );
-                mutex.swap ( temp );
 
-            }
-            else
-            {
-                mutex->unlock();
-            }
-            if ( !sniffer )
-            {
-                sniffer=std::unique_ptr<zmq_world_sniffer<world_sim_packet> > ( new zmq_world_sniffer<world_sim_packet> ( buffer,mutex ) );
-                sniffer->start_receiving();
-            }
 
         }
+        }
+
         ui->ViewerContainer->addWidget ( insideViewer );
-        insideViewer->init(graphname);
+        insideViewer->init ( graphname );
         insideViewer->start();
 
         return true;
-        }
+
     }
     return false;
 
