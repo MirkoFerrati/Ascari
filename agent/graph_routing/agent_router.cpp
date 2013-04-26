@@ -61,16 +61,18 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
 
 void agent_router::run_plugin()
 {
+	priority=identifier;
+	
     if ( internal_state==state::STOPPED )
     {
 		prepare_stopped_packet();
 		update_packet();
-		communicator.send();
+		communicator.send(my_LRP);
         stopAgent();
         return;
     }
 
-    if ( internal_state==state::MOVING || internal_state==state::EMERGENCY || internal_state==state::STARTING )
+    if ( internal_state==state::MOVING || internal_state==state::EMERGENCY || internal_state==state::STARTING ||internal_state==state::LOADING)
     {
         if ( isTimeToNegotiate ( time ) )
         {
@@ -79,10 +81,18 @@ void agent_router::run_plugin()
         }
         if ( abs ( next_time- ( time+1.7 ) ) <0.001 )
         {
+			auto oldtarget=target;
             if ( setNextTarget() )
             {
-                internal_state=state::NODE_HANDSHAKING;
+				if (oldtarget!=target)
+				{
+				internal_state=state::NODE_HANDSHAKING;
                 negotiation_steps=0;
+				}
+				else
+				{
+					internal_state=state::LOADING;
+				}
             }
             else
             {
@@ -90,7 +100,6 @@ void agent_router::run_plugin()
                 return;
             }
         }
-
     }
 
     if ( internal_state==state::NODE_HANDSHAKING )
@@ -133,7 +142,13 @@ void agent_router::run_plugin()
         }
     }
 
-
+	if (internal_state==state::LOADING)
+	{
+		prepare_loading_packet();
+		priority=" "; //BRUTTO HACK
+		update_packet();
+		communicator.send(my_LRP);
+	}
 
     if ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING || internal_state==state::ARC_HANDSHAKING )
     {
@@ -156,7 +171,7 @@ void agent_router::run_plugin()
 
     }
 
-	if (isEmergency())
+	if (isEmergency(node_id))
 	{
 		internal_state==state::EMERGENCY;
 		prepare_emergency_packet();
@@ -407,6 +422,20 @@ void agent_router::prepare_stopped_packet()
 	using namespace lemon;
 	node_id.clear();
 	last_time_updated = time;	
+}
+
+void agent_router::prepare_loading_packet()
+{
+	using namespace lemon;
+	
+	node_id.clear();
+	int i = 0;//target_counter;
+	while(targets[target_counter+i]==graph.id(target))
+	{
+		node_id.push_back(graph.id(target)+graph_node_size*i);
+		i++;
+	}
+	last_time_updated = time;
 }
 
 

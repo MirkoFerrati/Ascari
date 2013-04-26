@@ -24,7 +24,8 @@ enum  class state
     ARC_HANDSHAKING,
     EMERGENCY,
     STOPPED,
-    STARTING
+    STARTING,
+	LOADING
 };
 
 class agent_router: public Plugin_module
@@ -61,6 +62,7 @@ private:
     void print_path();
 	int findAge(simulation_time present_time, simulation_time old_time);
     void prepare_stopped_packet();
+	void prepare_loading_packet();
 private:
     state internal_state;
     bool next_target_reachable;
