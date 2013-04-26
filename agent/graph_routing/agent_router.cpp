@@ -63,6 +63,9 @@ void agent_router::run_plugin()
 {
     if ( internal_state==state::STOPPED )
     {
+		prepare_stopped_packet();
+		update_packet();
+		communicator.send();
         stopAgent();
         return;
     }
@@ -153,7 +156,13 @@ void agent_router::run_plugin()
 
     }
 
-
+	if (isEmergency())
+	{
+		internal_state==state::EMERGENCY;
+		prepare_emergency_packet();
+		update_packet();
+		communicator.send ( my_LRP );
+	}
 
     if ( ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING
 		|| internal_state==state::ARC_HANDSHAKING ) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
@@ -246,6 +255,38 @@ bool agent_router::check_for_overtaking ()
     _mutex.unlock();
     cout<<endl;
     return overtaking;
+}
+
+bool agent_router::isEmergency(const std::vector<int>& nodes)
+{
+	std::unique_lock<std::mutex>(_mutex);//.lock(); invece di lockare dato che ho piu return uso la unique_lock
+	for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it ) //per ogni pacchetto ricevuto
+    {
+		if ( identifier==it->first ) continue;
+        if (!it->second.emergency) continue;
+		
+		cout<<"controllo se devo entrare in emergenza per colpa dell'agente:"<<it->first<<" "<<endl;
+		for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
+        {
+			int id = ( *itt );// - age * graph_node_size;  //attualizzo il nodo
+			int i=0;
+			for (auto node:nodes)
+			{
+				i++;
+				if (i>4) break;					
+				if (node%graph_node_size==id%graph_node_size)
+				{
+					cout<<"emergenza!!"<<endl;
+					return true;
+				}
+				
+			}
+		}
+
+	}
+	cout<<"nessuna emergenza"<<endl;
+	return false;
+	//_mutex.unlock();
 }
 
 
@@ -360,6 +401,12 @@ void agent_router::prepare_move_packet()
         node_id.push_back ( graph.id ( i ) );
     }
     last_time_updated = time;
+}
+void agent_router::prepare_stopped_packet()
+{
+	using namespace lemon;
+	node_id.clear();
+	last_time_updated = time;	
 }
 
 

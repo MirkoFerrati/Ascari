@@ -45,6 +45,7 @@ public:
 
 private:
     bool findPath ( lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< bool >& useArc );
+	bool isEmergency(const std::vector<int>& nodes);
     bool setNextTarget();
     void setSpeed();
     void stopAgent ();
@@ -59,6 +60,7 @@ private:
     bool isTimeToNegotiate(simulation_time time);
     void print_path();
 	int findAge(simulation_time present_time, simulation_time old_time);
+    void prepare_stopped_packet();
 private:
     state internal_state;
     bool next_target_reachable;
