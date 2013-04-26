@@ -58,7 +58,7 @@ int main ( int argc, char *argv[] )
         try
         {
             ap.parse();
-            if ( ( viewerType==2 || viewerType==4 ) && !ap.given ( "f" ) )
+            if ( ( viewerType==2) && !ap.given ( "f" ) )
             {
                 ERR ( "inserire il nome del file%s","" );
                 return 0;
@@ -106,6 +106,7 @@ int main ( int argc, char *argv[] )
 		plugins.push_back(ta_viewer);
 		ta_viewer->setfather(&window);
 		ta_viewer->setAgentSize(0.2);
+		ta_viewer->setPainterScale(1000.0);
 		window.addPlugin(ta_viewer);
         }
         break;
@@ -115,7 +116,7 @@ int main ( int argc, char *argv[] )
 
             identifier_sniffer=std::unique_ptr<zmq_identifier_sniffer> ( new zmq_identifier_sniffer ( monitor_read,monitor_read_mutex ) );
             identifier_sniffer->start_receiving();
-	         viewer_plugin* temp=new monitor_viewer(&monitor_read,monitor_read_mutex);
+	    viewer_plugin* temp=new monitor_viewer(&monitor_read,monitor_read_mutex);
 	    temp->setfather(&window);
 	    window.addPlugin(temp);
 	    plugins.push_back(temp);
@@ -136,7 +137,7 @@ int main ( int argc, char *argv[] )
 
         QSettings settings ( "K2BRobotics","Viewer" );
 
-        window.restoreGeometry ( settings.value ( "mainWindowGeometry" ).toByteArray() );
+       // window.restoreGeometry ( settings.value ( "mainWindowGeometry" ).toByteArray() );
 
         sniffer_world.start_receiving();
         window.start();
