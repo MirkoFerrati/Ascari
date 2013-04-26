@@ -22,7 +22,7 @@
 #include <boost/serialization/map.hpp>
 #include <map>
 #include "../../shared/communication/global.h"
-#define BORDER 0.3+0.2
+#define BORDER 0.2
 
 using namespace std;
 
@@ -49,30 +49,33 @@ void Viewer::init ( std::string filename )
     scalingFactorY=10;
     translateX=0;
     translateY=0;
-    maxX=0;
-    maxY=0;
-    minX=0;
-    minY=0;
+    maxX=-500000;
+    maxY=-500000;
+    minX=500000;
+    minY=500000;
 
     for (auto plugin:plugins)
       plugin->init(filename);
 
-    setScalingAndTranslateFactor(0,0,0,0);	
+   // setScalingAndTranslateFactor(0,0,0,0);	
 
 }
 
 void Viewer::setScalingAndTranslateFactor ( double maxX, double minX, double maxY, double minY )
 {
     if ( this->maxX<maxX )
-        this->maxX=maxX+abs ( maxX ) *BORDER;
+        this->maxX=maxX +(maxX+minX)/2.0*BORDER;
     if ( this->minX>minX )
-        this->minX=minX-abs ( minX ) *BORDER;
+		this->minX=minX -(maxX+minX)/2.0*BORDER;
     if ( this->minY>minY )
-        this->minY=minY-abs ( minY ) *BORDER;
+		this->minY=minY -(maxY+minY)/2.0*BORDER;
     if ( this->maxY<maxY )
-        this->maxY=maxY+abs ( maxY ) *BORDER;
-    setScalingFactor ( this->maxX-this->minX,this->maxY-this->minY );
-    setTranslateFactor ( ( this->maxX+this->minX ) /2, ( this->maxY+this->minY ) /2 );
+		this->maxY=maxY +(maxY+minY)/2.0*BORDER;
+	
+	setScalingFactor ( this->maxX-this->minX,this->maxY-this->minY );
+	setTranslateFactor ( ( this->maxX+this->minX ) /2.0, ( this->maxY+this->minY ) /2.0 );
+
+	
 }
 
 
@@ -120,6 +123,23 @@ Viewer::~Viewer()
   }
 }
 
+void Viewer::paintTextPoint(QPainter *painter,double x,double y)
+{
+	painter->save();
+	painter->setPen(QColor("blue"));
+	QFont f = painter->font();
+	f.setPointSizeF ( 20 );
+	painter->setFont ( f );
+	QString s;
+	s.append(QString("").setNum(x*0.9));
+	s.append(",");
+	s.append(QString("").setNum(y*0.9));
+	painter->translate(x*0.9,y*0.9);
+	painter->scale(1,-1);
+	painter->drawText(0,0,s);
+	painter->restore();
+	
+}
 
 void Viewer::paintEvent ( QPaintEvent */*event*/ )
 {
@@ -130,6 +150,11 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
     painter.translate ( sidex/2,sidey/2 );
     painter.scale ( sidex/scalingFactorX,-sidey/scalingFactorY );
     painter.translate ( -translateX,-translateY );
+// 	paintTextPoint(&painter,maxX,maxY);
+// 	paintTextPoint(&painter,maxX,minY);
+// 	paintTextPoint(&painter,minX,maxY);
+// 	paintTextPoint(&painter,minX,minY);
+
 
     if ( backImage.compare ( "" ) )
     {
@@ -138,19 +163,26 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 
     for (auto plugin:plugins)
     {
-     plugin->paintBackground(painter); 
+		painter.save();
+     plugin->paintBackground(painter);
+	 painter.restore();
     }
     for (auto plugin:plugins)
     {
+		painter.save();
       plugin->paintAgents(painter,agents);
-    }
+		painter.restore();
+		
+	}
     
     painter.save();
     QFont f = painter.font();
-    f.setPointSizeF ( height() /25.0 );
+    f.setPointSizeF ( max(height() /25.0,4.0 ));
     painter.setFont ( f );
     painter.setPen ( QColor ( "blue" ) );
-    painter.drawText ( width() /2,1.1*painter.fontMetrics().height(), QString("").setNum(simulation_time) );
+	painter.translate(translateX,maxY-1.1*painter.fontMetrics().height());
+	painter.scale(1,-1);
+    painter.drawText (0,0, QString("").setNum(simulation_time) );
     painter.restore();
     painter.restore();
 }
@@ -209,7 +241,7 @@ void Viewer::keyPressEvent ( QKeyEvent *event )
 void Viewer::start()
 {
 
-    timerId = startTimer ( 10 );
+    timerId = startTimer ( 25 );
     cout<<"timer started"<<endl;
     repaint();
 

@@ -313,7 +313,6 @@ bool MainWindow::startViewer()
     if ( ui->selectViewType->selectedItems().first()->text().compare ( "Grafo" ) ==0 )
     {
         viewerType=2;
-        arguments<< "-f"<<QString::fromStdString ( world.graphName ).toLower();
     }
     if ( ui->selectViewType->selectedItems().first()->text().compare ( "Vuoto" ) ==0 )
     {
@@ -353,9 +352,7 @@ bool MainWindow::startViewer()
             sniffer->start_receiving();
         }
         insideViewer=new Viewer ( buffer,mutex,NULL );
-        QString a;
-        // arguments <<"-t"<< a.setNum ( viewerType );
-        std::string graphname="";
+ 
 
 
         switch ( viewerType )
@@ -364,10 +361,12 @@ bool MainWindow::startViewer()
 
         case 2:
         {
+			std::string graphname="";
+			
             QFile file ( fileName );
             QDir d = QFileInfo ( file ).absoluteDir();
             graphname= ( d.absolutePath().append ( "/" ).append ( QString::fromStdString ( world.graphName ).toLower() ) ).toStdString();
-            viewer_plugin* temp=new agent_router_viewer();
+            viewer_plugin* temp=new agent_router_viewer(graphname);
             temp->setfather ( insideViewer );
             insideViewer->addPlugin ( temp );
             plugins.push_back ( temp );
@@ -414,7 +413,7 @@ bool MainWindow::startViewer()
         }
 
         ui->ViewerContainer->addWidget ( insideViewer );
-        insideViewer->init ( graphname );
+        insideViewer->init ( fileName.toStdString() );
         insideViewer->start();
 
         return true;

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-agent_router_viewer::agent_router_viewer()
+agent_router_viewer::agent_router_viewer(std::string graphname):graphname(graphname)
 {
   father=0;
      length=0;
@@ -16,24 +16,17 @@ void agent_router_viewer::init(std::string filename)
 {
   assert(father);
   Viewer* temp_father=reinterpret_cast<Viewer*>(father);
-    parseGraph (filename);
+    parseGraph (graphname);
+	lemon::SmartDigraph::NodeIt n ( graph );
+	double maxx=( *coord_x ) [n],maxy=( *coord_y ) [n],minx=( *coord_x ) [n],miny=( *coord_y ) [n];
     for ( lemon::SmartDigraph::NodeIt n ( graph ); n!=lemon::INVALID; ++n )
     {
-        if ( temp_father->maxX< ( *coord_x ) [n] ) temp_father->maxX= ( *coord_x ) [n]*1.1;
-        if ( temp_father->maxY< ( *coord_y ) [n] ) temp_father->maxX= ( *coord_y ) [n]*1.1;
-        if ( temp_father->minX> ( *coord_x ) [n] ) temp_father->minX= ( *coord_x ) [n]*1.1;
-        if ( temp_father->minY< ( *coord_y ) [n] ) temp_father->minY= ( *coord_y ) [n]*1.1;
-
+        if ( maxx< ( *coord_x ) [n] ) maxx= ( *coord_x ) [n];
+        if ( maxy< ( *coord_y ) [n] ) maxy= ( *coord_y ) [n];
+        if ( minx> ( *coord_x ) [n] ) minx= ( *coord_x ) [n];
+        if ( miny> ( *coord_y ) [n] ) miny= ( *coord_y ) [n];
     }
-    
-    for (lemon::SmartDigraph::NodeIt n(graph);n!=lemon::INVALID;++n)
-	{
-		if (temp_father->maxX<(*coord_x)[n]) temp_father->maxX=(*coord_x)[n]*1.1;
-		if (temp_father->maxY<(*coord_y)[n]) temp_father->maxX=(*coord_y)[n]*1.1;
-		if (temp_father->minX>(*coord_x)[n]) temp_father->minX=(*coord_x)[n]*1.1;
-		if (temp_father->minY<(*coord_y)[n]) temp_father->minY=(*coord_y)[n]*1.1;
-		
-	} 
+    temp_father->setScalingAndTranslateFactor(maxx,minx,maxy,miny);
 }
 
 void agent_router_viewer::paintBackground ( QPainter& painter )
@@ -46,8 +39,11 @@ void agent_router_viewer::paintBackground ( QPainter& painter )
         {
             painter.save();
             painter.translate ( ( *coord_x ) [n], ( *coord_y ) [n] );
+			
+			painter.scale(4,4);
             painter.drawEllipse ( QPoint ( 0,0 ),1,1 );
-            painter.scale ( painter.fontMetrics().height() /20.0,-painter.fontMetrics().height() /20.0 );
+			painter.scale(1/8.0,1/8.0);
+            painter.scale ( painter.fontMetrics().height() /10.0,-painter.fontMetrics().height() /10.0 );
             painter.drawText ( -1,-1,QString ( "" ).setNum ( graph.id ( n ) ) );
             painter.restore();
         }

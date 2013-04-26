@@ -26,13 +26,12 @@ void addPlugin(viewer_plugin* plugin);
  int * getTime(){return &simulation_time;}
 
 private:
-
+	void paintTextPoint( QPainter* painter, double x, double y );
     void paintEvent ( QPaintEvent *event );
     void timerEvent ( QTimerEvent *event );
     void keyPressEvent ( QKeyEvent *event );
     void pause();
     void closeEvent ( QCloseEvent *event );
-    void setScalingAndTranslateFactor ( double maxX,double minX,double maxY,double minY );
     std::vector<viewer_plugin*> plugins;
     int timerId;
     int simulation_time;
@@ -45,7 +44,8 @@ private:
     std::shared_ptr<std::mutex> mutex;
 public:
     double scalingFactorX, scalingFactorY, translateX, translateY;
-
+	void setScalingAndTranslateFactor ( double maxX,double minX,double maxY,double minY );
+	
     double maxX;
     double minX;
     double maxY;
