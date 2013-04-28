@@ -16,7 +16,7 @@
 #define TIME_SLOT_FOR_3DGRAPH 10.0
 
 
-enum  class state
+enum class state
 {
     MOVING,
     LISTENING,
@@ -25,8 +25,9 @@ enum  class state
     EMERGENCY,
     STOPPED,
     STARTING,
-	LOADING
+	LOADING,
 };
+
 
 class agent_router: public Plugin_module
 {
@@ -51,6 +52,7 @@ private:
     void setSpeed();
     void stopAgent ();
     void startAgent ();
+	bool isOnTarget();
     bool target_reached();
     void prepare_move_packet();
     void prepare_emergency_packet();
@@ -63,6 +65,7 @@ private:
 	int findAge(simulation_time present_time, simulation_time old_time);
     void prepare_stopped_packet();
 	void prepare_loading_packet();
+	void print_state( state s );
 private:
     state internal_state;
     bool next_target_reachable;
@@ -103,6 +106,8 @@ private:
     Udp_graph_communicator communicator;
     std::string priority;
 
+	
+	
 };
 
 #endif // AGENT_ROUTER_H

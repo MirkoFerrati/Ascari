@@ -81,10 +81,12 @@ void agent_router::run_plugin()
         }
         if ( abs ( next_time- ( time+1.7 ) ) <0.001 )
         {
-			auto oldtarget=target;
+			if (isOnTarget())
+			{
+			auto oldtarget=graph.id(target);
             if ( setNextTarget() )
             {
-				if (oldtarget!=target)
+				if (oldtarget!=graph.id(target))
 				{
 				internal_state=state::NODE_HANDSHAKING;
                 negotiation_steps=0;
@@ -99,6 +101,7 @@ void agent_router::run_plugin()
                 internal_state=state::STOPPED;
                 return;
             }
+			}
         }
     }
 
@@ -173,7 +176,7 @@ void agent_router::run_plugin()
 
 	if (isEmergency(node_id))
 	{
-		internal_state==state::EMERGENCY;
+		internal_state=state::EMERGENCY;
 		prepare_emergency_packet();
 		update_packet();
 		communicator.send ( my_LRP );
@@ -207,6 +210,9 @@ void agent_router::run_plugin()
     }
 
     setSpeed();
+	cout<<"stato interno: ";
+	print_state(internal_state);
+	cout<<endl;
 }
 
 
@@ -463,12 +469,21 @@ void agent_router::setSpeed()
     }
 }
 
+bool agent_router::isOnTarget()
+{
+	assert ( node_id.size()>1 );
+	source = graph.nodeFromId ( node_id[1] % graph_node_size );
+	if ( graph.id ( source ) == graph.id ( target ) )
+		return true;
+	return false;
+}
+
 bool agent_router::setNextTarget()
 {
-    assert ( node_id.size()>1 );
-    source = graph.nodeFromId ( node_id[1] % graph_node_size );
-    if ( graph.id ( source ) == graph.id ( target ) )
-    {
+//     assert ( node_id.size()>1 );
+//     source = graph.nodeFromId ( node_id[1] % graph_node_size );
+//     if ( graph.id ( source ) == graph.id ( target ) )
+//     {
         if ( target_counter == targets.size() )
         {
             cout << " TARGET FINALE raggiunto, mi fermo" << endl;
@@ -482,6 +497,6 @@ bool agent_router::setNextTarget()
             cout << time << ": TARGET raggiunto, nuovo target: " << id << " " << coord_x [target] << " " << coord_y[target] << endl;
             return true;
         }
-    }
-    return true;
+//     }
+//     return true;
 }
