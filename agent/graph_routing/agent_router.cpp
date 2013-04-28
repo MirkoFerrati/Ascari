@@ -74,33 +74,30 @@ void agent_router::run_plugin()
 
     if ( internal_state==state::MOVING || internal_state==state::EMERGENCY || internal_state==state::STARTING ||internal_state==state::LOADING)
     {
-        if ( isTimeToNegotiate ( time ) )
+        if ( isTimeToNegotiate ( time ) ) //negozio anche sugli archi, basta che sia il momento giusto
         {
             internal_state=state::ARC_HANDSHAKING;
             negotiation_steps=0;
         }
-        if ( abs ( next_time- ( time+1.7 ) ) <0.001 )
+        if ( abs ( next_time- ( time+1.7 ) ) <0.001 )  //se sono su un nodo invece faccio di piu' che negoziare
         {
-			if (isOnTarget())
+			internal_state=state::NODE_HANDSHAKING;
+			negotiation_steps=0;
+			if (isOnTarget()) //se il nodo e' il mio target
 			{
-			auto oldtarget=graph.id(target);
-            if ( setNextTarget() )
-            {
-				if (oldtarget!=graph.id(target))
+				auto oldtarget=graph.id(target);
+				if ( setNextTarget() )  //se ci sono altri target
 				{
-				internal_state=state::NODE_HANDSHAKING;
-                negotiation_steps=0;
+					if (oldtarget==graph.id(target)) //se il target e' ripetuto vuol dire che devo fare loading
+					{	
+						internal_state=state::LOADING;
+					}
 				}
-				else
+				else  //se non ci sono altri target
 				{
-					internal_state=state::LOADING;
+					internal_state=state::STOPPED;
+					return;
 				}
-            }
-            else
-            {
-                internal_state=state::STOPPED;
-                return;
-            }
 			}
         }
     }
