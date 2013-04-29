@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QCheckBox>
 #include <QSettings>
 #include "yaml_parser.h"
 #include <QProcess>
@@ -52,9 +53,14 @@ private slots:
     
 	void simulatorExited(int exitcode,QProcess::ExitStatus exitstatus);
 	
+	void agentSelected(int);
+	
     bool startViewer();
     void startAgents();
     void startSimulator();
+
+
+    void on_selectAll_stateChanged(int arg1);
 
 private:
     Ui::MainWindow *ui;
@@ -70,10 +76,13 @@ private:
     Parsed_World world;
     Viewer * insideViewer;
     std::vector<viewer_plugin*> plugins;
+    std::vector<QCheckBox*> agentcontainer;
     std::unique_ptr<world_sniffer_abstract> sniffer;
     std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
     std::vector<QProcess*> agents;
     QString fileName,simulatorPath,agentPath,viewerPath;
+    int selectedAgents;
+    bool disable;
 };
 
 #endif // MAINWINDOW_H
