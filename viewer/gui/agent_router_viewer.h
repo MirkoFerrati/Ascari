@@ -12,7 +12,7 @@ public:
 
     void init(std::string);
     void paintBackground ( QPainter& painter );
-
+    void setPainterScale ( double scale );
     ~agent_router_viewer();
 private:
     void parseGraph (std::string);

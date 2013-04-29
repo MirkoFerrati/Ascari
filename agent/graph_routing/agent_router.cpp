@@ -207,9 +207,9 @@ void agent_router::run_plugin()
     }
 
     setSpeed();
-	cout<<"stato interno: ";
-	print_state(internal_state);
-	cout<<endl;
+	//cout<<"stato interno: ";
+	//print_state(internal_state);
+	//cout<<endl;
 }
 
 
@@ -302,7 +302,7 @@ bool agent_router::isEmergency(const std::vector<int>& nodes)
 		}
 
 	}
-	cout<<"nessuna emergenza"<<endl;
+	//cout<<"nessuna emergenza"<<endl;
 	return false;
 	//_mutex.unlock();
 }
@@ -424,6 +424,8 @@ void agent_router::prepare_stopped_packet()
 {
 	using namespace lemon;
 	node_id.clear();
+	node_id.push_back(-1);
+	node_id.push_back(-1);
 	last_time_updated = time;	
 }
 

@@ -10,7 +10,14 @@ agent_router_viewer::agent_router_viewer(std::string graphname):graphname(graphn
      length=0;
     coord_x=0;
     coord_y=0;
+    setPainterScale(35);
 }
+
+void agent_router_viewer::setPainterScale ( double scale )
+{
+    viewer_plugin::setPainterScale ( scale );
+}
+
 
 void agent_router_viewer::init(std::string filename)
 {
