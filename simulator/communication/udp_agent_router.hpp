@@ -3,7 +3,7 @@
 #include <../shared/communication/udp_receiver.hpp>
 #include <../shared/communication/udp_sender.hpp>
 
-#include <boost/thread.hpp>
+#include <thread>
 
 #include <vector>
 #include <map>
@@ -11,7 +11,7 @@
 
 #include <typedefs_topology.h>
 
-typedef boost::shared_ptr<boost::thread> thread_ptr;
+typedef std::thread* thread_ptr;
 
 template <class T>
 class Udp_agent_router
@@ -41,15 +41,13 @@ Udp_agent_router(int sim_port,int agent_port):receiverTop(service,boost::asio::i
 void start_thread()
 {
 	should_run=true;
-	t=thread_ptr(new boost::thread(boost::bind(&Udp_agent_router::service_thread,this)));
+	t=thread_ptr(new std::thread(boost::bind(&Udp_agent_router::service_thread,this)));
 }
 
 void join_thread()
 {
 	set_run(false);
 	service.stop();
-	if (t)
-	  t->interrupt();
 	if (t)
 		t->join();
 }
@@ -64,7 +62,7 @@ void set_run(bool running)
 	should_run=false;
 	service.stop();
 	if (t)
-	  t->interrupt();	
+	  t->join();	
 }
 
 

@@ -61,7 +61,7 @@ void Udp_graph_communicator::startReceive(bool printDebug)
 {
 	should_run=true;
 	this->printDebug=printDebug;
-	t=thread_ptr(new boost::thread(boost::bind(&Udp_graph_communicator::service_thread,this)));
+	t=thread_ptr(new std::thread(boost::bind(&Udp_graph_communicator::service_thread,this)));
     socket_.async_receive_from(
         boost::asio::buffer(inbound_data_, MAX_PACKET_LENGTH), listen_endpoint_,
         boost::bind(&Udp_graph_communicator::handle_receive_from, this,

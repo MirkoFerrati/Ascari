@@ -9,11 +9,11 @@
 #include "boost/bind.hpp"
 #include <typedefs_topology.h>
 #include <communication/udp_sender.hpp>
-#include <boost/thread.hpp>
+#include <thread>
 #include "define.h"
 #include <types.h>
 #include <types/graph_informations.h>
-typedef boost::shared_ptr<boost::thread> thread_ptr;
+typedef std::thread* thread_ptr;
 
 
 class Udp_graph_communicator
