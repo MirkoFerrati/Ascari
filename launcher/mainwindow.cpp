@@ -58,8 +58,6 @@ MainWindow::MainWindow ( QWidget *parent ) :
 
 }
 
-
-
 void MainWindow::closeEvent ( QCloseEvent *event )
 {
     QSettings settings;
