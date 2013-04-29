@@ -11,7 +11,7 @@
 #include "../../shared/types/graph_informations.h"
 #include <types/events.h>
 #include "udp_graph_communicator.h"
-#include <boost/thread.hpp>
+#include <thread>
 
 #define TIME_SLOT_FOR_3DGRAPH 10.0
 
