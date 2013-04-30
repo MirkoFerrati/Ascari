@@ -6,7 +6,6 @@
 #include "plugin_module.h"
 #include <yaml_parser.h>
  
-#include <boost/thread.hpp>
 #include <task_assignment_communicator.h>
 #include <assignment_problem.h>
 #include <random.hpp>

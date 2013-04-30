@@ -42,7 +42,7 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
     source = graph.nodeFromId ( targets[0] );
     target = graph.nodeFromId ( targets[1] );
     node_id.push_back ( targets[0] ); //next = source;
-	node_id.push_back ( targets[0] ); //next = source;
+    node_id.push_back ( targets[0] ); //next = source;
     target_counter = 2;
     next_time=TIME_SLOT_FOR_3DGRAPH;
     xtarget = 0;//coord_x[next];
@@ -51,7 +51,7 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
 //    setTargetStop(false);
     communicator.startReceive();
     last_time_updated = time;
-	last_time_left_a_node=0;
+    last_time_left_a_node=0;
     negotiation_steps=0;
     next_target_reachable=false;
     internal_state=state::STARTING;
@@ -61,33 +61,47 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
 
 void agent_router::run_plugin()
 {
+    priority=identifier;
+
     if ( internal_state==state::STOPPED )
     {
+        prepare_stopped_packet();
+        update_packet();
+        communicator.send ( my_LRP );
         stopAgent();
         return;
     }
 
-    if ( internal_state==state::MOVING || internal_state==state::EMERGENCY || internal_state==state::STARTING )
+    if ( internal_state==state::MOVING || internal_state==state::EMERGENCY || internal_state==state::STARTING ||internal_state==state::LOADING )
     {
-        if ( isTimeToNegotiate ( time ) )
+        if ( isTimeToNegotiate ( time ) ) //negozio anche sugli archi, basta che sia il momento giusto
         {
             internal_state=state::ARC_HANDSHAKING;
             negotiation_steps=0;
         }
-        if ( abs ( next_time- ( time+1.7 ) ) <0.001 )
+        if ( abs ( next_time- ( time+1.7 ) ) <0.001 )  //se sono su un nodo invece faccio di piu' che negoziare
         {
-            if ( setNextTarget() )
+            internal_state=state::NODE_HANDSHAKING;
+            negotiation_steps=0;
+            if ( isOnTarget() ) //se il nodo e' il mio target
             {
-                internal_state=state::NODE_HANDSHAKING;
-                negotiation_steps=0;
-            }
-            else
-            {
-                internal_state=state::STOPPED;
-                return;
+                auto oldtarget=graph.id ( target );
+                if ( setNextTarget() )  //se ci sono altri target
+                {
+                    if ( oldtarget==graph.id ( target ) ) //se il target e' ripetuto vuol dire che devo fare loading
+                    {
+                        internal_state=state::LOADING;
+			            negotiation_steps=0;
+
+                    }
+                }
+                else  //se non ci sono altri target
+                {
+                    internal_state=state::STOPPED;
+                    return;
+                }
             }
         }
-
     }
 
     if ( internal_state==state::NODE_HANDSHAKING )
@@ -130,7 +144,16 @@ void agent_router::run_plugin()
         }
     }
 
-
+    if ( internal_state==state::LOADING )
+    {
+        prepare_loading_packet();
+        priority=" "; //BRUTTO HACK
+        update_packet();
+        communicator.send ( my_LRP );
+	            negotiation_steps++;
+	if (negotiation_steps==15)
+	  internal_state=state::MOVING;
+    }
 
     if ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING || internal_state==state::ARC_HANDSHAKING )
     {
@@ -144,19 +167,25 @@ void agent_router::run_plugin()
         }
         else
         {
-			if (internal_state!=state::LISTENING)
-			{
-				old_state=internal_state;
-			}
+            if ( internal_state!=state::LISTENING )
+            {
+                old_state=internal_state;
+            }
             internal_state=state::LISTENING;
         }
 
     }
 
-
+    if ( isEmergency ( node_id ) )
+    {
+        internal_state=state::EMERGENCY;
+        prepare_emergency_packet();
+        update_packet();
+        communicator.send ( my_LRP );
+    }
 
     if ( ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING
-		|| internal_state==state::ARC_HANDSHAKING ) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
+            || internal_state==state::ARC_HANDSHAKING ) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
     {
         if ( next_target_reachable )
         {
@@ -182,7 +211,11 @@ void agent_router::run_plugin()
         stopAgent();
     }
 
-    setSpeed();
+    //if (internal_state!=state::LOADING && internal_state!=state::EMERGENCY)
+      setSpeed();
+    //cout<<"stato interno: ";
+    //print_state(internal_state);
+    //cout<<endl;
 }
 
 
@@ -191,37 +224,38 @@ bool agent_router::check_for_overtaking ()
 {
     std::cout<<"check for overtakings";
     bool overtaking = false;
-    int myage=findAge(time,last_time_left_a_node);//round ( ( round ( time * 1000.0 ) - round ( last_time_left_a_node * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+    int myage=findAge ( time,last_time_left_a_node ); //round ( ( round ( time * 1000.0 ) - round ( last_time_left_a_node * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
     _mutex.lock();
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
         if ( identifier==it->first ) continue;
-        assert(findAge(time, it->second.timestamp)==0);//0==round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH ));
-		assert ( ( *it ).second.lockedNode.size() >1 );
-		int age=findAge(time, it->second.started_moving);//round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.started_moving * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+        assert ( findAge ( time, it->second.timestamp ) ==0 ); //0==round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH ));
+//        assert ( ( *it ).second.lockedNode.size() >1 );
+        int age=findAge ( time, it->second.started_moving ); //round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.started_moving * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         for ( unsigned int j = 1; j < ( *it ).second.lockedNode.size(); j++ )
         {
-            int other_id = ( *it ).second.lockedNode[j - 1] - (j==1?age * graph_node_size:0);
+            int other_id = ( *it ).second.lockedNode[j - 1] - ( j==1?age * graph_node_size:0 );
             int other_id1 = ( *it ).second.lockedNode[j];//TODO: Attenzione!! - age * graph_node_size;
-			if (other_id1<other_id) //Impossibile almeno che other_id1 sia al piano terra
-			{
-				break;
-			}
+            if ( other_id1<other_id ) //Impossibile almeno che other_id1 sia al piano terra
+            {
+                break;
+            }
             for ( unsigned int i = 1; i < node_id.size(); i++ )
             {
-                int my_id=node_id[i-1]-(i==1?myage*graph_node_size:0);//TODO: Attenzione!!
+                int my_id=node_id[i-1]- ( i==1?myage*graph_node_size:0 ); //TODO: Attenzione!!
                 int my_id1= node_id[i];
-				if (my_id1<my_id || my_id>other_id1) //Impossibile almeno che my_id1 sia al piano terra
-				{										//se my_id>other_id1 inutile controllare i sorpassi
-					break;
-				}
+                if ( my_id1<my_id || my_id>other_id1 ) //Impossibile almeno che my_id1 sia al piano terra
+                {
+                    //se my_id>other_id1 inutile controllare i sorpassi
+                    break;
+                }
                 if ( ( my_id - other_id ) % graph_node_size == 0 &&
                         ( my_id1 - other_id1 ) % graph_node_size == 0 )
                 {
-					if(my_id==other_id)
-						WARN("collisione durante il controllo sorpassi? %d %d",my_id,other_id);
-					if(my_id1==other_id1)
-						WARN("collisione durante il controllo sorpassi? %d %d",my_id1,other_id1);
+                    if ( my_id==other_id )
+                        WARN ( "collisione durante il controllo sorpassi? %d %d",my_id,other_id );
+                    if ( my_id1==other_id1 )
+                        WARN ( "collisione durante il controllo sorpassi? %d %d",my_id1,other_id1 );
                     if (
                         my_id > other_id &&
                         my_id1< other_id1 )
@@ -248,6 +282,38 @@ bool agent_router::check_for_overtaking ()
     return overtaking;
 }
 
+bool agent_router::isEmergency ( const std::vector<int>& nodes )
+{
+    std::unique_lock<std::mutex> ( _mutex ); //.lock(); invece di lockare dato che ho piu return uso la unique_lock
+    for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it ) //per ogni pacchetto ricevuto
+    {
+        if ( identifier==it->first ) continue;
+        if ( !it->second.emergency ) continue;
+
+        cout<<"controllo se devo entrare in emergenza per colpa dell'agente:"<<it->first<<" "<<endl;
+        for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
+        {
+            int id = ( *itt );// - age * graph_node_size;  //attualizzo il nodo
+            int i=0;
+        for ( auto node:nodes )
+            {
+                i++;
+                if ( i>4 ) break;
+                if ( node%graph_node_size==id%graph_node_size )
+                {
+                    cout<<"emergenza!!"<<endl;
+                    return true;
+                }
+
+            }
+        }
+
+    }
+    //cout<<"nessuna emergenza"<<endl;
+    return false;
+    //_mutex.unlock();
+}
+
 
 void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< bool >& useArc )
 {
@@ -256,7 +322,7 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
     {
         if ( identifier==it->first ) continue;
         if ( identifier.compare ( it->first ) <0 ) continue;  //se il pacchetto ha priorita' piu' alta
-        int age = findAge(time, it->second.timestamp);//round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+        int age = findAge ( time, it->second.timestamp ); //round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         cout<<"filtro i nodi dell'agente:"<<it->first<<" ";
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
         {
@@ -277,16 +343,16 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
 bool agent_router::detect_collision ( )
 {
     bool collision = false;
-	std::ostringstream out;
+    std::ostringstream out;
     out<<"ricerca collisione:";
-	int my_age=findAge(time, last_time_updated);//round ( ( round ( time * 1000.0 ) - round ( last_time_updated * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
-	
+    int my_age=findAge ( time, last_time_updated ); //round ( ( round ( time * 1000.0 ) - round ( last_time_updated * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+
     _mutex.lock();
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
         if ( identifier==it->first ) continue;
         if ( identifier.compare ( it->first ) <0 ) continue;
-        int age = findAge(time, it->second.timestamp);//round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
+        int age = findAge ( time, it->second.timestamp ); //round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )
         {
             int id = ( *itt ) - age * graph_node_size;
@@ -310,8 +376,8 @@ bool agent_router::detect_collision ( )
     }
     _mutex.unlock();
     out<<"ricerca collisione completata"<<endl;
-if (collision)
-	cout<<out.str();
+    if ( collision )
+        cout<<out.str();
     return collision;
 }
 
@@ -334,7 +400,7 @@ void agent_router::update_packet()
     my_LRP.priority = priority;
     my_LRP.lockedNode = node_id;
     my_LRP.timestamp = last_time_updated;
-	my_LRP.started_moving = last_time_left_a_node;
+    my_LRP.started_moving = last_time_left_a_node;
     my_LRP.emergency=internal_state==state::EMERGENCY;
 }
 
@@ -361,6 +427,30 @@ void agent_router::prepare_move_packet()
     }
     last_time_updated = time;
 }
+void agent_router::prepare_stopped_packet()
+{
+    using namespace lemon;
+    node_id.clear();
+    node_id.push_back ( -1 );
+    node_id.push_back ( -1 );
+    last_time_updated = time;
+}
+
+void agent_router::prepare_loading_packet()
+{
+    using namespace lemon;
+
+    node_id.clear();
+    int i = 0;//target_counter;
+    node_id.push_back(graph.id(source));
+    assert(targets[target_counter-1]==graph.id ( target ));
+    while ( targets[target_counter-1+i]==graph.id ( target ) )
+    {
+        node_id.push_back ( graph.id ( target ) +graph_node_size*(i+1) );
+        i++;
+    }
+    last_time_updated = time;
+}
 
 
 void agent_router::setSpeed()
@@ -370,7 +460,7 @@ void agent_router::setSpeed()
         speed=0;
         return;
     }
-    assert(node_id.size()>1);
+    assert ( node_id.size() >1 );
     SmartDigraphBase::Node next=graph.nodeFromId ( node_id[1] );
     xtarget =  coord_x[next];
     ytarget =  coord_y[next];
@@ -387,25 +477,34 @@ void agent_router::setSpeed()
     }
 }
 
-bool agent_router::setNextTarget()
+bool agent_router::isOnTarget()
 {
-    assert ( node_id.size()>1 );
+    assert ( node_id.size() >1 );
     source = graph.nodeFromId ( node_id[1] % graph_node_size );
     if ( graph.id ( source ) == graph.id ( target ) )
+        return true;
+    return false;
+}
+
+bool agent_router::setNextTarget()
+{
+//     assert ( node_id.size()>1 );
+//     source = graph.nodeFromId ( node_id[1] % graph_node_size );
+//     if ( graph.id ( source ) == graph.id ( target ) )
+//     {
+    if ( target_counter == targets.size() )
     {
-        if ( target_counter == targets.size() )
-        {
-            cout << " TARGET FINALE raggiunto, mi fermo" << endl;
-            return false;
-        }
-        else
-        {
-            int id = targets[target_counter];
-            target_counter++;
-            target = graph.nodeFromId ( id );
-            cout << time << ": TARGET raggiunto, nuovo target: " << id << " " << coord_x [target] << " " << coord_y[target] << endl;
-            return true;
-        }
+        cout << " TARGET FINALE raggiunto, mi fermo" << endl;
+        return false;
     }
-    return true;
+    else
+    {
+        int id = targets[target_counter];
+        target_counter++;
+        target = graph.nodeFromId ( id );
+        cout << time << ": TARGET raggiunto, nuovo target: " << id << " " << coord_x [target] << " " << coord_y[target] << endl;
+        return true;
+    }
+//     }
+//     return true;
 }

@@ -21,6 +21,26 @@
 
 using namespace std;
 
+
+void agent_router::print_state(state s)
+{
+	stringstream os;
+		switch( s )
+		{
+			case state::MOVING: os << "moving"; break;
+			case state::LISTENING: os << "listening"; break;
+			case state::LOADING: os << "loading"; break;
+			case state::ARC_HANDSHAKING: os << "arc_handshaking"; break;
+			case state::NODE_HANDSHAKING: os << "node_handshaking"; break;
+			case state::EMERGENCY: os << "emergency"; break;
+			case state::STARTING: os << "starting"; break;
+			case state::STOPPED: os << "stopped"; break;
+			default: assert(0);
+		}
+		cout<<os.str();
+	
+}
+
 void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_table)
 {
 	symbol_table.add_variable("XTARGET",xtarget,false);

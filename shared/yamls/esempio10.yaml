@@ -1,0 +1,118 @@
+#agente che gira nel magazzino con il modulo router attivo
+- WORLD:
+  - bonus_variables: [c]
+    c: 1
+  AGENTS:
+  - agent: Agente1
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta,v_start]
+    control_commands: [v,w]
+    INITIAL:
+    - &initial
+      x: '-99'
+      y: '120'
+      theta: '0'
+      v_start: '5'
+    STATE_START: GO
+    TARGET_LIST: [0,1,2,3,4,5,6,7,8]
+    DYNAMIC_MAP:
+    - &dynamic
+      x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: w
+      v_start: 0
+    BEHAVIOR:
+    - &machine
+      name: machine 
+      CONTROLLERS:
+      - name: go
+        v: v_start
+        w: sin(atan2(ytarget-y,xtarget-x)-theta)*10
+      - name: wait
+        v: 0
+        w: 0
+      DISCRETE_STATES:
+      - name: go
+        controller: go
+      - name: wait
+        controller: wait
+      - name: wait_for_target
+        controller: wait
+      ENCODER:
+      - TOPOLOGY:
+          - topology: [t1]
+            t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+        LAMBDA:
+          - lambda: [Lreached] 
+            Lreached: abs(x-xtarget)<3 and abs(y-ytarget)<3
+      EVENTS:
+      - events: [someone, reached, new_target, stopped, started]
+        someone: t1
+        clear: !t1
+        reached: Lreached
+        new_target: !Lreached
+        stopped: ''
+        started: ''
+      AUTOMATON:
+      - name: aut_machine
+        GO:
+          - WAIT: [stopped]
+            WAIT_FOR_TARGET: [reached]
+            WAIT_CLEAR: [someone]
+        WAIT:
+          - GO: [started]
+        WAIT_CLEAR:
+          - GO: [clear]
+        WAIT_FOR_TARGET:
+          - GO: [new_target]
+  - agent: Agente2
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta,v_start]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '30'
+      y: '30'
+      theta: '0'
+      v_start: '6'
+    STATE_START: GO
+    TARGET_LIST: [8,7,6,5,8,1]
+    DYNAMIC_MAP:
+    - *dynamic
+    BEHAVIOR:
+    - *machine
+  - agent: Agente3
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta,v_start]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '135'
+      y: '-60'
+      theta: '0'
+      v_start: '7'
+    STATE_START: GO
+    TARGET_LIST: [4,5,6,7,0]
+    DYNAMIC_MAP:
+    - *dynamic
+    BEHAVIOR:
+    - *machine
+  - agent: Agente4
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    states: [x,y,theta,v_start]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '135'
+      y: '30'
+      theta: '0'
+      v_start: '8'
+    STATE_START: GO
+    TARGET_LIST: [3,2,1,8,5,6]
+    DYNAMIC_MAP:
+    - *dynamic
+    BEHAVIOR:
+    - *machine

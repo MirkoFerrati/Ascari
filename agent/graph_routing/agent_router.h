@@ -11,12 +11,12 @@
 #include "../../shared/types/graph_informations.h"
 #include <types/events.h>
 #include "udp_graph_communicator.h"
-#include <boost/thread.hpp>
+#include <thread>
 
 #define TIME_SLOT_FOR_3DGRAPH 10.0
 
 
-enum  class state
+enum class state
 {
     MOVING,
     LISTENING,
@@ -24,8 +24,10 @@ enum  class state
     ARC_HANDSHAKING,
     EMERGENCY,
     STOPPED,
-    STARTING
+    STARTING,
+	LOADING,
 };
+
 
 class agent_router: public Plugin_module
 {
@@ -45,10 +47,12 @@ public:
 
 private:
     bool findPath ( lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< bool >& useArc );
+	bool isEmergency(const std::vector<int>& nodes);
     bool setNextTarget();
     void setSpeed();
     void stopAgent ();
     void startAgent ();
+	bool isOnTarget();
     bool target_reached();
     void prepare_move_packet();
     void prepare_emergency_packet();
@@ -59,6 +63,9 @@ private:
     bool isTimeToNegotiate(simulation_time time);
     void print_path();
 	int findAge(simulation_time present_time, simulation_time old_time);
+    void prepare_stopped_packet();
+	void prepare_loading_packet();
+	void print_state( state s );
 private:
     state internal_state;
     bool next_target_reachable;
@@ -99,6 +106,8 @@ private:
     Udp_graph_communicator communicator;
     std::string priority;
 
+	
+	
 };
 
 #endif // AGENT_ROUTER_H
