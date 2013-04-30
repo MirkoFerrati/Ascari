@@ -14,7 +14,8 @@
 #include <QtCore/QTimer>
 #include <QtGui/QApplication>
 #include <QtGui/QGridLayout>
-
+#include "task_assignment_viewer.h"
+#include "monitor_viewer.h"
 #include <osgViewer/CompositeViewer>
 #include <osgViewer/ViewerEventHandlers>
 

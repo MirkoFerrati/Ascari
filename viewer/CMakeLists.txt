@@ -10,7 +10,7 @@ include(${QT_USE_FILE})
 
 set(viewer_HEADERS gui/Agent.h gui/viewer.h communication/udp_world_sniffer.h ../shared/communication/global.h)
 set(viewer_SOURCES gui/baseball_viewer.cpp gui/agent_router_viewer.cpp gui/task_assignment_viewer.cpp gui/monitor_viewer.cpp gui/main.cpp gui/Agent.cpp gui/viewer.cpp
-../shared/communication/global.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp osgviewerqt.cpp)
+../shared/communication/global.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp osgviewerqt.cpp 
 communication/udp_world_sniffer.cpp communication/zmq_world_sniffer.hpp communication/zmq_identifier_sniffer.hpp 
 ../shared/communication/global.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../shared/objects/task_assignment_task.cpp)
 
