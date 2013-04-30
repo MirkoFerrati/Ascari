@@ -3,7 +3,10 @@
 
 #include "plugin_module.h"
 #include "communication/empty_plugin_communicator.hpp"
-#include "typedefs.h"
+#include <types/events.h>
+#include <types/empty_packet.h>
+#include <types.h>
+
 
 
 

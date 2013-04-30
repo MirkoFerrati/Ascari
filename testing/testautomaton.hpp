@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 #include <string>
-#include "typedefs.h"
+#include <assert.h>
 #include "testClass.h"
 
 using namespace std;

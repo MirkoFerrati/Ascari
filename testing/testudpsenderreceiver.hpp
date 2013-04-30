@@ -3,13 +3,14 @@
 
 #include <../shared/communication/udp_receiver.hpp>
 #include <../shared/communication/udp_sender.hpp>
+#include <types/agents_name_to_states.h>
 
 
 
 #include <vector>
 #include <map>
 #include <string>
-#include "typedefs.h"
+
 #include "testClass.h"
 
 using namespace std;

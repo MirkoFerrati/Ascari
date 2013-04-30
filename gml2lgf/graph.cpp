@@ -74,6 +74,22 @@ ostream &operator<<( ostream &out, const graph &g ){
   return out;
 }
 
+string graph::tolgf()
+{
+  stringstream out;
+  out<<"@nodes"<<endl;
+  out<<"label\tcoordinates_x\tcoordinates_y"<<endl;
+  for (unsigned int i=0;i<nodes.size();i++)
+    out<<nodes[i]<<endl;
+  out<<"@arcs"<<endl;
+  out<<"\t\tlabel\tlength"<<endl;
+  for (unsigned int i=0;i<arcs.size();i++)
+    out<<arcs[i]<<endl;
+  return out.str();
+
+}
+
+
 graph::~graph()
 {
 

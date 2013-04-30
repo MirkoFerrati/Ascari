@@ -1,9 +1,10 @@
 #ifndef VIEWER_COMMUNICATOR_ABSTRACT_H
 #define VIEWER_COMMUNICATOR_ABSTRACT_H
 
-#include "typedefs.h"
+
 #include <vector>
 #include <string>
+#include <types/world_sim_packet.h>
 
 
 namespace simulator_namespace

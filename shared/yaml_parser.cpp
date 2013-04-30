@@ -191,7 +191,7 @@ void createTaskList ( const YAML::Node& node, task_assignment_namespace::task_li
 {
     unsigned int j=0;
 
-    for ( unsigned int i=0; i<task_number*7; )
+    for ( unsigned int i=0; i<task_number*8; )
     {
         task_assignment_namespace::task_id temp1;
         node[i] >> temp1;
@@ -199,16 +199,23 @@ void createTaskList ( const YAML::Node& node, task_assignment_namespace::task_li
 
         task_assignment_namespace::task temp2;
 
+	node[i] >> temp2.id;
         node[i+1] >> temp2.task_position[0];
         node[i+2] >> temp2.task_position[1];
         node[i+3] >> temp2.task_position[2];
         node[i+4] >> temp2.task_type;
         node[i+5] >> temp2.task_execution_time;
-        node[i+6] >> temp2.task_deadline;
+	node[i+6] >> temp2.period;
+        node[i+7] >> temp2.task_deadline;
+	
+	temp2.executing=false;
+	temp2.owner="";
+	temp2.time=0;
+	temp2.available=true;
 
         task_list.insert ( make_pair ( temp1,temp2 ) );
 
-        i=i+7;
+        i=i+8;
         j++;
     }
 }
@@ -429,8 +436,7 @@ void operator>> ( const YAML::Node& node, Parsed_World& wo )
 		node[0]["WORLD"][0]["TASK_ASSIGNMENT_ALGORITHM"]>>algorithm;
 		
 		if (algorithm == "SUBGRADIENT" ) wo.task_assignment_algorithm = SUBGRADIENT; 
-		if (algorithm == "SOLUTION_EXCHANGE" ) wo.task_assignment_algorithm = SOLUTION_EXCHANGE;
-		if (algorithm == "COST_EXCHANGE") wo.task_assignment_algorithm = COST_EXCHANGE;
+
 		if (wo.task_assignment_algorithm == -1)
 		{
 		      ERR("UNDEFINED TASK ASSIGNMENT ALGORITHM",NULL);

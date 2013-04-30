@@ -50,6 +50,8 @@
   - bonus_variables: [c]
     c: 1
     GRAPH_NAME: 'test5.gml.lgf'
+    TASK_NUMBER: 5
+    TASK_LIST: [T1,1,1,0,2,35,0,T2,12,10,0,1,50,120,T3,3,10,0,1,45,0,T4,12,4,0,1,40,0,RECHARGE,7,7,0,0,100,0]
   AGENTS:
   - agent: Agente11
 #     VISIBLE_AREA: circle(9)

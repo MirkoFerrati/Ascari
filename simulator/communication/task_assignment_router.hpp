@@ -9,7 +9,7 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <typedefs.h>
+ 
 
 class task_assignment_router_base
 {
@@ -42,7 +42,7 @@ class task_assignment_router: public simulator_to_agent_ta_communicator<datatype
 			
 			for (unsigned int i=0;i<temp.size();i++)
 			{
-				std::cout<<">> RESEND: "<<data.at(i).agent_id<<std::endl;
+				//std::cout<<">> RESEND: "<<data.at(i).agent_id<<std::endl;
 				this->send(data.at(i));
 			}
 		      
@@ -52,8 +52,9 @@ class task_assignment_router: public simulator_to_agent_ta_communicator<datatype
 
     public:
 
-	task_assignment_router()
+	task_assignment_router(unsigned int num_agent)
 	{
+		init(num_agent);
 		this->start_thread();
 	}
 	

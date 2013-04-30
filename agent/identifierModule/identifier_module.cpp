@@ -1,5 +1,7 @@
 #include "identifier_module.h"
 #include "../shared/debug_constants.h"
+#include <types/monitor_packet.h>
+#include <types/monitor_result.h>
 #include <thread>
 
 using namespace std;
@@ -8,7 +10,7 @@ using namespace std;
 
 identifier_module::identifier_module ( Parsed_World const& W, const std::map<int, double> & sensed_bonus_variables, const std::map<std::string, int> & map_bonus_variables_to_id,
                                        std::shared_ptr<agent_namespace::world_communicator_abstract>& comm, const simulation_time& sensed_time, std::string owner ) :
-    parsed_world ( W ),owner ( owner ),agent_world_comm ( comm ),  agent_packet ( last_sensed_agents.bonus_variables,last_sensed_agents.time ),sensed_bonus_variables ( sensed_bonus_variables ),
+    parsed_world ( W ),owner ( owner ),agent_world_comm ( comm ),  agent_packet ( last_sensed_agents.bonus_variables,last_sensed_agents.time, last_sensed_agents.objects ),sensed_bonus_variables ( sensed_bonus_variables ),
     map_bonus_variables_to_id ( map_bonus_variables_to_id ),sensed_time ( sensed_time ),real_semaphore1(buffer_lenght),
 real_semaphore2(0)
 {

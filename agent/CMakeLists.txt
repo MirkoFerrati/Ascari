@@ -10,18 +10,18 @@ set(agent_SOURCES empty_plugin/empty_plugin.cpp
 	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp 
 	identifierModule/agent_to_dummy_communicator.hpp identifierModule/dummy_agent.hpp
 	identifierModule/identifier_module.cpp identifierModule/identifierModule_communicator.hpp
-	
+	../shared/objects/task_assignment_task.cpp
 )
 
 #add_definitions(-DZMQDEBUG)
 
 FIND_PACKAGE(GLPK 4.33)
 
-set(GLPK_FOUND 0)
+set(GLPK_FOUND 1)
 if (${GLPK_FOUND})
 add_definitions(-DGLPK_FOUND)
 #written by Alessandro Settimi
-set (agent_SOURCES ${agent_SOURCES} task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/algorithms_utility.cpp task_assignment/solution_exchange_algorithm.cpp task_assignment/cost_exchange_algorithm.cpp task_assignment/subgradient_algorithm.cpp task_assignment/bilp_problem.cpp)
+set (agent_SOURCES ${agent_SOURCES} task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/algorithms_utility.cpp task_assignment/subgradient_algorithm.cpp task_assignment/assignment_problem.cpp task_assignment/dubins.cpp)
 #written by Alessandro Settimi
 endif (${GLPK_FOUND})
 
@@ -72,9 +72,11 @@ MESSAGE(STATUS "Process file: ${infileName}")
 configure_file(${infileName} ./ COPYONLY)
 endforeach(${infileName})
 
-configure_file(../shared/graphs/test2.gml.lgf test2.gml.lgf COPYONLY)
-configure_file(../shared/graphs/test3.gml.lgf test3.gml.lgf COPYONLY)
-configure_file(../shared/graphs/test4.gml.lgf test4.gml.lgf COPYONLY)
-configure_file(../shared/graphs/test5.gml.lgf test5.gml.lgf COPYONLY)
+file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/agent" "../shared/graphs/*.lgf")
+FOREACH(infileName ${yaml_files})
+MESSAGE(STATUS "Process file: ${infileName}")
+configure_file(${infileName} ./ COPYONLY)
+endforeach(${infileName})
+
 configure_file(test.sh test.sh COPYONLY)
 

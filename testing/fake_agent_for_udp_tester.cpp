@@ -3,7 +3,7 @@
 #include <../agent/communication/udp_agent_communicator.h>
 #include <boost/signals2/mutex.hpp>
 #include <../shared/communication/udp_receiver.hpp>
-#include <boost/thread.hpp>
+#include <thread>
 #include "logog.hpp"
 class fake_agent_for_udp_tester
 {
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
         data.data["mario"]["gnomo"]["t2"]=0;
     }
     fake_agent_for_udp_tester f(&data,io_service1,io_service);
-	boost::thread   t(service_thread);
+	std::thread   t(service_thread);
 	f.start();
 	should_run=false;
 	io_service.stop();

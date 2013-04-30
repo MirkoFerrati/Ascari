@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(gml2lgf)
+project(gmlreader)
 
-add_executable(gml2lgf utils.cpp main.cpp node.cpp graph.cpp arc.cpp)
+add_executable(gmlreader utils.cpp gmlreader.hpp main.cpp node.cpp graph.cpp arc.cpp)

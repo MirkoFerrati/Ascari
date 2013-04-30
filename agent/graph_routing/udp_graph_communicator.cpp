@@ -1,8 +1,9 @@
 #include "udp_graph_communicator.h"
+#include <types/graph_informations.h>
 
 Udp_graph_communicator::Udp_graph_communicator(std::mutex& mutex,graph_packet* tp,boost::asio::io_service& io_service,std::string identifier)
-        :mutex(mutex),tp(tp),socket_(io_service),sender(io_service,boost::asio::ip::address::from_string(MULTICAST_ADDRESS),SIMULATOR_GRAPH_PORT)
-        ,listen_endpoint_(boost::asio::ip::address::from_string(SOCKET_BINDING), AGENT_GRAPH_PORT),_io_service(io_service),identifier(identifier)
+	:identifier(identifier),mutex(mutex),tp(tp),socket_(io_service),sender(io_service,boost::asio::ip::address::from_string(MULTICAST_ADDRESS),SIMULATOR_GRAPH_PORT)
+		,listen_endpoint_(boost::asio::ip::address::from_string(SOCKET_BINDING), AGENT_GRAPH_PORT),_io_service(io_service)
 {
     mutex_is_mine=false;
 	printDebug=false;
@@ -60,7 +61,7 @@ void Udp_graph_communicator::startReceive(bool printDebug)
 {
 	should_run=true;
 	this->printDebug=printDebug;
-	t=thread_ptr(new boost::thread(boost::bind(&Udp_graph_communicator::service_thread,this)));
+	t=thread_ptr(new std::thread(boost::bind(&Udp_graph_communicator::service_thread,this)));
     socket_.async_receive_from(
         boost::asio::buffer(inbound_data_, MAX_PACKET_LENGTH), listen_endpoint_,
         boost::bind(&Udp_graph_communicator::handle_receive_from, this,

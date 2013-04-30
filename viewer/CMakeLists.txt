@@ -9,8 +9,10 @@ find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
 include(${QT_USE_FILE})
 
 set(viewer_HEADERS gui/Agent.h gui/viewer.h communication/udp_world_sniffer.h ../shared/communication/global.h)
-set(viewer_SOURCES gui/main.cpp gui/Agent.cpp gui/viewer.cpp communication/udp_world_sniffer.cpp communication/zmq_world_sniffer.hpp communication/zmq_identifier_sniffer.hpp 
+set(viewer_SOURCES gui/baseball_viewer.cpp gui/agent_router_viewer.cpp gui/task_assignment_viewer.cpp gui/monitor_viewer.cpp gui/main.cpp gui/Agent.cpp gui/viewer.cpp
 ../shared/communication/global.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp osgviewerqt.cpp)
+communication/udp_world_sniffer.cpp communication/zmq_world_sniffer.hpp communication/zmq_identifier_sniffer.hpp 
+../shared/communication/global.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../shared/objects/task_assignment_task.cpp)
 
 #set(viewer_UIS myproject.ui)
 #set(viewer_RESOURCES myproject.qrc)
@@ -38,7 +40,8 @@ target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
   
 target_link_libraries(viewer ${Boost_LIBRARIES} pthread zmq)
 target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
-configure_file(../shared/graphs/test2.gml.lgf test2.gml.lgf COPYONLY)
-configure_file(../shared/graphs/test3.gml.lgf test3.gml.lgf COPYONLY)
-configure_file(../shared/graphs/test4.gml.lgf test4.gml.lgf COPYONLY)
-configure_file(../shared/graphs/test5.gml.lgf test5.gml.lgf COPYONLY)
+file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/agent" "../shared/graphs/*.lgf")
+FOREACH(infileName ${yaml_files})
+MESSAGE(STATUS "Process file: ${infileName}")
+configure_file(${infileName} ./ COPYONLY)
+endforeach(${infileName})

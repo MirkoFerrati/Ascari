@@ -4,7 +4,8 @@
 
 #include <vector>
 #include <string>
-#include <typedefs.h>
+#include <map>
+#include <types/agent_state_packet.h>
 
 
 class Agent
@@ -37,6 +38,10 @@ class Agent
 		if (this->minY>y)
 		this->minY=y;
 		
+		//written by Alessandro Settimi
+		if((temp=agent.state.find(charge_index))!=agent.state.end())
+		  charge=temp->second;
+		//written by Alessandro Settimi
 	}
 	  
     inline double getMaxX(){
@@ -57,7 +62,11 @@ class Agent
     double y;
     double x;
     double angle;
-
+    
+    //written by Alessandro Settimi
+    double charge;
+    
+    //written by Alessandro Settimi
 
 private:
     std::string agent_name;
@@ -65,6 +74,7 @@ private:
     int angle_index;
     int x_index;
     int y_index;
+    int charge_index;
     void init();
 
 	

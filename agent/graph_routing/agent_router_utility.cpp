@@ -6,7 +6,7 @@
 #include <agent.h>
 #include <lemon/adaptors.h>
 #include <cassert>
-#include "typedefs.h"
+
 #include <lemon/smart_graph.h>
 #include <lemon/lgf_reader.h>
 #include <lemon/lgf_writer.h>
@@ -20,6 +20,26 @@
 
 
 using namespace std;
+
+
+void agent_router::print_state(state s)
+{
+	stringstream os;
+		switch( s )
+		{
+			case state::MOVING: os << "moving"; break;
+			case state::LISTENING: os << "listening"; break;
+			case state::LOADING: os << "loading"; break;
+			case state::ARC_HANDSHAKING: os << "arc_handshaking"; break;
+			case state::NODE_HANDSHAKING: os << "node_handshaking"; break;
+			case state::EMERGENCY: os << "emergency"; break;
+			case state::STARTING: os << "starting"; break;
+			case state::STOPPED: os << "stopped"; break;
+			default: assert(0);
+		}
+		cout<<os.str();
+	
+}
 
 void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_table)
 {
@@ -40,6 +60,11 @@ void agent_router::compileExpressions(exprtk::symbol_table< double >& symbol_tab
 // 		throw "impossibile creare l'espressione";
 	}
 	
+}
+
+int agent_router::findAge(simulation_time present_time, simulation_time old_time)
+{
+	return round ( ( round ( present_time * 1000.0 ) - round ( old_time * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
 }
 
 void agent_router::print_path()
@@ -88,29 +113,16 @@ void agent_router::setTarget(lemon::SmartDigraphBase::Node t)
 }
 
 
-std::pair< int, int > agent_router::getTargetCoords()
-{
-	return std::pair<int,int> ((coord_x)[next] , (coord_y)[next]);
-}
+// std::pair< int, int > agent_router::getTargetCoords()
+// {
+// 	return std::pair<int,int> ((coord_x)[next] , (coord_y)[next]);
+// }
 
 void agent_router::setGraph(lemon::SmartDigraph& g)
 {
 	lemon::digraphCopy<lemon::SmartDigraph,lemon::SmartDigraph>(g,graph); //graph=g;
 }
 
-void agent_router::setSpeed()
-{
-    simulation_time delta = next_time - time;
-    int floor = trunc(graph.id ( next ) / graph_node_size);
-    if ( floor ==0 ) //floor==0 nei double
-        speed = 0;
-    else
-    {
-        double length = distance_to_target.value();
-	speed=length/delta;
-        //cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
-    }
-}
 
 bool agent_router::isTimeToNegotiate( simulation_time time )
 {

@@ -1,0 +1,112 @@
+#Rosa a 6
+- BEHAVIORS:
+  - name: prova
+    states: [x,y,theta]
+    control_commands: [v,w]
+    DYNAMIC_MAP:
+    - x: 'v*cos(w)'
+      y: 'v*sin(w)'
+      theta: '5*sin(w-theta)'
+    CONTROLLERS:
+    - name: go
+      v: v_router
+      w: atan2(ytarget-y,xtarget-x)
+    - name: wait
+      v: 0
+      w: 0
+    DISCRETE_STATES:
+    - name: go
+      controller: go
+    - name: wait
+      controller: wait
+    - name: wait_for_target
+      controller: wait
+    ENCODER:
+    - TOPOLOGY:
+      - topology: [t1]
+        t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+      LAMBDA:
+      - lambda: [Lreached] 
+        Lreached: 'abs(x-xtarget)<3 and abs(y-ytarget)<3'
+    EVENTS:
+    - events: [reached, new_target, stopped, started]
+      reached: 'Lreached'
+      new_target: '!Lreached'
+      stopped: ''
+      started: ''
+    AUTOMATON:
+    - name: aut_machine
+      GO:
+      - WAIT: [stopped]
+        WAIT_FOR_TARGET: [reached]
+      WAIT:
+      - GO: [started]
+      WAIT_FOR_TARGET:
+      - GO: [new_target]
+
+  WORLD:
+  - bonus_variables: [c]
+    c: 1
+    GRAPH_NAME: 'loading.gml.lgf'
+
+  AGENTS:
+  - agent: Agente1
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '165'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [0,4,6,8,1,3,5,35]
+    BEHAVIOR: prova
+
+  - agent: Agente2
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [8,4,2,3,6,7,1,3,35]
+    BEHAVIOR: prova
+
+  - agent: Agente3
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: prova
+
+  - agent: Agente4
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [7,8,2,3,5,1,7,2,35]
+    BEHAVIOR: prova
+
+  - agent: Agente5
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [6,2,7,3,5,1,7,35]
+    BEHAVIOR: prova
+
+  - agent: Agente6
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: prova
+

@@ -3,7 +3,7 @@
 #include <plugin_module.h>
 #include <agent.h>
 #include <yaml_parser.h>
-#include "typedefs.h"
+
 #include <dynamic.h>
 #include <forward_list>
 #include "agent_to_dummy_communicator.hpp"

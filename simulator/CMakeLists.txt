@@ -1,3 +1,4 @@
+link_directories(/usr/local/lib)
 
 
 add_executable(simulator collisionchecker.cpp ../shared/dynamic.cpp 
@@ -5,6 +6,7 @@ communication/udp_agent_communicator.cpp simulator.cpp main.cpp communication/zm
 communication/agent_communicator_abstract.h ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp 
 communication/zmq_agent_communicator.cpp ../shared/communication/global.cpp visibility/visibility.cpp
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/zmq_communicator.hpp communication/task_assignment_router.hpp
+	../shared/objects/task_assignment_task.cpp visibility/map2d.cpp ../gml2lgf/graph.cpp ../gml2lgf/node.cpp ../gml2lgf/arc.cpp ../gml2lgf/gmlreader.hpp
 )
 
 add_subdirectory(parser)
@@ -24,9 +26,10 @@ target_link_libraries(simulator zmq)
 
  find_package(Boost REQUIRED system thread serialization)
  
-target_link_libraries(simulator ${Boost_LIBRARIES} pthread)
+target_link_libraries(simulator pthread)
 target_link_libraries(simulator ${Boost_LIBRARIES} boost_regex)
 target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
+target_link_libraries(simulator rt)
 
 
 include_directories(../shared)
@@ -41,4 +44,9 @@ MESSAGE(STATUS "Process file: ${infileName}")
 configure_file(${infileName} ./ COPYONLY)
 endforeach(${infileName})
 
-configure_file(../shared/graphs/test2.gml.lgf test2.gml.lgf COPYONLY)
+configure_file(../shared/graphs/museum.gml museum.gml COPYONLY)
+file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/agent" "../shared/graphs/*.lgf")
+FOREACH(infileName ${yaml_files})
+MESSAGE(STATUS "Process file: ${infileName}")
+configure_file(${infileName} ./ COPYONLY)
+endforeach(${infileName})

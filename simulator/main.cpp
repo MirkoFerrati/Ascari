@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include "typedefs.h"
+
 #include "debug_constants.h"
 #include "simulator.h"
 #include "time.h"
@@ -22,6 +22,8 @@ int main(int argc, char **argv) {
   
 	srand(time(NULL));
     LOGOG_INITIALIZE();	
+	std::thread exiting;
+	static_zmq::context=new zmq::context_t(1);
     {
         logog::Cout out;
         simulator s;
@@ -59,8 +61,11 @@ int main(int argc, char **argv) {
 		s.start_sim();
     
 	std::cout << "Hello, world! simulator" << std::endl;
+	exiting=std::thread ( []() {  delete(static_zmq::context);    }     );
 	
     }
+    exiting.join();
+	
     LOGOG_SHUTDOWN();
     return 0;
 }

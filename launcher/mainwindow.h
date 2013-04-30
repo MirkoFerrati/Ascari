@@ -2,12 +2,15 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QCheckBox>
 #include <QSettings>
 #include "yaml_parser.h"
 #include <QProcess>
+#include "QDebugStream.hpp"
 #include <boost/asio.hpp>
 #include <viewer.h>
 #include <udp_world_sniffer.h>
+#include "../shared/types/monitor_packet.h"
 namespace Ui
 {
 class MainWindow;
@@ -36,20 +39,32 @@ private slots:
 
     void on_StartSimulator_clicked();
 
+	void on_PauseSimulator_clicked();
+	
     void on_Updateshell_clicked();
 
     void on_StartViewer_clicked();
 
     void on_playall_clicked();
+	
+	void on_stopall_clicked();
 
     void closeEvent(QCloseEvent *event);
     
+	void simulatorExited(int exitcode,QProcess::ExitStatus exitstatus);
+	
+	void agentSelected(int);
+	
     bool startViewer();
     void startAgents();
     void startSimulator();
 
+
+    void on_selectAll_stateChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
+	QDebugStream *qout,*qerr;
     QProcess *simulator;
     boost::asio::io_service io_service;
     //std::vector<char> buffer;
@@ -60,12 +75,14 @@ private:
     QSettings *settings;
     Parsed_World world;
     Viewer * insideViewer;
+    std::vector<viewer_plugin*> plugins;
+    std::vector<QCheckBox*> agentcontainer;
     std::unique_ptr<world_sniffer_abstract> sniffer;
-
     std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
-
     std::vector<QProcess*> agents;
     QString fileName,simulatorPath,agentPath,viewerPath;
+    int selectedAgents;
+    bool disable;
 };
 
 #endif // MAINWINDOW_H

@@ -10,13 +10,14 @@ class arc
 {
 
   
-  int first;
-  int second;
   double len;
   void readLabelGraphics(std::fstream* arg1);
   
   
 public:
+  int first;
+  int second;
+  
   std::string name;
     arc();
     

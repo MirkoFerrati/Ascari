@@ -1,149 +1,210 @@
 //written by Alessandro Settimi
 #include "task_assignment.h"
 #include <agent.h>
-#include "typedefs.h"
+
 
 using namespace task_assignment_namespace;
+
+bool task_assignment::convergence_control_routine()
+{
+     bool a=1;
+     unsigned int iter=0;
+     unsigned int control=0;
+     
+     unsigned int fr = count_free_robots();
+     unsigned int ut = count_undone_task();
+     
+     std::cout<<"FREE ROBOTS: "<<fr<<std::endl;
+     std::cout<<"UNDONE TASK: "<<ut<<std::endl;
+     
+     if ( fr < ut ) control=fr;
+     else control=ut;
+
+     std::cout<<"TASK DONE or ASSIGNED: "<<num_task-ut-recharge_is_present()<<" CONTROL :"<<control<<std::endl; //TODO:-1 se c'è recharge
+     
+     for (unsigned int i=0;i<num_task;i++)
+     {
+	    if (fabs(total_subgradient.at(i)) < 0.01) iter++;
+     }
+
+     std::cout<<"zeri in SIGMA: "<<iter<<std::endl;
+     
+     if(iter==control)
+     {
+	  step++;
+	  std::cout<<"passi stabili: "<<step<<std::endl;
+     }
+     
+     if(!(iter==control))
+     {
+	  step=0;
+     }
+      
+     a = a && (step>5);
+	 
+     if(a)
+     {
+	    std::cout<<"CONVERGE"<<std::endl;
+     }
+	  
+     return a;
+}
+
 
 bool find_mininum_pair_task_id_cost(std::pair<task_id,task_cost> i,std::pair<task_id,task_cost> j)
 {
       return i.second < j.second;
 }
 
+void task_assignment ::control_print()
+{
+	std::cout<<"F: |";
+	for (unsigned int i=0;i<num_task;i++)
+	{
+	      std::cout<<F.at(i)<<'|';
+	}
+	std::cout<<std::endl<<std::endl;
+	
+	std::cout<<"D: |";
+	for (unsigned int i=0;i<num_task;i++)
+	{
+	      std::cout<<D.at(i)<<'|';
+	}
+	std::cout<<std::endl<<std::endl;
+	
+	
+	
+	std::cout<<"SELECTED TASK: "<<selected_task<<std::endl<<std::endl;
+	
+	printTaskCostVector();
+	
+	printTaskAssignmentVector();
+	
+	std::cout<<"ALPHA="<<alpha<<std::endl;
+		
+	std::cout<<"mu_T = |";
+	for (unsigned int i=0;i<num_task;i++)
+	{
+	      std::cout<<mu_T.at(i)<<'|';
+	}
+	std::cout<<std::endl;
+			
+	std::cout<<"Send => sigma_i = |";
+	for (unsigned int i=0;i<num_task;i++)
+	{
+		std::cout<< subgradient.at(i) <<'|';
+	}
+	std::cout<<std::endl<<std::endl;
+}
+ 
 task_id task_assignment ::subgradient_algorithm()
 {
-	ptr_subgradient_packet.get()->agent_id=my_id;
-      
-	std::vector<subgradient_packet>& data_receive = *(std::vector<subgradient_packet>*)ta_communicator->get_data();
-	      
-	unsigned int w=0;
-	
-	unsigned int passi=1;
-	
-	update_costs_with_deadlines();
-	printTaskCostMatrix(task_cost_matrix);
-	  
-	update_costs_with_position();
-	printTaskCostMatrix(task_cost_matrix);
-      
-	double subgradient=0;
-	
-	double total_gradient=0;
-	
-	double new_value=0;
-	
-	std::map<agent_id,task_id> optimum_solution; //giusto per fare delle prove, il robot non la sa a prescindere
-	
-	/*optimum_solution.insert(std::make_pair("AGENTE1","T2"));
-	optimum_solution.insert(std::make_pair("AGENTE2","T4"));
-	optimum_solution.insert(std::make_pair("AGENTE3","T3"));
-	optimum_solution.insert(std::make_pair("AGENTE4","T1"));*/ //ta_eg_9
-	
-	optimum_solution.insert(std::make_pair("AGENTE1","T2"));
-	optimum_solution.insert(std::make_pair("AGENTE2","T7"));
-	optimum_solution.insert(std::make_pair("AGENTE3","T4"));
-	optimum_solution.insert(std::make_pair("AGENTE4","T3"));
-	optimum_solution.insert(std::make_pair("AGENTE5","T1"));
-	optimum_solution.insert(std::make_pair("AGENTE6","T6"));
-	optimum_solution.insert(std::make_pair("AGENTE7","T5"));
-	optimum_solution.insert(std::make_pair("AGENTE8","T10"));
-	optimum_solution.insert(std::make_pair("AGENTE9","T8"));
-	optimum_solution.insert(std::make_pair("AGENTE10","T9")); //ta_eg_10
-	
-	std::vector<task_id> fill;
-		
-	task_id my_task="";
-	
-	while(!converge && !s_interrupted)
+	if(1)//!converge)
 	{
-		std::cout<<"----------------PASSO "<<passi<<"----------------"<<std::endl<<std::endl;
-
-		sleep(1);
+		ptr_subgradient_packet.get()->agent_id=my_id;
 		
-		total_gradient = subgradient;
-		
-		
-		ptr_receive_mutex->lock();
-		
-		fresh_data=false;
-		
-		for (unsigned int i=0;i<data_receive.size();i++)
+		if(!busy_robots.at(my_id))
 		{
-		    subgradient_task_packet temp = *(subgradient_task_packet*)data_receive.at(i).get_data();
-		    agent_id name = data_receive.at(i).agent_id;
-		    
-		    if (!(name ==""))
-		    {
-			total_gradient += temp.subgradient;
-		    }
+		  
+			std::cout<<"----------------PASSO "<<passi<<" ("<<time<<") ----------------"<<std::endl<<std::endl;
+
+			
+			for (unsigned int i=0;i<num_task;i++)
+			{
+			      F.at(i) = C.at(i) + D.at(i) + mu_T.at(i);
+			      
+			      if(tasks_id.at(i)!="RECHARGE" && (((!reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i)).getState())->executing && reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i)).getState())->available)))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
+			}
+			
+
+			  
+			ta_problem.set_cost_vector(F);
+
+			
+			
+			ta_problem.solve(solution);
+		
+		      
+			for(unsigned int j=0;j<num_task;j++)//copy_solution_to_TA_vector
+			{
+				agent_task_assignment_vector->at(tasks_id.at(j))=solution.at(j);
+			}
+
+			
+			solution.clear();
 		}
 		
-	        std::cout<<"G = "<<total_gradient<<std::endl<<std::endl;
-		
-		new_value=(total_gradient)/(agents_id.size());
-				
-		if (data_receive.size() == agents_id.size()-1)
+		selected_task="";
+			
+		for (unsigned int i=0;i<num_task;i++)
 		{
-			for (unsigned int i=0;i<agents_id.size();i++)
-			{			  
-			      for (unsigned int j=0;j<tasks_id.size();j++)
-			      {
-				    if(/*COSA PRENDE NEW_VALUE?*/1)
-				    {
-					task_cost_matrix.at(agents_id.at(i)).at(tasks_id.at(j))=new_value;
-				    }
-			      }
+		      if (agent_task_assignment_vector->at(tasks_id.at(i)) > 0.5)
+			  selected_task = tasks_id.at(i);
+		      
+		      subgradient.at(i) = -(agent_task_assignment_vector->at(tasks_id.at(i)));
+		      total_subgradient.at(i) = subgradient.at(i) + e_i.at(i);
+		}
+		
+		
+		receive_from_others();
+		
+		
+		for (unsigned int j=0;j<num_task;j++)
+		{
+		      for (unsigned int h=0;h<num_robot;h++)
+		      {
+			    total_subgradient.at(j) +=  others_subgradient.at(agents_id.at(h)).at(j);
+		      }
+		}
+		
+		
+		for (unsigned int i=0;i<num_robot;i++)
+		{
+			previous_taken_tasks.at(agents_id.at(i))=taken_tasks.at(agents_id.at(i));
+		}
+		
+		
+		
+		std::cout<<"SIGMA = |"; 
+		for (unsigned int i=0;i<num_task;i++)
+		{
+			std::cout<< total_subgradient.at(i) <<'|';
+		}
+		std::cout<<std::endl;
+		
+		alpha=-0.1;
+		
+		if(1) //TODO: RIFLETTERE SUL FATTO CHE MU_T NON CONVERGE SE CI SONO PIU' TASKS
+		{
+			for (unsigned int i=0;i<num_task;i++)
+			{
+			      mu_T.at(i) = mu_T.at(i) + alpha* total_subgradient.at(i);
 			}
 		}
-		
-		data_receive.clear();
-		
-		ptr_receive_mutex->unlock();
-		
-		
-		printTaskCostMatrix(task_cost_matrix);
-		
-		copy_cost_matrix_to_cost_vector(task_cost_matrix);
-		ta_problem.set_cost_vector(C);
-		
-		
-		resolve_bilp_problem();
-				
-		//printTaskAssignmentMatrix();
-		
-		for (unsigned int i=0;i<tasks_id.size();i++)
+			
+			
+		if(!busy_robots.at(my_id))
 		{
-		      if (agent_task_assignment_vector->at(tasks_id.at(i))) my_task = tasks_id.at(i);
+				
+			ptr_subgradient_packet.get()->data.subgradient=subgradient;
+						
+			control_print();
+						
+			converge=convergence_control_routine();
+			
+			passi++;
 		}
 		
-		subgradient = task_cost_matrix.at(my_id).at(my_task);
-		
-		ptr_subgradient_packet.get()->data.subgradient=subgradient;
-			
-		
-		std::cout<<my_id<<" invia: | g = "<<subgradient<<" : "<<my_task<<"|"<<std::endl;
-		
+		ptr_subgradient_packet.get()->x=x.value();
+		ptr_subgradient_packet.get()->y=y.value();
+		ptr_subgradient_packet.get()->theta=theta.value();
 		ta_communicator->send();
-		
-		std::cout<<" - "<<((my_task==optimum_solution.at(my_id))?("OPTIMUM"):("NOT OPTIMUM"))<<std::endl<<std::endl;
-		
-		convergence_control_routine(w-1);
-		
-		w=0;
-		
-		subgradient=0;
-		
-		total_gradient=0;
-		
-		passi++;
-	}
-		
-	ta_communicator->send();
+		//std::cout<<"MANDO "<<((ptr_subgradient_packet.get()->busy)?("occupato"):("libero"))<<std::endl;
+// 		std::cout<<"MANDO x:"<<x.value()<<" y:"<<y.value()<<std::endl;
 
-	for(unsigned int j=0;j<tasks_id.size();j++)
-	{
-		if(agent_task_assignment_vector->at(tasks_id[j]) == true) return tasks_id[j];
 	}
+
+	if (selected_task=="") return "TASK_ASSIGNMENT_FAILED";
+	else return selected_task;
 	
-	return "TASK_ASSIGNMENT_FAILED";
 }

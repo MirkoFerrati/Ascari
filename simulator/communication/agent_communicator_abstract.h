@@ -1,9 +1,12 @@
 #ifndef AGENT_COMMUNICATOR_ABSTRACT_H
 #define AGENT_COMMUNICATOR_ABSTRACT_H
 
-#include "typedefs.h"
+
 #include <vector>
 #include <string>
+#include <types/control_command_packet.h>
+#include <types/agent_sim_packet.h>
+#include <types.h>
 
 
 namespace simulator_namespace

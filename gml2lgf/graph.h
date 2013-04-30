@@ -9,12 +9,12 @@
 
 class graph
 {
-  
+  public:
+
   std::vector<node> nodes;
   std::vector<arc> arcs;
 
 
-public:
      graph();
      virtual ~graph();
 
@@ -22,6 +22,8 @@ public:
     friend std::ostream &operator<<( std::ostream &out, const graph &g );
     void readGraph(std::fstream* arg1);
 
+    std::string tolgf();
+    
 };
 
 #endif // GRAPH_H

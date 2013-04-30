@@ -1,82 +1,56 @@
 #ifndef VIEWER
 #define VIEWER
 
-//written by Alessandro Settimi
-#include "yaml_parser.h"
-#include <typedefs.h>
-//written by Alessandro Settimi
-
 #include "Agent.h"
-#include <lemon/smart_graph.h>
-#include <lemon/path.h>
+#include "viewer_plugin.h"
+#include <types/world_sim_packet.h>
 #include <QtGui/QWidget>
 #include <QtGui/QKeyEvent>
-#include <boost/asio.hpp>
 #include <mutex>
 #include <map>
 class Viewer : public QWidget
 {
 
-  public:
-    //Viewer(const std::vector< char >& buffer, boost::asio::io_service& io_service, QWidget* parent = 0, int view_type=0, std::string graphName="");
-    Viewer(const world_sim_packet& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent=0, int view_type=0, std::string graphName="");
-    
+public:
+    Viewer ( const world_sim_packet& read, std::shared_ptr< std::mutex >& read_mutex, QWidget* parent = 0 );
+
     ~Viewer();
-    void setScalingFactor(double scalingFactorX, double scalingFactorY);
-    void setTranslateFactor(double tx=0,double ty=0);
-    void setBackImage(std::string path);
+    void setScalingFactor ( double scalingFactorX, double scalingFactorY );
+    void setTranslateFactor ( double tx=0,double ty=0 );
+    void setBackImage ( std::string path );
     void start();
-    void setMonitor(std::map<std::string,monitor_packet>* monitor_read, std::shared_ptr< std::mutex > monitor_read_mutex);
-    int view_type;
+    void init ( std::string filename );
 
-    //written by Alessandro Settimi
-    void set_tasklist(const Parsed_World& wo);
-    //written by Alessandro Settimi
+void addPlugin(viewer_plugin* plugin);
 
-   
-protected:
-    void paintEvent(QPaintEvent *event);
-    void timerEvent(QTimerEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-	void parse_graph(std::string graphName);
+ int * getTime(){return &simulation_time;}
+
+private:
+	void paintTextPoint( QPainter* painter, double x, double y );
+    void paintEvent ( QPaintEvent *event );
+    void timerEvent ( QTimerEvent *event );
+    void keyPressEvent ( QKeyEvent *event );
     void pause();
-   void init(std::string graphName);
-void closeEvent(QCloseEvent *event);
-  private:
+    void closeEvent ( QCloseEvent *event );
+    std::vector<viewer_plugin*> plugins;
     int timerId;
-    int time;
-    bool monitor;
+    int simulation_time;
     std::map<std::string,Agent> agents;
-    std::vector<QColor> colors;
-    double scalingFactorX, scalingFactorY, translateX, translateY;
     std::string backImage;
     QImage immagine;
     QPixmap pixmap;
     //const std::vector<char>& buffer;
     const world_sim_packet& infos;
     std::shared_ptr<std::mutex> mutex;
-	std::map<std::string,monitor_packet> *monitor_read;
-	std::shared_ptr<std::mutex > monitor_read_mutex;
+public:
+    double scalingFactorX, scalingFactorY, translateX, translateY;
+	void setScalingAndTranslateFactor ( double maxX,double minX,double maxY,double minY );
 	
-	enum { header_length = 8 };
-	//boost::asio::io_service& io_service;
-    void setScalingAndTranslateFactor(double maxX,double minX,double maxY,double minY);
-    void drawArrow( int x1, int y1, int x2, int y2, double sze, QPainter* painter );
-	double maxX;
-	double minX;
-	double maxY;
-	double minY;
-	lemon::SmartDigraph graph;
-    lemon::SmartDigraph::Node source, target;  
-    lemon::SmartDigraph::Node next;
-    lemon::SmartDigraph::ArcMap<int> *length;
-    lemon::SmartDigraph::NodeMap<int> *coord_x, *coord_y;
-    
-    //written by Alessandro Settimi
-    task_assignment_namespace::task_list tasklist;
-    std::vector<task_assignment_namespace::task_id> tasks_id;
-    //written by Alessandro Settimi
-   
+    double maxX;
+    double minX;
+    double maxY;
+    double minY;
+
 };
 
 #endif //VIEWER

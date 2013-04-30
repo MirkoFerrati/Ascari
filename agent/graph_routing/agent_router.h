@@ -8,22 +8,26 @@
 
 #include <lemon/random.h>
 #include "plugin_module.h"
-#include <typedefs.h>
+#include "../../shared/types/graph_informations.h"
+#include <types/events.h>
 #include "udp_graph_communicator.h"
-#include <boost/thread.hpp>
+#include <thread>
 
 #define TIME_SLOT_FOR_3DGRAPH 10.0
 
 
-enum  class state
+enum class state
 {
     MOVING,
     LISTENING,
-    HANDSHAKING,
+    NODE_HANDSHAKING,
+    ARC_HANDSHAKING,
     EMERGENCY,
     STOPPED,
-    STARTING
+    STARTING,
+	LOADING,
 };
+
 
 class agent_router: public Plugin_module
 {
@@ -38,15 +42,17 @@ public:
     void compileExpressions ( exprtk::symbol_table< double >& symbol_table );
     void setSource ( lemon::SmartDigraph::Node s );
     void setTarget ( lemon::SmartDigraph::Node t );
-    std::pair<int,int> getTargetCoords();
+    //std::pair<int,int> getTargetCoords();
     ~agent_router();
 
 private:
     bool findPath ( lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< bool >& useArc );
-    void setNextTarget();
+	bool isEmergency(const std::vector<int>& nodes);
+    bool setNextTarget();
     void setSpeed();
     void stopAgent ();
     void startAgent ();
+	bool isOnTarget();
     bool target_reached();
     void prepare_move_packet();
     void prepare_emergency_packet();
@@ -56,7 +62,10 @@ private:
     void update_packet();
     bool isTimeToNegotiate(simulation_time time);
     void print_path();
-
+	int findAge(simulation_time present_time, simulation_time old_time);
+    void prepare_stopped_packet();
+	void prepare_loading_packet();
+	void print_state( state s );
 private:
     state internal_state;
     bool next_target_reachable;
@@ -79,12 +88,15 @@ private:
     std::vector<int> targets;  //lista dei targets
     unsigned int target_counter; //avanzamento dei target
     std::vector<int> node_id;  //nodi della path
-    lemon::SmartDigraph::Node source, target, next; //informazioni locali sui nodi
+    lemon::SmartDigraph::Node source, target;//, next; //informazioni locali sui nodi
 
     /**Informazioni temporali*/
     simulation_time next_time;
     simulation_time &time;
     simulation_time last_time_updated;
+    simulation_time last_time_left_a_node;
+	state old_state;
+	
 
     /**Comunicatore*/
     std::mutex _mutex;  
@@ -94,6 +106,8 @@ private:
     Udp_graph_communicator communicator;
     std::string priority;
 
+	
+	
 };
 
 #endif // AGENT_ROUTER_H

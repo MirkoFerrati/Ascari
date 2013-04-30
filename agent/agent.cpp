@@ -71,7 +71,7 @@ agent::agent ( int agent_index,const Parsed_World& world, bool noStart ) :
     //written by Alessandro Settimi
     if ( !world.task_list.empty() )
     {
-        Plugin_module* plugin=new task_assignment ( world,world.agents.at ( agent_index ),time,events,events_to_index );
+        Plugin_module* plugin=new task_assignment ( world,world.agents.at ( agent_index ),time,events,events_to_index,objects );
         plugins.push_back ( plugin );
     }
     //written by Alessandro Settimi
@@ -320,6 +320,12 @@ void agent::main_loop()
     for ( std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin(); it!=temp.bonus_variables.end(); ++it )
     {
         bonusVariables.at ( map_bonus_variables_to_id.at ( it->first ) ) =it->second;
+    }
+
+     for ( std::map<std::string,task_assignment_task>::const_iterator it=temp.objects.begin(); it!=temp.objects.end(); ++it )
+    {
+        objects[it->first] =it->second;
+// 	std::cout<<"task ricevuto:"<<it->second<<std::endl;
     }
 
    

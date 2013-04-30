@@ -1,0 +1,92 @@
+- WORLD:
+  - TASK_ASSIGNMENT_ALGORITHM: SUBGRADIENT #choose SUBGRADIENT or add another algorithm
+    TASK_NUMBER: 5
+    TASK_LIST: [T1,1,1,0,2,35,0,T2,12,10,0,1,50,120,T3,3,10,0,1,45,0,T4,12,4,0,1,40,0,RECHARGE,7,7,0,0,100,0]
+    #id,position(x,y,z),type,execution time,deadline TODO fare TASK_LIST T1 T2 T3 e poi a capo i parametri per ognuno (T1: . . etc)
+    #tipo 1 generico, tipo 0 recharge, tipo 2 periodico, appare ogni 150
+  BEHAVIORS:
+  - name: prova
+    states: [x,y,theta,charge]
+    control_commands: [v,w,c]
+    
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+      charge: 'c'
+    CONTROLLERS:
+    - name: go
+      v: v_t
+      w: w_t
+      c: set_charge
+    - name: wait
+      v: 0
+      w: 0
+      c: set_charge
+    DISCRETE_STATES:
+    - name: go
+      controller: go
+    - name: wait
+      controller: wait
+    - name: wait_for_target
+      controller: wait
+    ENCODER:
+    - TOPOLOGY:
+        - topology: [t1]
+          t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+      LAMBDA:
+        - lambda: [Lreached] 
+          Lreached: 'abs(x-x_task)<0.1 and abs(y-y_task)<0.1'
+    EVENTS:
+    - events: [reached, new_target, stopped, started]
+      reached: 'Lreached'
+      new_target: '!Lreached'
+      stopped: ''
+      started: ''
+    AUTOMATON:
+    - name: aut_machine
+      GO:
+        - WAIT: [stopped]
+          WAIT_FOR_TARGET: [reached]
+      WAIT:
+        - GO: [started]
+      WAIT_FOR_TARGET:
+        - GO: [new_target]
+    
+  AGENTS:
+  - agent: Agente1
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - &initial
+      x: '4'
+      y: '4'
+      theta: '3'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,15,T2,2,T3,6,T4,1,RECHARGE,INF]
+    
+  - agent: Agente2
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - x: '6'
+      y: '4'
+      theta: '1'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,8,T2,2,T3,1,T4,15,RECHARGE,INF]
+    
+  - agent: Agente3
+    VISIBLE_AREA: circle(x,y,200)
+    COMMUNICATION_AREA: =  circle(50)
+    INITIAL:
+    - x: '9'
+      y: '9'
+      theta: '2'
+      charge: '50'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,6,T2,5,T3,2,T4,8,RECHARGE,INF]

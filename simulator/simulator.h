@@ -9,7 +9,10 @@
 #include "communication/udp_agent_router.hpp"
 #include "collisioncheckerabstract.h"
 #include "random.hpp"
+#include <objects/abstract_object.h>
+#include <types/graph_informations.h>
 #include <mutex>
+#include <condition_variable>
 #include <thread>
 //written by Alessandro Settimi
 #include "communication/task_assignment_router.hpp"
@@ -48,6 +51,7 @@ private:
 	std::map<std::string,int> map_bonus_variables_to_id;
 	std::map<std::string,control_command_packet> commands;
 	void main_loop();
+	void input_loop( std::mutex& input_mutex, std::condition_variable& input_cond, volatile bool& paused, volatile bool& exit );
 	std::vector<std::string> identifiers;
 	simulation_time time;
 	unsigned int num_agents;
@@ -58,6 +62,7 @@ private:
 	std::map<std::string,int> map_bonus_variables;
 	Udp_agent_router<topology_packet> topology_router;
 	Udp_agent_router<graph_packet> graph_router;
+	void createObjects(const Parsed_World& world);
 	
 	//written by Alessandro Settimi
 

@@ -6,8 +6,9 @@
 #include <map>
 #include <string>
 #include <boost/concept_check.hpp>
-#include "typedefs.h"
+
 #include "testClass.h"
+#include <types/agent_sim_packet.h>
 
 
 using namespace std;
@@ -35,11 +36,26 @@ public:
 	agente2.state[0]=2.0;
 	agente2.state[1]=2.1;
 	
+	std::map<std::string,task_assignment_task> tasks;
+	
+	task_assignment_namespace::task app;
+	
+	app.id="T1";
+	
+	task_assignment_task ta(app);
 	
 	
-	agent_sim_packet agent_packet(bonus,t);
+	tasks["T1"]=ta;
+	
+	agent_sim_packet agent_packet(bonus,t,tasks);
 	agent_packet.state_agents.internal_map[agente1.identifier]=&agente1;
 	agent_packet.state_agents.internal_map[agente2.identifier]=&agente2;
+	
+	world_sim_packet world_packet;
+	world_packet.objects=tasks;
+	world_packet.bonus_variables=agent_packet.bonus_variables;
+	world_packet.state_agents.internal_map["AGENTE1"]=agente1;
+	world_packet.state_agents.internal_map["AGENTE2"]=agente2;
 	
 	
 	
@@ -79,4 +95,4 @@ public:
     }
 };
 
-#endif // TESTAUTOMATON_HPP
+#endif
