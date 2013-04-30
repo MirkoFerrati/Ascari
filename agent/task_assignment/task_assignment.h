@@ -48,7 +48,7 @@ public:
 private:
   
 	std::map<task_assignment_namespace::agent_id,std::vector<double>> positions;
-  
+
 	double set_charge;
 	
 	double lambda_u;

@@ -25,6 +25,8 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     task_assignment_algorithm=world.task_assignment_algorithm;
     
     my_task="";
+    my_task_x=x0;
+    my_task_y=y0;
     
     task_assigned=false;
     task_started=false;
@@ -266,6 +268,8 @@ bool task_assignment::recharge_is_present()
 
 void task_assignment::compute_speeds(double x_t,double y_t)
 {
+	 lambda_u=0; //per la max_dist
+	 
 	 omega=-1*sin(theta.value()-atan2(y_t-y.value(),x_t-x.value())) + lambda_u;
 	 	 
 	 if((my_task!="TASK_ASSIGNMENT_FAILED") && (my_task!=""))
@@ -299,13 +303,13 @@ void task_assignment::avoid_collision(double& a)
 	      {
 		      double d=norm2(x.value(),y.value(),positions.at(agents_id.at(i)).at(0),positions.at(agents_id.at(i)).at(1));
 		      min_d=std::min(d,min_d);
-		      a += ((2)/(d))*sin(theta.value()-atan2(positions.at(agents_id.at(i)).at(1)-y.value(),positions.at(agents_id.at(i)).at(0)-x.value()));
+		      if(d > 0) a += ((2)/(d))*sin(theta.value()-atan2(positions.at(agents_id.at(i)).at(1)-y.value(),positions.at(agents_id.at(i)).at(0)-x.value()));
 	      }
 	}
 	
 	a -= lambda_u;
 	
-	speed = speed-((min_d<1.2)?0.15:0);
+	//speed = speed-((min_d<1.2)?0.15:0); //per rallentare vicino ad altri robot
 }
 
 
@@ -338,6 +342,7 @@ void task_assignment::receive_from_others()
 			copy_cost_vector_to_C();
 			std::cout<<"task "<<data_receive.at(i).taken_task<<" e' preso"<<std::endl;
 			taken_tasks.at(name)=data_receive.at(i).taken_task;
+			if (my_task==taken_tasks.at(name)) converge=false;
 		  }
 		  
 		  if (data_receive.at(i).busy)
@@ -568,6 +573,6 @@ void task_assignment ::run_plugin()
 		}
 		
 		compute_speeds(my_task_x,my_task_y);
-// 		std::cout<<"speed= "<<speed<<std::endl;
+ 		//std::cout<<"speed= "<<speed<<" omega= "<<omega<<" omega_dubins "<<omega_dubins<<" set_charge= "<<set_charge<<std::endl;
       }
 }

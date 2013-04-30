@@ -1,0 +1,90 @@
+#3_3_TA
+- WORLD:
+  - TASK_ASSIGNMENT_ALGORITHM: SUBGRADIENT #choose SUBGRADIENT or add another algorithm
+    TASK_NUMBER: 3
+    TASK_LIST: [T1,2,2,0,1,100,0,0,T2,3,10,0,1,50,0,0,T3,10,7,0,1,45,0,0]
+    #id,position(x,y,z),type,execution time,period,deadline TODO fare TASK_LIST T1 T2 T3 e poi a capo i parametri per ognuno (T1: . . etc)
+    #tipo 1 generico, tipo 0 recharge, tipo 2 periodico
+  BEHAVIORS:
+  - name: prova
+    states: [x,y,theta,charge]
+    control_commands: [v,w,c]
+    
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+      charge: 'c'
+    CONTROLLERS:
+    - name: go
+      v: v_t
+      w: w_t_diff
+      c: set_charge
+    - name: wait
+      v: 0
+      w: 0
+      c: set_charge
+    DISCRETE_STATES:
+    - name: go
+      controller: go
+    - name: wait
+      controller: wait
+    - name: wait_for_target
+      controller: wait
+    ENCODER:
+    - TOPOLOGY:
+        - topology: [t1]
+          t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+      LAMBDA:
+        - lambda: [Lreached] 
+          Lreached: 'abs(x-x_task)<0.1 and abs(y-y_task)<0.1'
+    EVENTS:
+    - events: [reached, new_target, stopped, started]
+      reached: 'Lreached'
+      new_target: '!Lreached'
+      stopped: ''
+      started: ''
+    AUTOMATON:
+    - name: aut_machine
+      GO:
+        - WAIT: [stopped]
+          WAIT_FOR_TARGET: [reached]
+      WAIT:
+        - GO: [started]
+      WAIT_FOR_TARGET:
+        - GO: [new_target]
+    
+  AGENTS:
+  - agent: Agente1
+    COMMUNICATION_AREA:   circle(50)
+    INITIAL:
+    - &initial
+      x: '5'
+      y: '3'
+      theta: '0'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,6,T2,2,T3,4]
+    
+  - agent: Agente2
+    COMMUNICATION_AREA:   circle(50)
+    INITIAL:
+    - x: '8'
+      y: '3'
+      theta: '1'
+      charge: '45'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,2,T2,8,T3,5]
+    
+  - agent: Agente3
+    COMMUNICATION_AREA:   circle(50)
+    INITIAL:
+    - x: '9'
+      y: '9'
+      theta: '2'
+      charge: '70'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,6,T2,2,T3,5]
