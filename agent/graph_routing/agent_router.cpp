@@ -91,6 +91,8 @@ void agent_router::run_plugin()
                     if ( oldtarget==graph.id ( target ) ) //se il target e' ripetuto vuol dire che devo fare loading
                     {
                         internal_state=state::LOADING;
+			            negotiation_steps=0;
+
                     }
                 }
                 else  //se non ci sono altri target
@@ -148,6 +150,9 @@ void agent_router::run_plugin()
         priority=" "; //BRUTTO HACK
         update_packet();
         communicator.send ( my_LRP );
+	            negotiation_steps++;
+	if (negotiation_steps==15)
+	  internal_state=state::MOVING;
     }
 
     if ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING || internal_state==state::ARC_HANDSHAKING )
@@ -206,7 +211,8 @@ void agent_router::run_plugin()
         stopAgent();
     }
 
-    setSpeed();
+    //if (internal_state!=state::LOADING && internal_state!=state::EMERGENCY)
+      setSpeed();
     //cout<<"stato interno: ";
     //print_state(internal_state);
     //cout<<endl;
@@ -224,7 +230,7 @@ bool agent_router::check_for_overtaking ()
     {
         if ( identifier==it->first ) continue;
         assert ( findAge ( time, it->second.timestamp ) ==0 ); //0==round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH ));
-        assert ( ( *it ).second.lockedNode.size() >1 );
+//        assert ( ( *it ).second.lockedNode.size() >1 );
         int age=findAge ( time, it->second.started_moving ); //round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.started_moving * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         for ( unsigned int j = 1; j < ( *it ).second.lockedNode.size(); j++ )
         {
@@ -436,9 +442,11 @@ void agent_router::prepare_loading_packet()
 
     node_id.clear();
     int i = 0;//target_counter;
-    while ( targets[target_counter+i]==graph.id ( target ) )
+    node_id.push_back(graph.id(source));
+    assert(targets[target_counter-1]==graph.id ( target ));
+    while ( targets[target_counter-1+i]==graph.id ( target ) )
     {
-        node_id.push_back ( graph.id ( target ) +graph_node_size*i );
+        node_id.push_back ( graph.id ( target ) +graph_node_size*(i+1) );
         i++;
     }
     last_time_updated = time;
