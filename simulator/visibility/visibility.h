@@ -24,6 +24,7 @@ class visibleArea
     };
 
     virtual bool isVisible ( const agent_state& me,const agent_state& other )=0;
+    
 
     virtual ~visibleArea()
     {

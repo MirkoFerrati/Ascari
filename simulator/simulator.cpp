@@ -277,9 +277,14 @@ void simulator::main_loop()
                 for ( auto other=sim_packet.state_agents.internal_map.begin(); other!=sim_packet.state_agents.internal_map.end(); other++ )
                 {
 
-                    if ( agent->first==other->first||!agents_visibility.count ( agents_name_to_index.at ( agent->first ) )
-                            ||!agents_visibility.count ( agents_name_to_index.at ( other->first ) )
-                            || agents_visibility.at ( agents_name_to_index.at ( agent->first ) )->isVisible ( agent->second.state,other->second.state ) )
+                    if ( agent->first==other->first ||
+		      !agents_visibility.count ( agents_name_to_index.at ( agent->first ) ) ||
+                      !agents_visibility.count ( agents_name_to_index.at ( other->first ) ) ||
+                       (
+			 agents_visibility.at ( agents_name_to_index.at ( agent->first ) )->isVisible ( agent->second.state,other->second.state ) 
+//			  && (!mappa mondo esiste || agenti si vedono nel mondo ) 
+			)
+		    )
                     {
                         agent_packet.state_agents.internal_map[other->first]=&other->second;
                     }
