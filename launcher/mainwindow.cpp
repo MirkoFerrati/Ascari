@@ -77,6 +77,7 @@ MainWindow::~MainWindow()
 {
     s_interrupted=1;
     delete insideViewer;
+    insideViewer=0;
     delete ui;
     if ( simulator )
     {
@@ -377,9 +378,11 @@ bool MainWindow::startViewer()
         {
             ui->ViewerContainer->removeWidget ( insideViewer );
             delete insideViewer;
+	    insideViewer=0;
         }
     for ( auto plugin:plugins )
             delete plugin;
+    plugins.clear();
         if ( !mutex )
         {
             std::shared_ptr<std::mutex> temp ( new std::mutex );
