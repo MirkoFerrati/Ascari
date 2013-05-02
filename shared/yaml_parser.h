@@ -97,6 +97,7 @@ class Parsed_World{
   public:
   friend std::ostream& operator<<(std::ostream& os, const Parsed_World& wo );
   
+  bool parsedSuccessfully;
 
   std::vector<bonusVariable> bonus_variables;
   std::map<bonusVariable, bonus_expression> bonus_expressions;
@@ -104,13 +105,10 @@ class Parsed_World{
   std::map<std::string,std::unique_ptr< Parsed_Behavior>> behaviors;
   std::string graphName;
   
-  //written by Alessandro Settimi
   std::vector<task_assignment_namespace::task_id> tasks_id;
   task_assignment_namespace::task_list task_list;
   task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
-  //written by Alessandro Settimi
 
-//   Parsed_World(int num_agents):agents(num_agents){}
    
 
 
@@ -118,9 +116,9 @@ class Parsed_World{
     
     Parsed_World parse_file(const char * file_name);
     Parsed_World parse_file(std::string file_name);
-    void operator>>(const YAML::Node& node, std::unique_ptr< Parsed_Behavior >& behavior);
-    void operator>>(const YAML::Node& node, Parsed_World& wo);
-    void operator>>(const YAML::Node& node, Parsed_Behavior& beh);
+    bool operator>>(const YAML::Node& node, std::unique_ptr< Parsed_Behavior >& behavior);
+    bool operator>>(const YAML::Node& node, Parsed_World& wo);
+    bool operator>>(const YAML::Node& node, Parsed_Behavior& beh);
     std::ostream& operator<< (std::ostream& , const std::vector<Parsed_Agent>& );
     
 

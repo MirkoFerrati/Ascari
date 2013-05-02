@@ -30,15 +30,15 @@ Parsed_World parse_file ( string file_name )
 
     Parsed_World World;//(doc[1]["AGENTS"].size());
 
-    doc>>World;
-
+   if (!(doc>>World))
+    World.parsedSuccessfully=false;
 
     return World;
 
 }
 
 
-void operator>> ( const YAML::Node& node, std::unique_ptr<Parsed_Behavior>& behavior )
+bool operator>> ( const YAML::Node& node, std::unique_ptr<Parsed_Behavior>& behavior )
 {
 
 
@@ -170,7 +170,8 @@ void operator>> ( const YAML::Node& node, std::unique_ptr<Parsed_Behavior>& beha
                         {
                             if ( behavior->automaton[actual_state].count ( tran_ev[j] ) )
                             {
-                                ERR("DUPLICATED EVENT %s", tran_ev[j].c_str());
+                                ERR ( "DUPLICATED EVENT %s", tran_ev[j].c_str() );
+                                return false;
 //                                 throw "DUPLICATED EVENT";
                             }
                             behavior->automaton[actual_state].insert ( pair<event_name, discreteState_Name> ( tran_ev[j],new_state ) );
@@ -180,8 +181,7 @@ void operator>> ( const YAML::Node& node, std::unique_ptr<Parsed_Behavior>& beha
             }
         }
     }
-
-
+return true;
 }
 
 
@@ -199,19 +199,19 @@ void createTaskList ( const YAML::Node& node, task_assignment_namespace::task_li
 
         task_assignment_namespace::task temp2;
 
-	node[i] >> temp2.id;
+        node[i] >> temp2.id;
         node[i+1] >> temp2.task_position[0];
         node[i+2] >> temp2.task_position[1];
         node[i+3] >> temp2.task_position[2];
         node[i+4] >> temp2.task_type;
         node[i+5] >> temp2.task_execution_time;
-	node[i+6] >> temp2.period;
+        node[i+6] >> temp2.period;
         node[i+7] >> temp2.task_deadline;
-	
-	temp2.executing=false;
-	temp2.owner="";
-	temp2.time=0;
-	temp2.available=true;
+
+        temp2.executing=false;
+        temp2.owner="";
+        temp2.time=0;
+        temp2.available=true;
 
         task_list.insert ( make_pair ( temp1,temp2 ) );
 
@@ -222,16 +222,16 @@ void createTaskList ( const YAML::Node& node, task_assignment_namespace::task_li
 //written by Alessandro Settimi
 
 
-void operator>> ( const YAML::Node& node, Parsed_Agent& ag )
+bool operator>> ( const YAML::Node& node, Parsed_Agent& ag )
 {
 
-     if ( node.FindValue ( "VISIBLE_AREA" ) ) 
-     {
+    if ( node.FindValue ( "VISIBLE_AREA" ) )
+    {
         node["VISIBLE_AREA"]>>ag.visibility;
     }
     else
     {
-        WARN( "NO VISIBLE AREA SPECIFIED",NULL );
+        WARN ( "NO VISIBLE AREA SPECIFIED",NULL );
 //         throw "NO VISIBLE AREA SPECIFIED";
     }
     node["COMMUNICATION_AREA"]>>ag.communication;
@@ -253,6 +253,7 @@ void operator>> ( const YAML::Node& node, Parsed_Agent& ag )
             {
 
                 ERR ( "NO KNOWN BEHAVIORS SPECIFIED FOR IDENTIFIER MODULE",NULL );
+                return false;
 //                 throw "NO KNOWN BEHAVIORS SPECIFIED FOR IDENTIFIER MODULE";
             }
         }
@@ -261,7 +262,7 @@ void operator>> ( const YAML::Node& node, Parsed_Agent& ag )
             ag.monitoring=false;
             if ( tmp_mon!=0 )
             {
-                ERR ( "UNRECOGNIZED VALUE FOR MONITORING. SET TO FALSE",NULL );
+                WARN ( "UNRECOGNIZED VALUE FOR MONITORING. SET TO FALSE",NULL );
             }
         }
 
@@ -285,7 +286,8 @@ void operator>> ( const YAML::Node& node, Parsed_Agent& ag )
 
     if ( !ag.behavior->discrete_states.count ( ag.state_start ) )
     {
-        ERR("UNDEFINED START DISCRETE STATE %s", ag.state_start.c_str());
+        ERR ( "UNDEFINED START DISCRETE STATE %s", ag.state_start.c_str() );
+        return false;
 //         throw "UNDEFINED DISCRETE START STATE";
 
     }
@@ -315,12 +317,12 @@ void operator>> ( const YAML::Node& node, Parsed_Agent& ag )
     }
     //written by Alessandro Settimi
 
-
+return true;
 }
 
 
 
-void operator>> ( const YAML::Node& node, Parsed_World& wo )
+bool operator>> ( const YAML::Node& node, Parsed_World& wo )
 {
     wo.graphName="UNSET";
 
@@ -359,12 +361,14 @@ void operator>> ( const YAML::Node& node, Parsed_World& wo )
     for ( unsigned int i=0; i<behaviors_nodes.size(); i++ )
     {
 
-      std::string tmp_beh_name;
-      
-       if (!behaviors_nodes[i].FindValue("NAME")){
-	 
-            ERR("BEHAVIOR NAME UNDEFINED: BEHAVIOR NUMBER %d", i);
-//             throw "BEHAVIOR NAME UNDEFINED";        
+        std::string tmp_beh_name;
+
+        if ( !behaviors_nodes[i].FindValue ( "NAME" ) )
+        {
+
+            ERR ( "BEHAVIOR NAME UNDEFINED: BEHAVIOR NUMBER %d", i );
+            return false;
+//             throw "BEHAVIOR NAME UNDEFINED";
         }
 
         behaviors_nodes[i]["NAME"]>> tmp_beh_name;
@@ -372,6 +376,7 @@ void operator>> ( const YAML::Node& node, Parsed_World& wo )
         if ( wo.behaviors.find ( tmp_beh_name ) !=wo.behaviors.end() )
         {
             ERR ( "DUPLICATED BEHAVIOR %s", tmp_beh_name.c_str() );
+	    return false;
 //             throw "DUPLICATED BEHAVIOR";
         }
 
@@ -380,7 +385,9 @@ void operator>> ( const YAML::Node& node, Parsed_World& wo )
             wo.behaviors.insert ( std::make_pair ( tmp_beh_name,std::move ( tmp_ptr ) ) );
         }
         wo.behaviors[tmp_beh_name]->name=tmp_beh_name;
-        behaviors_nodes[i]>>wo.behaviors[tmp_beh_name];
+	
+        if (!(behaviors_nodes[i]>>wo.behaviors[tmp_beh_name]))
+	  return false;
     }
 
 
@@ -396,6 +403,7 @@ void operator>> ( const YAML::Node& node, Parsed_World& wo )
         if ( !agent_nodes[i].FindValue ( "BEHAVIOR" ) )
         {
             ERR ( "BEHAVIOR NAME UNSPECIFIED FOR AGENT %s", tmp_ag_name.c_str() );
+	    return false;
 //             throw "BEHAVIOR NAME UNSPECIFIED FOR AGENT";
         }
 
@@ -405,16 +413,19 @@ void operator>> ( const YAML::Node& node, Parsed_World& wo )
         if ( !wo.behaviors.count ( tmp_agent_behavior_name ) )
         {
             ERR ( "UNDEFINED BEHAVIOR %s FOR AGENT %s", tmp_agent_behavior_name.c_str(), tmp_ag_name.c_str() );
+	    return false;
 //             throw "UNDEFINED BEHAVIOR %s FOR AGENT %s";
         }
         wo.agents.emplace_back ( wo.behaviors[tmp_agent_behavior_name] );
         wo.agents[i].name=tmp_ag_name;
-        //wo.agents[i].behavior=(*wo.behaviors[tmp_agent_behavior_name]);//TODO(Mirko) perche' e' una copia?
         wo.agents[i].behavior_name=tmp_agent_behavior_name;
-        agent_nodes[i] >> wo.agents[i];
+
+	if (!(agent_nodes[i] >> wo.agents[i]))
+	  return false;
         if ( ( wo.agents[i].target_list.size() ==0 && wo.graphName.compare ( "UNSET" ) !=0 ) || ( wo.agents[i].target_list.size() >0 && wo.graphName.compare ( "UNSET" ) ==0 ) )
         {
-            ERR("GRAPH NAME OR TARGET LIST UNDEFINED", NULL);
+            ERR ( "GRAPH NAME OR TARGET LIST UNDEFINED", NULL );
+            return false;
 //             throw "GRAPH NAME OR TARGET LIST UNDEFINED";
 
         }
@@ -423,30 +434,30 @@ void operator>> ( const YAML::Node& node, Parsed_World& wo )
 
     if ( node[0].FindValue ( "WORLD" ) )
     {
-        if (node[0]["WORLD"].size()>0)
-        { 
-	  
-            if (node[0]["WORLD"][0].FindValue("TASK_ASSIGNMENT_ALGORITHM") && node[0]["WORLD"][0].FindValue("TASK_NUMBER") && node[0]["WORLD"][0].FindValue("TASK_LIST"))
-	    {
-		unsigned int task_number;
-		std::string algorithm;
-		
-		node[0]["WORLD"][0]["TASK_NUMBER"]>>task_number;
-		
-		node[0]["WORLD"][0]["TASK_ASSIGNMENT_ALGORITHM"]>>algorithm;
-		
-		if (algorithm == "SUBGRADIENT" ) wo.task_assignment_algorithm = SUBGRADIENT; 
+        if ( node[0]["WORLD"].size() >0 )
+        {
 
-		if (wo.task_assignment_algorithm == -1)
-		{
-		      ERR("UNDEFINED TASK ASSIGNMENT ALGORITHM",NULL);
+            if ( node[0]["WORLD"][0].FindValue ( "TASK_ASSIGNMENT_ALGORITHM" ) && node[0]["WORLD"][0].FindValue ( "TASK_NUMBER" ) && node[0]["WORLD"][0].FindValue ( "TASK_LIST" ) )
+            {
+                unsigned int task_number;
+                std::string algorithm;
+
+                node[0]["WORLD"][0]["TASK_NUMBER"]>>task_number;
+
+                node[0]["WORLD"][0]["TASK_ASSIGNMENT_ALGORITHM"]>>algorithm;
+
+                if ( algorithm == "SUBGRADIENT" ) wo.task_assignment_algorithm = SUBGRADIENT;
+
+                if ( wo.task_assignment_algorithm == -1 )
+                {
+                    ERR ( "UNDEFINED TASK ASSIGNMENT ALGORITHM",NULL );
+                    return false;
 // 		      throw "UNDEFINED TASK ASSIGNMENT ALGORITHM";
-		}
-		
-		createTaskList(node[0]["WORLD"][0]["TASK_LIST"],wo.task_list,wo.tasks_id,task_number);
-	    }
-	}
+                }
+
+                createTaskList ( node[0]["WORLD"][0]["TASK_LIST"],wo.task_list,wo.tasks_id,task_number );
+            }
+        }
     }
-
-
+    return true;
 }
