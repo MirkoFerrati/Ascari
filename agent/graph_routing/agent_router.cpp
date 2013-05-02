@@ -118,6 +118,21 @@ void agent_router::run_plugin()
         {
             last_time_left_a_node=time;
             prepare_move_packet();
+
+// 	    //HACK: 
+// 	    if (graph.id(target)==node_id[1] && node_id.size()==2)
+// 	    {
+// 	      cout<<"il prossimo nodo sara' il mio target"<<endl;
+// 		if (node_id[1]==targets[target_counter])
+// 		{
+// 		  cout<<"il prossimo nodo sara' un nodo di loading"<<endl;
+// 		  
+// 		  node_id.push_back(node_id[1]);
+// 		  
+// 		  priority=" ";
+// 		}
+// 	    }
+// 	    
             update_packet();
             print_path();
             communicator.send ( my_LRP );
@@ -222,7 +237,7 @@ void agent_router::run_plugin()
 //TODO(Mirko): implementare sorpassi multipli
 bool agent_router::check_for_overtaking ()
 {
-    std::cout<<"check for overtakings";
+    //std::cout<<"check for overtakings";
     bool overtaking = false;
     int myage=findAge ( time,last_time_left_a_node ); //round ( ( round ( time * 1000.0 ) - round ( last_time_left_a_node * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
     _mutex.lock();
@@ -253,9 +268,9 @@ bool agent_router::check_for_overtaking ()
                         ( my_id1 - other_id1 ) % graph_node_size == 0 )
                 {
                     if ( my_id==other_id )
-                        WARN ( "collisione durante il controllo sorpassi? %d %d",my_id,other_id );
+                        WARN ( "collisione su un nodo durante il controllo sorpassi? %d %d",my_id,other_id );
                     if ( my_id1==other_id1 )
-                        WARN ( "collisione durante il controllo sorpassi? %d %d",my_id1,other_id1 );
+                        WARN ( "collisione su un nodo durante il controllo sorpassi? %d %d",my_id1,other_id1 );
                     if (
                         my_id > other_id &&
                         my_id1< other_id1 )
@@ -278,7 +293,7 @@ bool agent_router::check_for_overtaking ()
         }
     }
     _mutex.unlock();
-    cout<<endl;
+    cout.flush();
     return overtaking;
 }
 
@@ -288,7 +303,7 @@ bool agent_router::isEmergency ( const std::vector<int>& nodes )
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it ) //per ogni pacchetto ricevuto
     {
         if ( identifier==it->first ) continue;
-        if ( !it->second.emergency ) continue;
+        if ( !it->second.emergency && !it->second.priority.compare(" ")==0 ) continue;
 
         cout<<"controllo se devo entrare in emergenza per colpa dell'agente:"<<it->first<<" "<<endl;
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
@@ -317,13 +332,17 @@ bool agent_router::isEmergency ( const std::vector<int>& nodes )
 
 void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< bool >& useArc )
 {
+    string start="filtro i nodi:";
+    string end="";
     _mutex.lock();
+    
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it ) //per ogni pacchetto ricevuto
     {
         if ( identifier==it->first ) continue;
-        if ( identifier.compare ( it->first ) <0 ) continue;  //se il pacchetto ha priorita' piu' alta
+        if ( priority.compare ( it->second.priority ) <0 ) continue;  //se il pacchetto ha priorita' piu' alta
         int age = findAge ( time, it->second.timestamp ); //round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
-        cout<<"filtro i nodi dell'agente:"<<it->first<<" ";
+        cout<<start<<it->first<<" ";
+	start="";end="\n";
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
         {
             int id = ( *itt ) - age * graph_node_size;  //attualizzo il nodo
@@ -334,9 +353,11 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
             }
             cout<<id<<" ";
         }
-        cout<<endl;
+        cout<<"; ";
     }
     _mutex.unlock();
+    cout<<end;
+    cout.flush();
 }
 
 
@@ -351,7 +372,7 @@ bool agent_router::detect_collision ( )
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
         if ( identifier==it->first ) continue;
-        if ( identifier.compare ( it->first ) <0 ) continue;
+        if ( priority.compare ( it->second.priority ) <0 ) continue;
         int age = findAge ( time, it->second.timestamp ); //round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )
         {

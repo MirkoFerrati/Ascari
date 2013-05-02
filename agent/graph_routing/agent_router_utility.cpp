@@ -70,7 +70,7 @@ int agent_router::findAge(simulation_time present_time, simulation_time old_time
 void agent_router::print_path()
 {
     int j=0;
-     std::cout<<"path calcolata: ";
+     std::cout<<time<<": path calcolata= ";
     for ( unsigned int i=0; i<node_id.size(); i++ )
     {
         j++;
@@ -78,7 +78,8 @@ void agent_router::print_path()
             break;
        cout << node_id[i]  << "(" <<  node_id[i]  % graph_node_size << ")" << ">>";
     }
-    std::cout << " next_time=" << next_time << " fine" << std::endl;
+    cout<<endl;
+   // std::cout << " next_time=" << next_time << std::endl;
 
 }
 
