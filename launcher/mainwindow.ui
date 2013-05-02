@@ -61,6 +61,14 @@
           <height>0</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <family>TlwgTypewriter</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -202,8 +210,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>208</width>
-              <height>189</height>
+              <width>209</width>
+              <height>130</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -425,7 +433,7 @@
     </property>
     <addaction name="actionSimulator"/>
     <addaction name="actionAgent"/>
-    <addaction name="actionViewer"/>
+    <addaction name="actionYaml_files"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuPaths"/>
@@ -464,6 +472,11 @@
   <action name="actionAgents">
    <property name="text">
     <string>Agents</string>
+   </property>
+  </action>
+  <action name="actionYaml_files">
+   <property name="text">
+    <string>Yaml files</string>
    </property>
   </action>
  </widget>

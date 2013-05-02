@@ -41,7 +41,7 @@ MainWindow::MainWindow ( QWidget *parent ) :
 
     agentPath=settings->value ( "paths/agent","" ).toString();
     simulatorPath=settings->value ( "paths/simulator","" ).toString();
-    viewerPath=settings->value ( "paths/viewer","" ).toString();
+    yamlsPath=settings->value ( "paths/yamls","" ).toString();
     fileName = settings->value ( "paths/lastopen","" ).toString();
     if ( fileName.compare ( "" ) !=0 )
     {
@@ -211,7 +211,7 @@ void MainWindow::agentSelected ( int state)
 void MainWindow::on_actionOpen_triggered()
 {
 
-    fileName = QFileDialog::getOpenFileName ( this,"","","*.yaml" );
+    fileName = QFileDialog::getOpenFileName ( this,"Select yaml file",yamlsPath,"*.yaml" );
     if ( fileName.compare ( "" ) !=0 )
         openFile();
 }
@@ -281,17 +281,17 @@ void MainWindow::on_actionAgent_triggered()
     }
 }
 
-void MainWindow::on_actionViewer_triggered()
+void MainWindow::on_actionYaml_files_triggered()
 {
     QFileDialog openApp ( this );
-    openApp.setDirectory ( ".." );
-    openApp.setFileMode ( QFileDialog::ExistingFile );
+    openApp.setDirectory ( "../../" );
+    openApp.setFileMode ( QFileDialog::DirectoryOnly );
     openApp.setFilter ( QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot );
-    openApp.setNameFilter ( "viewer" );
+    openApp.setNameFilter ( "" );
     if ( openApp.exec() )
     {
-        viewerPath=openApp.selectedFiles().first();
-        settings->setValue ( "paths/viewer",viewerPath );
+        yamlsPath=openApp.selectedFiles().first();
+        settings->setValue ( "paths/yamls",yamlsPath );
     }
 }
 
