@@ -5,3 +5,13 @@ build
 *.png
 *.mpeg
 shared/lemon/lemon/lemon/config.h
+doc/
+latex/
+html/
+shared/wykobi/Makefile
+shared/wykobi/release-notes.txt
+shared/wykobi/wykobi_license.txt
+launcher-build/
+.kdev_ignore
+oldyamls/
+*launcher.pro.user.*
