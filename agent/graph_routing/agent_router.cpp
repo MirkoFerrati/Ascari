@@ -47,6 +47,7 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
     xtarget = 0;//coord_x[next];
     ytarget = 0;//coord_y[next];
     my_LRP.timestamp = 0;
+    started=false;
 //    setTargetStop(false);
     communicator.startReceive();
     last_time_updated = time;
@@ -223,8 +224,7 @@ void agent_router::run_plugin()
         stopAgent();
     }
 
-//     if ( internal_state!=state::EMERGENCY )
-        setSpeed();
+    setSpeed();
     //cout<<"stato interno: ";
     //print_state(internal_state);
     //cout<<endl;
@@ -268,21 +268,16 @@ bool agent_router::check_for_overtaking ()
                         WARN ( "collisione su un nodo durante il controllo sorpassi? %d %d",my_id,other_id );
                     if ( my_id1==other_id1 )
                         WARN ( "collisione su un nodo durante il controllo sorpassi? %d %d",my_id1,other_id1 );
-                    if (
-                        my_id > other_id &&
-                        my_id1< other_id1 )
+                    if ( my_id > other_id && my_id1< other_id1 )
                     {
                         overtaking = true;
-                        std::cout << time << ": sto rischiando di sorpassare l'agente " << ( *it ).second.id << " tra il nodo " << other_id << " e "
-                                  << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
+                        std::cout << time << ": sto rischiando di sorpassare l'agente " << ( *it ).second.id << " tra il nodo " << other_id << " e " << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
                         node_id[i]=other_id1;
                     }
-                    if ( my_id < other_id &&
-                            my_id1 > other_id1 )
+                    if ( my_id < other_id && my_id1 > other_id1 )
                     {
                         overtaking = true;
-                        std::cout << time << ": sto rischiando di essere sorpassato dall'agente " << ( *it ).second.id
-                                  << " tra il nodo " << other_id << " e " << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
+                        std::cout << time << ": sto rischiando di essere sorpassato dall'agente " << ( *it ).second.id << " tra il nodo " << other_id << " e " << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
                         node_id[i]=other_id1;
                     }
                 }
@@ -307,16 +302,16 @@ bool agent_router::isEmergency ( const std::vector<int>& nodes )
         {
             int id = ( *itt );// - age * graph_node_size;  //attualizzo il nodo
             int i=0;
-   //     for ( auto node:nodes )
-	    auto node=nodes[1];
-   //         {
-  //              i++;
+            //     for ( auto node:nodes )
+            auto node=nodes[1];
+            //         {
+            //              i++;
 //                if ( node/graph_node_size ) break;
-                if ( node%graph_node_size==id%graph_node_size &&  getNextTime()-time<2*TIME_SLOT_FOR_3DGRAPH)
-                {
-                    cout<<"emergenza!!"<<endl;
-                    return true;
-                }
+            if ( node%graph_node_size==id%graph_node_size &&  getNextTime()-time<2*TIME_SLOT_FOR_3DGRAPH )
+            {
+                cout<<"emergenza!!"<<endl;
+                return true;
+            }
 
 //             }
         }
@@ -324,7 +319,6 @@ bool agent_router::isEmergency ( const std::vector<int>& nodes )
     }
     //cout<<"nessuna emergenza"<<endl;
     return false;
-    //_mutex.unlock();
 }
 
 
@@ -378,7 +372,6 @@ bool agent_router::detect_collision ( )
             int id = ( *itt ) - age * graph_node_size;
             if ( id < graph_node_size ) //Se il nodo e' finito nel passato oppure al piano terra lo ignoro
             {
-                //TODO: Perfetto cosi', ma va testato:
                 continue;
             }
             //Calcolo le collisioni
@@ -484,26 +477,17 @@ void agent_router::setSpeed()
         speed=0;
         return;
     }
+    started=true;
     assert ( node_id.size() >1 );
-//     SmartDigraphBase::Node next=graph.nodeFromId ( node_id[1] );
-//     xtarget =  coord_x[next];
-//     ytarget =  coord_y[next];
-//     unsigned int floor = graph.id ( next ) / graph_node_size;
-//     next_time = round ( last_time_updated/TIME_SLOT_FOR_3DGRAPH ) *TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
     simulation_time delta = getNextTime() - time;
-//     if ( floor == 0 ) //floor==0 nei double
-//         speed = 0;
-//     else
-    {
-        double length = distance_to_target.value();
-        speed=length/delta;
-        //cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
-    }
+    double length = distance_to_target.value();
+    speed=length/delta;
+    //cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
 }
 
 simulation_time agent_router::getNextTime()
 {
-  if (internal_state==state::STARTING) return TIME_SLOT_FOR_3DGRAPH;
+    if ( !started ) return TIME_SLOT_FOR_3DGRAPH;
     assert ( node_id.size() >1 );
     SmartDigraphBase::Node next=graph.nodeFromId ( node_id[1] );
     xtarget =  coord_x[next];

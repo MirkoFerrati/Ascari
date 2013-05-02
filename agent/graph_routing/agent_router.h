@@ -106,6 +106,7 @@ private:
     boost::asio::io_service _io_service;
     Udp_graph_communicator communicator;
     std::string priority;
+    bool started;
 
 	
 	
