@@ -70,7 +70,16 @@ void MainWindow::closeEvent ( QCloseEvent *event )
         sniffer->stop_receiving();
     delete qout;
     delete qerr;
-
+if (!agentcontainer.empty())
+	{
+	  for (auto widg:agentcontainer)
+	  {
+	      ui->agentList->removeWidget(widg);
+	      delete widg;
+	  }
+	  agentcontainer.clear();
+	}
+	
 }
 
 MainWindow::~MainWindow()
@@ -91,6 +100,17 @@ MainWindow::~MainWindow()
         agents[i]->kill();
         delete ( agents[i] );
     }
+    
+    if (!agentcontainer.empty())
+	{
+	  for (auto widg:agentcontainer)
+	  {
+	      ui->agentList->removeWidget(widg);
+	      delete widg;
+	  }
+	  agentcontainer.clear();
+	}
+	
 }
 
 void MainWindow::openFile()
@@ -116,11 +136,28 @@ void MainWindow::openFile()
     try
     {
         world=parse_file ( fileName.toStdString() );
+	if (!world.parsedSuccessfully)
+	{
+	       ui->StartAgents->setText ( "impossibile parsare il file" );
+	       return;
+	}
         QString temp="Agents: ";
         QString num;
 	selectedAgents=world.agents.size();
         num.setNum ( selectedAgents );
 	ui->selectAll->setCheckState(Qt::Checked);
+	
+	if (!agentcontainer.empty())
+	{
+	  for (auto widg:agentcontainer)
+	  {
+	      ui->agentList->removeWidget(widg);
+	      delete widg;
+	  }
+	  agentcontainer.clear();
+	}
+	
+	
 	for (int i=0;i<world.agents.size();i++)
 	{
 	  QCheckBox* temp= new QCheckBox(QString::fromStdString(world.agents.at(i).name));
