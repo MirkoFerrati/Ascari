@@ -62,6 +62,8 @@ private slots:
 
     void on_selectAll_stateChanged ( int arg1 );
 
+    void on_speed_sliderMoved(int position);
+
 private:
     Ui::MainWindow *ui;
     QDebugStream *qout,*qerr;

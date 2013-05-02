@@ -198,13 +198,18 @@ void simulator::initialize_agents ( const vector<Parsed_Agent>& ag )
 //     }
 }
 
-void simulator::input_loop ( mutex& input_mutex,condition_variable& input_cond,volatile bool& paused,volatile bool& exit )
+void simulator::input_loop ( mutex& input_mutex,condition_variable& input_cond,volatile bool& paused,volatile bool& exit,volatile int& secSleep )
 {
     char c;
+    string temp;
+    bool isReading;
     while ( !exit )
     {
-        //usleep ( 100000 );
         std::cin.read ( &c,1 );
+	if (isReading)
+	{
+	 temp.push_back(c); 
+	}
         if ( c=='p' )
         {
             std::lock_guard<std::mutex> lock ( input_mutex );
@@ -214,6 +219,21 @@ void simulator::input_loop ( mutex& input_mutex,condition_variable& input_cond,v
             c='0';
             input_cond.notify_one();
         }
+        if (c=='s')
+	{
+	    isReading=true;
+	    temp.clear();
+	    c='0';
+	}
+	if (c=='!')
+	{
+	    isReading=false;
+	    std::lock_guard<std::mutex> lock ( input_mutex );
+	    cout<<"letto un carattere:"<<c<<temp<<atoi(temp.c_str())<<endl;
+	    secSleep=atoi(temp.c_str());
+	    c='0';
+            input_cond.notify_one();
+	}
     }
 }
 
@@ -233,7 +253,7 @@ void simulator::main_loop()
         std::condition_variable input_cond;
         volatile bool input_exit=false;
         volatile bool paused=false;
-        std::thread input_thread ( &simulator::input_loop,this,std::ref ( input_mutex ),std::ref ( input_cond ),std::ref ( paused ),std::ref ( input_exit ) );
+        std::thread input_thread ( &simulator::input_loop,this,std::ref ( input_mutex ),std::ref ( input_cond ),std::ref ( paused ),std::ref ( input_exit ),std::ref(secSleep) );
 
         sim_packet.time=0;
         int clock=0;

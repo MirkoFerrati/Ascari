@@ -51,7 +51,7 @@ private:
 	std::map<std::string,int> map_bonus_variables_to_id;
 	std::map<std::string,control_command_packet> commands;
 	void main_loop();
-	void input_loop( std::mutex& input_mutex, std::condition_variable& input_cond, volatile bool& paused, volatile bool& exit );
+	void input_loop( std::mutex& input_mutex, std::condition_variable& input_cond, volatile bool& paused, volatile bool& exit, volatile int& secSleep );
 	std::vector<std::string> identifiers;
 	simulation_time time;
 	unsigned int num_agents;

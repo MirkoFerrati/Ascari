@@ -553,3 +553,14 @@ void MainWindow::on_selectAll_stateChanged(int arg1)
        disable=false;
 
 }
+
+void MainWindow::on_speed_sliderMoved(int position) //from 0 to 100
+{
+    if ( simulator )
+    {
+        char temp[10];
+        snprintf(temp,10,"s%u!",(100-(position))*(100-position)*2);
+	std::cout<<temp<<std::endl;
+        simulator->write(temp);
+    }
+}
