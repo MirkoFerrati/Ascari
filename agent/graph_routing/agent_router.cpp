@@ -44,7 +44,6 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
     node_id.push_back ( targets[0] ); //next = source;
     node_id.push_back ( targets[0] ); //next = source;
     target_counter = 2;
-    next_time=TIME_SLOT_FOR_3DGRAPH;
     xtarget = 0;//coord_x[next];
     ytarget = 0;//coord_y[next];
     my_LRP.timestamp = 0;
@@ -72,14 +71,14 @@ void agent_router::run_plugin()
         return;
     }
 
-    if ( internal_state==state::MOVING || internal_state==state::EMERGENCY || internal_state==state::STARTING ||internal_state==state::LOADING )
+    if ( internal_state==state::MOVING ||  internal_state==state::STARTING ||internal_state==state::LOADING )
     {
         if ( isTimeToNegotiate ( time ) ) //negozio anche sugli archi, basta che sia il momento giusto
         {
             internal_state=state::ARC_HANDSHAKING;
             negotiation_steps=0;
         }
-        if ( abs ( next_time- ( time+1.7 ) ) <0.001 )  //se sono su un nodo invece faccio di piu' che negoziare
+        if ( abs ( getNextTime()- ( time+1.7 ) ) <0.001 )  //se sono su un nodo invece faccio di piu' che negoziare
         {
             internal_state=state::NODE_HANDSHAKING;
             negotiation_steps=0;
@@ -91,7 +90,7 @@ void agent_router::run_plugin()
                     if ( oldtarget==graph.id ( target ) ) //se il target e' ripetuto vuol dire che devo fare loading
                     {
                         internal_state=state::LOADING;
-			            negotiation_steps=0;
+                        negotiation_steps=0;
 
                     }
                 }
@@ -102,6 +101,21 @@ void agent_router::run_plugin()
                 }
             }
         }
+    }
+
+    if ( internal_state==state::EMERGENCY )
+    {
+        usleep ( 2000 ); //TODO: serve per dare tempo alla comunicazione di girare
+        _io_service.poll();
+        _io_service.reset();
+        if ( isTimeToNegotiate ( time ) ) //negozio anche sugli archi, basta che sia il momento giusto
+        {
+            internal_state=state::NODE_HANDSHAKING;
+            negotiation_steps=0;
+        }
+        prepare_emergency_packet();
+        update_packet();
+        communicator.send ( my_LRP );
     }
 
     if ( internal_state==state::NODE_HANDSHAKING )
@@ -118,27 +132,10 @@ void agent_router::run_plugin()
         {
             last_time_left_a_node=time;
             prepare_move_packet();
-
-// 	    //HACK: 
-// 	    if (graph.id(target)==node_id[1] && node_id.size()==2)
-// 	    {
-// 	      cout<<"il prossimo nodo sara' il mio target"<<endl;
-// 		if (node_id[1]==targets[target_counter])
-// 		{
-// 		  cout<<"il prossimo nodo sara' un nodo di loading"<<endl;
-// 		  
-// 		  node_id.push_back(node_id[1]);
-// 		  
-// 		  priority=" ";
-// 		}
-// 	    }
-// 	    
             update_packet();
             print_path();
             communicator.send ( my_LRP );
         }
-
-
     }
 
     if ( internal_state==state::ARC_HANDSHAKING )
@@ -165,9 +162,9 @@ void agent_router::run_plugin()
         priority=" "; //BRUTTO HACK
         update_packet();
         communicator.send ( my_LRP );
-	            negotiation_steps++;
-	if (negotiation_steps==15)
-	  internal_state=state::MOVING;
+        negotiation_steps++;
+        if ( negotiation_steps==15 )
+            internal_state=state::MOVING;
     }
 
     if ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING || internal_state==state::ARC_HANDSHAKING )
@@ -226,8 +223,8 @@ void agent_router::run_plugin()
         stopAgent();
     }
 
-    //if (internal_state!=state::LOADING && internal_state!=state::EMERGENCY)
-      setSpeed();
+//     if ( internal_state!=state::EMERGENCY )
+        setSpeed();
     //cout<<"stato interno: ";
     //print_state(internal_state);
     //cout<<endl;
@@ -303,24 +300,25 @@ bool agent_router::isEmergency ( const std::vector<int>& nodes )
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it ) //per ogni pacchetto ricevuto
     {
         if ( identifier==it->first ) continue;
-        if ( !it->second.emergency && !it->second.priority.compare(" ")==0 ) continue;
+        if ( !it->second.emergency && !it->second.priority.compare ( " " ) ==0 ) continue;
 
         cout<<"controllo se devo entrare in emergenza per colpa dell'agente:"<<it->first<<" "<<endl;
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
         {
             int id = ( *itt );// - age * graph_node_size;  //attualizzo il nodo
             int i=0;
-        for ( auto node:nodes )
-            {
-                i++;
-                if ( i>4 ) break;
-                if ( node%graph_node_size==id%graph_node_size )
+   //     for ( auto node:nodes )
+	    auto node=nodes[1];
+   //         {
+  //              i++;
+//                if ( node/graph_node_size ) break;
+                if ( node%graph_node_size==id%graph_node_size &&  getNextTime()-time<2*TIME_SLOT_FOR_3DGRAPH)
                 {
                     cout<<"emergenza!!"<<endl;
                     return true;
                 }
 
-            }
+//             }
         }
 
     }
@@ -335,14 +333,15 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
     string start="filtro i nodi:";
     string end="";
     _mutex.lock();
-    
+
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it ) //per ogni pacchetto ricevuto
     {
         if ( identifier==it->first ) continue;
         if ( priority.compare ( it->second.priority ) <0 ) continue;  //se il pacchetto ha priorita' piu' alta
         int age = findAge ( time, it->second.timestamp ); //round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         cout<<start<<it->first<<" ";
-	start="";end="\n";
+        start="";
+        end="\n";
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
         {
             int id = ( *itt ) - age * graph_node_size;  //attualizzo il nodo
@@ -406,10 +405,14 @@ bool agent_router::detect_collision ( )
 bool agent_router::findPath ( lemon::SmartDigraph::ArcMap<bool>& useArc )
 {
     assert ( target != INVALID );
+//     int best_distance;
+//     dijkstra ( graph, length ).path ( computed_path ).dist ( best_distance ).run ( source, target );
     int distance;
     bool reached = dijkstra ( filterArcs ( graph, useArc ), length ).path ( computed_path ).dist ( distance ).run ( source, target );
     if ( distance > MAX_LENGTH )
         reached = false;
+//     if (distance>3*best_distance)
+//       reached=false;
     return reached;
 
 }
@@ -463,11 +466,11 @@ void agent_router::prepare_loading_packet()
 
     node_id.clear();
     int i = 0;//target_counter;
-    node_id.push_back(graph.id(source));
-    assert(targets[target_counter-1]==graph.id ( target ));
+    node_id.push_back ( graph.id ( source ) );
+    assert ( targets[target_counter-1]==graph.id ( target ) );
     while ( targets[target_counter-1+i]==graph.id ( target ) )
     {
-        node_id.push_back ( graph.id ( target ) +graph_node_size*(i+1) );
+        node_id.push_back ( graph.id ( target ) +graph_node_size* ( i+1 ) );
         i++;
     }
     last_time_updated = time;
@@ -476,26 +479,38 @@ void agent_router::prepare_loading_packet()
 
 void agent_router::setSpeed()
 {
-    if ( !last_time_left_a_node || last_time_left_a_node==-1 )
+    if ( !last_time_left_a_node || last_time_left_a_node==-1||internal_state==state::EMERGENCY )
     {
         speed=0;
         return;
     }
     assert ( node_id.size() >1 );
-    SmartDigraphBase::Node next=graph.nodeFromId ( node_id[1] );
-    xtarget =  coord_x[next];
-    ytarget =  coord_y[next];
-    unsigned int floor = graph.id ( next ) / graph_node_size;
-    next_time = round ( last_time_updated/TIME_SLOT_FOR_3DGRAPH ) *TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
-    simulation_time delta = next_time - time;
-    if ( floor ==0 ) //floor==0 nei double
-        speed = 0;
-    else
+//     SmartDigraphBase::Node next=graph.nodeFromId ( node_id[1] );
+//     xtarget =  coord_x[next];
+//     ytarget =  coord_y[next];
+//     unsigned int floor = graph.id ( next ) / graph_node_size;
+//     next_time = round ( last_time_updated/TIME_SLOT_FOR_3DGRAPH ) *TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
+    simulation_time delta = getNextTime() - time;
+//     if ( floor == 0 ) //floor==0 nei double
+//         speed = 0;
+//     else
     {
         double length = distance_to_target.value();
         speed=length/delta;
         //cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
     }
+}
+
+simulation_time agent_router::getNextTime()
+{
+  if (internal_state==state::STARTING) return TIME_SLOT_FOR_3DGRAPH;
+    assert ( node_id.size() >1 );
+    SmartDigraphBase::Node next=graph.nodeFromId ( node_id[1] );
+    xtarget =  coord_x[next];
+    ytarget =  coord_y[next];
+    unsigned int floor = graph.id ( next ) / graph_node_size;
+    int next_time = round ( last_time_updated/TIME_SLOT_FOR_3DGRAPH ) *TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
+    return next_time;
 }
 
 bool agent_router::isOnTarget()
@@ -509,10 +524,6 @@ bool agent_router::isOnTarget()
 
 bool agent_router::setNextTarget()
 {
-//     assert ( node_id.size()>1 );
-//     source = graph.nodeFromId ( node_id[1] % graph_node_size );
-//     if ( graph.id ( source ) == graph.id ( target ) )
-//     {
     if ( target_counter == targets.size() )
     {
         cout << " TARGET FINALE raggiunto, mi fermo" << endl;
@@ -526,6 +537,4 @@ bool agent_router::setNextTarget()
         cout << time << ": TARGET raggiunto, nuovo target: " << id << " " << coord_x [target] << " " << coord_y[target] << endl;
         return true;
     }
-//     }
-//     return true;
 }

@@ -66,6 +66,7 @@ private:
     void prepare_stopped_packet();
 	void prepare_loading_packet();
 	void print_state( state s );
+    simulation_time getNextTime();
 private:
     state internal_state;
     bool next_target_reachable;
@@ -91,7 +92,7 @@ private:
     lemon::SmartDigraph::Node source, target;//, next; //informazioni locali sui nodi
 
     /**Informazioni temporali*/
-    simulation_time next_time;
+    //simulation_time next_time;
     simulation_time &time;
     simulation_time last_time_updated;
     simulation_time last_time_left_a_node;
