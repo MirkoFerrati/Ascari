@@ -8,7 +8,7 @@ std::shared_ptr< visibleArea > visibleArea::createVisibilityFromParsedVisibleAre
   
     
      const boost::regex circle_pattern("CIRCLE\\(\\w+,\\w+,(\\d+\\.{0,1}\\d*)\\)");
-     const boost::regex map_pattern("MAP\\(\\w+,\\w+,\\w+)");
+     const boost::regex map_pattern("MAP\\(\\w+,\\w+,\\w+\\)");
      
     if(boost::regex_match(parsed_visibility.begin(),parsed_visibility.end(), circle_pattern)==true){ 
       return std::make_shared<circle>( parsed_visibility,map_statename_to_id );  
