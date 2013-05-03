@@ -19,7 +19,7 @@ void agent_router_viewer::setPainterScale ( double scale )
 }
 
 
-void agent_router_viewer::init(std::string filename)
+void agent_router_viewer::init(std::string /*filename*/)
 {
   assert(father);
   Viewer* temp_father=reinterpret_cast<Viewer*>(father);

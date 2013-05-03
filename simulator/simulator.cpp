@@ -382,10 +382,10 @@ void simulator::main_loop()
             // Calculate time taken by a request
             clock_gettime ( CLOCK_REALTIME, &requestEnd );
 
-            // Calculate time it took
-            double accum = ( requestEnd.tv_sec - requestStart.tv_sec )
-                           + ( requestEnd.tv_nsec - requestStart.tv_nsec )
-                           / 1E9;
+//             Calculate time it took
+//             double accum = ( requestEnd.tv_sec - requestStart.tv_sec )
+//                            + ( requestEnd.tv_nsec - requestStart.tv_nsec )
+//                            / 1E9;
 
             //cout<<endl<< "tempo necessario:"<<endl;
             //printf( "%f\n", accum );

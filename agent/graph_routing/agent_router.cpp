@@ -301,7 +301,6 @@ bool agent_router::isEmergency ( const std::vector<int>& nodes )
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
         {
             int id = ( *itt );// - age * graph_node_size;  //attualizzo il nodo
-            int i=0;
             //     for ( auto node:nodes )
             auto node=nodes[1];
             //         {

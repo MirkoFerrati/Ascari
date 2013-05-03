@@ -158,7 +158,7 @@ void MainWindow::openFile()
 	}
 	
 	
-	for (int i=0;i<world.agents.size();i++)
+	for (unsigned int i=0;i<world.agents.size();i++)
 	{
 	  QCheckBox* temp= new QCheckBox(QString::fromStdString(world.agents.at(i).name));
 	  temp->setTristate(false);

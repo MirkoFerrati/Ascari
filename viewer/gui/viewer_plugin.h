@@ -49,7 +49,7 @@ public:
       
     }
   };
-  virtual void paintBackground(QPainter &painter){};
+  virtual void paintBackground(QPainter &/*painter*/){};
   virtual void timerEvent(){};
   virtual void init(std::string){};
   virtual void keypress(){};
