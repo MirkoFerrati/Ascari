@@ -108,7 +108,7 @@
     dim: 500
     dst: 50
     angle: 1.5
-    world_map: nomefile TODO
+    world_map: ../graphs/museum.gml
   AGENTS:
   - agent: Agente01
     VISIBLE_AREA: circle(x,y,300)

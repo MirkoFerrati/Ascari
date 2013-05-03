@@ -11,17 +11,19 @@ class map2d: public visibleArea
     int second_axis;
 
 public:
-
-    map2d ( std::string& vis, const index_map& map_statename );
+map2d(std::string filename);
+    map2d ( std::string& visibility, const index_map& map_statename );
 
     bool isVisible ( const agent_state& me, const agent_state& other );
 
+    inline const graph& getGraph(){return g;};
+    
 private:
     void openfile ( std::string filename );
   
     void create ( std::string& vis, const index_map& map_statename );
     void loadfromgraph ( graph g );
-    
+    graph g;
 
 };
 

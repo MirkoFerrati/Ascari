@@ -2,10 +2,16 @@
 
 #include <istream>
 
-map2d::map2d ( std::string& vis, const index_map& map_statename )
+map2d::map2d ( std::string& visibility, const index_map& map_statename )
 {
-    create ( vis, map_statename );
+    create ( visibility, map_statename );
 }
+
+map2d::map2d( std::string fil )
+{
+  openfile ( fil );
+}
+
 
 bool map2d::isVisible ( const agent_state& me,const agent_state& other )
 {
@@ -74,7 +80,7 @@ void map2d::openfile ( std::string filename )
     gmlreader reader;
     std::fstream f;
     f.open ( filename.c_str(),std::ios::in );
-    graph g=reader.read ( &f );
+    g=reader.read ( &f );
     f.close();
     loadfromgraph ( g );
 
@@ -82,18 +88,11 @@ void map2d::openfile ( std::string filename )
 
 void map2d::loadfromgraph ( graph g )
 {
-    std::list<arc> arcs;
-for ( auto arc:g.arcs )
-    {
-        arcs.push_back ( arc );
-    }
-    {
-        for ( auto arc=arcs.begin(); arc!=arcs.end(); ++arc )
+        for ( auto arc=g.arcs.begin(); arc!=g.arcs.end(); ++arc )
         {
             wykobi::segment<double,2> temp;
             temp[0]=wykobi::make_point<double> ( g.nodes[arc->first].x,g.nodes[arc->first].y );
             temp[1]=wykobi::make_point<double> ( g.nodes[arc->second].x,g.nodes[arc->second].y );
             internal_map.push_back ( temp );
         }
-    }
 }

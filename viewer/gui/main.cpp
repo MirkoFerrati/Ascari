@@ -116,7 +116,7 @@ int main ( int argc, char *argv[] )
 
             identifier_sniffer=std::unique_ptr<zmq_identifier_sniffer> ( new zmq_identifier_sniffer ( monitor_read,monitor_read_mutex ) );
             identifier_sniffer->start_receiving();
-            viewer_plugin* temp=new monitor_viewer ( &monitor_read,monitor_read_mutex );
+            viewer_plugin* temp=new monitor_viewer ( &monitor_read,monitor_read_mutex,filename );
             temp->setfather ( &window );
             window.addPlugin ( temp );
             plugins.push_back ( temp );

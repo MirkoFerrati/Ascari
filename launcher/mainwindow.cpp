@@ -469,6 +469,7 @@ bool MainWindow::startViewer()
 
         case 5:
         {
+	  std::string mapfilename="";
             if ( !monitor_mutex )
             {
                 std::shared_ptr<std::mutex> temp ( new std::mutex );
@@ -483,7 +484,11 @@ bool MainWindow::startViewer()
                 identifier_sniffer= std::unique_ptr<zmq_identifier_sniffer> ( new zmq_identifier_sniffer ( monitor_buffer,monitor_mutex ) );
                 identifier_sniffer->start_receiving();
             }
-            viewer_plugin* temp=new monitor_viewer ( &monitor_buffer,monitor_mutex );
+              QFile file ( fileName );
+            QDir d = QFileInfo ( file ).absoluteDir();
+	    if (!(world.mapfilename=="UNSET"))
+		mapfilename= ( d.absolutePath().append ( "/" ).append ( QString::fromStdString ( world.mapfilename ).toLower() ) ).toStdString();
+            viewer_plugin* temp=new monitor_viewer ( &monitor_buffer,monitor_mutex,mapfilename );
             temp->setfather ( insideViewer );
             insideViewer->addPlugin ( temp );
             plugins.push_back ( temp );

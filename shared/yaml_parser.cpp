@@ -325,6 +325,7 @@ return true;
 bool operator>> ( const YAML::Node& node, Parsed_World& wo )
 {
     wo.graphName="UNSET";
+    wo.mapfilename="UNSET";
 
     wo.task_assignment_algorithm=-1;
 
@@ -351,7 +352,12 @@ bool operator>> ( const YAML::Node& node, Parsed_World& wo )
 
                 world_node["GRAPH_NAME"]>> wo.graphName;
             }
+	    if ( node[0]["WORLD"][0].FindValue ( "WORLD_MAP" ) )
+            {
+                const YAML::Node &world_node=node[0]["WORLD"][0];
 
+                world_node["WORLD_MAP"]>> wo.mapfilename;
+            }
         }
     }
 

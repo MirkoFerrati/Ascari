@@ -1,16 +1,18 @@
 #include "monitor_viewer.h"
-
+#include "viewer.h"
+#include <../simulator/visibility/map2d.h>
+#include "../../gml2lgf/arc.h"
 #include <mutex>
 #include <memory>
 #include <string>
 #include <map>
- 
- monitor_viewer::monitor_viewer(std::map< std::string, monitor_packet >* monitor_read, std::shared_ptr< std::mutex > monitor_read_mutex)
+#include <sstream>
+ monitor_viewer::monitor_viewer(std::map< std::string, monitor_packet >* monitor_read, std::shared_ptr< std::mutex > monitor_read_mutex, std::string mapfilename):mapfilename(mapfilename)
  {
       monitor=true; 
       this->monitor_read=monitor_read;
       this->monitor_read_mutex=monitor_read_mutex;
-
+map=0;
  }
 
 void monitor_viewer::drawArrow(int x1,int y1, int x2, int y2, double sze, QPainter* painter )
@@ -36,6 +38,44 @@ void monitor_viewer::drawArrow(int x1,int y1, int x2, int y2, double sze, QPaint
     painter->drawLine( pa.x(), pa.y(), x1, y1 );
     painter->drawLine( pb.x(), pb.y(), x1, y1 );
     
+}
+
+void monitor_viewer::paintBackground ( QPainter& painter )
+{
+  if (!map)
+    return;
+auto &nodes=map->getGraph().nodes;
+auto &arcs=map->getGraph().arcs;
+  for (unsigned int i=0;i<arcs.size();i++)
+  {
+        painter.drawLine( nodes[arcs[i].first].x,nodes[arcs[i].first].y,nodes[arcs[i].second].x,nodes[arcs[i].second].y);
+  }
+  
+  
+}
+
+void monitor_viewer::init ( std::string )
+{
+    if (mapfilename!="")
+    {
+	map=new map2d(mapfilename);      
+	
+	
+	 assert(father);
+	 Viewer* temp_father=reinterpret_cast<Viewer*>(father);
+	auto &nodes=map->getGraph().nodes;
+
+	double maxx=nodes[0].x,maxy=nodes[0].y,minx=nodes[0].x,miny=nodes[0].y;
+    for ( unsigned int i=0;i<nodes.size();i++ )
+    {
+        if ( maxx< nodes[i].x) maxx= nodes[i].x;
+        if ( maxy< nodes[i].y) maxy= nodes[i].y;
+        if ( minx> nodes[i].x) minx= nodes[i].x;
+        if ( miny> nodes[i].y) miny= nodes[i].y;
+    }
+    temp_father->setScalingAndTranslateFactor(maxx,minx,maxy,miny);
+	
+    }
 }
 
 

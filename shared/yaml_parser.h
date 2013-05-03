@@ -104,7 +104,7 @@ class Parsed_World{
   std::vector<Parsed_Agent> agents;
   std::map<std::string,std::unique_ptr< Parsed_Behavior>> behaviors;
   std::string graphName;
-  
+  std::string mapfilename;
   std::vector<task_assignment_namespace::task_id> tasks_id;
   task_assignment_namespace::task_list task_list;
   task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
