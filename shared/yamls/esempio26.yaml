@@ -127,13 +127,13 @@
     
     
   - agent: Agente02
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,500)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
-    - x: '171'
+    - x: '071'
       y: '151'
       theta: '0.2'
     STATE_START: FAST
@@ -141,7 +141,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente03
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,500)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -155,7 +155,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente04
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,500)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -169,7 +169,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente05
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,500)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -183,13 +183,13 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente06
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,500)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
-    - x: '151'
+    - x: '351'
       y: '231'
       theta: '0.6'
     STATE_START: FAST
@@ -197,7 +197,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente07
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,500)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -211,7 +211,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente08
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,500)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -225,7 +225,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente09
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,500)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -239,7 +239,7 @@
     KNOWN_BEHAVIORS:    [LGV]
     
   - agent: Agente10
-    VISIBLE_AREA: circle(x,y,200)
+    VISIBLE_AREA: circle(x,y,500)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]

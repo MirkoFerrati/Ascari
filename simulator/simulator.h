@@ -17,6 +17,7 @@
 //written by Alessandro Settimi
 #include "communication/task_assignment_router.hpp"
 #include "visibility/visibility.h"
+#include <map2d.h>
 //written by Alessandro Settimi
 
 class simulator
@@ -73,6 +74,7 @@ private:
 	//written by Alessandro Settimi
 	
 	std::map<int,std::shared_ptr<visibleArea> > agents_visibility;
+	visibleArea* world_map;
 };
 
 

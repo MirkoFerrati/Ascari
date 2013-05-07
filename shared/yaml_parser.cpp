@@ -15,6 +15,8 @@ Parsed_World parse_file ( const char * file_name )
 Parsed_World parse_file ( string file_name )
 {
     std::ifstream fin ( file_name.c_str() );
+    if (!fin.is_open())
+      ERR("ATTENZIONE, impossibile aprire il file %s",file_name.c_str());
     std::ostringstream str;
     str<<fin.rdbuf();
     std::string new_str=str.str();
@@ -357,6 +359,7 @@ bool operator>> ( const YAML::Node& node, Parsed_World& wo )
                 const YAML::Node &world_node=node[0]["WORLD"][0];
 
                 world_node["WORLD_MAP"]>> wo.mapfilename;
+		 boost::algorithm::to_lower ( wo.mapfilename);
             }
         }
     }

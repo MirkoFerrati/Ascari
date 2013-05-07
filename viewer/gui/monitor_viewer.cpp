@@ -13,6 +13,8 @@
       this->monitor_read=monitor_read;
       this->monitor_read_mutex=monitor_read_mutex;
 map=0;
+
+setPainterScale(25.0);
  }
 
 void monitor_viewer::drawArrow(int x1,int y1, int x2, int y2, double sze, QPainter* painter )

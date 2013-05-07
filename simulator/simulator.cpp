@@ -10,6 +10,7 @@
 #include <condition_variable>
 #include "collisionchecker.h"
 #include "visibility/visibility.h"
+#include <map2d.h>
 #include <time.h>
 
 
@@ -40,6 +41,7 @@ simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.tim
     max_loops=0;
     communicator=0;
     num_agents=0;
+    world_map=0;
     pi=exprtk::details::numeric::constant::pi;
     f_rndom=0;
     secSleep=5000;
@@ -79,7 +81,10 @@ void simulator::initialize ( const Parsed_World& wo )
     //written by Alessandro Settimi
     task_assignment_algorithm = wo.task_assignment_algorithm;
     //written by Alessandro Settimi
-
+    if (wo.mapfilename!="UNSET" && wo.mapfilename!="")
+    {
+      this->world_map=new map2d(wo.mapfilename);
+    }
     initialize_agents ( wo.agents );
     createObjects(wo);
     bonus_symbol_table.add_constants();
@@ -302,7 +307,7 @@ void simulator::main_loop()
                       !agents_visibility.count ( agents_name_to_index.at ( other->first ) ) ||
                        (
 			 agents_visibility.at ( agents_name_to_index.at ( agent->first ) )->isVisible ( agent->second.state,other->second.state ) 
-//			  && (!mappa mondo esiste || agenti si vedono nel mondo ) 
+			  && (!world_map || world_map->isVisible(agent->second.state,other->second.state) ) 
 			)
 		    )
                     {
@@ -441,7 +446,7 @@ simulator::~simulator()
 
     delete ta_router;
 
-
+    delete world_map;
     delete collisionChecker;
 }
 

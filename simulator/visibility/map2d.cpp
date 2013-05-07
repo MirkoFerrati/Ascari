@@ -80,6 +80,8 @@ void map2d::openfile ( std::string filename )
     gmlreader reader;
     std::fstream f;
     f.open ( filename.c_str(),std::ios::in );
+    if (!f.is_open())
+      ERR("Attenzione, impossibile aprire il file %s",filename.c_str());
     g=reader.read ( &f );
     f.close();
     loadfromgraph ( g );
@@ -95,4 +97,6 @@ void map2d::loadfromgraph ( graph g )
             temp[1]=wykobi::make_point<double> ( g.nodes[arc->second].x,g.nodes[arc->second].y );
             internal_map.push_back ( temp );
         }
+        first_axis=0;
+	second_axis=1;
 }

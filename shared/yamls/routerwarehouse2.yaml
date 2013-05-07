@@ -48,7 +48,7 @@
   - bonus_variables: [c]
     c: 1
     GRAPH_NAME: '../graphs/loading.gml.lgf'
-
+    GOODS: [33,33,33,33,33,34,34,34,34]
   AGENTS:
   - agent: Agente1
     COMMUNICATION_AREA: =  circle(10)
