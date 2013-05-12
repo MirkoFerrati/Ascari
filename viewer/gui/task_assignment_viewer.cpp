@@ -98,7 +98,7 @@ void task_assignment_viewer::paintBackground (QPainter& painter)
 
 void task_assignment_viewer::paintAgents(QPainter& painter,const std::map<std::string,Agent>& agents)
 {
-	viewer_plugin::paintAgents(painter,agents);
+	abstract_viewer_plugin::paintAgents(painter,agents);
 	
 	for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
 	{

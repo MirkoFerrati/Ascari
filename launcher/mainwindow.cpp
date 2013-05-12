@@ -8,6 +8,7 @@
 #include <zmq_identifier_sniffer.hpp>
 #include "../viewer/gui/agent_router_viewer.h"
 #include "../viewer/gui/task_assignment_viewer.h"
+#include "../plugins/abstract_viewer_plugin.h"
 
 MainWindow::MainWindow ( QWidget *parent ) :
     QMainWindow ( parent ),
@@ -450,7 +451,7 @@ bool MainWindow::startViewer()
             QFile file ( fileName );
             QDir d = QFileInfo ( file ).absoluteDir();
             graphname= ( d.absolutePath().append ( "/" ).append ( QString::fromStdString ( world.graphName ).toLower() ) ).toStdString();
-            viewer_plugin* temp=new agent_router_viewer(graphname);
+            abstract_viewer_plugin* temp=new agent_router_viewer(graphname);
             temp->setfather ( insideViewer );
             insideViewer->addPlugin ( temp );
             plugins.push_back ( temp );
@@ -458,7 +459,7 @@ bool MainWindow::startViewer()
 
         case 4:
         {
-            viewer_plugin* temp=new task_assignment_viewer(insideViewer->getTime(),mutex,buffer);
+            abstract_viewer_plugin* temp=new task_assignment_viewer(insideViewer->getTime(),mutex,buffer);
             temp->setfather ( insideViewer );
 	    temp->setAgentSize(0.2);
 	    temp->setPainterScale(1000.0);
@@ -488,7 +489,7 @@ bool MainWindow::startViewer()
             QDir d = QFileInfo ( file ).absoluteDir();
 	    if (!(world.mapfilename=="UNSET"))
 		mapfilename= ( d.absolutePath().append ( "/" ).append ( QString::fromStdString ( world.mapfilename ).toLower() ) ).toStdString();
-            viewer_plugin* temp=new monitor_viewer ( &monitor_buffer,monitor_mutex,mapfilename );
+            abstract_viewer_plugin* temp=new monitor_viewer ( &monitor_buffer,monitor_mutex,mapfilename );
             temp->setfather ( insideViewer );
             insideViewer->addPlugin ( temp );
             plugins.push_back ( temp );

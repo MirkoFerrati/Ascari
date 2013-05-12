@@ -9,7 +9,7 @@ set(launcher_MOC_HEADERS mainwindow.h )
 set(launcher_SOURCES main.cpp mainwindow.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../shared/communication/zmq_identifier_communicator.hpp
 ../viewer/communication/zmq_identifier_sniffer.hpp ../viewer/gui/monitor_viewer.cpp ../viewer/gui/agent_router_viewer.cpp ../viewer/gui/task_assignment_viewer.cpp
 ../simulator/visibility/map2d.cpp ../gml2lgf/utils.cpp ../gml2lgf/gmlreader.hpp  ../gml2lgf/node.cpp ../gml2lgf/graph.cpp ../gml2lgf/arc.cpp
-
+../shared/objects/router_graph_good.cpp
 ../viewer/gui/viewer.cpp ../viewer/communication/udp_world_sniffer.cpp ../viewer/gui/Agent.cpp ../shared/communication/global.cpp ../shared/objects/task_assignment_task.cpp)
 SET(launcher_UIS mainwindow.ui)
 

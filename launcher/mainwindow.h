@@ -77,7 +77,7 @@ private:
     QSettings *settings;
     Parsed_World world;
     Viewer * insideViewer;
-    std::vector<viewer_plugin*> plugins;
+    std::vector<abstract_viewer_plugin*> plugins;
     std::vector<QCheckBox*> agentcontainer;
     std::unique_ptr<world_sniffer_abstract> sniffer;
     std::unique_ptr<world_sniffer_abstract> identifier_sniffer;

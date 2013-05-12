@@ -6,9 +6,10 @@
 #include <types/monitor_packet.h>
 #include "viewer_plugin.h"
 #include <../simulator/visibility/map2d.h>
+#include "../plugins/abstract_viewer_plugin.h"
 #include <mutex>
 
-class monitor_viewer:public viewer_plugin
+class monitor_viewer:public abstract_viewer_plugin
 {
   
 public:

@@ -15,7 +15,7 @@ agent_router_viewer::agent_router_viewer(std::string graphname):graphname(graphn
 
 void agent_router_viewer::setPainterScale ( double scale )
 {
-    viewer_plugin::setPainterScale ( scale );
+    abstract_viewer_plugin::setPainterScale ( scale );
 }
 
 

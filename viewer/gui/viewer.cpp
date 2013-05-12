@@ -33,7 +33,7 @@ Viewer::Viewer ( const world_sim_packet& read, std::shared_ptr<std::mutex>& read
     simulation_time=0;
 }
 
-void Viewer::addPlugin ( viewer_plugin* plugin )
+void Viewer::addPlugin ( abstract_viewer_plugin* plugin )
 {
   assert(plugin);
   plugins.push_back(plugin);

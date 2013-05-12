@@ -20,7 +20,7 @@ public:
     
     virtual void updateState ( const simulation_time& time, const agents_name_to_states& agent_states, const index_map& agents_name_to_index );
     
-  
+     ~router_graph_good();
   
   
 };

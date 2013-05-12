@@ -2,6 +2,7 @@
 #include "viewer.h"
 #include <../simulator/visibility/map2d.h>
 #include "../../gml2lgf/arc.h"
+#include "../plugins/abstract_viewer_plugin.h"
 #include <mutex>
 #include <memory>
 #include <string>
@@ -83,7 +84,7 @@ void monitor_viewer::init ( std::string )
 
 void monitor_viewer::paintAgents(QPainter& painter, const std::map< std::string, Agent >& agents)
 {
-  viewer_plugin::paintAgents(painter, agents);
+  abstract_viewer_plugin::paintAgents(painter, agents);
 
   for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
     {   

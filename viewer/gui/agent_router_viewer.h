@@ -5,7 +5,7 @@
 #include <lemon/smart_graph.h>
 #include <map>
 
-class agent_router_viewer:public viewer_plugin
+class agent_router_viewer:public abstract_viewer_plugin
 {
 public:
     agent_router_viewer (std::string graphname );

@@ -73,7 +73,7 @@ int main ( int argc, char *argv[] )
 
         QApplication app ( argc,argv );
         std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
-        std::vector<viewer_plugin*> plugins;
+        std::vector<abstract_viewer_plugin*> plugins;
         world_sim_packet read;
         std::map<std::string,monitor_packet> monitor_read;
         std::shared_ptr<std::mutex> monitor_read_mutex ( new std::mutex );
@@ -89,7 +89,7 @@ int main ( int argc, char *argv[] )
         break;
         case 2:
         {
-            viewer_plugin* router_viewer = new agent_router_viewer ( filename );
+            abstract_viewer_plugin* router_viewer = new agent_router_viewer ( filename );
             plugins.push_back ( router_viewer );
             router_viewer->setfather ( &window );
             window.addPlugin ( router_viewer );
@@ -102,7 +102,7 @@ int main ( int argc, char *argv[] )
         }
         case 4:
         {
-            viewer_plugin* ta_viewer = new task_assignment_viewer ( window.getTime(),read_mutex,read );
+            abstract_viewer_plugin* ta_viewer = new task_assignment_viewer ( window.getTime(),read_mutex,read );
             plugins.push_back ( ta_viewer );
             ta_viewer->setfather ( &window );
             ta_viewer->setAgentSize ( 0.2 );
@@ -116,7 +116,7 @@ int main ( int argc, char *argv[] )
 
             identifier_sniffer=std::unique_ptr<zmq_identifier_sniffer> ( new zmq_identifier_sniffer ( monitor_read,monitor_read_mutex ) );
             identifier_sniffer->start_receiving();
-            viewer_plugin* temp=new monitor_viewer ( &monitor_read,monitor_read_mutex,filename );
+            abstract_viewer_plugin* temp=new monitor_viewer ( &monitor_read,monitor_read_mutex,filename );
             temp->setfather ( &window );
             window.addPlugin ( temp );
             plugins.push_back ( temp );

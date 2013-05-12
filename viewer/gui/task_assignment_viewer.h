@@ -5,10 +5,10 @@
 #include <boost/circular_buffer.hpp>
 #include "objects/task_assignment_task.h"
 #include "viewer.h"
-#include "viewer_plugin.h"
+#include "../plugins/abstract_viewer_plugin.h"
 
 
-class task_assignment_viewer:public viewer_plugin
+class task_assignment_viewer:public abstract_viewer_plugin
 {
 public:
     task_assignment_viewer (  int* time,std::shared_ptr< std::mutex >& mutex, const world_sim_packet& infos );
