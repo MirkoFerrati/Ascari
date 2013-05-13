@@ -9,7 +9,7 @@
 #include "logog.hpp"
 #include <map>
 #include <yaml-cpp/yaml.h>
-#include "task_assignment_types.h"
+#include "../plugins/task_assignment/task_assignment_types.h"
 #include "objects/router_graph_good.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/strong_typedef.hpp>

@@ -2,7 +2,7 @@
 #define TASK_ASSIGNMENT_TASK_H
 #include "streams_utils.h"
 #include "types/agents_name_to_states.h"
-#include "../../task_assignment_types.h"
+#include "../../plugins/task_assignment/task_assignment_types.h"
 #define TA_RADIUS 5
 
 

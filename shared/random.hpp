@@ -8,7 +8,6 @@
 
 template <typename T>
 struct rndom : public exprtk::ifunction<T> 
-//TODO(MIRKO): Spostare in un file a parte con i Warning disabilitati
 {
 	rndom() : exprtk::ifunction<T>(2),name("RNDOM") {
     }

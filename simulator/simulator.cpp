@@ -42,7 +42,6 @@ simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.tim
     communicator=0;
     num_agents=0;
     world_map=0;
-    pi=exprtk::details::numeric::constant::pi;
     f_rndom=0;
     secSleep=5000;
     collisionChecker=0;
@@ -116,8 +115,7 @@ void simulator::initialize ( const Parsed_World& wo )
     {
         bonus_symbol_table.add_variable ( it->first,bonusVariables[it->second] );
     }
-    pi=exprtk::details::numeric::constant::pi;
-    bonus_symbol_table.add_variable ( "PI_GRECO",pi,true );
+    bonus_symbol_table.add_constant ( "PI_GRECO",exprtk::details::numeric::constant::pi );
     f_rndom = new rndom<double>();
     bonus_symbol_table.add_function ( f_rndom->name, *f_rndom );
     exprtk::parser<double> parser;
