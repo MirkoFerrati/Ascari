@@ -1,6 +1,5 @@
 #ifndef IDENTIFIER_MODULE_H
 #define IDENTIFIER_MODULE_H
-#include <plugin_module.h>
 #include <agent.h>
 #include <yaml_parser.h>
 
