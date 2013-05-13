@@ -1,7 +1,7 @@
 #ifndef EMPTY_PLUGIN_H
 #define EMPTY_PLUGIN_H
 
-#include "plugin_module.h"
+#include "../plugins/abstract_agent_plugin.h"
 #include "communication/empty_plugin_communicator.hpp"
 #include <types/events.h>
 #include <types/empty_packet.h>
@@ -10,7 +10,7 @@
 
 
 
-class empty_plugin: public Plugin_module
+class empty_plugin: public abstract_agent_plugin
 {
 public:
 	empty_plugin( std::map< transition, Events >& events,

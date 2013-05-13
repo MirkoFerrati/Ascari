@@ -3,7 +3,6 @@
 #define TASK_ASSIGNMENT_H
 #include <vector>
 
-#include "plugin_module.h"
 #include <yaml_parser.h>
  
 #include <task_assignment_communicator.h>
@@ -14,8 +13,9 @@
 
 //TODO (Alessandro): che semafori uso? per ora quelli di simone
 #include "../identifierModule/named_semaphore.hpp"
+#include "../plugins/abstract_agent_plugin.h"
 
-class task_assignment: public Plugin_module
+class task_assignment: public abstract_agent_plugin
 {
 	
 public:

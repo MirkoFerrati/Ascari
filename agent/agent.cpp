@@ -48,14 +48,14 @@ agent::agent ( int agent_index,const Parsed_World& world, bool noStart ) :
 
     if ( !world.agents.at ( agent_index ).target_list.empty() )
     {
-        Plugin_module *plugin=new agent_router ( world.agents.at ( agent_index ).target_list,events,events_to_index,world.agents.at ( agent_index ).name,time,world.graphName );
+        abstract_agent_plugin *plugin=new agent_router ( world.agents.at ( agent_index ).target_list,events,events_to_index,world.agents.at ( agent_index ).name,time,world.graphName );
         plugins.push_back ( plugin );
     }
 
     if ( world.agents.at ( agent_index ).monitoring )
     {
 
-        Plugin_module *monitor=new identifier_module ( world,bonusVariables,map_bonus_variables_to_id,world_comm,time,identifier );
+        abstract_agent_plugin *monitor=new identifier_module ( world,bonusVariables,map_bonus_variables_to_id,world_comm,time,identifier );
         plugins.push_back ( monitor );
     }
 
@@ -71,7 +71,7 @@ agent::agent ( int agent_index,const Parsed_World& world, bool noStart ) :
     //written by Alessandro Settimi
     if ( !world.task_list.empty() )
     {
-        Plugin_module* plugin=new task_assignment ( world,world.agents.at ( agent_index ),time,events,events_to_index,objects );
+        abstract_agent_plugin* plugin=new task_assignment ( world,world.agents.at ( agent_index ),time,events,events_to_index,objects );
         plugins.push_back ( plugin );
     }
     //written by Alessandro Settimi

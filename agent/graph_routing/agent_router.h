@@ -7,10 +7,10 @@
 
 
 #include <lemon/random.h>
-#include "plugin_module.h"
 #include "../../shared/types/graph_informations.h"
 #include <types/events.h>
 #include "udp_graph_communicator.h"
+#include "../plugins/abstract_agent_plugin.h"
 #include <thread>
 
 #define TIME_SLOT_FOR_3DGRAPH 10.0
@@ -29,7 +29,7 @@ enum class state
 };
 
 
-class agent_router: public Plugin_module
+class agent_router: public abstract_agent_plugin
 {
 
 public:

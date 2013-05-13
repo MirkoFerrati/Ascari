@@ -20,7 +20,7 @@
 #define buffer_refill
 
 
-class identifier_module: public Plugin_module
+class identifier_module: public abstract_agent_plugin
 {
 
 public:

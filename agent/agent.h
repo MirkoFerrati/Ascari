@@ -13,7 +13,7 @@
 #include "encoder/encoderAbstract.h"
 #include "decoder/decoder.h"
 #include "random.hpp"
-#include "plugin_module.h"
+#include "../plugins/abstract_agent_plugin.h"
 
 
 
@@ -140,7 +140,7 @@ protected:
 	/*!
 	 * Moduli aggiuntivi utilizzabili stile plugin (ma quanto sarebbe bello farlo in modo sistematico!)
 	 */
-	std::vector <Plugin_module*> plugins;
+	std::vector <abstract_agent_plugin*> plugins;
 	
 
 	/**
