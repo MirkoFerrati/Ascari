@@ -1,31 +1,32 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(agent_SOURCES empty_plugin/empty_plugin.cpp 
- graph_routing/graph_creator.cpp encoder/encoderDet.cpp automaton/automatonFSM.cpp automaton/automatonEFSM.cpp
-  communication/udp_agent_communicator.cpp identifierModule/identifier_module.cpp ../shared/dynamic.cpp
+
+
+set_property(GLOBAL APPEND PROPERTY agent_SOURCES empty_plugin/empty_plugin.cpp 
+  encoder/encoderDet.cpp automaton/automatonFSM.cpp automaton/automatonEFSM.cpp
+  communication/udp_agent_communicator.cpp  ../shared/dynamic.cpp
   communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
   ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp decoder/decoder.cpp 
-  graph_routing/agent_router.cpp graph_routing/agent_router_utility.cpp graph_routing/udp_graph_communicator.cpp
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/global.cpp
 	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp 
-	identifierModule/agent_to_dummy_communicator.hpp identifierModule/dummy_agent.hpp
-	identifierModule/identifier_module.cpp identifierModule/identifierModule_communicator.hpp
 	../shared/objects/task_assignment_task.cpp ../shared/objects/router_graph_good.cpp
 )
+#set(agent_SOURCES ${agent_SOURCES} )
 
 #add_definitions(-DZMQDEBUG)
 
-FIND_PACKAGE(GLPK 4.33)
+#FIND_PACKAGE(GLPK 4.33)
 
 set(GLPK_FOUND 1)
 if (${GLPK_FOUND})
 add_definitions(-DGLPK_FOUND)
 #written by Alessandro Settimi
-set (agent_SOURCES ${agent_SOURCES} task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/algorithms_utility.cpp task_assignment/subgradient_algorithm.cpp task_assignment/assignment_problem.cpp task_assignment/dubins.cpp)
+set_property(GLOBAL APPEND PROPERTY agent_SOURCES task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/algorithms_utility.cpp task_assignment/subgradient_algorithm.cpp task_assignment/assignment_problem.cpp task_assignment/dubins.cpp)  
 #written by Alessandro Settimi
 endif (${GLPK_FOUND})
 
-add_executable(agent ${agent_SOURCES})
+get_property(sources GLOBAL PROPERTY agent_SOURCES)
+add_executable(agent ${sources})
 
 include_directories(identifierModule)
 include_directories(controller)
@@ -51,7 +52,7 @@ include_directories(../shared/logog/include)
 include_directories(../shared/parserYAML/include)
 include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
 include_directories(decoder)
-include_directories(graph_routing)
+include_directories(plugins)
 #written by Alessandro Settimi
 include_directories(task_assignment)
 #written by Alessandro Settimi
@@ -68,13 +69,13 @@ target_link_libraries(agent ${Boost_LIBRARIES} pthread)
 message("Configurazione di ${CMAKE_BUILD_TYPE}")
 file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/agent" "../shared/yamls/*.yaml")
 FOREACH(infileName ${yaml_files})
-MESSAGE(STATUS "Process file: ${infileName}")
+#MESSAGE(STATUS "Process file: ${infileName}")
 configure_file(${infileName} ./ COPYONLY)
 endforeach(${infileName})
 
 file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/agent" "../shared/graphs/*.lgf")
 FOREACH(infileName ${yaml_files})
-MESSAGE(STATUS "Process file: ${infileName}")
+#MESSAGE(STATUS "Process file: ${infileName}")
 configure_file(${infileName} ./ COPYONLY)
 endforeach(${infileName})
 

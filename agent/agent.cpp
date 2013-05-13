@@ -1,5 +1,5 @@
 #include "agent.h"
-#include "graph_routing/agent_router.h"
+#include "../plugins/agent_router/agent_router.h"
 
 //written by Alessandro Settimi
 #ifdef GLPK_FOUND
@@ -7,7 +7,7 @@
 #endif
 //written by Alessandro Settimi
 
-#include "identifierModule/identifier_module.h"
+#include "../plugins/monitor/identifier_module.h"
 #include <string>
 #include <utility>
 #include <map>

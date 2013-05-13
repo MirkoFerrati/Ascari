@@ -1,6 +1,6 @@
 #ifndef IDENTIFIER_MODULE_H
 #define IDENTIFIER_MODULE_H
-#include <agent.h>
+#include "../agent/agent.h"
 #include <yaml_parser.h>
 
 #include <dynamic.h>
@@ -26,11 +26,6 @@ public:
     void addReservedVariables (exprtk::symbol_table< double >& arg1);
     void compileExpressions (exprtk::symbol_table< double >& arg1);
     void run_plugin();
-    void simulate(std::list<std::map<std::string,agent_state_packet>> &sensed_agents, named_semaphore& real_semaphore1,
-		  named_semaphore& real_semaphore2 , std::mutex& mutex_simulate_variable_access,
-		const Parsed_World & parsed_world, std::shared_ptr<agent_to_dummy_communicator> & communicator,std::list<world_sim_packet> &old_sensed_agents, 
-		std::map <std::string,std::vector< bool >> &identifier_matrix, std::string& owner);
-    void updateLastSensedAgents();
     identifier_module (Parsed_World const& W, const std::map<int,double> & sensed_bonus_variables, const std::map<std::string,int> & map_bonus_variables_to_id,
     std::shared_ptr<agent_namespace::world_communicator_abstract>& comm, const simulation_time & sensed_time,std::string owner);
     ~identifier_module();
@@ -39,7 +34,12 @@ public:
 private:
     //void create_agents(std::string, const agent_state& );
     //bool agentStatesAreConsistent(const agent_state& first, const agent_state& second);
+    void simulate(std::list<std::map<std::string,agent_state_packet>> &sensed_agents, named_semaphore& real_semaphore1,
+		  named_semaphore& real_semaphore2 , std::mutex& mutex_simulate_variable_access,
+		const Parsed_World & parsed_world, std::shared_ptr<agent_to_dummy_communicator> & communicator,std::list<world_sim_packet> &old_sensed_agents, 
+		std::map <std::string,std::vector< bool >> &identifier_matrix, std::string& owner);
     
+    void updateLastSensedAgents();
 
     const Parsed_World & parsed_world;
     std::string owner;

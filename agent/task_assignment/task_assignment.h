@@ -12,7 +12,7 @@
 #include <types/events.h>
 
 //TODO (Alessandro): che semafori uso? per ora quelli di simone
-#include "../identifierModule/named_semaphore.hpp"
+#include "../shared/named_semaphore.hpp"
 #include "../plugins/abstract_agent_plugin.h"
 
 class task_assignment: public abstract_agent_plugin

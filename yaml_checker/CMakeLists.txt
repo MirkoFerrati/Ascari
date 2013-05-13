@@ -73,7 +73,7 @@ target_link_libraries(checker ${Boost_LIBRARIES} pthread)
 message("Configurazione di ${CMAKE_BUILD_TYPE}")
 file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/checker" "../shared/yamls/*.yaml")
 FOREACH(infileName ${yaml_files})
-MESSAGE(STATUS "Process file: ${infileName}")
+#MESSAGE(STATUS "Process file: ${infileName}")
 configure_file(${infileName} ./ COPYONLY)
 endforeach(${infileName})
 
