@@ -2,7 +2,6 @@
 #define VIEWER
 
 #include "Agent.h"
-#include "viewer_plugin.h"
 #include <types/world_sim_packet.h>
 #include "../plugins/abstract_viewer_plugin.h"
 #include <QtGui/QWidget>

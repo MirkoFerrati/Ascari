@@ -1,6 +1,6 @@
 #include <QtGui/QApplication>
 #include "viewer.h"
-#include "agent_router_viewer.h"
+#include "../plugins/agent_router/agent_router_viewer.h"
 #include <QtGui/QDesktopWidget>
 #include "udp_world_sniffer.h"
 #include "../communication/zmq_world_sniffer.hpp"
@@ -10,8 +10,8 @@
 #include "../communication/zmq_identifier_sniffer.hpp"
 #include <QSettings>
 #include "../../shared/types/monitor_packet.h"
-#include "task_assignment_viewer.h"
-#include "monitor_viewer.h"
+#include "../plugins/task_assignment/task_assignment_viewer.h"
+#include "../plugins/monitor/monitor_viewer.h"
 
 void center ( QWidget &widget,int WIDTH=800,int HEIGHT=800 )
 {

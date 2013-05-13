@@ -2,12 +2,12 @@
 #include "ui_mainwindow.h"
 #include <QtGui>
 #include <viewer.h>
-#include <monitor_viewer.h>
+#include "../plugins/monitor/monitor_viewer.h"
 #include <udp_world_sniffer.h>
 #include <zmq_world_sniffer.hpp>
 #include <zmq_identifier_sniffer.hpp>
-#include "../viewer/gui/agent_router_viewer.h"
-#include "../viewer/gui/task_assignment_viewer.h"
+#include "../plugins/agent_router/agent_router_viewer.h"
+#include "../plugins/task_assignment/task_assignment_viewer.h"
 #include "../plugins/abstract_viewer_plugin.h"
 
 MainWindow::MainWindow ( QWidget *parent ) :

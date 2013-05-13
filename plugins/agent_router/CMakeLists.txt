@@ -6,3 +6,11 @@ set_property(GLOBAL APPEND PROPERTY agent_SOURCES
 )
 
 #message(${agent_SOURCES})
+set_property(GLOBAL APPEND PROPERTY viewer_SOURCES  
+${CMAKE_CURRENT_SOURCE_DIR}/agent_router_viewer.cpp  
+)
+
+set_property(GLOBAL APPEND PROPERTY launcher_SOURCES  
+${CMAKE_CURRENT_SOURCE_DIR}/agent_router_viewer.cpp  
+)
+
