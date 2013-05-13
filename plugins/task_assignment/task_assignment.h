@@ -5,8 +5,8 @@
 
 #include <yaml_parser.h>
  
-#include <task_assignment_communicator.h>
-#include <assignment_problem.h>
+#include "task_assignment_communicator.h"
+#include "assignment_problem.h"
 #include <random.hpp>
 #include "../shared/objects/task_assignment_task.h"
 #include <types/events.h>

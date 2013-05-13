@@ -17,13 +17,7 @@ set_property(GLOBAL APPEND PROPERTY agent_SOURCES
 
 #FIND_PACKAGE(GLPK 4.33)
 
-set(GLPK_FOUND 1)
-if (${GLPK_FOUND})
-add_definitions(-DGLPK_FOUND)
-#written by Alessandro Settimi
-set_property(GLOBAL APPEND PROPERTY agent_SOURCES task_assignment/task_assignment.cpp task_assignment/task_assignment_utility.cpp task_assignment/algorithms_utility.cpp task_assignment/subgradient_algorithm.cpp task_assignment/assignment_problem.cpp task_assignment/dubins.cpp)  
-#written by Alessandro Settimi
-endif (${GLPK_FOUND})
+
 
 get_property(sources GLOBAL PROPERTY agent_SOURCES)
 add_executable(agent ${sources})
@@ -40,11 +34,9 @@ target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
 target_link_libraries(agent zmq)
 
-if (${GLPK_FOUND})
 #written by Alessandro Settimi
 target_link_libraries(agent glpk)
 #written by Alessandro Settimi
-endif (${GLPK_FOUND})
 
 include_directories(../agent)
 include_directories(../shared)
@@ -66,7 +58,7 @@ find_package(Boost REQUIRED system thread serialization)
 target_link_libraries(agent ${Boost_LIBRARIES} pthread)
 
 
-message("Configurazione di ${CMAKE_BUILD_TYPE}")
+#message("Configurazione di ${CMAKE_BUILD_TYPE}")
 file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/agent" "../shared/yamls/*.yaml")
 FOREACH(infileName ${yaml_files})
 #MESSAGE(STATUS "Process file: ${infileName}")
