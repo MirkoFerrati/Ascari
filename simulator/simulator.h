@@ -6,7 +6,6 @@
 #include "dynamic.h"
 #include <vector>
 #include <map>
-#include "communication/udp_agent_router.hpp"
 #include "collisioncheckerabstract.h"
 #include "random.hpp"
 #include <objects/abstract_object.h>
@@ -15,10 +14,11 @@
 #include <condition_variable>
 #include <thread>
 //written by Alessandro Settimi
-#include "communication/task_assignment_router.hpp"
 #include "visibility/visibility.h"
 #include <map2d.h>
 //written by Alessandro Settimi
+
+#include "../plugins/abstract_simulator_plugin.h"
 
 class simulator
 {
@@ -61,15 +61,20 @@ private:
 	std::vector<exprtk::expression<double> > bonus_expressions;
 	exprtk::symbol_table<double> bonus_symbol_table;
 	std::map<std::string,int> map_bonus_variables;
-	Udp_agent_router<topology_packet> topology_router;
-	Udp_agent_router<graph_packet> graph_router;
+	//Udp_agent_router<topology_packet> topology_router;
+	//Udp_agent_router<graph_packet> graph_router;
 	void createObjects(const Parsed_World& world);
+    void initialize_plugins ( const Parsed_World& world );
+	
+	
+	std::vector<abstract_simulator_plugin*> plugins;
+	
 	
 	//written by Alessandro Settimi
 
-	bool ta_router_started;
-	task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
-	task_assignment_router_base* ta_router;
+	//bool ta_router_started;
+	//task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
+	//task_assignment_router_base* ta_router;
 
 	//written by Alessandro Settimi
 	

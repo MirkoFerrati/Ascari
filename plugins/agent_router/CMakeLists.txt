@@ -14,3 +14,7 @@ set_property(GLOBAL APPEND PROPERTY launcher_SOURCES
 ${CMAKE_CURRENT_SOURCE_DIR}/agent_router_viewer.cpp  
 )
 
+set_property(GLOBAL APPEND PROPERTY simulator_SOURCES  
+${CMAKE_CURRENT_SOURCE_DIR}/agent_router_simulator_plugin.cpp  
+)
+

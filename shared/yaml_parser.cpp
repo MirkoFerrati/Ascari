@@ -247,6 +247,7 @@ bool operator>> ( const YAML::Node& node, Parsed_Agent& ag )
         if ( tmp_mon==1 )
         {
             ag.monitoring=true;
+	    ag.active_plugins.push_back("MONITOR");
             if ( node.FindValue ( "KNOWN_BEHAVIORS" ) )
             {
                 node["KNOWN_BEHAVIORS"]>>ag.known_behaviors;
@@ -284,6 +285,7 @@ bool operator>> ( const YAML::Node& node, Parsed_Agent& ag )
     if ( node.FindValue ( "TARGET_LIST" ) )
     {
         node["TARGET_LIST"]>> ag.target_list;
+	ag.active_plugins.push_back("AGENT_ROUTER");
     }
 
     if ( !ag.behavior->discrete_states.count ( ag.state_start ) )
@@ -300,7 +302,7 @@ bool operator>> ( const YAML::Node& node, Parsed_Agent& ag )
     if ( node.FindValue ( "TASK_COST_VECTOR" ) )
     {
         const YAML::Node& co=node["TASK_COST_VECTOR"];
-
+	ag.active_plugins.push_back("TASK_ASSIGNMENT");
         task_assignment_namespace::task_cost_vector app;
         double cost;
         std::string id;

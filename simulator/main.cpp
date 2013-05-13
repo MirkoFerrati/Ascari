@@ -8,6 +8,8 @@
 #include "simulator.h"
 #include "time.h"
 #include "lemon/arg_parser.h"
+#include <communication/global.h>
+
 using namespace std;
 
 

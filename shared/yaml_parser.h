@@ -91,6 +91,9 @@ public:
     //written by Alessandro Settimi
     task_assignment_namespace::task_cost_vector agent_task_cost_vector;
     //written by Alessandro Settimi
+    
+      std::vector<std::string> active_plugins; 
+
 };
 
 class Parsed_World{
@@ -111,7 +114,6 @@ class Parsed_World{
   task_assignment_namespace::task_list task_list;
   task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
 
-   
 
 
 };
