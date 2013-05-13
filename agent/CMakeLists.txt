@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 
 
-set_property(GLOBAL APPEND PROPERTY agent_SOURCES empty_plugin/empty_plugin.cpp 
+set_property(GLOBAL APPEND PROPERTY agent_SOURCES 
   encoder/encoderDet.cpp automaton/automatonFSM.cpp automaton/automatonEFSM.cpp
   communication/udp_agent_communicator.cpp  ../shared/dynamic.cpp
   communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
