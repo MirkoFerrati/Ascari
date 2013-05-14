@@ -41,8 +41,8 @@ int main ( int argc, char** argv )
         std::cout << "Parameters of '" << ap.commandName() << "':\n";
         std::cout << "  Value of -a: " << agent_name << std::endl;
         std::cout << "  Value of -f: " << filename << std::endl;
-
-        world = parse_file ( filename );
+yaml_parser parser;
+        world = parser.parse_file ( filename );
         int myAgent = -1;
         for ( unsigned int i = 0; i < world.agents.size(); i++ )
             if ( world.agents.at ( i ).name.compare ( agent_name ) == 0 )

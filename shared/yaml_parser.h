@@ -9,17 +9,12 @@
 #include "logog.hpp"
 #include <map>
 #include <yaml-cpp/yaml.h>
-#include "../plugins/task_assignment/task_assignment_types.h"
-#include "objects/router_graph_good.h"
+#include "../plugins/abstract_parser_plugin.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/strong_typedef.hpp>
 
-// using namespace std;
-
 typedef std::string bonusVariable;
 typedef std::string bonus_expression;
-
-
 typedef std::string stateVariable;
 typedef std::string controlVariable;
 typedef double initial_state_value;
@@ -32,16 +27,11 @@ typedef std::string topology_name;
 typedef std::string topology_expression;
 typedef std::string lambda_name;
 typedef std::string lambda_expression;
-// typedef std::map<lambda_name, lambda_expression> Lambda_MapExpressions;
 typedef std::string event_name;
 typedef std::string event_expression;
 typedef std::string communication_area;
 typedef std::string graph_name;
-
-
 typedef int target_id;
-
-// typedef std::map<event_name, event_expression> Events_MapExpressions;
 
 class Parsed_Behavior {
 public:
@@ -58,7 +48,8 @@ public:
 	std::vector<event_name> events;
     std::map<event_name, event_expression> events_expressions;
     std::map<discreteState_Name, std::map<event_name,discreteState_Name> > automaton;
-	
+    bool load_from_node( const YAML::Node& node);
+
 };
 
 class Parsed_Agent {
@@ -69,7 +60,7 @@ public:
 	monitoring=false;	
 	}
 	friend std::ostream& operator<<(std::ostream& os, const Parsed_Agent& ag );
-    
+
     std::string name;
    
     std::map<stateVariable,initial_state_value> initial_states;
@@ -88,12 +79,9 @@ public:
     
     bool monitoring;
     
-    //written by Alessandro Settimi
-    task_assignment_namespace::task_cost_vector agent_task_cost_vector;
-    //written by Alessandro Settimi
-    
-      std::vector<std::string> active_plugins; 
-
+ 
+    bool load_from_node( const YAML::Node& node);
+    std::vector<std::shared_ptr<abstract_parsed_agent_plugin>> parsed_items_from_plugins;
 };
 
 class Parsed_World{
@@ -109,26 +97,21 @@ class Parsed_World{
   std::map<std::string,std::unique_ptr< Parsed_Behavior>> behaviors;
   std::string graphName;
   std::string mapfilename;
-  std::map<int,router_graph_good> goods;
-  std::vector<task_assignment_namespace::task_id> tasks_id;
-  task_assignment_namespace::task_list task_list;
-  task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
+  
+  std::vector<abstract_parser_plugin*> plugins; 
 
 
+  std::vector<std::shared_ptr<abstract_parsed_world_plugin>> parsed_items_from_plugins;
+  bool load_from_node(const YAML::Node& node);
 
 };
     
+
+class yaml_parser
+{
+public:
     Parsed_World parse_file(const char * file_name);
     Parsed_World parse_file(std::string file_name);
-    bool operator>>(const YAML::Node& node, std::unique_ptr< Parsed_Behavior >& behavior);
-    bool operator>>(const YAML::Node& node, Parsed_World& wo);
-    bool operator>>(const YAML::Node& node, Parsed_Behavior& beh);
-    std::ostream& operator<< (std::ostream& , const std::vector<Parsed_Agent>& );
-    
-
-
-    
-    
-    
+};
 #endif
 

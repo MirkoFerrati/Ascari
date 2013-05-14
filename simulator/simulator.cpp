@@ -84,7 +84,7 @@ for ( auto a:wo.agents )
         }
         if ( a.active_plugins[0]=="TASK_ASSIGNMENT" )
         {
-            plugins.push_back ( new task_assignment_simulator() );
+            plugins.push_back ( new task_assignment_simulator(sim_packet) );
         }
     }
 
@@ -143,18 +143,7 @@ void simulator::initialize ( const Parsed_World& wo )
 
 void simulator::createObjects ( const Parsed_World& world )
 {
-    auto tasklist=world.task_list;
-    auto tasks_id=world.tasks_id;
-
-    for ( unsigned int i=0; i<tasks_id.size(); i++ )
-    {
-        task_assignment_task tmp ( world.task_list.at ( tasks_id.at ( i ) ) );
-
-
-        sim_packet.objects[tasks_id.at ( i )]=tmp;
-    }
-
-    std::cout<<sim_packet.objects<<std::endl;
+//TODO: chiamare le createObjects dei plugin, se ha senso
 }
 
 

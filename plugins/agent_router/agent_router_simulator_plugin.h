@@ -1,8 +1,8 @@
 #ifndef AGENT_ROUTER_SIMULATOR_PLUGIN_H
 #define AGENT_ROUTER_SIMULATOR_PLUGIN_H
 
-#include <../../home/mirko/projects/ascari/plugins/abstract_simulator_plugin.h>
 #include "udp_agent_router.hpp"
+#include "../abstract_simulator_plugin.h"
 #include <types/graph_informations.h>
 
 

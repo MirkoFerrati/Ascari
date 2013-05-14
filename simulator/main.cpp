@@ -48,7 +48,8 @@ int main(int argc, char **argv) {
 			ERR("errore nella lettura dei parametri %s",ex.what());
 			return 0;
 		}
-		World=parse_file(filename);
+		yaml_parser parser;
+		World=parser.parse_file(filename);
  	//cout<<World;
 	//s_catch_signals();
 	s.initialize(World);

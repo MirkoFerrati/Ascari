@@ -1,6 +1,6 @@
 //written by Alessandro Settimi
 #include "task_assignment.h"
-#include <agent.h>
+#include "task_assignment_parser_plugin.h"
 
 
 using namespace task_assignment_namespace;
@@ -21,8 +21,8 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     createTaskCostMatrixFromParsedWorld(agent);
     inizializeTaskAssignmentMatrix();
     
-    
-    task_assignment_algorithm=world.task_assignment_algorithm;
+  task_assignment_algorithm=std::static_pointer_cast<task_assignment_parsed_world>(world.parsed_items_from_plugins[0])->task_assignment_algorithm;
+    //task_assignment_algorithm=reinterpret_cast<task_assignment_parsed_world*>(world.parsed_items_from_plugins[0])->task_assignment_algorithm;
     
     my_task="";
     
@@ -105,13 +105,13 @@ void task_assignment ::initialize_assignment_problem()
 }
 
  
-void task_assignment ::createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo)
+void task_assignment ::createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& world)
 {
-    for (unsigned int i=0;i<wo.agents.size();i++)
-      agents_id.push_back(wo.agents.at(i).name);  
-    
-    for (unsigned int i=0;i<wo.task_list.size();i++)
-	tasks_id.push_back(wo.tasks_id.at(i));
+    for (unsigned int i=0;i<world.agents.size();i++)
+      agents_id.push_back(world.agents.at(i).name);  
+  auto wo=std::static_pointer_cast<task_assignment_parsed_world>(world.parsed_items_from_plugins[0]);    
+    for (unsigned int i=0;i<wo->task_list.size();i++)
+	tasks_id.push_back(wo->tasks_id.at(i));
 }
 
  
@@ -127,7 +127,7 @@ void task_assignment ::createAusiliarVariables()
  
 void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a)
 {   
-    task_cost_matrix[my_id]=a.agent_task_cost_vector;
+    task_cost_matrix[my_id]=std::static_pointer_cast<task_assignment_parsed_agent>(a.parsed_items_from_plugins[0])->agent_task_cost_vector;
     
     task_cost_vector app;
     

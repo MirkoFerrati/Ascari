@@ -136,7 +136,8 @@ void MainWindow::openFile()
     file.close();
     try
     {
-        world=parse_file ( fileName.toStdString() );
+      yaml_parser parser;
+        world=parser.parse_file ( fileName.toStdString() );
 	if (!world.parsedSuccessfully)
 	{
 	       ui->StartAgents->setText ( "impossibile parsare il file" );
