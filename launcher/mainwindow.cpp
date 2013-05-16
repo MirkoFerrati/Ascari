@@ -9,6 +9,7 @@
 #include "../plugins/agent_router/agent_router_viewer.h"
 #include "../plugins/task_assignment/task_assignment_viewer.h"
 #include "../plugins/abstract_viewer_plugin.h"
+#include "../plugins/agent_router/agent_router_parsed_world.h"
 
 MainWindow::MainWindow ( QWidget *parent ) :
     QMainWindow ( parent ),
@@ -98,8 +99,8 @@ MainWindow::~MainWindow()
 
     for ( auto a=agents.begin();a!=agents.end();++a )
     {
-        a->second()->kill();
-        delete ( a->second() );
+        a->second->kill();
+        delete ( a->second );
     }
     
     if (!agentcontainer.empty())
@@ -256,8 +257,8 @@ void MainWindow::on_stopall_clicked()
 
     for ( auto a=agents.begin();a!=agents.end();++a )
     {
-        a->second()->kill();
-        delete ( a->second() );
+        a->second->kill();
+        delete ( a->second );
     }
         agents.clear();
     }
@@ -305,7 +306,7 @@ void MainWindow::startAgents()
     {
 for ( auto a=agents.begin();a!=agents.end();++a )
     {
-        a->second()->kill();
+        a->second->kill();
         delete ( a->second );
     }
         agents.clear();
@@ -324,7 +325,7 @@ for ( auto a=agents.begin();a!=agents.end();++a )
         agent->setWorkingDirectory ( d.absolutePath() );
         agent->setProcessChannelMode ( QProcess::MergedChannels );
         agent->start ( agentPath,arguments );
-        agents[QString::toStdString(agentcontainer.at(i)->text())]=  agent ;
+		agents[agentcontainer.at(i)->text().toStdString()]=  agent ;
 
     }
 
@@ -453,7 +454,11 @@ bool MainWindow::startViewer()
 			
             QFile file ( fileName );
             QDir d = QFileInfo ( file ).absoluteDir();
-            graphname= ( d.absolutePath().append ( "/" ).append ( QString::fromStdString ( world.graphName ).toLower() ) ).toStdString();
+            graphname= ( d.absolutePath().append ( "/" ).append ( 
+            QString::fromStdString ( 
+            reinterpret_cast<agent_router_parsed_world*>(world.parsed_items_from_plugins[0])->graphName
+			).toLower() 
+			) ).toStdString();
             abstract_viewer_plugin* temp=new agent_router_viewer(graphname);
             temp->setfather ( insideViewer );
             insideViewer->addPlugin ( temp );

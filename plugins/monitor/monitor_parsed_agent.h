@@ -1,7 +1,7 @@
 #ifndef MONITOR_PARSED_AGENT_H
 #define MONITOR_PARSED_AGENT_H
 
-#include <../../home/mirko/projects/ascari/plugins/abstract_parser_plugin.h>
+#include <../../plugins/abstract_parser_plugin.h>
 
 
 class monitor_parsed_agent : public abstract_parsed_agent_plugin

@@ -6,12 +6,13 @@
 #include <lemon/smart_graph.h>
 #include <map>
 #include "../abstract_viewer_plugin.h"
+#include <yaml_parser.h>
 
 class agent_router_viewer:public abstract_viewer_plugin
 {
 public:
     agent_router_viewer (std::string graphname );
-
+	agent_router_viewer (Parsed_World* world);
     void init(std::string);
     void paintBackground ( QPainter& painter );
     void setPainterScale ( double scale );
