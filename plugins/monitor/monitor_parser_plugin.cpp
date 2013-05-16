@@ -1,14 +1,20 @@
 #include "monitor_parser_plugin.h"
+#include "monitor_parsed_agent.h"
 #include <logog.hpp>
 
-std::shared_ptr< abstract_parsed_world_plugin > monitor_parser_plugin::parseWorld ( const YAML::Node& node )
-{
+#include <yaml-cpp/yaml.h>
 
+bool monitor_parser_plugin::parseWorld ( const YAML::Node& , abstract_parsed_world_plugin* )
+{
+return true;
 }
 
-std::shared_ptr< abstract_parsed_agent_plugin > monitor_parser_plugin::parseAgent ( const YAML::Node& node )
+bool monitor_parser_plugin::parseAgent ( const YAML::Node& node, abstract_parsed_agent_plugin* agent)
 {
- ag.monitoring=false;
+  assert(agent==0);
+  agent=new monitor_parsed_agent();
+  auto ag=reinterpret_cast<monitor_parsed_agent*>(agent);
+    ag->monitoring=false;
 
     if ( node.FindValue ( "MONITORING" ) )
     {
@@ -16,10 +22,10 @@ std::shared_ptr< abstract_parsed_agent_plugin > monitor_parser_plugin::parseAgen
         node["MONITORING"]>>tmp_mon;
         if ( tmp_mon==1 )
         {
-            ag.monitoring=true;
+            ag->monitoring=true;
             if ( node.FindValue ( "KNOWN_BEHAVIORS" ) )
             {
-                node["KNOWN_BEHAVIORS"]>>ag.known_behaviors;
+                node["KNOWN_BEHAVIORS"]>>ag->known_behaviors;
             }
             else
             {
@@ -31,7 +37,7 @@ std::shared_ptr< abstract_parsed_agent_plugin > monitor_parser_plugin::parseAgen
         }
         else
         {
-            ag.monitoring=false;
+            ag->monitoring=false;
             if ( tmp_mon!=0 )
             {
                 WARN ( "UNRECOGNIZED VALUE FOR MONITORING. SET TO FALSE",NULL );
@@ -40,5 +46,6 @@ std::shared_ptr< abstract_parsed_agent_plugin > monitor_parser_plugin::parseAgen
 
 
     }
+    return true;
 }
 

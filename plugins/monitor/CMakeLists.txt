@@ -1,3 +1,4 @@
+
 set_property(GLOBAL APPEND PROPERTY agent_SOURCES  
 ${CMAKE_CURRENT_SOURCE_DIR}/identifier_module.cpp  
 	${CMAKE_CURRENT_SOURCE_DIR}/agent_to_dummy_communicator.hpp

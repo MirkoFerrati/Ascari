@@ -138,7 +138,7 @@ protected:
 	//identifier_module* idModule;
 	
 	/*!
-	 * Moduli aggiuntivi utilizzabili stile plugin (ma quanto sarebbe bello farlo in modo sistematico!)
+	 * Moduli aggiuntivi utilizzabili stile plugin 
 	 */
 	std::vector <abstract_agent_plugin*> plugins;
 	

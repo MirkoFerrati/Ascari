@@ -30,8 +30,6 @@ typedef std::string lambda_expression;
 typedef std::string event_name;
 typedef std::string event_expression;
 typedef std::string communication_area;
-typedef std::string graph_name;
-typedef int target_id;
 
 class Parsed_Behavior {
 public:
@@ -57,7 +55,6 @@ class Parsed_Agent {
 public:
 	Parsed_Agent(const std::unique_ptr<Parsed_Behavior>& behavior):behavior(behavior)
 	{
-	monitoring=false;	
 	}
 	friend std::ostream& operator<<(std::ostream& os, const Parsed_Agent& ag );
 
@@ -69,15 +66,11 @@ public:
    
     std::string visibility;
     communication_area communication;
-    
-    std::vector<target_id> target_list;
-    std::vector<std::string> known_behaviors;
-    
-    
+
     const std::unique_ptr<Parsed_Behavior>& behavior;
     std::string behavior_name;
     
-    bool monitoring;
+
     
  
     bool load_from_node( const YAML::Node& node);
@@ -95,7 +88,6 @@ class Parsed_World{
   std::map<bonusVariable, bonus_expression> bonus_expressions;
   std::vector<Parsed_Agent> agents;
   std::map<std::string,std::unique_ptr< Parsed_Behavior>> behaviors;
-  std::string graphName;
   std::string mapfilename;
   
   std::vector<abstract_parser_plugin*> plugins; 

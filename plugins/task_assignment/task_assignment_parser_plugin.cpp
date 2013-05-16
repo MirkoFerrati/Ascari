@@ -3,13 +3,16 @@
 
   task_assignment_parser_plugin::task_assignment_parser_plugin()
   {
-    
+    enabled=false;
   }
 
 
-std::shared_ptr< abstract_parsed_world_plugin > task_assignment_parser_plugin::parseWorld ( const YAML::Node& node )
+ bool task_assignment_parser_plugin::parseWorld ( const YAML::Node& node, abstract_parsed_world_plugin* wor)
 {
-      wo.task_assignment_algorithm=-1;
+  assert(wor==0);
+   wor=new task_assignment_parsed_world();
+   auto wo=reinterpret_cast<task_assignment_parsed_world*> ( wor );
+   wo->task_assignment_algorithm=-1;
 
   if ( node[0].FindValue ( "WORLD" ) )
     {
@@ -18,6 +21,7 @@ std::shared_ptr< abstract_parsed_world_plugin > task_assignment_parser_plugin::p
 
             if ( node[0]["WORLD"][0].FindValue ( "TASK_ASSIGNMENT_ALGORITHM" ) && node[0]["WORLD"][0].FindValue ( "TASK_NUMBER" ) && node[0]["WORLD"][0].FindValue ( "TASK_LIST" ) )
             {
+	      enabled=true;
                 unsigned int task_number;
                 std::string algorithm;
 
@@ -25,25 +29,30 @@ std::shared_ptr< abstract_parsed_world_plugin > task_assignment_parser_plugin::p
 
                 node[0]["WORLD"][0]["TASK_ASSIGNMENT_ALGORITHM"]>>algorithm;
 
-                if ( algorithm == "SUBGRADIENT" ) wo.task_assignment_algorithm = SUBGRADIENT;
+                if ( algorithm == "SUBGRADIENT" ) wo->task_assignment_algorithm = SUBGRADIENT;
 
-                if ( wo.task_assignment_algorithm == -1 )
+                if ( wo->task_assignment_algorithm == -1 )
                 {
                     ERR ( "UNDEFINED TASK ASSIGNMENT ALGORITHM",NULL );
                     return false;
 // 		      throw "UNDEFINED TASK ASSIGNMENT ALGORITHM";
                 }
 
-                createTaskList ( node[0]["WORLD"][0]["TASK_LIST"],wo.task_list,wo.tasks_id,task_number );
+                createTaskList ( node[0]["WORLD"][0]["TASK_LIST"],wo->task_list,wo->tasks_id,task_number );
             }
         }
     }
+    //return  std::dynamic_pointer_cast<abstract_parsed_world_plugin>(std::make_shared<task_assignment_parsed_world>(wo));
+    return enabled;
 }
 
-std::shared_ptr< abstract_parsed_agent_plugin > task_assignment_parser_plugin::parseAgent ( const YAML::Node& node )
+bool task_assignment_parser_plugin::parseAgent ( const YAML::Node& node,abstract_parsed_agent_plugin* ag )
 {
+  assert(ag==0);
+  if (!enabled)
+    return false;
    //written by Alessandro Settimi
-
+    ag=new task_assignment_parsed_agent();
     if ( node.FindValue ( "TASK_COST_VECTOR" ) )
     {
         const YAML::Node& co=node["TASK_COST_VECTOR"];
@@ -59,11 +68,16 @@ std::shared_ptr< abstract_parsed_agent_plugin > task_assignment_parser_plugin::p
             if ( temp=="INF" ) cost=INF;
             else co[i+1] >> cost;
 
-            ag.agent_task_cost_vector.insert ( make_pair ( id,cost ) );
+            reinterpret_cast<task_assignment_parsed_agent*> (ag)->agent_task_cost_vector.insert ( make_pair ( id,cost ) );
             i=i+2;
         }
+            return true;
+
     }
+    else
+      return false;
     //written by Alessandro Settimi
+    //return std::dynamic_pointer_cast<abstract_parsed_agent_plugin>(std::make_shared<task_assignment_parsed_agent>(ag));
 }
 
 //written by Alessandro Settimi

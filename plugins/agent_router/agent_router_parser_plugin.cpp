@@ -1,28 +1,46 @@
 #include "agent_router_parser_plugin.h"
+#include "agent_router_parsed_agent.h"
+#include "agent_router_parsed_world.h"
 
-std::shared_ptr< abstract_parsed_world_plugin > agent_router_parser_plugin::parseWorld ( const YAML::Node& node )
+#include <logog.hpp>
+
+bool agent_router_parser_plugin::parseWorld ( const YAML::Node& node, abstract_parsed_world_plugin* wo )
 {
-    wo.graphName="UNSET";
-  if ( node[0]["WORLD"][0].FindValue ( "GRAPH_NAME" ) )
-            {
-                const YAML::Node &world_node=node[0]["WORLD"][0];
+    assert ( wo==0 );
+    enabled=false;
+    wo=new agent_router_parsed_world();
+    reinterpret_cast<agent_router_parsed_world*> ( wo )->graphName="UNSET";
+    if ( node[0]["WORLD"][0].FindValue ( "GRAPH_NAME" ) )
+    {
+        const YAML::Node &world_node=node[0]["WORLD"][0];
 
-                world_node["GRAPH_NAME"]>> wo.graphName;
-            }
+        world_node["GRAPH_NAME"]>> ( reinterpret_cast<agent_router_parsed_world*> ( wo ) )->graphName;
+        enabled=true;
+    }
+    return enabled;
 }
 
-std::shared_ptr< abstract_parsed_agent_plugin > agent_router_parser_plugin::parseAgent ( const YAML::Node& node )
+bool agent_router_parser_plugin::parseAgent ( const YAML::Node& node, abstract_parsed_agent_plugin* ag )
 {
-  if ( node.FindValue ( "TARGET_LIST" ) )
+  assert(ag==0);
+    if ( !enabled )
+        return false;
+    ag=new agent_router_parsed_agent();
+    if ( node.FindValue ( "TARGET_LIST" ) )
     {
-        node["TARGET_LIST"]>> ag.target_list;
-    }
-
-  
-        if ( ( wo.agents[i].target_list.size() ==0 && wo.graphName.compare ( "UNSET" ) !=0 ) || ( wo.agents[i].target_list.size() >0 && wo.graphName.compare ( "UNSET" ) ==0 ) )
+        int toint=0;
+        std::vector<target_id>temp = ( reinterpret_cast<agent_router_parsed_agent*> ( ag ) )->target_list;
+        for ( unsigned int i=0; i<node["TARGET_LIST"].size(); i++ )
         {
-            ERR ( "GRAPH NAME OR TARGET LIST UNDEFINED", NULL );
-            return false;
+            node["TARGET_LIST"][i]>>toint;
+            temp.push_back ( toint );
         }
+    }
+    if ( ( reinterpret_cast<agent_router_parsed_agent*> ( ag )->target_list.size() ==0 && enabled ) || ( reinterpret_cast<agent_router_parsed_agent*> ( ag )->target_list.size() >0 && !enabled ) )
+    {
+        ERR ( "GRAPH NAME OR TARGET LIST UNDEFINED", NULL );
+        return false;
+    }
+    return true;
 }
 

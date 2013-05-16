@@ -6,21 +6,27 @@
 class abstract_parsed_agent_plugin
 {
 public:
-  abstract_parsed_agent_plugin()=delete;
+  abstract_parsed_agent_plugin(){};
+  
+  virtual std::string getType()=0;
+  virtual ~abstract_parsed_agent_plugin(){};
+
 };
 
 class abstract_parsed_world_plugin
 {
 public:
-  abstract_parsed_world_plugin()=delete;
+  abstract_parsed_world_plugin(){};
+  virtual std::string getType()=0;
+  virtual ~abstract_parsed_world_plugin(){};
 };
 
 
 class abstract_parser_plugin
 {
 public:
-  virtual std::shared_ptr<abstract_parsed_agent_plugin> parseAgent(const YAML::Node& node)=0;
-  virtual std::shared_ptr<abstract_parsed_world_plugin> parseWorld(const YAML::Node& node)=0;
+  virtual bool parseAgent(const YAML::Node& node,abstract_parsed_agent_plugin*)=0;
+  virtual bool parseWorld(const YAML::Node& node,abstract_parsed_world_plugin*)=0;
   virtual ~abstract_parser_plugin(){};
   
 };

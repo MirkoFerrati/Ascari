@@ -59,6 +59,13 @@ agent::agent ( int agent_index,const Parsed_World& world, bool noStart ) :
         plugins.push_back ( monitor );
     }
 
+    if ( !world.task_list.empty() )
+    {
+        abstract_agent_plugin* plugin=new task_assignment ( world,world.agents.at ( agent_index ),time,events,events_to_index,objects );
+        plugins.push_back ( plugin );
+    }
+
+
     /*
     if (condition to enable a plugin)
     {
@@ -66,17 +73,6 @@ agent::agent ( int agent_index,const Parsed_World& world, bool noStart ) :
     	plugins.push_back(plugin);
     }
     */
-
-#ifdef GLPK_FOUND
-    //written by Alessandro Settimi
-    if ( !world.task_list.empty() )
-    {
-        abstract_agent_plugin* plugin=new task_assignment ( world,world.agents.at ( agent_index ),time,events,events_to_index,objects );
-        plugins.push_back ( plugin );
-    }
-    //written by Alessandro Settimi
-#endif
-
     /*!
      * Aggiungo le variabili richieste dai plugin
      */
