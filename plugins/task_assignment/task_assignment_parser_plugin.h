@@ -19,7 +19,7 @@ public:
   task_assignment_namespace::task_list task_list;
     std::vector<task_assignment_namespace::task_id> tasks_id;
     std::string getType(){return "task_assignment_parsed_world";};
-
+std::vector<std::string> agents;
 };
 class task_assignment_parser_plugin : public abstract_parser_plugin
 {

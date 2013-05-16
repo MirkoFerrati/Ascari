@@ -1,6 +1,8 @@
 #ifndef ABSTRACT_VIEWER_PLUGIN_H
 #define ABSTRACT_VIEWER_PLUGIN_H
 
+#ifdef ISVIEWER
+
 #include <QPainter>
 #include "../viewer/gui/Agent.h"
 #include <assert.h>
@@ -90,5 +92,5 @@ private:
 
 
 
-
+#endif //ISVIEWER
 #endif // ABSTRACT_VIEWER_PLUGIN_H

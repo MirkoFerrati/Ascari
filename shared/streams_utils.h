@@ -31,4 +31,12 @@ std::ostream& operator<<( std::ostream& os, const std::vector<T>& m )
     return os;
 }
 
+
+template< typename T>//,typename C, typename Alloc >
+std::ostream& operator<<( std::ostream& os, const std::list<T>& m )
+{
+    for (typename std::list<T>::const_iterator it=m.begin();it!=m.end();++it)
+        os<<(*it)<<" ";
+    return os;
+}
 #endif

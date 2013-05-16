@@ -96,10 +96,10 @@ MainWindow::~MainWindow()
         delete ( simulator );
     }
 
-    for ( unsigned int i=0; i<agents.size(); i++ )
+    for ( auto a=agents.begin();a!=agents.end();++a )
     {
-        agents[i]->kill();
-        delete ( agents[i] );
+        a->second()->kill();
+        delete ( a->second() );
     }
     
     if (!agentcontainer.empty())
@@ -159,16 +159,17 @@ void MainWindow::openFile()
 	  agentcontainer.clear();
 	}
 	
-	
-	for (unsigned int i=0;i<world.agents.size();i++)
+	int i=0;
+	for (auto ag:world.agents)
 	{
-	  QCheckBox* temp= new QCheckBox(QString::fromStdString(world.agents.at(i).name));
+	  QCheckBox* temp= new QCheckBox(QString::fromStdString(ag.name));
 	  temp->setTristate(false);
 	  temp->setCheckState(Qt::Checked);
 	   QObject::connect ( temp, SIGNAL ( stateChanged(int) ),
                        this, SLOT ( agentSelected(int) ) );
 	  agentcontainer.push_back(temp);
 	  ((QVBoxLayout*)ui->agentList)->addWidget(temp,i+1,0);
+	  i++;
 	}
         ui->StartAgents->setText ( temp.append ( num ) );
         ui->ShowFile->setText ( line );
@@ -252,11 +253,12 @@ void MainWindow::on_stopall_clicked()
 
     if ( !agents.empty() )
     {
-        for ( unsigned int i=0; i<agents.size(); i++ )
-        {
-            agents[i]->kill();
-            delete ( agents[i] );
-        }
+
+    for ( auto a=agents.begin();a!=agents.end();++a )
+    {
+        a->second()->kill();
+        delete ( a->second() );
+    }
         agents.clear();
     }
     if ( simulator )
@@ -301,11 +303,11 @@ void MainWindow::startAgents()
 {
     if ( !agents.empty() )
     {
-        for ( unsigned int i=0; i<agents.size(); i++ )
-        {
-            agents[i]->kill();
-            delete ( agents[i] );
-        }
+for ( auto a=agents.begin();a!=agents.end();++a )
+    {
+        a->second()->kill();
+        delete ( a->second );
+    }
         agents.clear();
     }
     for ( unsigned int i=0; i<agentcontainer.size(); i++ )
@@ -322,7 +324,7 @@ void MainWindow::startAgents()
         agent->setWorkingDirectory ( d.absolutePath() );
         agent->setProcessChannelMode ( QProcess::MergedChannels );
         agent->start ( agentPath,arguments );
-        agents.push_back ( agent );
+        agents[QString::toStdString(agentcontainer.at(i)->text())]=  agent ;
 
     }
 
@@ -358,15 +360,15 @@ void MainWindow::startSimulator()
 
 void MainWindow::on_Updateshell_clicked()
 {
-    for ( unsigned int i=0; i<agents.size(); i++ )
+    for ( auto a=agents.begin();a!=agents.end();++a )
     {
-        QString strout= agents[i]->readAllStandardOutput();
-        QFile file ( QString::fromStdString ( world.agents[i].name ).append ( ".log" ) );
+        QString strout= a->second->readAllStandardOutput();
+        QFile file ( QString::fromStdString ( a->first ).append ( ".log" ) );
         file.open ( QIODevice::WriteOnly );
         QTextStream out ( &file );
         out<<strout<<"\n";
         //std::cout<<strout.toStdString()<<std::endl;
-        strout= agents[i]->readAllStandardError();
+        strout= a->second->readAllStandardError();
         out<<strout<<"\n";
     }
     if ( simulator )

@@ -14,12 +14,14 @@
 //TODO (Alessandro): che semafori uso? per ora quelli di simone
 #include "../shared/named_semaphore.hpp"
 #include "../plugins/abstract_agent_plugin.h"
+#include "../agent/agent.h"
 
 class task_assignment: public abstract_agent_plugin
 {
 	
 public:
 	task_assignment(const Parsed_World& world, const Parsed_Agent& agent,simulation_time& time, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index, const std::map<std::string,task_assignment_task>& tasks);
+	task_assignment(agent* a, Parsed_World* parse);
 	void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
 	void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
 	void inizializeTaskAssignmentMatrix();
@@ -107,7 +109,7 @@ private:
 	const std::map<std::string,transition>& events_to_index;
 	
 	
-	const std::map<std::string,task_assignment_task>& tasks;
+	std::map<std::string,task_assignment_task> tasks;
 	
 	task_assignment_communicator_base* ta_communicator;
 	
@@ -174,6 +176,7 @@ private:
 	void copy_solution_to_TA_vector(std::vector<double>& solution);
 	void copy_cost_vector_to_C();
 	void control_print();
+    void initialize( const Parsed_World& world );
 
 	std::map<task_assignment_namespace::agent_id,std::vector< double >> others_subgradient;
 };

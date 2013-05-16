@@ -14,6 +14,15 @@
    auto wo=reinterpret_cast<task_assignment_parsed_world*> ( wor );
    wo->task_assignment_algorithm=-1;
 
+      const YAML::Node &agent_nodes=node[0]["AGENTS"];
+    wo->agents.reserve ( agent_nodes.size() );
+     for ( unsigned int i=0; i<agent_nodes.size(); i++ )
+    {
+        std::string tmp_ag_name;
+        agent_nodes[i]["AGENT"]>>tmp_ag_name;
+      wo->agents.push_back(tmp_ag_name); 
+    }
+   
   if ( node[0].FindValue ( "WORLD" ) )
     {
         if ( node[0]["WORLD"].size() >0 )

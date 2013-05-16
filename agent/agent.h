@@ -1,6 +1,8 @@
 #ifndef AGENT_H
 #define AGENT_H
 
+#define ISAGENT
+
 #include <list>
 #include <vector>
 #include <forward_list>
@@ -21,16 +23,16 @@ class agent
 {
 public:
     agent (std::string name,  const std::unique_ptr< Parsed_Behavior >& behavior, const Parsed_World& world);
-    agent (int agent_index, const Parsed_World& world,bool noStart=false);
+    agent ( const Parsed_World& world, bool noStart = false );
     ~agent();
     void init (const std::unique_ptr< Parsed_Behavior >& behavior, bool isDummy,bool noStart=false);
     void start();
     void main_loop();
-
+    void addPlugin( abstract_agent_plugin* plugin );
     /**
      * Setta il comunicatore
      */
-
+    agent(const agent&)=delete;
     void setCommunicator (std::shared_ptr< agent_namespace::world_communicator_abstract >& communicator);
 
     /**
@@ -52,7 +54,7 @@ public:
     }
 
 	
-protected:
+public:
     
 	
 	
@@ -174,7 +176,6 @@ protected:
 private:
     rndom<double>* f_rndom;
     double pi;
-    agent (const agent& a);
 };
 
 #endif // AGENT_H

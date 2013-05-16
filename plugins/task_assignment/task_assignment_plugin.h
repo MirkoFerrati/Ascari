@@ -1,16 +1,15 @@
-#ifndef AGENT_ROUTER_PLUGIN_H
-#define AGENT_ROUTER_PLUGIN_H
-#include "../abstract_plugin.h"
-#include "agent_router.h"
-#include "agent_router_viewer.h"
-#include "agent_router_simulator_plugin.h"
-#include "agent_router_parser_plugin.h"
+#ifndef TASK_ASSIGNMENT_PLUGIN_H
+#define TASK_ASSIGNMENT_PLUGIN_H
+#include "../plugins/abstract_plugin.h"
+#include "task_assignment.h"
+#include "task_assignment_parser_plugin.h"
+#include "task_assignment_viewer.h"
 
 
-class agent_router_plugin: public abstract_plugin
+class task_assignment_plugin: public abstract_plugin
 {
 public:
-    agent_router_plugin()
+    task_assignment_plugin()
     {
       #ifdef ISAGENT
         agent_plugin=0;
@@ -25,9 +24,7 @@ public:
     };
 
 
- std::string getType(){return "AGENT_ROUTER";};
-    
-    
+
 #ifdef ISAGENT
     abstract_agent_plugin* getAgentPlugin()
     {
@@ -37,14 +34,15 @@ public:
     {
         if ( agent_plugin!=0 )
 	{
-            ERR ( "already created agent plugin, please check for double calls",NULL );
+            ERR ( "already created agent plugin, please check for double calls",NULL )
 	}
 	else
-            agent_plugin=new agent_router ( a ,parse);
+            agent_plugin=new task_assignment( a ,parse);
         return agent_plugin;
     };
 #endif
 
+ std::string getType(){return "TASK_ASSIGNMENT";};
 
 
 
@@ -57,9 +55,9 @@ public:
     bool createSimulatorPlugin ( simulator* s )
     {
         if ( simulator_plugin!=0 )
-            ERR ( "already created agent plugin, please check for double calls",NULL );
+            ERR ( "already created agent plugin, please check for double calls",NULL )
         else
-            simulator_plugin=new agent_router_simulator_plugin ( s );
+            simulator_plugin=new task_assignment_simulator_plugin ( s );
         return simulator_plugin;
     };
 #endif
@@ -72,9 +70,9 @@ public:
     bool createViewerPlugin ( Viewer* v )
     {
         if ( viewer_plugin!=0 )
-            ERR ( "already created viewer plugin, please check for double calls",NULL );
+            ERR ( "already created viewer plugin, please check for double calls",NULL )
         else
-            viewer_plugin=new agent_router_viewer ( v );
+            viewer_plugin=new task_assignment_viewer ( v );
         return viewer_plugin;
     };
 #endif
@@ -88,11 +86,9 @@ public:
     bool createParserPlugin()
     {
         if ( parser_plugin!=0 )
-	{
-            ERR ( "already created agent plugin, please check for double calls",NULL );
-	}
+            ERR ( "already created agent plugin, please check for double calls",NULL )
         else
-            parser_plugin=new agent_router_parser_plugin ( );
+            parser_plugin=new task_assignment_parser_plugin ( );
         return parser_plugin;
     };
 
@@ -100,21 +96,24 @@ public:
 
 private:
 #ifdef ISAGENT
-    agent_router* agent_plugin;
+    task_assignment* agent_plugin;
 #endif
     
 #ifdef ISVIEWER
-    agent_router_viewer* viewer_plugin;
+   task_assignment_viewer* viewer_plugin;
 #endif
     
 #ifdef ISSIMULATOR
-    agent_router_simulator_plugin* simulator_plugin;
+    task_assignment_simulator_plugin* simulator_plugin;
 #endif
 
-    agent_router_parser_plugin* parser_plugin;
+    task_assignment_parser_plugin* parser_plugin;
 
 };
 
 
 
-#endif //AGENT_ROUTER_PLUGIN_H
+
+
+
+#endif //TASK_ASSIGNMENT_PLUGIN_H

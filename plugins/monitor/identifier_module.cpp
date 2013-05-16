@@ -26,6 +26,19 @@ real_semaphore2(0)
 }
 
 
+identifier_module::identifier_module ( agent* a, Parsed_World* parse ): parsed_world ( *parse ),owner ( a->identifier ),agent_world_comm ( a->world_comm ),
+agent_packet ( last_sensed_agents.bonus_variables,last_sensed_agents.time, last_sensed_agents.objects ),sensed_bonus_variables ( a->bonusVariables ),
+    map_bonus_variables_to_id ( a->map_bonus_variables_to_id ),sensed_time ( a->time ),real_semaphore1(buffer_lenght),
+real_semaphore2(0)
+{
+ cicli_plugin=0;
+
+    communicator = std::make_shared<agent_to_dummy_communicator>();
+
+    simulate_thread=new std::thread ( &identifier_module::simulate,std::ref ( *this ),std::ref ( sensed_state_agents ), std::ref ( real_semaphore1 ), std::ref ( real_semaphore2 ),
+                                      std::ref ( mutex_simulate_variable_access ),std::ref ( parsed_world ),std::ref ( communicator ),std::ref ( old_sensed_agents ),
+                                      std::ref ( identifier_matrix ),std::ref ( owner ) );
+}
 
 
 
@@ -292,7 +305,7 @@ for ( auto const & behavior: parsed_world.behaviors )
                         bool state_consistant=true;
                         for ( auto it = new_state.begin(); it != new_state.end(); it++ )
                         {
-                            if ( abs ( it->second - sensed_state_agents.at ( agent->first ).state.at ( it->first ) ) > tol )
+                            if ( abs ( it->second - sensed_state_agents.at ( agent->first ).state.at ( it->first ) ) > TOL )
                             {
                                 state_consistant=false;
 

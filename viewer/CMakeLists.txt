@@ -7,6 +7,8 @@ include_directories(../shared/parserYAML/include)
 find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
 include(${QT_USE_FILE})
 
+add_definitions(-DISVIEWER)
+
 set(viewer_HEADERS gui/Agent.h gui/viewer.h communication/udp_world_sniffer.h ../shared/communication/global.h)
 set_property(GLOBAL APPEND PROPERTY viewer_SOURCES gui/baseball_viewer.cpp 
  gui/main.cpp gui/Agent.cpp gui/viewer.cpp

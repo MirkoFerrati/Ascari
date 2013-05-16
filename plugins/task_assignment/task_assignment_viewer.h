@@ -1,6 +1,9 @@
 //written by Alessandro Settimi
 #ifndef TASK_ASSIGNMENT_VIEWER_H
 #define TASK_ASSIGNMENT_VIEWER_H
+
+#ifdef ISVIEWER
+
 #include "yaml_parser.h"
 #include <boost/circular_buffer.hpp>
 #include "objects/task_assignment_task.h"
@@ -29,4 +32,5 @@ private:
 
 };
 
+#endif
 #endif // TASK_ASSIGNMENT_VIEWER_H

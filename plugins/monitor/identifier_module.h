@@ -11,8 +11,8 @@
 #include <condition_variable>
 #include "named_semaphore.hpp"
 
-
-#define tol 1
+ 
+#define TOL 1 //MAI USARE LE MINUSCOLE NEI DEFINE? http://stackoverflow.com/questions/5056117/do-i-need-to-undef-a-local-define-is-there-such-a-thing-as-a-local-define
 #define mon_debug_mode 0
 #define update_after 5
 #define buffer_lenght 100
@@ -28,6 +28,7 @@ public:
     void run_plugin();
     identifier_module (Parsed_World const& W, const std::map<int,double> & sensed_bonus_variables, const std::map<std::string,int> & map_bonus_variables_to_id,
     std::shared_ptr<agent_namespace::world_communicator_abstract>& comm, const simulation_time & sensed_time,std::string owner);
+    identifier_module(agent *a, Parsed_World* parse);
     ~identifier_module();
     
 
@@ -50,7 +51,7 @@ private:
     
     
     std::shared_ptr<agent_to_dummy_communicator> communicator;
-    std::shared_ptr<agent_namespace::world_communicator_abstract>& agent_world_comm;
+    std::shared_ptr<agent_namespace::world_communicator_abstract> agent_world_comm;
     
     
     
@@ -77,7 +78,6 @@ private:
     
     
 };
-
 
 
 

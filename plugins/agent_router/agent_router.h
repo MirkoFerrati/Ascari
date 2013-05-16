@@ -11,6 +11,7 @@
 #include <types/events.h>
 #include "udp_graph_communicator.h"
 #include "../plugins/abstract_agent_plugin.h"
+#include "../agent/agent.h"
 #include <thread>
 
 #define TIME_SLOT_FOR_3DGRAPH 10.0
@@ -36,6 +37,7 @@ public:
     agent_router ( std::vector< int > tarlist, std::map< transition, Events >& events,
                    const std::map<std::string,transition>& events_to_index, std::string identifier,
                    simulation_time& time,std::string graphName );
+    agent_router( agent* a, Parsed_World* parse );
     void setGraph ( lemon::SmartDigraph& g );
     void run_plugin();
     void addReservedVariables ( exprtk::symbol_table< double >& symbol_table );
@@ -46,6 +48,7 @@ public:
     ~agent_router();
 
 private:
+  bool initialize( std::string graphName );
     bool findPath ( lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< bool >& useArc );
 	bool isEmergency(const std::vector<int>& nodes);
     bool setNextTarget();

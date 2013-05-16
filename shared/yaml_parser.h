@@ -74,7 +74,7 @@ public:
     
  
     bool load_from_node( const YAML::Node& node);
-    std::vector<std::shared_ptr<abstract_parsed_agent_plugin>> parsed_items_from_plugins;
+    std::vector<abstract_parsed_agent_plugin*> parsed_items_from_plugins;
 };
 
 class Parsed_World{
@@ -86,14 +86,14 @@ class Parsed_World{
 
   std::vector<bonusVariable> bonus_variables;
   std::map<bonusVariable, bonus_expression> bonus_expressions;
-  std::vector<Parsed_Agent> agents;
+  std::list<Parsed_Agent> agents;
   std::map<std::string,std::unique_ptr< Parsed_Behavior>> behaviors;
   std::string mapfilename;
   
   std::vector<abstract_parser_plugin*> plugins; 
 
 
-  std::vector<std::shared_ptr<abstract_parsed_world_plugin>> parsed_items_from_plugins;
+  std::vector<abstract_parsed_world_plugin*> parsed_items_from_plugins;
   bool load_from_node(const YAML::Node& node);
 
 };
@@ -102,8 +102,13 @@ class Parsed_World{
 class yaml_parser
 {
 public:
+  yaml_parser();
+  yaml_parser( std::vector< abstract_parser_plugin* > plugins );
+  void addPlugin(abstract_parser_plugin*);
     Parsed_World parse_file(const char * file_name);
     Parsed_World parse_file(std::string file_name);
+private:
+  std::vector<abstract_parser_plugin*> plugins;
 };
 #endif
 

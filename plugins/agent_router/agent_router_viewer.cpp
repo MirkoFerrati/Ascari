@@ -2,6 +2,8 @@
 #include "viewer.h"
 #include <lemon/lgf_reader.h>
 
+#ifdef ISVIEWER
+
 using namespace std;
 
 agent_router_viewer::agent_router_viewer(std::string graphname):graphname(graphname)
@@ -100,3 +102,5 @@ agent_router_viewer::~agent_router_viewer()
         delete coord_y;
     
 }
+
+#endif

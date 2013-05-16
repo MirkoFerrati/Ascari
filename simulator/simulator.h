@@ -25,7 +25,7 @@ public:
 	~simulator();
 	void start_sim(int max_loops=10000);
 	void create_communicator(int communicator_type);
-	void initialize_agents(std::vector<Parsed_Agent> const&);
+	void initialize_agents( const std::list< Parsed_Agent >& ag );
 	void initialize (Parsed_World const&);
 	void update_bonus_variables();
 	void setSleep(unsigned secSleep);

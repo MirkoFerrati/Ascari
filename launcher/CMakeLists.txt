@@ -5,7 +5,7 @@ find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
 include(${QT_USE_FILE})
 
 set(launcher_MOC_HEADERS mainwindow.h )
-
+add_definitions(-DISVIEWER)
 set_property(GLOBAL APPEND PROPERTY launcher_SOURCES main.cpp mainwindow.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../shared/communication/zmq_identifier_communicator.hpp
 ../viewer/communication/zmq_identifier_sniffer.hpp 
 ../simulator/visibility/map2d.cpp ../gml2lgf/utils.cpp ../gml2lgf/gmlreader.hpp  ../gml2lgf/node.cpp ../gml2lgf/graph.cpp ../gml2lgf/arc.cpp

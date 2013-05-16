@@ -1,6 +1,8 @@
 //written by Alessandro Settimi
 #include "task_assignment_viewer.h"
 
+#ifdef ISVIEWER
+
 task_assignment_viewer::task_assignment_viewer( int* time ,std::shared_ptr<std::mutex>& mutex,const world_sim_packet& infos):time(time),mutex(mutex),infos(infos)
 {
     started=false;
@@ -161,3 +163,4 @@ task_assignment_viewer::~task_assignment_viewer()
 
 }
 
+#endif

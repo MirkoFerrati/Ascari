@@ -1,16 +1,34 @@
 //written by Alessandro Settimi
 #include "task_assignment.h"
 #include "task_assignment_parser_plugin.h"
+#include "../agent/agent.h"
 
 
 using namespace task_assignment_namespace;
 
+
+task_assignment::task_assignment ( agent* a, Parsed_World* parse )
+:time(a->time),my_id(a->identifier),events(a->events),events_to_index(a->events_to_index)
+{
+//TODO(Mirko): sistemare il concetto di oggetto nel nuovo sistema di plugin tasks= 
+x0=parse->agents.front().initial_states.at("X");
+y0=parse->agents.front().initial_states.at("Y");
+initialize(*parse);
+}
+
   
-task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events, const std::map< std::string, transition >& events_to_index, const std::map< std::string, task_assignment_task >& tasks)
+task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events,
+				   const std::map< std::string, transition >& events_to_index, const std::map< std::string, task_assignment_task >& tasks)
 :time(time),my_id(agent.name),x0(agent.initial_states.at("X")),y0(agent.initial_states.at("Y")),events(events),events_to_index(events_to_index), tasks(tasks)
 {
-    
-    std::shared_ptr<std::mutex> temp(new std::mutex);
+    initialize(world);
+   
+}
+
+
+void task_assignment::initialize(const Parsed_World& world)
+{
+ std::shared_ptr<std::mutex> temp(new std::mutex);
     ptr_receive_mutex.swap(temp);
     
     createAgentIdAndTaskIdVectorFromParsedWorld(world);
@@ -18,10 +36,10 @@ task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent
     num_robot=agents_id.size();
     num_task=tasks_id.size();
     
-    createTaskCostMatrixFromParsedWorld(agent);
+    createTaskCostMatrixFromParsedWorld(world.agents.front());
     inizializeTaskAssignmentMatrix();
     
-  task_assignment_algorithm=std::static_pointer_cast<task_assignment_parsed_world>(world.parsed_items_from_plugins[0])->task_assignment_algorithm;
+  task_assignment_algorithm=reinterpret_cast<task_assignment_parsed_world*>(world.parsed_items_from_plugins[0])->task_assignment_algorithm;
     //task_assignment_algorithm=reinterpret_cast<task_assignment_parsed_world*>(world.parsed_items_from_plugins[0])->task_assignment_algorithm;
     
     my_task="";
@@ -107,11 +125,13 @@ void task_assignment ::initialize_assignment_problem()
  
 void task_assignment ::createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& world)
 {
-    for (unsigned int i=0;i<world.agents.size();i++)
-      agents_id.push_back(world.agents.at(i).name);  
-  auto wo=std::static_pointer_cast<task_assignment_parsed_world>(world.parsed_items_from_plugins[0]);    
+  auto wo=reinterpret_cast<task_assignment_parsed_world*>(world.parsed_items_from_plugins[0]);    
     for (unsigned int i=0;i<wo->task_list.size();i++)
 	tasks_id.push_back(wo->tasks_id.at(i));
+    
+    for (unsigned int i=0;i<wo->agents.size();i++)
+      agents_id.push_back(wo->agents.at(i));  
+
 }
 
  
@@ -127,7 +147,7 @@ void task_assignment ::createAusiliarVariables()
  
 void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a)
 {   
-    task_cost_matrix[my_id]=std::static_pointer_cast<task_assignment_parsed_agent>(a.parsed_items_from_plugins[0])->agent_task_cost_vector;
+    task_cost_matrix[my_id]=(reinterpret_cast<task_assignment_parsed_agent*>(a.parsed_items_from_plugins[0]))->agent_task_cost_vector;
     
     task_cost_vector app;
     

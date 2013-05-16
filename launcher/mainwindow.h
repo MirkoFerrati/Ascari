@@ -81,7 +81,7 @@ private:
     std::vector<QCheckBox*> agentcontainer;
     std::unique_ptr<world_sniffer_abstract> sniffer;
     std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
-    std::vector<QProcess*> agents;
+    std::map<std::string,QProcess*> agents;
     QString fileName,simulatorPath,agentPath,yamlsPath;
     int selectedAgents;
     bool disable;

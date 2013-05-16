@@ -15,9 +15,11 @@
 #include <sstream>
 #include <iomanip>
 #include <mutex>
-#include<lemon/graph_to_eps.h>
+#include <lemon/graph_to_eps.h>
 #include "debug_constants.h"
 #include "graph_creator.h"
+#include "agent_router_parsed_agent.h"
+#include "agent_router_parsed_world.h"
 
 
 
@@ -33,7 +35,22 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
        coord_x ( graph ), coord_y ( graph ),
        targets ( tarlist ),time ( time ),identifier ( identifier ),communicator ( _mutex, &info, _io_service,identifier )
 {
-    Graph_creator c ( graph, length, coord_x, coord_y );
+ initialize(graphName);
+}
+
+agent_router::agent_router ( agent* a, Parsed_World* parse ):  events ( a->events ), events_to_index ( a->events_to_index ), length ( graph ),
+       coord_x ( graph ), coord_y ( graph ),
+       /*targets ( tarlist ),*/time ( a->time ),identifier ( a->identifier ),communicator ( _mutex, &info, _io_service,identifier )
+{
+  targets=(reinterpret_cast<agent_router_parsed_agent*>(parse->agents.front().parsed_items_from_plugins[0]))->target_list;
+  //(reinterpret_cast<agent_router_parsed_agent>(parse->agents.at(0).parsed_items_from_plugins[0])).target_list; //funziona perche' rimane un solo agente nel mondo(gli altri vengono eliminati dal main)
+  std::string graphName=(reinterpret_cast<agent_router_parsed_world*>(parse->parsed_items_from_plugins[0]))->graphName;
+initialize(graphName);
+}
+
+bool agent_router::initialize(std::string graphName)
+{
+   Graph_creator c ( graph, length, coord_x, coord_y );
     graph_node_size = c.createGraph ( MAXFLOORS, graphName );
     if ( !graph_node_size )
         ERR ( "attenzione, impossibile creare il grafo", 0 );
@@ -57,7 +74,9 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
     internal_state=state::STARTING;
     speed=0;
     priority=identifier;
+    return true;
 }
+
 
 void agent_router::run_plugin()
 {

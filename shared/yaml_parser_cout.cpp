@@ -2,6 +2,8 @@
 #include "yaml_parser.h"
 #include "parserYAML/include/yaml-cpp/node.h"
 
+#include "streams_utils.h"
+
 using namespace std;
 
 //TODO(Simone): bisogna aggiornare il cout con le ultime cose lette dal file yaml (i behavior)
@@ -75,11 +77,11 @@ ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
         }
     }
 
-    os<< "Target List: ";
-    for (std::vector<target_id>::const_iterator iter=ag.target_list.begin(); iter!=ag.target_list.end();++iter)
-    {
-        os<< " "<<*iter;
-    }
+    os<< "Target List: TODO";
+//     for (std::vector<target_id>::const_iterator iter=ag.target_list.begin(); iter!=ag.target_list.end();++iter)
+//     {
+//         os<< " "<<*iter;
+//     }
     os<<endl;
 
     os<< "Visibility:"<<ag.visibility<<endl;

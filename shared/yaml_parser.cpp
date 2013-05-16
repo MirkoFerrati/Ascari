@@ -6,6 +6,23 @@
 
 using namespace std;
 
+yaml_parser::yaml_parser ( std::vector< abstract_parser_plugin* > plugins ) :plugins ( plugins )
+{
+
+}
+
+yaml_parser::yaml_parser()
+{
+
+}
+
+
+void yaml_parser::addPlugin ( abstract_parser_plugin* plugin )
+{
+    assert ( plugin->enabled ); //will give segfault if the plugin was not created with a new()
+    plugins.push_back ( plugin );
+}
+
 Parsed_World yaml_parser::parse_file ( const char * file_name )
 {
     std::string temp ( file_name );
@@ -28,11 +45,11 @@ Parsed_World yaml_parser::parse_file ( string file_name )
     YAML::Node doc;
     parser.GetNextDocument ( doc );
     Parsed_World World;
-    World.plugins.push_back(new task_assignment_parser_plugin());
-    World.plugins.push_back(new agent_router_parser_plugin());
-    World.plugins.push_back(new monitor_parser_plugin());
 
-    if ( ! ( World.load_from_node(doc) ) )
+    World.plugins=plugins;
+
+
+    if ( ! ( World.load_from_node ( doc ) ) )
         World.parsedSuccessfully=false;
 
     return World;
@@ -40,17 +57,17 @@ Parsed_World yaml_parser::parse_file ( string file_name )
 }
 
 
-bool Parsed_Behavior::load_from_node ( const YAML::Node& node)
+bool Parsed_Behavior::load_from_node ( const YAML::Node& node )
 {
     node["STATES"]>>state;//behavior->state;
     node["CONTROL_COMMANDS"]>>inputs;//behavior->inputs;
     node["NAME"]>>name;//behavior->name;
 
-    for ( unsigned int i=0; i<state.size();i++) //behavior->state.size(); i++ )
+    for ( unsigned int i=0; i<state.size(); i++ ) //behavior->state.size(); i++ )
     {
         dynamic_expression tmp_exp;
         //node["DYNAMIC_MAP"][0][behavior->state[i]]>>tmp_exp;
-	node["DYNAMIC_MAP"][0][state[i]]>>tmp_exp;
+        node["DYNAMIC_MAP"][0][state[i]]>>tmp_exp;
         //behavior->
         expressions.insert ( std::pair<stateVariable,dynamic_expression> ( state[i],tmp_exp ) );
     }
@@ -155,7 +172,7 @@ bool Parsed_Behavior::load_from_node ( const YAML::Node& node)
 
 
 
-bool Parsed_Agent::load_from_node ( const YAML::Node& node)
+bool Parsed_Agent::load_from_node ( const YAML::Node& node )
 {
     if ( node.FindValue ( "VISIBLE_AREA" ) )
     {
@@ -180,7 +197,7 @@ bool Parsed_Agent::load_from_node ( const YAML::Node& node)
     {
         ERR ( "UNDEFINED START DISCRETE STATE %s", state_start.c_str() );
         return false;
-    }    
+    }
     return true;
 }
 
@@ -215,12 +232,13 @@ bool Parsed_World::load_from_node ( const YAML::Node& node )
         }
     }
 
-    for (auto plugin:plugins)
-	{
-	    auto temp=plugin->parseWorld(node[0]);
-	    parsed_items_from_plugins.push_back(temp);
-	}
-    
+for ( auto plugin:plugins )
+    {
+        abstract_parsed_world_plugin* temp=0;
+        if ( plugin->parseWorld ( node[0],temp ) )
+            parsed_items_from_plugins.push_back (temp  );
+    }
+
     const YAML::Node &behaviors_nodes=node[0]["BEHAVIORS"];
 
     for ( unsigned int i=0; i<behaviors_nodes.size(); i++ )
@@ -240,13 +258,12 @@ bool Parsed_World::load_from_node ( const YAML::Node& node )
         std::unique_ptr<Parsed_Behavior> tmp_ptr ( new Parsed_Behavior() );
         behaviors.insert ( std::make_pair ( tmp_beh_name,std::move ( tmp_ptr ) ) );
         behaviors[tmp_beh_name]->name=tmp_beh_name;
-        if ( !  behaviors[tmp_beh_name]->load_from_node(behaviors_nodes[i]) )
+        if ( !  behaviors[tmp_beh_name]->load_from_node ( behaviors_nodes[i] ) )
             return false;
     }
 
 
     const YAML::Node &agent_nodes=node[0]["AGENTS"];
-    agents.reserve ( agent_nodes.size() );
     for ( unsigned int i=0; i<agent_nodes.size(); i++ )
     {
         std::string tmp_ag_name;
@@ -264,16 +281,19 @@ bool Parsed_World::load_from_node ( const YAML::Node& node )
             return false;
         }
         agents.emplace_back ( behaviors[tmp_agent_behavior_name] );
-        agents[i].name=tmp_ag_name;
-        agents[i].behavior_name=tmp_agent_behavior_name;
-        if ( ! ( agents[i].load_from_node(agent_nodes[i] ) ) )
+        agents.back().name=tmp_ag_name;
+        agents.back().behavior_name=tmp_agent_behavior_name;
+        if ( ! ( agents.back().load_from_node ( agent_nodes[i] ) ) )
             return false;
-	
-	for (auto plugin:plugins)
-	{
-	    auto temp=plugin->parseAgent(agent_nodes[i]);
-	    agents[i].parsed_items_from_plugins.push_back(temp);
-	}
+
+    for ( auto plugin:plugins )
+        {
+            abstract_parsed_agent_plugin* temp_ptr=0;
+            if ( plugin->parseAgent ( agent_nodes[i],temp_ptr ) )
+	    {
+                agents.back().parsed_items_from_plugins.push_back (temp_ptr);
+	    }
+        }
     }
     return true;
 }

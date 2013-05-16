@@ -1,6 +1,8 @@
 #ifndef MONITOR_VIEWER_H
 #define MONITOR_VIEWER_H
 
+#ifdef ISVIEWER
+
 #include <map>
 #include<memory>
 #include <types/monitor_packet.h>
@@ -28,5 +30,5 @@ private:
     std::string mapfilename;
     map2d* map;
 };
-
+#endif //ISVIEWER
 #endif // MONITOR_VIEWER_H

@@ -74,18 +74,19 @@ void simulator::initialize_plugins ( Parsed_World const& wo )
 {
 for ( auto a:wo.agents )
     {
-        if ( a.active_plugins[0]=="MONITOR" )
-        {
-            // throw "not implemented";
-        }
-        if ( a.active_plugins[0]=="AGENT_ROUTER" )
-        {
-            plugins.push_back ( new agent_router_simulator_plugin() );
-        }
-        if ( a.active_plugins[0]=="TASK_ASSIGNMENT" )
-        {
-            plugins.push_back ( new task_assignment_simulator(sim_packet) );
-        }
+      //TODO
+//         if ( a.active_plugins[0]=="MONITOR" )
+//         {
+//             // throw "not implemented";
+//         }
+//         if ( a.active_plugins[0]=="AGENT_ROUTER" )
+//         {
+//             plugins.push_back ( new agent_router_simulator_plugin() );
+//         }
+//         if ( a.active_plugins[0]=="TASK_ASSIGNMENT" )
+//         {
+//             plugins.push_back ( new task_assignment_simulator(sim_packet) );
+//         }
     }
 
 for ( auto & plugin:plugins )
@@ -147,50 +148,52 @@ void simulator::createObjects ( const Parsed_World& world )
 }
 
 
-void simulator::initialize_agents ( const vector<Parsed_Agent>& ag )
+void simulator::initialize_agents ( const list<Parsed_Agent>& agents )
 {
-    num_agents=ag.size();
-    for ( unsigned int i=0; i<num_agents; i++ )
+    num_agents=agents.size();
+    int i=0;
+    for ( auto ag:agents)
     {
-        agents_name_to_index.insert ( make_pair ( ag.at ( i ).name,i ) );
+      i++;
+        agents_name_to_index.insert ( make_pair ( ag.name,i ) );
         agent_state_packet agent_packet_tmp;
         control_command_packet command_packet_tmp;
-        sim_packet.state_agents.internal_map.insert ( make_pair ( ag.at ( i ).name,agent_packet_tmp ) );
-        commands.insert ( make_pair ( ag.at ( i ).name,command_packet_tmp ) );
-        agent_state_packet& agent_packet=sim_packet.state_agents.internal_map.at ( ag.at ( i ).name );
-        control_command_packet& command_packet=commands.at ( ag.at ( i ).name );
-        agent_packet.identifier=ag.at ( i ).name;
-        command_packet.identifier=ag.at ( i ).name;
+        sim_packet.state_agents.internal_map.insert ( make_pair ( ag.name,agent_packet_tmp ) );
+        commands.insert ( make_pair ( ag.name,command_packet_tmp ) );
+        agent_state_packet& agent_packet=sim_packet.state_agents.internal_map.at ( ag.name );
+        control_command_packet& command_packet=commands.at ( ag.name );
+        agent_packet.identifier=ag.name;
+        command_packet.identifier=ag.name;
 
 
 
         index_map commands_to_index_tmp;
 
-        for ( unsigned int j=0; j<ag.at ( i ).behavior->state.size(); j++ )
+        for ( unsigned int j=0; j<ag.behavior->state.size(); j++ )
         {
-            agent_packet.state.insert ( make_pair ( j,ag.at ( i ).initial_states.at ( ag.at ( i ).behavior->state.at ( j ) ) ) );
-            agent_states_to_index.insert ( make_pair ( ag.at ( i ).behavior->state.at ( j ),j ) );
-            bonus_symbol_table.add_variable ( ag.at ( i ).behavior->state.at ( j ) +ag.at ( i ).name,agent_packet.state.at ( j ) );
+            agent_packet.state.insert ( make_pair ( j,ag.initial_states.at ( ag.behavior->state.at ( j ) ) ) );
+            agent_states_to_index.insert ( make_pair ( ag.behavior->state.at ( j ),j ) );
+            bonus_symbol_table.add_variable ( ag.behavior->state.at ( j ) +ag.name,agent_packet.state.at ( j ) );
         }
 
         //Al simulatore non deve mai arrivare piu' di un controllo per agente, percio' la mappa avra' un solo elemento
 
-        for ( unsigned int j=0; j<ag.at ( i ).behavior->inputs.size(); j++ )
+        for ( unsigned int j=0; j<ag.behavior->inputs.size(); j++ )
         {
             command_packet.default_command.insert ( make_pair ( j,0 ) );
-            commands_to_index_tmp.insert ( make_pair ( ag.at ( i ).behavior->inputs.at ( j ),j ) );
-            bonus_symbol_table.add_variable ( ag.at ( i ).behavior->inputs.at ( j ) +ag.at ( i ).name,command_packet.default_command.at ( j ) );
+            commands_to_index_tmp.insert ( make_pair ( ag.behavior->inputs.at ( j ),j ) );
+            bonus_symbol_table.add_variable ( ag.behavior->inputs.at ( j ) +ag.name,command_packet.default_command.at ( j ) );
         }
         agent_commands_to_index.push_back ( commands_to_index_tmp );
 
-        dynamic *d= new dynamic ( sim_packet.state_agents.internal_map.at ( ag.at ( i ).name ).state, commands.at ( ag.at ( i ).name ).default_command,
-                                  ag.at ( i ).behavior->expressions, ag.at ( i ).behavior->state,ag.at ( i ).behavior->inputs );
+        dynamic *d= new dynamic ( sim_packet.state_agents.internal_map.at ( ag.name ).state, commands.at ( ag.name ).default_command,
+                                  ag.behavior->expressions, ag.behavior->state,ag.behavior->inputs );
 
         dynamic_module.push_back ( d );
 
-        if ( ag.at ( i ).visibility!="" )
+        if ( ag.visibility!="" )
         {
-            agents_visibility[i]=visibleArea::createVisibilityFromParsedVisibleArea ( ag.at ( i ).visibility,agent_states_to_index );
+            agents_visibility[i]=visibleArea::createVisibilityFromParsedVisibleArea ( ag.visibility,agent_states_to_index );
         }
     }
 
