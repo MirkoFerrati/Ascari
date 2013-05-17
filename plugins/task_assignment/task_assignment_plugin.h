@@ -53,7 +53,7 @@ public:
     {
         return simulator_plugin;
     };
-    bool createSimulatorPlugin ( simulator* s )
+    bool createSimulatorPlugin ( simulator* s ,Parsed_World* world)
     {
         if ( simulator_plugin!=0 )
             ERR ( "already created simulator plugin, please check for double calls",NULL )
