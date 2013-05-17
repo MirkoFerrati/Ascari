@@ -33,38 +33,40 @@ private slots:
 
     void on_actionAgent_triggered();
 
-    void on_actionViewer_triggered();
+    void on_actionYaml_files_triggered();
 
     void on_StartAgents_clicked();
 
     void on_StartSimulator_clicked();
 
-	void on_PauseSimulator_clicked();
-	
+    void on_PauseSimulator_clicked();
+
     void on_Updateshell_clicked();
 
     void on_StartViewer_clicked();
 
     void on_playall_clicked();
-	
-	void on_stopall_clicked();
 
-    void closeEvent(QCloseEvent *event);
-    
-	void simulatorExited(int exitcode,QProcess::ExitStatus exitstatus);
-	
-	void agentSelected(int);
-	
+    void on_stopall_clicked();
+
+    void closeEvent ( QCloseEvent *event );
+
+    void simulatorExited ( int exitcode,QProcess::ExitStatus exitstatus );
+
+    void agentSelected ( int );
+
     bool startViewer();
     void startAgents();
     void startSimulator();
 
 
-    void on_selectAll_stateChanged(int arg1);
+    void on_selectAll_stateChanged ( int arg1 );
+
+    void on_speed_sliderMoved(int position);
 
 private:
     Ui::MainWindow *ui;
-	QDebugStream *qout,*qerr;
+    QDebugStream *qout,*qerr;
     QProcess *simulator;
     boost::asio::io_service io_service;
     //std::vector<char> buffer;
@@ -75,12 +77,12 @@ private:
     QSettings *settings;
     Parsed_World world;
     Viewer * insideViewer;
-    std::vector<viewer_plugin*> plugins;
+    std::vector<abstract_viewer_plugin*> plugins;
     std::vector<QCheckBox*> agentcontainer;
     std::unique_ptr<world_sniffer_abstract> sniffer;
     std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
-    std::vector<QProcess*> agents;
-    QString fileName,simulatorPath,agentPath,viewerPath;
+    std::map<std::string,QProcess*> agents;
+    QString fileName,simulatorPath,agentPath,yamlsPath;
     int selectedAgents;
     bool disable;
 };

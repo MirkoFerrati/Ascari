@@ -5,9 +5,11 @@ find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
 include(${QT_USE_FILE})
 
 set(launcher_MOC_HEADERS mainwindow.h )
-
-set(launcher_SOURCES main.cpp mainwindow.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../shared/communication/zmq_identifier_communicator.hpp
-../viewer/communication/zmq_identifier_sniffer.hpp ../viewer/gui/monitor_viewer.cpp ../viewer/gui/agent_router_viewer.cpp ../viewer/gui/task_assignment_viewer.cpp
+add_definitions(-DISVIEWER)
+set_property(GLOBAL APPEND PROPERTY launcher_SOURCES main.cpp mainwindow.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../shared/communication/zmq_identifier_communicator.hpp
+../viewer/communication/zmq_identifier_sniffer.hpp 
+../simulator/visibility/map2d.cpp ../gml2lgf/utils.cpp ../gml2lgf/gmlreader.hpp  ../gml2lgf/node.cpp ../gml2lgf/graph.cpp ../gml2lgf/arc.cpp
+../shared/objects/router_graph_good.cpp
 ../viewer/gui/viewer.cpp ../viewer/communication/udp_world_sniffer.cpp ../viewer/gui/Agent.cpp ../shared/communication/global.cpp ../shared/objects/task_assignment_task.cpp)
 SET(launcher_UIS mainwindow.ui)
 
@@ -24,6 +26,10 @@ include_directories(${CMAKE_BINARY_DIR})
 QT4_WRAP_UI( launcher_UI_HEADERS ${launcher_UIS} )
 QT4_WRAP_CPP( launcher_MOC_SOURCES ${launcher_MOC_HEADERS} )
 
+get_property(viewer_SOURCES GLOBAL PROPERTY viewer_SOURCES)
+get_property(viewer_SOURCES GLOBAL PROPERTY launcher_SOURCES)
+
+set(launcher_SOURCES ${launcher_SOURCES} ${viewer_SOURCES})
 
 add_executable(launcher
     ${launcher_SOURCES}

@@ -1,5 +1,5 @@
 #include "agent.h"
-#include "graph_routing/agent_router.h"
+#include "../plugins/agent_router/agent_router.h"
 
 //written by Alessandro Settimi
 #ifdef GLPK_FOUND
@@ -7,7 +7,7 @@
 #endif
 //written by Alessandro Settimi
 
-#include "identifierModule/identifier_module.h"
+#include "../plugins/monitor/identifier_module.h"
 #include <string>
 #include <utility>
 #include <map>
@@ -41,23 +41,37 @@ for ( auto const & disc_state : map_discreteStateName_to_id )
 }
 
 
-agent::agent ( int agent_index,const Parsed_World& world, bool noStart ) :
-    identifier ( world.agents.at ( agent_index ).name )
+void agent::addPlugin ( abstract_agent_plugin* plugin)
+{
+        plugins.push_back ( plugin );
+}
+
+
+agent::agent ( const Parsed_World& world, bool noStart ) :
+    identifier ( world.agents.front().name )
 {
     createBonusVariablesFromWorld ( world.bonus_expressions );
 
-    if ( !world.agents.at ( agent_index ).target_list.empty() )
-    {
-        Plugin_module *plugin=new agent_router ( world.agents.at ( agent_index ).target_list,events,events_to_index,world.agents.at ( agent_index ).name,time,world.graphName );
-        plugins.push_back ( plugin );
-    }
+     //TODO: questa roba non esiste piu', viene fatta dal main e dal metodo addPlugin che devo ancora implementare
+//     if ( !world.agents.at ( agent_index ).target_list.empty() )
+//     {
+//         abstract_agent_plugin *plugin=new agent_router ( world.agents.at ( agent_index ).target_list,events,events_to_index,world.agents.at ( agent_index ).name,time,world.graphName );
+//         plugins.push_back ( plugin );
+//     }
 
-    if ( world.agents.at ( agent_index ).monitoring )
-    {
+//     if ( world.agents.at ( agent_index ).monitoring )
+//     {
+// 
+//         abstract_agent_plugin *monitor=new identifier_module ( world,bonusVariables,map_bonus_variables_to_id,world_comm,time,identifier );
+//         plugins.push_back ( monitor );
+//     }
 
-        Plugin_module *monitor=new identifier_module ( world,bonusVariables,map_bonus_variables_to_id,world_comm,time,identifier );
-        plugins.push_back ( monitor );
-    }
+//     if ( !world.task_list.empty() )
+//     {
+//         abstract_agent_plugin* plugin=new task_assignment ( world,world.agents.at ( agent_index ),time,events,events_to_index,objects );
+//         plugins.push_back ( plugin );
+//     }
+
 
     /*
     if (condition to enable a plugin)
@@ -66,17 +80,6 @@ agent::agent ( int agent_index,const Parsed_World& world, bool noStart ) :
     	plugins.push_back(plugin);
     }
     */
-
-#ifdef GLPK_FOUND
-    //written by Alessandro Settimi
-    if ( !world.task_list.empty() )
-    {
-        Plugin_module* plugin=new task_assignment ( world,world.agents.at ( agent_index ),time,events,events_to_index,objects );
-        plugins.push_back ( plugin );
-    }
-    //written by Alessandro Settimi
-#endif
-
     /*!
      * Aggiungo le variabili richieste dai plugin
      */
@@ -87,8 +90,8 @@ agent::agent ( int agent_index,const Parsed_World& world, bool noStart ) :
 
     }
 
-    init ( world.agents.at ( agent_index ).behavior,false,noStart );
-    discreteState.push_front ( map_discreteStateName_to_id.at ( world.agents.at ( agent_index ).state_start ) );
+    init ( world.agents.front().behavior,false,noStart );
+    discreteState.push_front ( map_discreteStateName_to_id.at ( world.agents.front().state_start ) );
 
 //qui invece mi setto quello che manca a mano
 }

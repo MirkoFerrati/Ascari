@@ -2,8 +2,8 @@
 #define VIEWER
 
 #include "Agent.h"
-#include "viewer_plugin.h"
 #include <types/world_sim_packet.h>
+#include "../plugins/abstract_viewer_plugin.h"
 #include <QtGui/QWidget>
 #include <QtGui/QKeyEvent>
 #include <mutex>
@@ -21,7 +21,7 @@ public:
     void start();
     void init ( std::string filename );
 
-void addPlugin(viewer_plugin* plugin);
+void addPlugin(abstract_viewer_plugin* plugin);
 
  int * getTime(){return &simulation_time;}
 
@@ -32,7 +32,7 @@ private:
     void keyPressEvent ( QKeyEvent *event );
     void pause();
     void closeEvent ( QCloseEvent *event );
-    std::vector<viewer_plugin*> plugins;
+    std::vector<abstract_viewer_plugin*> plugins;
     int timerId;
     int simulation_time;
     std::map<std::string,Agent> agents;

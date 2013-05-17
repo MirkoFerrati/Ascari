@@ -12,6 +12,7 @@
 #include <fstream>
 #include <memory>
 #include "../shared/wykobi/wykobi.hpp"
+#include "../shared/wykobi/wykobi_utilities.hpp"
 #include <types.h>
 
 

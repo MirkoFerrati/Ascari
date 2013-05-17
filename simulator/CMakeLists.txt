@@ -1,13 +1,18 @@
 link_directories(/usr/local/lib)
 
-
-add_executable(simulator collisionchecker.cpp ../shared/dynamic.cpp 
+set_property(GLOBAL APPEND PROPERTY simulator_SOURCES collisionchecker.cpp ../shared/dynamic.cpp 
 communication/udp_agent_communicator.cpp simulator.cpp main.cpp communication/zmq_viewer_communicator.hpp
 communication/agent_communicator_abstract.h ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp 
 communication/zmq_agent_communicator.cpp ../shared/communication/global.cpp visibility/visibility.cpp
-	../shared/communication/zmq_full_communicator.hpp ../shared/communication/zmq_communicator.hpp communication/task_assignment_router.hpp
+../shared/objects/router_graph_good.cpp
+	../shared/communication/zmq_full_communicator.hpp ../shared/communication/zmq_communicator.hpp 
 	../shared/objects/task_assignment_task.cpp visibility/map2d.cpp ../gml2lgf/graph.cpp ../gml2lgf/node.cpp ../gml2lgf/arc.cpp ../gml2lgf/gmlreader.hpp
 )
+
+add_definitions(-DISSIMULATOR)
+get_property(sources GLOBAL PROPERTY simulator_SOURCES)
+
+add_executable(simulator ${sources})
 
 add_subdirectory(parser)
 include_directories(visibility)
@@ -40,13 +45,13 @@ include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se ha
 message("Configurazione di ${CMAKE_BUILD_TYPE}")
 file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/simulator" "../shared/yamls/*.yaml")
 FOREACH(infileName ${yaml_files})
-MESSAGE(STATUS "Process file: ${infileName}")
+#MESSAGE(STATUS "Process file: ${infileName}")
 configure_file(${infileName} ./ COPYONLY)
 endforeach(${infileName})
 
 configure_file(../shared/graphs/museum.gml museum.gml COPYONLY)
 file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/agent" "../shared/graphs/*.lgf")
 FOREACH(infileName ${yaml_files})
-MESSAGE(STATUS "Process file: ${infileName}")
+#MESSAGE(STATUS "Process file: ${infileName}")
 configure_file(${infileName} ./ COPYONLY)
 endforeach(${infileName})

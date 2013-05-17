@@ -4,12 +4,14 @@
 #include "logog.hpp"
 #include "debug_constants.h"
 #include <objects/task_assignment_task.h>
-#include <udp_agent_router.hpp>
 #include <zmq_agent_communicator.h>
 #include <zmq_viewer_communicator.hpp>
 #include <condition_variable>
 #include "collisionchecker.h"
 #include "visibility/visibility.h"
+#include <map2d.h>
+#include "../plugins/agent_router/agent_router_simulator_plugin.h"
+#include "../plugins/task_assignment/task_assignment_simulator.h"
 #include <time.h>
 
 
@@ -33,25 +35,26 @@ void simulator::create_communicator ( int communicator_type )
     }
 }
 
-simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.time,sim_packet.objects ),
-    topology_router ( SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT ),graph_router ( SIMULATOR_GRAPH_PORT,AGENT_GRAPH_PORT )
+simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.time,sim_packet.objects )
 {
     viewer_communicator=new zmq_viewer_communicator();
     max_loops=0;
     communicator=0;
     num_agents=0;
-    pi=exprtk::details::numeric::constant::pi;
+    world_map=0;
     f_rndom=0;
     secSleep=5000;
     collisionChecker=0;
     checkCollision=false;
 
-    //written by Alessandro Settimi
-    ta_router=0;
-    ta_router_started=false;
-    task_assignment_algorithm=-1;
-    //written by Alessandro Settimi
+
 }
+void simulator::addPlugin ( abstract_simulator_plugin* plugin)
+{
+        plugins.push_back ( plugin );
+}
+
+
 
 void simulator::setSleep ( unsigned secSleep )
 {
@@ -73,15 +76,40 @@ void simulator::setCheckCollision ( bool checkCollision )
     }
 }
 
+void simulator::initialize_plugins ( Parsed_World const& wo )
+{
+for ( auto a:wo.agents )
+    {
+      //TODO
+//         if ( a.active_plugins[0]=="MONITOR" )
+//         {
+//             // throw "not implemented";
+//         }
+//         if ( a.active_plugins[0]=="AGENT_ROUTER" )
+//         {
+//             plugins.push_back ( new agent_router_simulator_plugin() );
+//         }
+//         if ( a.active_plugins[0]=="TASK_ASSIGNMENT" )
+//         {
+//             plugins.push_back ( new task_assignment_simulator(sim_packet) );
+//         }
+    }
+
+for ( auto & plugin:plugins )
+        plugin->initialize(wo);
+}
+
 
 void simulator::initialize ( const Parsed_World& wo )
 {
-    //written by Alessandro Settimi
-    task_assignment_algorithm = wo.task_assignment_algorithm;
-    //written by Alessandro Settimi
 
+    if ( wo.mapfilename!="UNSET" && wo.mapfilename!="" )
+    {
+        this->world_map=new map2d ( wo.mapfilename );
+    }
     initialize_agents ( wo.agents );
-    createObjects(wo);
+    createObjects ( wo );
+    initialize_plugins ( wo );
     bonus_symbol_table.add_constants();
     int i=0;
     for ( map<bonusVariable,bonus_expression>::const_iterator it=wo.bonus_expressions.begin(); it!=wo.bonus_expressions.end(); ++it )
@@ -94,8 +122,7 @@ void simulator::initialize ( const Parsed_World& wo )
     {
         bonus_symbol_table.add_variable ( it->first,bonusVariables[it->second] );
     }
-    pi=exprtk::details::numeric::constant::pi;
-    bonus_symbol_table.add_variable ( "PI_GRECO",pi,true );
+    bonus_symbol_table.add_constant ( "PI_GRECO",exprtk::details::numeric::constant::pi );
     f_rndom = new rndom<double>();
     bonus_symbol_table.add_function ( f_rndom->name, *f_rndom );
     exprtk::parser<double> parser;
@@ -123,94 +150,105 @@ void simulator::initialize ( const Parsed_World& wo )
 
 void simulator::createObjects ( const Parsed_World& world )
 {
-  auto tasklist=world.task_list;
-  auto tasks_id=world.tasks_id;
-     
-     for (unsigned int i=0;i<tasks_id.size();i++)
-     {
-        	task_assignment_task tmp(world.task_list.at(tasks_id.at(i)));
-	
-
-	sim_packet.objects[tasks_id.at(i)]=tmp;
-     }
-     
-     std::cout<<sim_packet.objects<<std::endl;
+//TODO: chiamare le createObjects dei plugin, se ha senso
 }
 
 
-void simulator::initialize_agents ( const vector<Parsed_Agent>& ag )
+void simulator::initialize_agents ( const list<Parsed_Agent>& agents )
 {
-    num_agents=ag.size();
-    for ( unsigned int i=0; i<num_agents; i++ )
+    num_agents=agents.size();
+    int i=0;
+    for ( auto ag:agents)
     {
-        agents_name_to_index.insert ( make_pair ( ag.at ( i ).name,i ) );
+      i++;
+        agents_name_to_index.insert ( make_pair ( ag.name,i ) );
         agent_state_packet agent_packet_tmp;
         control_command_packet command_packet_tmp;
-        sim_packet.state_agents.internal_map.insert ( make_pair ( ag.at ( i ).name,agent_packet_tmp ) );
-        commands.insert ( make_pair ( ag.at ( i ).name,command_packet_tmp ) );
-        agent_state_packet& agent_packet=sim_packet.state_agents.internal_map.at ( ag.at ( i ).name );
-        control_command_packet& command_packet=commands.at ( ag.at ( i ).name );
-        agent_packet.identifier=ag.at ( i ).name;
-        command_packet.identifier=ag.at ( i ).name;
+        sim_packet.state_agents.internal_map.insert ( make_pair ( ag.name,agent_packet_tmp ) );
+        commands.insert ( make_pair ( ag.name,command_packet_tmp ) );
+        agent_state_packet& agent_packet=sim_packet.state_agents.internal_map.at ( ag.name );
+        control_command_packet& command_packet=commands.at ( ag.name );
+        agent_packet.identifier=ag.name;
+        command_packet.identifier=ag.name;
 
 
 
         index_map commands_to_index_tmp;
 
-        for ( unsigned int j=0; j<ag.at ( i ).behavior->state.size(); j++ )
+        for ( unsigned int j=0; j<ag.behavior->state.size(); j++ )
         {
-            agent_packet.state.insert ( make_pair ( j,ag.at ( i ).initial_states.at ( ag.at ( i ).behavior->state.at ( j ) ) ) );
-            agent_states_to_index.insert ( make_pair ( ag.at ( i ).behavior->state.at ( j ),j ) );
-            bonus_symbol_table.add_variable ( ag.at ( i ).behavior->state.at ( j ) +ag.at ( i ).name,agent_packet.state.at ( j ) );
+            agent_packet.state.insert ( make_pair ( j,ag.initial_states.at ( ag.behavior->state.at ( j ) ) ) );
+            agent_states_to_index.insert ( make_pair ( ag.behavior->state.at ( j ),j ) );
+            bonus_symbol_table.add_variable ( ag.behavior->state.at ( j ) +ag.name,agent_packet.state.at ( j ) );
         }
 
         //Al simulatore non deve mai arrivare piu' di un controllo per agente, percio' la mappa avra' un solo elemento
 
-        for ( unsigned int j=0; j<ag.at ( i ).behavior->inputs.size(); j++ )
+        for ( unsigned int j=0; j<ag.behavior->inputs.size(); j++ )
         {
             command_packet.default_command.insert ( make_pair ( j,0 ) );
-            commands_to_index_tmp.insert ( make_pair ( ag.at ( i ).behavior->inputs.at ( j ),j ) );
-            bonus_symbol_table.add_variable ( ag.at ( i ).behavior->inputs.at ( j ) +ag.at ( i ).name,command_packet.default_command.at ( j ) );
+            commands_to_index_tmp.insert ( make_pair ( ag.behavior->inputs.at ( j ),j ) );
+            bonus_symbol_table.add_variable ( ag.behavior->inputs.at ( j ) +ag.name,command_packet.default_command.at ( j ) );
         }
         agent_commands_to_index.push_back ( commands_to_index_tmp );
 
-        dynamic *d= new dynamic ( sim_packet.state_agents.internal_map.at ( ag.at ( i ).name ).state, commands.at ( ag.at ( i ).name ).default_command,
-                                  ag.at ( i ).behavior->expressions, ag.at ( i ).behavior->state,ag.at ( i ).behavior->inputs );
+        dynamic *d= new dynamic ( sim_packet.state_agents.internal_map.at ( ag.name ).state, commands.at ( ag.name ).default_command,
+                                  ag.behavior->expressions, ag.behavior->state,ag.behavior->inputs );
 
         dynamic_module.push_back ( d );
 
-        if ( ag.at ( i ).visibility!="" )
+        if ( ag.visibility!="" )
         {
-            agents_visibility[i]=visibleArea::createVisibilityFromParsedVisibleArea ( ag.at ( i ).visibility,agent_states_to_index );
+            agents_visibility[i]=visibleArea::createVisibilityFromParsedVisibleArea ( ag.visibility,agent_states_to_index );
         }
     }
 
-
-//     for (map<std::string,agent_state_packet>::iterator iter=states_index.internal_map.begin(); iter!=states_index.internal_map.end();iter++)
-//     {
-//         cout<<iter->first<<endl;
-//         for (map<int,double>::iterator iiter=iter->second.state.begin();iiter!=iter->second.state.end();iiter++) {
-//             //cout<< iiter->first<<"->"<<iiter->second<<endl;
-//         }
-//         for (map<string,int>::iterator iiter=agent_states_to_index.at(agent_name_to_index.at(iter->first)).begin();iiter!=agent_states_to_index.at(agent_name_to_index.at(iter->first)).end();iiter++) {
-//             cout<< iiter->first<<"->"<<iter->second.state.at(iiter->second)<<endl;
-//         }
-//     }
+    /*
+        for (map<std::string,agent_state_packet>::iterator iter=states_index.internal_map.begin(); iter!=states_index.internal_map.end();iter++)
+        {
+            cout<<iter->first<<endl;
+            for (map<int,double>::iterator iiter=iter->second.state.begin();iiter!=iter->second.state.end();iiter++) {
+                //cout<< iiter->first<<"->"<<iiter->second<<endl;
+            }
+            for (map<string,int>::iterator iiter=agent_states_to_index.at(agent_name_to_index.at(iter->first)).begin();iiter!=agent_states_to_index.at(agent_name_to_index.at(iter->first)).end();iiter++) {
+                cout<< iiter->first<<"->"<<iter->second.state.at(iiter->second)<<endl;
+            }
+        }*/
 }
 
-void simulator::input_loop ( mutex& input_mutex,condition_variable& input_cond,volatile bool& paused,volatile bool& exit )
+void simulator::input_loop ( mutex& input_mutex,condition_variable& input_cond,volatile bool& paused,volatile bool& exit,volatile int& secSleep )
 {
     char c;
+    string temp;
+    bool isReading;
     while ( !exit )
     {
-        //usleep ( 100000 );
         std::cin.read ( &c,1 );
+        if ( isReading )
+        {
+            temp.push_back ( c );
+        }
         if ( c=='p' )
         {
             std::lock_guard<std::mutex> lock ( input_mutex );
 //             cout<<"letto un carattere:"<<c<<paused<<endl;
 
             paused=!paused;
+            c='0';
+            input_cond.notify_one();
+        }
+        if ( c=='s' )
+        {
+            isReading=true;
+            temp.clear();
+            c='0';
+        }
+        if ( c=='!' )
+        {
+            isReading=false;
+            std::lock_guard<std::mutex> lock ( input_mutex );
+            cout<<"letto un carattere:"<<c<<temp<<atoi ( temp.c_str() ) <<endl;
+            secSleep=atoi ( temp.c_str() );
             c='0';
             input_cond.notify_one();
         }
@@ -226,14 +264,14 @@ void simulator::main_loop()
         tcgetattr ( STDIN_FILENO, &before ); // fill 'before' with current termios values
         after = before;                     // make a copy to be modified
         after.c_lflag &= ( ~ICANON );       // Disable canonical mode, including line buffering
-        after.c_lflag &= (~ECHO);           // Don't echo characters on the screen (optional)
+        after.c_lflag &= ( ~ECHO );         // Don't echo characters on the screen (optional)
         tcsetattr ( STDIN_FILENO, TCSANOW, &after ); // Set the modified flags
 
         std::mutex input_mutex;
         std::condition_variable input_cond;
         volatile bool input_exit=false;
         volatile bool paused=false;
-        std::thread input_thread ( &simulator::input_loop,this,std::ref ( input_mutex ),std::ref ( input_cond ),std::ref ( paused ),std::ref ( input_exit ) );
+        std::thread input_thread ( &simulator::input_loop,this,std::ref ( input_mutex ),std::ref ( input_cond ),std::ref ( paused ),std::ref ( input_exit ),std::ref ( secSleep ) );
 
         sim_packet.time=0;
         int clock=0;
@@ -246,7 +284,7 @@ void simulator::main_loop()
                 {
                     //cout<<"sono dentro il while della condition_variable"<<endl;
                     input_cond.wait ( lock );
-                   // cout<<paused<<endl;
+                    // cout<<paused<<endl;
                 }
             }
             clock++;
@@ -255,8 +293,8 @@ void simulator::main_loop()
                 cout<<".";
                 flush ( cout );
             }
-          else
-              cout<<endl<<sim_packet.time;
+            else
+                cout<<endl<<sim_packet.time;
             sim_packet.time= ( ( simulation_time ) clock ) /10.0;
 //             communicator->send_broadcast(time++);
             update_bonus_variables();
@@ -278,13 +316,13 @@ void simulator::main_loop()
                 {
 
                     if ( agent->first==other->first ||
-		      !agents_visibility.count ( agents_name_to_index.at ( agent->first ) ) ||
-                      !agents_visibility.count ( agents_name_to_index.at ( other->first ) ) ||
-                       (
-			 agents_visibility.at ( agents_name_to_index.at ( agent->first ) )->isVisible ( agent->second.state,other->second.state ) 
-//			  && (!mappa mondo esiste || agenti si vedono nel mondo ) 
-			)
-		    )
+                            !agents_visibility.count ( agents_name_to_index.at ( agent->first ) ) ||
+                            !agents_visibility.count ( agents_name_to_index.at ( other->first ) ) ||
+                            (
+                                agents_visibility.at ( agents_name_to_index.at ( agent->first ) )->isVisible ( agent->second.state,other->second.state )
+                                && ( !world_map || world_map->isVisible ( agent->second.state,other->second.state ) )
+                            )
+                       )
                     {
                         agent_packet.state_agents.internal_map[other->first]=&other->second;
                     }
@@ -303,26 +341,9 @@ void simulator::main_loop()
             viewer_communicator->send_target ( sim_packet,"viewer" );
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 
-            //written by Alessandro Settimi
 
-
-
-            if ( !ta_router_started )
-            {
-                if ( task_assignment_algorithm == SUBGRADIENT )
-                {
-                    ta_router = new task_assignment_router<task_assignment_namespace::subgradient_packet> ( num_agents );
-                    ta_router_started=true;
-
-                }
-
-                /*if (task_assignment_algorithm == -1)
-                {
-                      //ERR("attenzione, algoritmo per il task assignment non selezionato");
-                }*/
-            }
-            //written by Alessandro Settimi
-
+        for ( auto & plugin:plugins )
+                plugin->run_plugin();
 
             /*
              * if (condizione per inizializzare il plugin)
@@ -333,8 +354,8 @@ void simulator::main_loop()
              *
              */
 
-	    
-	    
+
+
             agent_state state_tmp;
             for ( int i=0; i<10; i++ ) //TODO(Mirko): this is 1 second/(sampling time of dynamic)
             {
@@ -348,12 +369,12 @@ void simulator::main_loop()
                     }
                 }
             }
-            
-            for ( auto object=sim_packet.objects.begin();object!=sim_packet.objects.end();++object ) 
+
+            for ( auto object=sim_packet.objects.begin(); object!=sim_packet.objects.end(); ++object )
             {
-                object->second.updateState(sim_packet.time,sim_packet.state_agents,agent_states_to_index);
+                object->second.updateState ( sim_packet.time,sim_packet.state_agents,agent_states_to_index );
             }
-       
+
             collisionChecker->checkCollisions();
             usleep ( secSleep );
             vector<control_command_packet> temp=communicator->receive_control_commands();
@@ -362,10 +383,10 @@ void simulator::main_loop()
             // Calculate time taken by a request
             clock_gettime ( CLOCK_REALTIME, &requestEnd );
 
-            // Calculate time it took
-            double accum = ( requestEnd.tv_sec - requestStart.tv_sec )
-                           + ( requestEnd.tv_nsec - requestStart.tv_nsec )
-                           / 1E9;
+//             Calculate time it took
+//             double accum = ( requestEnd.tv_sec - requestStart.tv_sec )
+//                            + ( requestEnd.tv_nsec - requestStart.tv_nsec )
+//                            / 1E9;
 
             //cout<<endl<< "tempo necessario:"<<endl;
             //printf( "%f\n", accum );
@@ -387,7 +408,9 @@ void simulator::main_loop()
                 break;
 
         }
-        graph_router.set_run ( false );
+
+    for ( auto & plugin:plugins )
+            plugin->stop();
         input_exit=true;
         tcsetattr ( STDIN_FILENO, TCSANOW, &before );
 
@@ -406,7 +429,6 @@ simulator::~simulator()
     if ( communicator )
         communicator->send_broadcast ( agent_packet );
 
-    graph_router.join_thread();
 
     delete communicator;
 
@@ -419,9 +441,8 @@ simulator::~simulator()
 
     delete f_rndom;
 
-    delete ta_router;
 
-
+    delete world_map;
     delete collisionChecker;
 }
 
@@ -429,9 +450,6 @@ void simulator::start_sim ( int max_loops )
 {
     this->max_loops=max_loops;
     time=0;
-    //communicator->send_broadcast(time);
-    graph_router.start_thread();
-
     main_loop();
 }
 

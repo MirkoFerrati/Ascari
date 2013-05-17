@@ -11,7 +11,6 @@
 #include <string>
 
 #include <typedefs_topology.h>
-#include <../simulator/communication/udp_agent_router.hpp>
 
 
 class testAgentUDPCommunicator: public testClass
@@ -25,15 +24,15 @@ class testAgentUDPCommunicator: public testClass
 // 	udp_receiver<topology_packet> receiverTop(service,boost::asio::ip::address::from_string(SOCKET_BINDING), 
 // 											  boost::asio::ip::address::from_string(multicast_address),SIMULATOR_ROUTE_PORT);
 // 	udp_sender<topology_packet> senderTop(service, boost::asio::ip::address::from_string(multicast_address),AGENT_ROUTE_PORT);
-	Udp_agent_router<topology_packet> r(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT);
+// 	Udp_agent_router<topology_packet> r(SIMULATOR_ROUTE_PORT,AGENT_ROUTE_PORT);
 		
 	sender.send(5);
 // 	int i=0;
 // 	while (i++<12)
 // 		senderTop.send(receiverTop.receive());
 // 	
-		r.start_thread();
-		r.join_thread();
+// 		r.start_thread();
+// 		r.join_thread();
 	}
 };
 

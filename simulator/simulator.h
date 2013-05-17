@@ -6,7 +6,6 @@
 #include "dynamic.h"
 #include <vector>
 #include <map>
-#include "communication/udp_agent_router.hpp"
 #include "collisioncheckerabstract.h"
 #include "random.hpp"
 #include <objects/abstract_object.h>
@@ -14,10 +13,10 @@
 #include <mutex>
 #include <condition_variable>
 #include <thread>
-//written by Alessandro Settimi
-#include "communication/task_assignment_router.hpp"
 #include "visibility/visibility.h"
-//written by Alessandro Settimi
+#include <map2d.h>
+
+#include "../plugins/abstract_simulator_plugin.h"
 
 class simulator
 {
@@ -26,13 +25,14 @@ public:
 	~simulator();
 	void start_sim(int max_loops=10000);
 	void create_communicator(int communicator_type);
-	void initialize_agents(std::vector<Parsed_Agent> const&);
+	void initialize_agents( const std::list< Parsed_Agent >& ag );
 	void initialize (Parsed_World const&);
 	void update_bonus_variables();
 	void setSleep(unsigned secSleep);
 	void setCheckCollision(bool checkCollision);
 	
 	simulator(const simulator&)=delete;
+    void addPlugin( abstract_simulator_plugin* plugin );
 	
 private:
 	int max_loops;
@@ -51,28 +51,18 @@ private:
 	std::map<std::string,int> map_bonus_variables_to_id;
 	std::map<std::string,control_command_packet> commands;
 	void main_loop();
-	void input_loop( std::mutex& input_mutex, std::condition_variable& input_cond, volatile bool& paused, volatile bool& exit );
-	std::vector<std::string> identifiers;
+	void input_loop( std::mutex& input_mutex, std::condition_variable& input_cond, volatile bool& paused, volatile bool& exit, volatile int& secSleep );
 	simulation_time time;
 	unsigned int num_agents;
 	rndom<double> *f_rndom;
-	double pi;
 	std::vector<exprtk::expression<double> > bonus_expressions;
 	exprtk::symbol_table<double> bonus_symbol_table;
 	std::map<std::string,int> map_bonus_variables;
-	Udp_agent_router<topology_packet> topology_router;
-	Udp_agent_router<graph_packet> graph_router;
 	void createObjects(const Parsed_World& world);
-	
-	//written by Alessandro Settimi
-
-	bool ta_router_started;
-	task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
-	task_assignment_router_base* ta_router;
-
-	//written by Alessandro Settimi
-	
+	void initialize_plugins ( const Parsed_World& world );
+	std::vector<abstract_simulator_plugin*> plugins;
 	std::map<int,std::shared_ptr<visibleArea> > agents_visibility;
+	visibleArea* world_map;
 };
 
 
