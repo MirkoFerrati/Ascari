@@ -60,7 +60,7 @@ abstract_parsed_agent_plugin* task_assignment_parser_plugin::parseAgent ( const 
 {
 //   assert(ag==0);
   if (!enabled)
-    return false;
+    return 0;
    //written by Alessandro Settimi
     abstract_parsed_agent_plugin* ag=new task_assignment_parsed_agent();
     if ( node.FindValue ( "TASK_COST_VECTOR" ) )
