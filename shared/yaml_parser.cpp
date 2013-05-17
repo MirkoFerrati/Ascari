@@ -133,7 +133,7 @@ bool Parsed_Behavior::load_from_node ( const YAML::Node& node )
 
     const YAML::Node& automa = node["AUTOMATON"];
 
-    for ( unsigned int i=0; i<automaton.size(); i++ )
+    for ( unsigned int i=0; i<automa.size(); i++ )
     {
         for ( map< discreteState_Name, controller_name >::const_iterator iter=discrete_states.begin(); iter!=discrete_states.end(); ++iter )
         {
