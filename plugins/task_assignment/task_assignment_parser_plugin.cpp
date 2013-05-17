@@ -7,11 +7,11 @@
   }
 
 
- bool task_assignment_parser_plugin::parseWorld ( const YAML::Node& node, abstract_parsed_world_plugin* wor)
+abstract_parsed_world_plugin* task_assignment_parser_plugin::parseWorld ( const YAML::Node& node)
 {
-  assert(wor==0);
-   wor=new task_assignment_parsed_world();
-   auto wo=reinterpret_cast<task_assignment_parsed_world*> ( wor );
+//   assert(wor==0);
+   task_assignment_parsed_world* wo=new task_assignment_parsed_world();
+//    task_assignment_parsed_world* wo=reinterpret_cast<task_assignment_parsed_world*> ( wor );
    wo->task_assignment_algorithm=-1;
 
       const YAML::Node &agent_nodes=node[0]["AGENTS"];
@@ -43,7 +43,7 @@
                 if ( wo->task_assignment_algorithm == -1 )
                 {
                     ERR ( "UNDEFINED TASK ASSIGNMENT ALGORITHM",NULL );
-                    return false;
+                    return 0;
 // 		      throw "UNDEFINED TASK ASSIGNMENT ALGORITHM";
                 }
 
@@ -52,7 +52,8 @@
         }
     }
     //return  std::dynamic_pointer_cast<abstract_parsed_world_plugin>(std::make_shared<task_assignment_parsed_world>(wo));
-    return enabled;
+    return wo;
+//     return enabled;
 }
 
 bool task_assignment_parser_plugin::parseAgent ( const YAML::Node& node,abstract_parsed_agent_plugin* ag )

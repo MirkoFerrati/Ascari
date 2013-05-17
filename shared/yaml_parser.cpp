@@ -235,7 +235,8 @@ bool Parsed_World::load_from_node ( const YAML::Node& node )
 for ( auto plugin:plugins )
     {
         abstract_parsed_world_plugin* temp=0;
-        if ( plugin->parseWorld ( node,temp ) )
+	temp=plugin->parseWorld ( node );
+        if ( temp!=0 )
             parsed_items_from_plugins.push_back (temp  );
     }
 

@@ -9,7 +9,7 @@ class agent_router_parser_plugin : public abstract_parser_plugin
 {
 
 public:
-    virtual  bool parseWorld ( const YAML::Node& node, abstract_parsed_world_plugin*);
+    virtual  abstract_parsed_world_plugin* parseWorld ( const YAML::Node& node);
     virtual bool parseAgent ( const YAML::Node& node,abstract_parsed_agent_plugin* );
     
 private:
