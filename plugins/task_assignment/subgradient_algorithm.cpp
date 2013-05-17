@@ -20,7 +20,7 @@ bool task_assignment::convergence_control_routine()
      if ( fr < ut ) control=fr;
      else control=ut;
 
-     std::cout<<"TASK DONE or ASSIGNED: "<<num_task-ut-recharge_is_present()<<" CONTROL :"<<control<<std::endl; //TODO:-1 se c'è recharge
+     std::cout<<"TASK DONE or ASSIGNED: "<<num_task-ut-recharge_is_present()<<" CONTROL :"<<control<<std::endl;
      
      for (unsigned int i=0;i<num_task;i++)
      {
@@ -40,7 +40,7 @@ bool task_assignment::convergence_control_routine()
 	  step=0;
      }
       
-     a = a && (step>5);
+     a = a && (step>10);
 	 
      if(a)
      {

@@ -19,10 +19,10 @@ void task_assignment_viewer::timerEvent()
     {
 	tasks[i->first]=*(reinterpret_cast<const task_assignment_namespace::task*>(i->second.getState()));
 	
-	if ( temp_father->maxX< tasks[i->first].task_position[0] ) temp_father->maxX= tasks[i->first].task_position[0]*1.5;
-	if ( temp_father->maxY< tasks[i->first].task_position[1] ) temp_father->maxY= tasks[i->first].task_position[1]*1.5;
-	if ( temp_father->minX> tasks[i->first].task_position[0] ) temp_father->minX= tasks[i->first].task_position[0]*1.5;
-	if ( temp_father->minY> tasks[i->first].task_position[1] ) temp_father->minY= tasks[i->first].task_position[1]*1.5;
+	if ( temp_father->maxX< tasks[i->first].task_position[0] ) temp_father->maxX= tasks[i->first].task_position[0] +2;
+	if ( temp_father->maxY< tasks[i->first].task_position[1] ) temp_father->maxY= tasks[i->first].task_position[1] +2;
+	if ( temp_father->minX> tasks[i->first].task_position[0] ) temp_father->minX= tasks[i->first].task_position[0] -2;
+	if ( temp_father->minY> tasks[i->first].task_position[1] ) temp_father->minY= tasks[i->first].task_position[1] -2;
     }
     
     mutex->unlock();
