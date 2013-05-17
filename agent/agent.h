@@ -24,7 +24,6 @@ public:
     agent (std::string name,  const std::unique_ptr< Parsed_Behavior >& behavior, const Parsed_World& world);
     agent ( const Parsed_World& world, bool noStart = false );
     ~agent();
-    void init (const std::unique_ptr< Parsed_Behavior >& behavior, bool isDummy,bool noStart=false);
     void start();
     void main_loop();
     void addPlugin( abstract_agent_plugin* plugin );
@@ -55,7 +54,8 @@ public:
 	
 public:
     
-	
+	void initialize();
+
 	
 	/**
 	 * Name of agent and it is used for unique indentification
@@ -171,10 +171,15 @@ public:
     void createBonusVariablesFromWorld(std::map< bonusVariable, bonus_expression > bonus);
     
 
-
 private:
+      void init ( const std::unique_ptr< Parsed_Behavior >& behavior, bool noStart = false );
+
     rndom<double>* f_rndom;
     double pi;
+    std::unique_ptr< Parsed_Behavior > const& behavior;
+    Parsed_World const& world;
+    bool noStart;
+    bool isDummy;
 };
 
 #endif // AGENT_H
