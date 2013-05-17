@@ -93,7 +93,7 @@ int main ( int argc, char** argv )
         agent a1 ( world );
 	for ( auto plugin:plugins )
         {
-            if ( plugin->getParserPlugin()->enabled )
+            if ( plugin->getParserPlugin()->isEnabled() )
             {
                 if ( !plugin->createAgentPlugin ( &a1 ,&world) )
 		   ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() )

@@ -27,7 +27,7 @@ abstract_parsed_agent_plugin* agent_router_parser_plugin::parseAgent ( const YAM
     if ( node.FindValue ( "TARGET_LIST" ) )
     {
         int toint=0;
-        std::vector<target_id>temp = ( reinterpret_cast<agent_router_parsed_agent*> ( ag ) )->target_list;
+        std::vector<target_id>& temp  = ( reinterpret_cast<agent_router_parsed_agent*> ( ag ) )->target_list;
         for ( unsigned int i=0; i<node["TARGET_LIST"].size(); i++ )
         {
             node["TARGET_LIST"][i]>>toint;
@@ -42,3 +42,8 @@ abstract_parsed_agent_plugin* agent_router_parser_plugin::parseAgent ( const YAM
     return ag;
 }
 
+bool agent_router_parser_plugin::isEnabled()
+{
+std::cout<<"classe derivata router parser,enabled="<<enabled<<std::endl;
+return enabled;
+}
