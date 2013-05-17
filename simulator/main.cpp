@@ -64,7 +64,7 @@ int main ( int argc, char **argv )
 	    plugin->createParserPlugin();
             parser.addPlugin ( plugin->getParserPlugin() );
 	}
-        world = parser.parse_file ( filename );
+	world = parser.parse_file ( filename );
      
 	for ( auto plugin:plugins )
         {
