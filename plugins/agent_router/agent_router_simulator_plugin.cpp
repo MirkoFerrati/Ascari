@@ -1,5 +1,6 @@
 #include "agent_router_simulator_plugin.h"
 #include <../gml2lgf/graph.h>
+#include "../simulator/simulator.h"
 
 void agent_router_simulator_plugin::stop()
 {
@@ -18,7 +19,7 @@ bool agent_router_simulator_plugin::initialize ( const Parsed_World& /*w*/ )
 return true;
 }
 
-agent_router_simulator_plugin::agent_router_simulator_plugin()
+agent_router_simulator_plugin::agent_router_simulator_plugin(simulator* )
 {
 graph_router=0;
 }

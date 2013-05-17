@@ -29,6 +29,7 @@ public:
   virtual bool parseWorld(const YAML::Node& node,abstract_parsed_world_plugin*)=0;
   virtual ~abstract_parser_plugin(){};
   bool enabled;
+  bool isCreated=true;
 };
 
 #endif // ABSTRACT_PARSER_PLUGIN_H

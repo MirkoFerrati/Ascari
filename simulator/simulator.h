@@ -14,7 +14,7 @@
 #include <condition_variable>
 #include <thread>
 #include "visibility/visibility.h"
-#include <map2d.h>
+#include "map2d.h"
 
 #include "../plugins/abstract_simulator_plugin.h"
 

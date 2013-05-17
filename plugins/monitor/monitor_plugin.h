@@ -70,7 +70,7 @@ public:
     };
 
 #ifdef ISSIMULATOR
-    bool createSimulatorPlugin ( simulator* s )
+    bool createSimulatorPlugin ( simulator* s,Parsed_World* parse )
     {
         return false;
     };

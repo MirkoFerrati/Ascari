@@ -54,12 +54,14 @@ public:
     {
         return simulator_plugin;
     };
-    bool createSimulatorPlugin ( simulator* s )
+    bool createSimulatorPlugin ( simulator* s,Parsed_World* parse )
     {
         if ( simulator_plugin!=0 )
             ERR ( "already created agent plugin, please check for double calls",NULL )
         else
+	{
             simulator_plugin=new agent_router_simulator_plugin ( s );
+	}
         return simulator_plugin;
     };
 #endif

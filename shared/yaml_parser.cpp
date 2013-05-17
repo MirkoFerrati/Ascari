@@ -19,7 +19,7 @@ yaml_parser::yaml_parser()
 
 void yaml_parser::addPlugin ( abstract_parser_plugin* plugin )
 {
-    assert ( plugin->enabled ); //will give segfault if the plugin was not created with a new()
+    assert ( plugin->isCreated ); //will give segfault if the plugin was not created with a new()
     plugins.push_back ( plugin );
 }
 
@@ -235,7 +235,7 @@ bool Parsed_World::load_from_node ( const YAML::Node& node )
 for ( auto plugin:plugins )
     {
         abstract_parsed_world_plugin* temp=0;
-        if ( plugin->parseWorld ( node[0],temp ) )
+        if ( plugin->parseWorld ( node,temp ) )
             parsed_items_from_plugins.push_back (temp  );
     }
 

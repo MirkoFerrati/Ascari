@@ -48,7 +48,10 @@ int main ( int argc, char** argv )
 
         yaml_parser parser;
 	for ( auto plugin:plugins )
+	{
+	    plugin->createParserPlugin();
             parser.addPlugin ( plugin->getParserPlugin() );
+	}
         world = parser.parse_file ( filename );
         int myAgent = -1;
 	int i=0;

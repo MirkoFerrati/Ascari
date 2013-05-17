@@ -31,7 +31,7 @@ public:
 
 #ifdef ISSIMULATOR
     virtual abstract_simulator_plugin* getSimulatorPlugin() =0;
-    virtual bool createSimulatorPlugin ( simulator* a ){return false;};
+    virtual bool createSimulatorPlugin ( simulator* a,Parsed_World* parse ){return false;};
 #endif
 
 #ifdef ISVIEWER
