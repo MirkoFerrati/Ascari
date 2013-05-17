@@ -6,6 +6,11 @@
     enabled=false;
   }
 
+bool task_assignment_parser_plugin::isEnabled()
+{
+      return enabled;
+}
+
 
 abstract_parsed_world_plugin* task_assignment_parser_plugin::parseWorld ( const YAML::Node& node)
 {

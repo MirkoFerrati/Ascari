@@ -7,7 +7,7 @@
 std::vector<abstract_plugin*> createPlugins()
 {
  std::vector<abstract_plugin*> temp;
-temp.push_back(new agent_router_plugin()); 
+//temp.push_back(new agent_router_plugin()); 
 //temp.push_back(new monitor_plugin()); 
 temp.push_back(new task_assignment_plugin()); 
   return temp;

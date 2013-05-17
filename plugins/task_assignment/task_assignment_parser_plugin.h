@@ -28,7 +28,7 @@ public:
   task_assignment_parser_plugin();
     abstract_parsed_world_plugin* parseWorld ( const YAML::Node& node);
     abstract_parsed_agent_plugin* parseAgent ( const YAML::Node& node);
-    
+    bool isEnabled();
 private:
   //written by Alessandro Settimi
 void createTaskList ( const YAML::Node& node, task_assignment_namespace::task_list& task_list,std::vector<task_assignment_namespace::task_id>& tasks_id,
