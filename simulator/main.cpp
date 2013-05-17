@@ -60,14 +60,17 @@ int main ( int argc, char **argv )
 
         yaml_parser parser;
 	for ( auto plugin:plugins )
+	{
+	    plugin->createParserPlugin();
             parser.addPlugin ( plugin->getParserPlugin() );
-        world = parser.parse_file ( filename );
+	}
+	world = parser.parse_file ( filename );
      
 	for ( auto plugin:plugins )
         {
             if ( plugin->getParserPlugin()->enabled )
             {
-                if ( !plugin->createSimulatorPlugin ( &s ) )
+                if ( !plugin->createSimulatorPlugin ( &s,&world ) )
                     ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() )
                 else
                     s.addPlugin ( plugin->getSimulatorPlugin() );
