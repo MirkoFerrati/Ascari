@@ -33,6 +33,7 @@ public:
 	
 	simulator(const simulator&)=delete;
     void addPlugin( abstract_simulator_plugin* plugin );
+    world_sim_packet sim_packet;
 	
 private:
 	int max_loops;
@@ -42,7 +43,7 @@ private:
 	std::vector<dynamic*> dynamic_module;
 	simulator_namespace::agent_communicator_abstract* communicator;
 	simulator_namespace::viewer_communicator_abstract* viewer_communicator;
-	world_sim_packet sim_packet;
+	
 	agent_sim_packet agent_packet;
 	index_map agent_states_to_index;
 	std::vector<index_map> agent_commands_to_index;

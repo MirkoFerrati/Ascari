@@ -1,5 +1,5 @@
 //written by Alessandro Settimi
-
+#ifdef ISAGENT
 #include <../shared/communication/zmq_task_assignment_communicator.hpp>
 
 #include <mutex>
@@ -117,3 +117,4 @@ public:
 	}
 
 };
+#endif //ISAGENT

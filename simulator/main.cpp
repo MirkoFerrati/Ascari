@@ -67,7 +67,7 @@ int main ( int argc, char **argv )
         {
             if ( plugin->getParserPlugin()->enabled )
             {
-                if ( !plugin->createSimulatorPlugin ( &s ,&world) )
+                if ( !plugin->createSimulatorPlugin ( &s ) )
                     ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() )
                 else
                     s.addPlugin ( plugin->getSimulatorPlugin() );

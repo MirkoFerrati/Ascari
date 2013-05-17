@@ -111,8 +111,9 @@ private:
 	
 	std::map<std::string,task_assignment_task> tasks;
 	
+	#ifdef ISAGENT
 	task_assignment_communicator_base* ta_communicator;
-	
+	#endif
 	
 	task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
 	

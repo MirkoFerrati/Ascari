@@ -4,6 +4,7 @@
 #include "task_assignment.h"
 #include "task_assignment_parser_plugin.h"
 #include "task_assignment_viewer.h"
+#include "task_assignment_simulator.h"
 
 
 class task_assignment_plugin: public abstract_plugin
@@ -57,7 +58,7 @@ public:
         if ( simulator_plugin!=0 )
             ERR ( "already created simulator plugin, please check for double calls",NULL )
         else
-            simulator_plugin=new task_assignment_simulator_plugin ( s );
+            simulator_plugin=new task_assignment_simulator ( s );
         return simulator_plugin;
     };
 #endif
@@ -104,7 +105,7 @@ private:
 #endif
     
 #ifdef ISSIMULATOR
-    task_assignment_simulator_plugin* simulator_plugin;
+    task_assignment_simulator* simulator_plugin;
 #endif
 
     task_assignment_parser_plugin* parser_plugin;

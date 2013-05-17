@@ -3,7 +3,7 @@
 #include <objects/task_assignment_task.h>
 #include <types/world_sim_packet.h>
 
-task_assignment_simulator::task_assignment_simulator(world_sim_packet const& sim_packet):sim_packet(sim_packet)
+task_assignment_simulator::task_assignment_simulator(simulator* s):sim_packet(s->sim_packet)
 {
     //written by Alessandro Settimi
     ta_router=0;

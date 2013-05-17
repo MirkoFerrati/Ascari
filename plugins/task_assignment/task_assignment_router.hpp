@@ -2,6 +2,7 @@
 
 #ifndef TASK_ASSIGNMENT_ROUTER_H
 #define TASK_ASSIGNMENT_ROUTER_H
+#ifdef ISSIMULATOR
 #include <../shared/communication/zmq_task_assignment_communicator.hpp>
 
 #include <mutex>
@@ -72,4 +73,5 @@ class task_assignment_router: public simulator_to_agent_ta_communicator<datatype
 	{}
 };
 
+#endif //ISSIMULATOR
 #endif // TASK_ASSIGNMENT_ROUTER_H
