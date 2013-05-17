@@ -74,7 +74,7 @@ bool Parsed_Behavior::load_from_node ( const YAML::Node& node )
 
     const YAML::Node& control = node["CONTROLLERS"];
     string temp;
-    for ( unsigned int i=0; i<controllers.size(); i++ )
+    for ( unsigned int i=0; i<control.size(); i++ )
     {
         map<int,string> temp1;
         control[i]["NAME"]>>temp;
@@ -290,7 +290,8 @@ for ( auto plugin:plugins )
     for ( auto plugin:plugins )
         {
             abstract_parsed_agent_plugin* temp_ptr=0;
-            if ( plugin->parseAgent ( agent_nodes[i],temp_ptr ) )
+	    temp_ptr=plugin->parseAgent ( agent_nodes[i] );
+            if ( temp_ptr!=0 )
 	    {
                 agents.back().parsed_items_from_plugins.push_back (temp_ptr);
 	    }

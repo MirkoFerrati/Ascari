@@ -9,7 +9,7 @@ class monitor_parser_plugin : public abstract_parser_plugin
 
 public:
     virtual abstract_parsed_world_plugin* parseWorld ( const YAML::Node& node);
-    virtual bool parseAgent ( const YAML::Node& node, abstract_parsed_agent_plugin* ag );
+    abstract_parsed_agent_plugin* parseAgent ( const YAML::Node& node );
 };
 
 #endif // MONITOR_PARSER_PLUGIN_H

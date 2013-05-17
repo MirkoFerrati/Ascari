@@ -4,28 +4,26 @@
 
 #include <logog.hpp>
 
-bool agent_router_parser_plugin::parseWorld ( const YAML::Node& node, abstract_parsed_world_plugin* wo )
+abstract_parsed_world_plugin* agent_router_parser_plugin::parseWorld ( const YAML::Node& node )
 {
-    assert ( wo==0 );
     enabled=false;
-    wo=new agent_router_parsed_world();
-    reinterpret_cast<agent_router_parsed_world*> ( wo )->graphName="UNSET";
+    auto wo=new agent_router_parsed_world();
+     wo ->graphName="UNSET";
     if ( node[0]["WORLD"][0].FindValue ( "GRAPH_NAME" ) )
     {
         const YAML::Node &world_node=node[0]["WORLD"][0];
 
-        world_node["GRAPH_NAME"]>> ( reinterpret_cast<agent_router_parsed_world*> ( wo ) )->graphName;
+        world_node["GRAPH_NAME"]>> wo->graphName;
         enabled=true;
     }
-    return enabled;
+    return enabled?wo:0;
 }
 
-bool agent_router_parser_plugin::parseAgent ( const YAML::Node& node, abstract_parsed_agent_plugin* ag )
+abstract_parsed_agent_plugin* agent_router_parser_plugin::parseAgent ( const YAML::Node& node )
 {
-  assert(ag==0);
     if ( !enabled )
-        return false;
-    ag=new agent_router_parsed_agent();
+        return 0;
+    auto ag=new agent_router_parsed_agent();
     if ( node.FindValue ( "TARGET_LIST" ) )
     {
         int toint=0;
@@ -39,8 +37,8 @@ bool agent_router_parser_plugin::parseAgent ( const YAML::Node& node, abstract_p
     if ( ( reinterpret_cast<agent_router_parsed_agent*> ( ag )->target_list.size() ==0 && enabled ) || ( reinterpret_cast<agent_router_parsed_agent*> ( ag )->target_list.size() >0 && !enabled ) )
     {
         ERR ( "GRAPH NAME OR TARGET LIST UNDEFINED", NULL );
-        return false;
+        return 0;
     }
-    return true;
+    return ag;
 }
 

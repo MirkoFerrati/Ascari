@@ -28,6 +28,7 @@ agent::agent ( std::string name,const std::unique_ptr<Parsed_Behavior>& behavior
     :identifier ( name ),behavior(behavior),world(world),isDummy(true),noStart(false)
 {
     encoder=0;
+    initialized=false;
 }
 
 agent::agent ( const Parsed_World& world, bool noStart ) :world(world),
@@ -46,8 +47,11 @@ void agent::initialize()
     }
     
     init(behavior,noStart);
-    for ( auto const & disc_state : map_discreteStateName_to_id )
+    if (isDummy)
+      for ( auto const & disc_state : map_discreteStateName_to_id )
         discreteState.push_front ( disc_state.second );
+      else
+	discreteState.push_front(map_discreteStateName_to_id.at(world.agents.front().state_start));
 }
 
 void agent::setCommunicator ( std::shared_ptr<agent_namespace::world_communicator_abstract>& communicator )
@@ -64,7 +68,7 @@ void agent::setControlCommandIdentifier ( string new_identifier )
 
 void agent::init ( const std::unique_ptr<Parsed_Behavior> & behavior, bool noStart )
 {
-    time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)
+    time=0;
     symbol_table.add_constants();
     pi=exprtk::details::numeric::constant::pi;
     symbol_table.add_variable ( "PI_GRECO",pi,true );
@@ -83,8 +87,6 @@ void agent::init ( const std::unique_ptr<Parsed_Behavior> & behavior, bool noSta
     createStateFromParsedAgent ( behavior );
     createSubEventsFromParsedAgent ( behavior );
     createEventsFromParsedAgent ( behavior );
-
-
     createControllersFromParsedAgent ( behavior );
 
     if ( !isDummy )
@@ -93,15 +95,10 @@ void agent::init ( const std::unique_ptr<Parsed_Behavior> & behavior, bool noSta
         encoder=new encoderDet ( sub_events, identifier,state,map_statename_to_id,bonusVariables,
                                  map_bonus_variables_to_id, behavior->topology_expressions,
                                  sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table );
-        //world_comm=new udp_world_communicator();
         if ( !noStart ) world_comm=std::make_shared<zmq_world_communicator> ( identifier );
-
     }
     else
     {
-
-        //TODO(Mirko): we will think about identifierModule later
-        //TODO:create non-deterministic automaton
         automaton=new automatonEFSM ( createAutomatonTableFromParsedAgent ( behavior ) );
         encoder=new encoderDet ( sub_events, identifier,state,map_statename_to_id,bonusVariables,
                                  map_bonus_variables_to_id, behavior->topology_expressions,
@@ -113,7 +110,6 @@ void agent::init ( const std::unique_ptr<Parsed_Behavior> & behavior, bool noSta
     }
     event_decoder.create ( behavior->events_expressions,sub_events_to_index,events_to_index );
     initialized=true;
-
 }
 
 void agent::addPlugin ( abstract_agent_plugin* plugin)
@@ -345,11 +341,6 @@ for ( auto discrete :discreteState )
 
 // 		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
 // 			break;
-
-
-
-
-
 }
 
 

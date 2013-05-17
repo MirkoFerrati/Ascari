@@ -4,15 +4,15 @@
 
 #include <yaml-cpp/yaml.h>
 
-bool monitor_parser_plugin::parseWorld ( const YAML::Node& , abstract_parsed_world_plugin* )
+abstract_parsed_world_plugin* monitor_parser_plugin::parseWorld ( const YAML::Node&   )
 {
-return true;
+  enabled=true;
+return 0;
 }
 
-bool monitor_parser_plugin::parseAgent ( const YAML::Node& node, abstract_parsed_agent_plugin* agent)
+abstract_parsed_agent_plugin* monitor_parser_plugin::parseAgent ( const YAML::Node& node)
 {
-  assert(agent==0);
-  agent=new monitor_parsed_agent();
+  auto agent=new monitor_parsed_agent();
   auto ag=reinterpret_cast<monitor_parsed_agent*>(agent);
     ag->monitoring=false;
 
@@ -31,7 +31,7 @@ bool monitor_parser_plugin::parseAgent ( const YAML::Node& node, abstract_parsed
             {
 
                 ERR ( "NO KNOWN BEHAVIORS SPECIFIED FOR IDENTIFIER MODULE",NULL );
-                return false;
+                return 0;
 //                 throw "NO KNOWN BEHAVIORS SPECIFIED FOR IDENTIFIER MODULE";
             }
         }
@@ -46,6 +46,6 @@ bool monitor_parser_plugin::parseAgent ( const YAML::Node& node, abstract_parsed
 
 
     }
-    return true;
+    return ag;
 }
 
