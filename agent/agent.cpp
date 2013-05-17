@@ -25,75 +25,29 @@
 using namespace std;
 
 agent::agent ( std::string name,const std::unique_ptr<Parsed_Behavior>& behavior, const Parsed_World & world )
-    :identifier ( name )
+    :identifier ( name ),behavior(behavior),world(world),isDummy(true),noStart(false)
 {
-
-    createBonusVariablesFromWorld ( world.bonus_expressions );
-//qui poi uno setta tutto quello che manca oppure lascia vuoto
-    initialized=false;
     encoder=0;
-    init ( behavior,true );
-
-
-for ( auto const & disc_state : map_discreteStateName_to_id )
-        discreteState.push_front ( disc_state.second );
-
 }
 
-
-void agent::addPlugin ( abstract_agent_plugin* plugin)
+agent::agent ( const Parsed_World& world, bool noStart ) :world(world),
+    identifier ( world.agents.front().name ),noStart(noStart),behavior(world.agents.front().behavior),isDummy(false)
 {
-        plugins.push_back ( plugin );
+    encoder=0;
 }
 
-
-agent::agent ( const Parsed_World& world, bool noStart ) :
-    identifier ( world.agents.front().name )
+void agent::initialize()
 {
-    createBonusVariablesFromWorld ( world.bonus_expressions );
-
-     //TODO: questa roba non esiste piu', viene fatta dal main e dal metodo addPlugin che devo ancora implementare
-//     if ( !world.agents.at ( agent_index ).target_list.empty() )
-//     {
-//         abstract_agent_plugin *plugin=new agent_router ( world.agents.at ( agent_index ).target_list,events,events_to_index,world.agents.at ( agent_index ).name,time,world.graphName );
-//         plugins.push_back ( plugin );
-//     }
-
-//     if ( world.agents.at ( agent_index ).monitoring )
-//     {
-// 
-//         abstract_agent_plugin *monitor=new identifier_module ( world,bonusVariables,map_bonus_variables_to_id,world_comm,time,identifier );
-//         plugins.push_back ( monitor );
-//     }
-
-//     if ( !world.task_list.empty() )
-//     {
-//         abstract_agent_plugin* plugin=new task_assignment ( world,world.agents.at ( agent_index ),time,events,events_to_index,objects );
-//         plugins.push_back ( plugin );
-//     }
-
-
-    /*
-    if (condition to enable a plugin)
-    {
-    	Plugin_module *plugin=new empty_plugin(....);
-    	plugins.push_back(plugin);
-    }
-    */
-    /*!
-     * Aggiungo le variabili richieste dai plugin
-     */
+      createBonusVariablesFromWorld ( world.bonus_expressions );
     for ( unsigned int i=0; i<plugins.size(); i++ )
     {
         plugins[i]->addReservedVariables ( symbol_table );
         plugins[i]->addReservedVariables ( encoder_symbol_table );
-
     }
-
-    init ( world.agents.front().behavior,false,noStart );
-    discreteState.push_front ( map_discreteStateName_to_id.at ( world.agents.front().state_start ) );
-
-//qui invece mi setto quello che manca a mano
+    
+    init(behavior,noStart);
+    for ( auto const & disc_state : map_discreteStateName_to_id )
+        discreteState.push_front ( disc_state.second );
 }
 
 void agent::setCommunicator ( std::shared_ptr<agent_namespace::world_communicator_abstract>& communicator )
@@ -108,7 +62,7 @@ void agent::setControlCommandIdentifier ( string new_identifier )
 }
 
 
-void agent::init ( const std::unique_ptr<Parsed_Behavior> & behavior, bool isDummy,bool noStart )
+void agent::init ( const std::unique_ptr<Parsed_Behavior> & behavior, bool noStart )
 {
     time=0;//TODO(Mirko): initialize with the real time? Needs the agents to be synchronized with a common clock (now comes from the simulator)
     symbol_table.add_constants();
@@ -162,6 +116,10 @@ void agent::init ( const std::unique_ptr<Parsed_Behavior> & behavior, bool isDum
 
 }
 
+void agent::addPlugin ( abstract_agent_plugin* plugin)
+{
+        plugins.push_back ( plugin );
+}
 
 void agent::createBonusVariablesFromWorld ( map< bonusVariable, bonus_expression > bonus )
 {

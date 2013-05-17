@@ -55,7 +55,7 @@ int main ( int argc, char** argv )
         world = parser.parse_file ( filename );
         int myAgent = -1;
 	int i=0;
-        for ( auto it=world.agents.begin();it!=world.agents.end();i++ )
+        for ( auto it=world.agents.begin();it!=world.agents.end();it++,i++ )
             if ( it->name.compare ( agent_name ) == 0 )
                 myAgent = i;
         if ( myAgent == -1 )
@@ -96,11 +96,12 @@ int main ( int argc, char** argv )
             if ( plugin->getParserPlugin()->enabled )
             {
                 if ( !plugin->createAgentPlugin ( &a1 ,&world) )
-		                    ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() )
+		   ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() )
                 else
                     a1.addPlugin ( plugin->getAgentPlugin() );
             }
         }
+        a1.initialize();
         a1.start();
         std::cout << agent_name <<" e' terminato" << std::endl;
         exiting=std::thread ( []()
