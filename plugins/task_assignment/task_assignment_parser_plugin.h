@@ -27,7 +27,7 @@ class task_assignment_parser_plugin : public abstract_parser_plugin
 public:
   task_assignment_parser_plugin();
     abstract_parsed_world_plugin* parseWorld ( const YAML::Node& node);
-    bool parseAgent ( const YAML::Node& node,abstract_parsed_agent_plugin* ag );
+    abstract_parsed_agent_plugin* parseAgent ( const YAML::Node& node);
     
 private:
   //written by Alessandro Settimi

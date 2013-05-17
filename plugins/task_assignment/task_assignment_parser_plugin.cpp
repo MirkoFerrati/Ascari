@@ -56,13 +56,13 @@ abstract_parsed_world_plugin* task_assignment_parser_plugin::parseWorld ( const 
 //     return enabled;
 }
 
-bool task_assignment_parser_plugin::parseAgent ( const YAML::Node& node,abstract_parsed_agent_plugin* ag )
+abstract_parsed_agent_plugin* task_assignment_parser_plugin::parseAgent ( const YAML::Node& node)
 {
-  assert(ag==0);
+//   assert(ag==0);
   if (!enabled)
     return false;
    //written by Alessandro Settimi
-    ag=new task_assignment_parsed_agent();
+    abstract_parsed_agent_plugin* ag=new task_assignment_parsed_agent();
     if ( node.FindValue ( "TASK_COST_VECTOR" ) )
     {
         const YAML::Node& co=node["TASK_COST_VECTOR"];
@@ -81,11 +81,11 @@ bool task_assignment_parser_plugin::parseAgent ( const YAML::Node& node,abstract
             reinterpret_cast<task_assignment_parsed_agent*> (ag)->agent_task_cost_vector.insert ( make_pair ( id,cost ) );
             i=i+2;
         }
-            return true;
+            return ag;
 
     }
     else
-      return false;
+      return 0;
     //written by Alessandro Settimi
     //return std::dynamic_pointer_cast<abstract_parsed_agent_plugin>(std::make_shared<task_assignment_parsed_agent>(ag));
 }
