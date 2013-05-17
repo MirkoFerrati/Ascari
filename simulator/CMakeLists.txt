@@ -9,7 +9,7 @@ communication/zmq_agent_communicator.cpp ../shared/communication/global.cpp visi
 	../shared/objects/task_assignment_task.cpp visibility/map2d.cpp ../gml2lgf/graph.cpp ../gml2lgf/node.cpp ../gml2lgf/arc.cpp ../gml2lgf/gmlreader.hpp
 )
 
-
+add_definitions(-DISSIMULATOR)
 get_property(sources GLOBAL PROPERTY simulator_SOURCES)
 
 add_executable(simulator ${sources})

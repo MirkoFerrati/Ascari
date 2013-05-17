@@ -55,7 +55,7 @@ public:
     bool createSimulatorPlugin ( simulator* s )
     {
         if ( simulator_plugin!=0 )
-            ERR ( "already created agent plugin, please check for double calls",NULL )
+            ERR ( "already created simulator plugin, please check for double calls",NULL )
         else
             simulator_plugin=new task_assignment_simulator_plugin ( s );
         return simulator_plugin;

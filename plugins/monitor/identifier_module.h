@@ -1,5 +1,8 @@
 #ifndef IDENTIFIER_MODULE_H
 #define IDENTIFIER_MODULE_H
+
+#ifdef ISAGENT
+
 #include "../agent/agent.h"
 #include <yaml_parser.h>
 
@@ -79,6 +82,6 @@ private:
     
 };
 
-
+#endif //ISAGENT
 
 #endif // IDENTIFIER_MODULE_H

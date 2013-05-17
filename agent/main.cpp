@@ -8,6 +8,7 @@
 #include "lemon/arg_parser.h"
 #include "../plugins/addplugins.h"
 #include "../shared/communication/global.h"
+
 int main ( int argc, char** argv )
 {
     srand ( time ( NULL ) );
@@ -92,7 +93,7 @@ int main ( int argc, char** argv )
             if ( plugin->getParserPlugin()->enabled )
             {
                 if ( !plugin->createAgentPlugin ( &a1 ,&world) )
-                    ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() )
+		                    ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() )
                 else
                     a1.addPlugin ( plugin->getAgentPlugin() );
             }

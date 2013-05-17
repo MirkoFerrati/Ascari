@@ -49,6 +49,12 @@ simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.tim
 
 
 }
+void simulator::addPlugin ( abstract_simulator_plugin* plugin)
+{
+        plugins.push_back ( plugin );
+}
+
+
 
 void simulator::setSleep ( unsigned secSleep )
 {

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-
+add_definitions(-DISAGENT)
 
 set_property(GLOBAL APPEND PROPERTY agent_SOURCES 
   encoder/encoderDet.cpp automaton/automatonFSM.cpp automaton/automatonEFSM.cpp

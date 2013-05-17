@@ -72,15 +72,11 @@ public:
 #ifdef ISSIMULATOR
     bool createSimulatorPlugin ( simulator* s )
     {
-        if ( simulator_plugin!=0 )
-	 ERR ( "already created agent plugin, please check for double calls",NULL )
-        else
-            simulator_plugin=new monitor_simulator_plugin ( s );
-        return simulator_plugin;
+        return false;
     };
     abstract_simulator_plugin* getSimulatorPlugin()
     {
-        return simulator_plugin;
+      assert(0);//should never be called
     };
 #endif
 

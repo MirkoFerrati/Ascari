@@ -37,7 +37,7 @@ public:
     {
         if ( agent_plugin!=0 )
 	{
-            ERR ( "already created agent plugin, please check for double calls",NULL );
+            ERR ( "already created agent plugin, please check for double calls",NULL )
 	}
 	else
             agent_plugin=new agent_router ( a ,parse);
@@ -57,7 +57,7 @@ public:
     bool createSimulatorPlugin ( simulator* s )
     {
         if ( simulator_plugin!=0 )
-            ERR ( "already created agent plugin, please check for double calls",NULL );
+            ERR ( "already created agent plugin, please check for double calls",NULL )
         else
             simulator_plugin=new agent_router_simulator_plugin ( s );
         return simulator_plugin;
@@ -72,7 +72,7 @@ public:
     bool createViewerPlugin ( Viewer* v )
     {
         if ( viewer_plugin!=0 )
-            ERR ( "already created viewer plugin, please check for double calls",NULL );
+            ERR ( "already created viewer plugin, please check for double calls",NULL )
         else
             viewer_plugin=new agent_router_viewer ( v );
         return viewer_plugin;
@@ -89,7 +89,7 @@ public:
     {
         if ( parser_plugin!=0 )
 	{
-            ERR ( "already created agent plugin, please check for double calls",NULL );
+            ERR ( "already created agent plugin, please check for double calls",NULL )
 	}
         else
             parser_plugin=new agent_router_parser_plugin ( );

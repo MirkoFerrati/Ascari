@@ -3,7 +3,6 @@
 #include <lemon/path.h>
 #include <lemon/random.h>
 #include <time.h>
-#include <agent.h>
 #include <lemon/adaptors.h>
 #include <cassert>
 

@@ -1,5 +1,8 @@
 #ifndef AGENT_ROUTER_H
 #define AGENT_ROUTER_H
+
+#ifdef ISAGENT
+
 #include <lemon/smart_graph.h>
 #include <lemon/path.h>
 #include <vector>
@@ -115,5 +118,6 @@ private:
 	
 };
 
+#endif
 #endif // AGENT_ROUTER_H
 

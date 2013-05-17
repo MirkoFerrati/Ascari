@@ -1,8 +1,6 @@
 #ifndef ABSTRACT_PLUGIN_H
 #define ABSTRACT_PLUGIN_H
-// #define ISAGENT
-// #define ISSIMULATOR
-// #define ISVIEWER
+
 
 #ifdef ISAGENT
 #include "abstract_agent_plugin.h"

@@ -1,7 +1,6 @@
 #ifndef AGENT_H
 #define AGENT_H
 
-#define ISAGENT
 
 #include <list>
 #include <vector>

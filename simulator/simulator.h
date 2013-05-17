@@ -32,6 +32,7 @@ public:
 	void setCheckCollision(bool checkCollision);
 	
 	simulator(const simulator&)=delete;
+    void addPlugin( abstract_simulator_plugin* plugin );
 	
 private:
 	int max_loops;
