@@ -1,6 +1,9 @@
 #ifndef ABSTRACT_AGENT_PLUGIN_H
 #define ABSTRACT_AGENT_PLUGIN_H
 
+
+#include "abstract_plugin.h"
+#ifdef ISAGENT
 #include "exprtk.hpp"
 #include <vector>
 
@@ -15,4 +18,5 @@ class abstract_agent_plugin
 
 };
 
+#endif
 #endif // ABSTRACT_AGENT_PLUGIN_H

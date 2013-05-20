@@ -2,7 +2,6 @@
 #include "viewer.h"
 #include <lemon/lgf_reader.h>
 
-#ifdef ISVIEWER
 
 using namespace std;
 
@@ -14,6 +13,17 @@ agent_router_viewer::agent_router_viewer(std::string graphname):graphname(graphn
     coord_y=0;
     setPainterScale(20);
 }
+
+agent_router_viewer::agent_router_viewer ( Parsed_World* world )
+{
+  father=0;
+     length=0;
+    coord_x=0;
+    coord_y=0;
+    setPainterScale(20);
+
+}
+
 
 void agent_router_viewer::setPainterScale ( double scale )
 {
@@ -102,5 +112,3 @@ agent_router_viewer::~agent_router_viewer()
         delete coord_y;
     
 }
-
-#endif

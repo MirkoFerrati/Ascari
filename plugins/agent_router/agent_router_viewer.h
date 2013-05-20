@@ -1,12 +1,15 @@
 #ifndef AGENT_ROUTER_VIEWER_H
 #define AGENT_ROUTER_VIEWER_H
 
-#ifdef ISVIEWER
 
+#include "../abstract_viewer_plugin.h"
+
+#ifdef ISVIEWER
 #include <lemon/smart_graph.h>
 #include <map>
-#include "../abstract_viewer_plugin.h"
 #include <yaml_parser.h>
+
+
 
 class agent_router_viewer:public abstract_viewer_plugin
 {
@@ -26,5 +29,5 @@ private:
     lemon::SmartDigraph::NodeMap<int> *coord_x, *coord_y;
 };
 
-#endif //ISVIEWER
+#endif
 #endif // AGENT_ROUTER_VIEWER_H

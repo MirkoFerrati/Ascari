@@ -7,6 +7,7 @@
 #include "agent_router_parser_plugin.h"
 
 
+
 class agent_router_plugin: public abstract_plugin
 {
 public:
@@ -76,7 +77,7 @@ public:
         if ( viewer_plugin!=0 )
             ERR ( "already created viewer plugin, please check for double calls",NULL )
         else
-            viewer_plugin=new agent_router_viewer ( v );
+            viewer_plugin=new agent_router_viewer ("TODO");
         return viewer_plugin;
     };
 #endif

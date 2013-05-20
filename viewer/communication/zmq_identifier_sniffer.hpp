@@ -36,6 +36,7 @@ public:
     {
 //      if (receiver)
 //	delete(receiver);
+      isrunning=false;
 if (receiver)
   receiver->join();
 

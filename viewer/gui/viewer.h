@@ -3,7 +3,7 @@
 
 #include "Agent.h"
 #include <types/world_sim_packet.h>
-#include "../plugins/abstract_viewer_plugin.h"
+#include "../../plugins/abstract_viewer_plugin.h"
 #include <QtGui/QWidget>
 #include <QtGui/QKeyEvent>
 #include <mutex>

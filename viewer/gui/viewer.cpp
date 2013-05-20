@@ -201,7 +201,7 @@ void Viewer::timerEvent ( QTimerEvent */*event*/ )
     
     for (auto plugin:plugins)
     {
-      plugin->timerEvent();
+      plugin->timerEvent(mutex,infos);
     }
     
     repaint();

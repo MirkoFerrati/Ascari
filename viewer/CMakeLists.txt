@@ -1,13 +1,15 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
+add_definitions(-DISVIEWER)
 
 include_directories(gui communication)
 include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
 include_directories(../shared/parserYAML/include)
+include_directories(../shared/)
+include_directories(../shared/logog/include)
 
 find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
 include(${QT_USE_FILE})
 
-add_definitions(-DISVIEWER)
 
 set(viewer_HEADERS gui/Agent.h gui/viewer.h communication/udp_world_sniffer.h ../shared/communication/global.h)
 set_property(GLOBAL APPEND PROPERTY viewer_SOURCES gui/baseball_viewer.cpp 

@@ -1,5 +1,6 @@
 //written by Alessandro Settimi
-
+#ifndef AGENT_TA_COMMUNICATOR
+#define AGENT_TA_COMMUNICATOR
 #include <zmq.h>
 #include "zmq_communicator.hpp"
 
@@ -23,3 +24,5 @@ public:
 		this->init_full("task_assignment_simulator_plugin",false,"tcp://127.0.0.1:5681","tcp://127.0.0.1:5680","tcp://127.0.0.1:5682",expected_senders,true,true);
 	}
 };
+
+#endif //AGENT_TA_COMMUNICATOR

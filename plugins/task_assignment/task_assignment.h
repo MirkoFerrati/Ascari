@@ -1,6 +1,8 @@
 //written by Alessandro Settimi
 #ifndef TASK_ASSIGNMENT_H
 #define TASK_ASSIGNMENT_H
+#ifdef ISAGENT
+
 #include <vector>
 
 #include <yaml_parser.h>
@@ -109,11 +111,8 @@ private:
 	const std::map<std::string,transition>& events_to_index;
 	
 	
-	std::map<std::string,task_assignment_task> tasks;
 	
-	#ifdef ISAGENT
 	task_assignment_communicator_base* ta_communicator;
-	#endif
 	
 	task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
 	
@@ -164,7 +163,7 @@ private:
 	
 	//algorithms packets ptr
 
-	
+	objects_container& tasks;
 	std::shared_ptr<task_assignment_namespace::subgradient_packet> ptr_subgradient_packet;
 	//
 	
@@ -181,5 +180,6 @@ private:
 
 	std::map<task_assignment_namespace::agent_id,std::vector< double >> others_subgradient;
 };
+	#endif
 
 #endif // TASK_ASSIGNMENT_H

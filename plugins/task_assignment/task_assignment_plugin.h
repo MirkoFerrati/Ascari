@@ -73,7 +73,7 @@ public:
         if ( viewer_plugin!=0 )
             ERR ( "already created viewer plugin, please check for double calls",NULL )
         else
-            viewer_plugin=new task_assignment_viewer ( v );
+            viewer_plugin=new task_assignment_viewer (  );
         return viewer_plugin;
     };
 #endif

@@ -8,7 +8,7 @@ using namespace task_assignment_namespace;
 
 
 task_assignment::task_assignment ( agent* a, Parsed_World* parse )
-:time(a->time),my_id(a->identifier),events(a->events),events_to_index(a->events_to_index)
+:time(a->time),my_id(a->identifier),events(a->events),events_to_index(a->events_to_index),tasks(a->objects)
 {
 //TODO(Mirko): sistemare il concetto di oggetto nel nuovo sistema di plugin tasks= 
 x0=parse->agents.front().initial_states.at("X");

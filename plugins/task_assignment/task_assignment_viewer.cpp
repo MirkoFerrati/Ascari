@@ -3,26 +3,39 @@
 
 #ifdef ISVIEWER
 
-task_assignment_viewer::task_assignment_viewer( int* time ,std::shared_ptr<std::mutex>& mutex,const world_sim_packet& infos):time(time),mutex(mutex),infos(infos)
+task_assignment_viewer::task_assignment_viewer( std::shared_ptr<std::mutex>& mutex,const world_sim_packet& infos)//:time(infos.time),mutex(mutex),infos(infos)
 {
     started=false;
     old_time=0;
+    setAgentSize ( 0.2 );
+    setPainterScale ( 1000.0 );
+}
+task_assignment_viewer::task_assignment_viewer()
+{
+    started=false;
+    old_time=0;
+        setAgentSize ( 0.2 );
+    setPainterScale ( 1000.0 );
+
 }
 
 
-void task_assignment_viewer::timerEvent()
+void task_assignment_viewer::timerEvent ( std::shared_ptr< std::mutex >& mutex, const world_sim_packet& infos )
 {
     Viewer* temp_father=reinterpret_cast<Viewer*>(father);
     mutex->lock();
-
-    for(auto i=infos.objects.begin(); i!=infos.objects.end(); ++i)
+    old_time=now_time;
+now_time=infos.time;
+    for(auto i=infos.object_list.objects.begin(); i!=infos.object_list.objects.end(); ++i)
     {
-	tasks[i->first]=*(reinterpret_cast<const task_assignment_namespace::task*>(i->second.getState()));
-	
-	if ( temp_father->maxX< tasks[i->first].task_position[0] ) temp_father->maxX= tasks[i->first].task_position[0] +2;
-	if ( temp_father->maxY< tasks[i->first].task_position[1] ) temp_father->maxY= tasks[i->first].task_position[1] +2;
-	if ( temp_father->minX> tasks[i->first].task_position[0] ) temp_father->minX= tasks[i->first].task_position[0] -2;
-	if ( temp_father->minY> tasks[i->first].task_position[1] ) temp_father->minY= tasks[i->first].task_position[1] -2;
+      //TODO: controllare che SIA UN TASK
+      //TODO: far funzionare queste righe
+// 	tasks[reinterpret_cast<const task_assignment_namespace::task*>(*i->getState())->id]=*(reinterpret_cast<const task_assignment_namespace::task*>(*i->getState()));
+// 	
+// 	if ( temp_father->maxX< tasks[i->first].task_position[0] ) temp_father->maxX= tasks[i->first].task_position[0] +2;
+// 	if ( temp_father->maxY< tasks[i->first].task_position[1] ) temp_father->maxY= tasks[i->first].task_position[1] +2;
+// 	if ( temp_father->minX> tasks[i->first].task_position[0] ) temp_father->minX= tasks[i->first].task_position[0] -2;
+// 	if ( temp_father->minY> tasks[i->first].task_position[1] ) temp_father->minY= tasks[i->first].task_position[1] -2;
     }
     
     mutex->unlock();
@@ -65,7 +78,7 @@ void task_assignment_viewer::paintBackground (QPainter& painter)
 
 		if (task.executing)
 		{
-			app <<  task.id.c_str() << " (" << ((task.task_execution_time-*time+floor(task.time))>0?(task.task_execution_time-*time+floor(task.time)):0) << ")";
+			app <<  task.id.c_str() << " (" << ((task.task_execution_time-now_time+floor(task.time))>0?(task.task_execution_time-now_time+floor(task.time)):0) << ")";
 		}
 		else
 		{
@@ -84,7 +97,7 @@ void task_assignment_viewer::paintBackground (QPainter& painter)
 
 		if (task.task_deadline != 0)
 		{
-			app << "[" << (((task.task_deadline-*time)>=0)?(task.task_deadline-*time):(0)) << "]";
+			app << "[" << (((task.task_deadline-now_time)>=0)?(task.task_deadline-now_time):(0)) << "]";
 		  
 			painter.save();
 			painter.translate(task.task_position[0],task.task_position[1]);
@@ -105,7 +118,7 @@ void task_assignment_viewer::paintAgents(QPainter& painter,const std::map<std::s
 	for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
 	{
     
-		if(!agents.empty() && (!started || old_time>*time))
+		if(!agents.empty() && (!started || old_time>now_time))
 		{
 			  for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
 			  {
@@ -120,7 +133,7 @@ void task_assignment_viewer::paintAgents(QPainter& painter,const std::map<std::s
 			  started=true;
 		}
 	    
-		old_time=*time;
+		old_time=now_time;
 		
 		
 		if (*time>0)

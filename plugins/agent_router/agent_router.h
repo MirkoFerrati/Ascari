@@ -1,6 +1,8 @@
 #ifndef AGENT_ROUTER_H
 #define AGENT_ROUTER_H
 
+#include "../plugins/abstract_agent_plugin.h"
+
 #ifdef ISAGENT
 
 #include <lemon/smart_graph.h>
@@ -13,7 +15,6 @@
 #include "../../shared/types/graph_informations.h"
 #include <types/events.h>
 #include "udp_graph_communicator.h"
-#include "../plugins/abstract_agent_plugin.h"
 #include "../agent/agent.h"
 #include <thread>
 

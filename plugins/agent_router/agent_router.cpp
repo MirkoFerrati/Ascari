@@ -42,8 +42,7 @@ agent_router::agent_router ( agent* a, Parsed_World* parse ):  events ( a->event
        coord_x ( graph ), coord_y ( graph ),
        /*targets ( tarlist ),*/time ( a->time ),identifier ( a->identifier ),communicator ( _mutex, &info, _io_service,identifier )
 {
-  targets=(reinterpret_cast<agent_router_parsed_agent*>(parse->agents.front().parsed_items_from_plugins[0]))->target_list;
-  //(reinterpret_cast<agent_router_parsed_agent>(parse->agents.at(0).parsed_items_from_plugins[0])).target_list; //funziona perche' rimane un solo agente nel mondo(gli altri vengono eliminati dal main)
+  targets=(reinterpret_cast<agent_router_parsed_agent*>(parse->agents.front().parsed_items_from_plugins[0]))->target_list; //funziona perche' rimane un solo agente nel mondo(gli altri vengono eliminati dal main)
   std::string graphName=(reinterpret_cast<agent_router_parsed_world*>(parse->parsed_items_from_plugins[0]))->graphName;
 initialize(graphName);
 }

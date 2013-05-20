@@ -12,6 +12,10 @@
 #include "../../shared/types/monitor_packet.h"
 #include "../plugins/task_assignment/task_assignment_viewer.h"
 #include "../plugins/monitor/monitor_viewer.h"
+#include <ostream>
+#include <sstream>
+#include "../plugins/addplugins.h"
+
 
 void center ( QWidget &widget,int WIDTH=800,int HEIGHT=800 )
 {
@@ -38,11 +42,8 @@ int main ( int argc, char *argv[] )
     std::thread exiting;
     static_zmq::context=new zmq::context_t ( 1 );
     {
-        //written by Alessandro Settimi
-
         std::string filename;
-        //written by Alessandro Settimi
-
+	auto generic_plugins=createPlugins();
         logog::Cout out;
 //         if (argc<2)
 //             std::cout<<"inserire il tipo di visualizzazione: 1-baseball 2-grafi 3-vuoto"<<std::endl;
@@ -52,17 +53,27 @@ int main ( int argc, char *argv[] )
         ap.refOption ( "f","Yaml filename",filename );
 
         ap.synonym ( "filename","f" );
-        ap.refOption ( "t"," 1-baseball 2-grafi 3-vuoto 4-Task Assignment 5-monitor",viewerType,true );
+	
+	std::ostringstream options;
+	int i=1;
+	options<<"0-blank ";
+	for (auto plugin:generic_plugins)
+	{
+	  options<<i++<<"-"<<plugin->getType()<<" ";
+	}
+        ap.refOption ( "t",options.str(),viewerType,true );
+	
+//        ap.refOption ( "t"," 1-baseball 2-grafi 3-vuoto 4-Task Assignment 5-monitor",viewerType,true );
 
         ap.throwOnProblems();
         try
         {
             ap.parse();
-            if ( ( viewerType==2 ) && !ap.given ( "f" ) )
-            {
-                ERR ( "inserire il nome del file%s","" );
-                return 0;
-            }
+//             if ( ( viewerType==2 ) && !ap.given ( "f" ) )
+//             {
+//                 ERR ( "inserire il nome del file%s","" );
+//                 return 0;
+//             }
         }
         catch ( lemon::ArgParserException const& ex )
         {
@@ -72,14 +83,21 @@ int main ( int argc, char *argv[] )
 
 
         QApplication app ( argc,argv );
-        std::unique_ptr<world_sniffer_abstract> identifier_sniffer;
+ 
         std::vector<abstract_viewer_plugin*> plugins;
         world_sim_packet read;
-        std::map<std::string,monitor_packet> monitor_read;
-        std::shared_ptr<std::mutex> monitor_read_mutex ( new std::mutex );
-
         std::shared_ptr<std::mutex> read_mutex ( new std::mutex );
         Viewer window ( read,read_mutex,NULL );
+	if (viewerType>generic_plugins.size())
+	  throw "undefined viewer plugin";
+	if (viewerType>0)
+	{
+	    generic_plugins.at(viewerType+1)->createViewerPlugin(&window);
+            plugins.push_back ( generic_plugins.at(viewerType+1)->getViewerPlugin() );
+            generic_plugins.at(viewerType+1)->getViewerPlugin()->setfather ( &window );
+            window.addPlugin ( generic_plugins.at(viewerType+1)->getViewerPlugin() );
+	}
+	/*
         switch ( viewerType )
         {
         case 1:
@@ -96,58 +114,45 @@ int main ( int argc, char *argv[] )
 
         }
         break;
+	  case 5:
+        {
+            abstract_viewer_plugin* temp=new monitor_viewer ( filename );
+            temp->setfather ( &window );
+            window.addPlugin ( temp );
+            plugins.push_back ( temp );
+        }
+        break;
         case 3:
         {
 
         }
         case 4:
         {
-            abstract_viewer_plugin* ta_viewer = new task_assignment_viewer ( window.getTime(),read_mutex,read );
+            abstract_viewer_plugin* ta_viewer = new task_assignment_viewer ();
             plugins.push_back ( ta_viewer );
             ta_viewer->setfather ( &window );
-            ta_viewer->setAgentSize ( 0.2 );
-            ta_viewer->setPainterScale ( 1000.0 );
+           
             window.addPlugin ( ta_viewer );
-        }
-        break;
-        case 5:
-        {
-
-
-            identifier_sniffer=std::unique_ptr<zmq_identifier_sniffer> ( new zmq_identifier_sniffer ( monitor_read,monitor_read_mutex ) );
-            identifier_sniffer->start_receiving();
-            abstract_viewer_plugin* temp=new monitor_viewer ( &monitor_read,monitor_read_mutex,filename );
-            temp->setfather ( &window );
-            window.addPlugin ( temp );
-            plugins.push_back ( temp );
         }
         break;
         default:
             throw "tipo di viewer sconosciuto";
         }
-
-
-
+*/
         //TODO:create plugins
         window.init ( filename );
         zmq_world_sniffer<world_sim_packet> sniffer_world ( read,read_mutex );
-
         window.setWindowTitle ( "Visualizer" );
         window.show();
-
         QSettings settings ( "K2BRobotics","Viewer" );
 
         // window.restoreGeometry ( settings.value ( "mainWindowGeometry" ).toByteArray() );
 
         window.setMinimumSize ( 200,200 );
-
         sniffer_world.start_receiving();
         window.start();
-
         app.exec();
 // 	std::cout<<"la main window si è chiusa"<<std::endl;
-        if ( identifier_sniffer )
-            identifier_sniffer->stop_receiving();
         sniffer_world.stop_receiving();
 
     for ( auto plugin:plugins )
@@ -159,13 +164,8 @@ int main ( int argc, char *argv[] )
         {
             delete ( static_zmq::context );
         } );
-//	delete(static_zmq::context);//.~context_t();
-
-
 //     	std::cout<<"contesto chiuso"<<std::endl;
-
     }
-//     	std::cout<<"la main program si è chiusa"<<std::endl;
     exiting.join();
     return 0;
 }

@@ -1,12 +1,12 @@
 #ifndef ABSTRACT_PLUGIN_H
 #define ABSTRACT_PLUGIN_H
 
+#include "HACK_KDEVELOP.h"
 
 #ifdef ISAGENT
 #include "abstract_agent_plugin.h"
 #include "../agent/agent.h"
 #endif
-
 
 #ifdef ISSIMULATOR
 #include "abstract_simulator_plugin.h"
@@ -19,6 +19,7 @@
 #endif
 
 #include "abstract_parser_plugin.h"
+
 
 
 class abstract_plugin

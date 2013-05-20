@@ -1,7 +1,8 @@
 #ifndef ABSTRACT_VIEWER_PLUGIN_H
 #define ABSTRACT_VIEWER_PLUGIN_H
 
-#ifdef ISVIEWER
+
+#include "HACK_KDEVELOP.h"
 
 #include <QPainter>
 #include "../viewer/gui/Agent.h"
@@ -53,7 +54,7 @@ public:
 		}
 	};
 	virtual void paintBackground(QPainter &/*painter*/){};
-	virtual void timerEvent(){};
+	virtual void timerEvent(std::shared_ptr<std::mutex>&,const world_sim_packet&){};
 	virtual void init(std::string){};
 	virtual void keypress(){};
 	virtual void setAgentShape(QPolygon shape)
@@ -91,6 +92,4 @@ private:
 };
 
 
-
-#endif //ISVIEWER
 #endif // ABSTRACT_VIEWER_PLUGIN_H
