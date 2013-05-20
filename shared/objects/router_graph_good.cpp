@@ -12,7 +12,7 @@ std::string router_graph_good::getObjectType()
 }
 
 
-const void* router_graph_good::getState()
+const void* router_graph_good::getState() const
 {
 
 }

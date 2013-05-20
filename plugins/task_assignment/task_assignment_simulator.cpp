@@ -26,10 +26,10 @@ bool task_assignment_simulator::initialize ( const Parsed_World& w )
     for ( unsigned int i=0; i<tasks_id.size(); i++ )
     {
         task_assignment_task tmp ( world->task_list.at ( tasks_id.at ( i ) ) );
-        sim_packet.objects[tasks_id.at ( i )]=tmp;
+//         sim_packet.objects[tasks_id.at ( i )]=tmp;
     }
 
-    std::cout<<sim_packet.objects<<std::endl;
+//     std::cout<<sim_packet.objects<<std::endl;
     
     return true;
     //written by Alessandro Settimi

@@ -14,7 +14,7 @@ public:
     
     virtual double getRadius();
     
-    virtual const void* getState();
+    virtual const void* getState() const;
     
     virtual bool isMovable();
     

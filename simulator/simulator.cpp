@@ -14,7 +14,7 @@
 #include "../plugins/task_assignment/task_assignment_simulator.h"
 #include <time.h>
 
-
+#include "streams_utils.h"
 using namespace std;
 
 void simulator::create_communicator ( int communicator_type )
@@ -35,7 +35,7 @@ void simulator::create_communicator ( int communicator_type )
     }
 }
 
-simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.time,sim_packet.objects )
+simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.time,sim_packet.object_list )
 {
     viewer_communicator=new zmq_viewer_communicator();
     max_loops=0;
@@ -150,7 +150,16 @@ void simulator::initialize ( const Parsed_World& wo )
 
 void simulator::createObjects ( const Parsed_World& world )
 {
-//TODO: chiamare le createObjects dei plugin, se ha senso
+  
+  //TODO usare world e chiamare i plugin
+  task_assignment_namespace::task my_task;
+  my_task.task_type=1241;
+  auto temp=new task_assignment_task(my_task);
+sim_packet.object_list.objects.push_back(temp);
+my_task.task_type=3894;
+  temp=new task_assignment_task(my_task);
+  sim_packet.object_list.objects.push_back(temp);
+  
 }
 
 
@@ -337,7 +346,10 @@ void simulator::main_loop()
                 communicator->send_target ( agent_packet,agent->first );
             }
 
-
+            for (auto object:sim_packet.object_list.objects)
+	    {
+	    object->print(std::cout);
+	    }
             viewer_communicator->send_target ( sim_packet,"viewer" );
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 
@@ -370,9 +382,9 @@ void simulator::main_loop()
                 }
             }
 
-            for ( auto object=sim_packet.objects.begin(); object!=sim_packet.objects.end(); ++object )
+            for ( auto object=sim_packet.object_list.objects.begin(); object!=sim_packet.object_list.objects.end(); ++object )
             {
-                object->second.updateState ( sim_packet.time,sim_packet.state_agents,agent_states_to_index );
+                (*object)->updateState ( sim_packet.time,sim_packet.state_agents,agent_states_to_index );
             }
 
             collisionChecker->checkCollisions();

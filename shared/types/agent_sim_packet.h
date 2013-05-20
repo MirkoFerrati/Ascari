@@ -2,15 +2,18 @@
 #define AGENT_SIM_PACKET_H
 #include "agent_name_to_ref_states.h"
 #include <objects/task_assignment_task.h>
+#include <objects/objects_container.hpp>
 
 struct agent_sim_packet{
   //pacchetto personalizzato per ogni agente in base alla visibilita'
   const std::map<std::string,double>& bonus_variables;
    agents_name_to_ref_states state_agents;
   const simulation_time& time;
-  const std::map<std::string, task_assignment_task>& objects;
+  //const std::map<std::string, task_assignment_task>& objects;
     
-    agent_sim_packet(const std:: map<std::string,double>& bonus, const simulation_time& t, const std::map<std::string, task_assignment_task>& objects)
+  objects_container& objects;
+  
+    agent_sim_packet(const std:: map<std::string,double>& bonus, const simulation_time& t, objects_container& objects)
     :bonus_variables(bonus),time(t),objects(objects)
     {
 	
@@ -19,7 +22,7 @@ struct agent_sim_packet{
     template <typename Archive>
     void serialize(Archive& ar,const unsigned int /*version*/)
     {
-		ar& time;
+	ar& time;
         ar& bonus_variables;
         ar& state_agents;
 	ar& objects;
@@ -32,13 +35,13 @@ struct agent_sim_packet_receiver{
   std::map<std::string,double> bonus_variables;
    agents_name_to_ref_states state_agents;
   simulation_time time;
-   std::map<std::string, task_assignment_task> objects;
+   objects_container objects;
     
     
     template <typename Archive>
     void serialize(Archive& ar,const unsigned int /*version*/)
     {
-		ar& time;
+	ar& time;
         ar& bonus_variables;
         ar& state_agents;
 	ar& objects;

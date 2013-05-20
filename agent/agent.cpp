@@ -279,12 +279,21 @@ void agent::main_loop()
         bonusVariables.at ( map_bonus_variables_to_id.at ( it->first ) ) =it->second;
     }
 
-     for ( std::map<std::string,task_assignment_task>::const_iterator it=temp.objects.begin(); it!=temp.objects.end(); ++it )
+    //TODO: non e' ottimizzato, distrugge e ricrea ogni volta, follia!!
+    for (auto object:objects.objects)
+      delete object;
+    objects.objects.clear();
+     for ( auto it=temp.object_list.objects.begin(); it!=temp.object_list.objects.end(); ++it )
     {
-        objects[it->first] =it->second;
+      (*it)->print(std::cout);
+        objects.objects.push_back(*it);
 // 	std::cout<<"task ricevuto:"<<it->second<<std::endl;
     }
 
+        for (auto object:objects.objects)
+	    {
+	      object->print(std::cout);
+	    }
    
     if (temp.state_agents.internal_map.find( identifier )==temp.state_agents.internal_map.end()){
        ERR("MANCA IL MIO STATO",NULL);

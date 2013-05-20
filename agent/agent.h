@@ -123,7 +123,8 @@ public:
 	
 	decoder event_decoder;
 	
-	    std::map<std::string,task_assignment_task> objects;
+	    //std::map<std::string,task_assignment_task> objects;
+	objects_container objects;
 
 	//in dummy we will not use this, since it is used for inter-agent communication
 	//Note that we need two versions, one for net and one for shared memory
