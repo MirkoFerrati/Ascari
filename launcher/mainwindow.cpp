@@ -10,6 +10,7 @@
 #include "../plugins/task_assignment/task_assignment_viewer.h"
 #include "../plugins/abstract_viewer_plugin.h"
 #include "../plugins/agent_router/agent_router_parsed_world.h"
+#include "../plugins/addplugins.h"
 
 MainWindow::MainWindow ( QWidget *parent ) :
     QMainWindow ( parent ),
@@ -56,7 +57,13 @@ MainWindow::MainWindow ( QWidget *parent ) :
             std::cerr<<"impossibile aprire il file "<<fileName.toStdString() <<std::endl;
         }
     }
-
+    generic_plugins=createPlugins();
+    ui->selectViewType->clear();
+    ui->selectViewType->addItem ( "Vuoto" );
+for ( auto plugin:generic_plugins )
+    {
+        ui->selectViewType->addItem ( QString::fromStdString(plugin->getType()) );
+    }
 
 }
 
@@ -72,16 +79,16 @@ void MainWindow::closeEvent ( QCloseEvent *event )
         sniffer->stop_receiving();
     delete qout;
     delete qerr;
-if (!agentcontainer.empty())
-	{
-	  for (auto widg:agentcontainer)
-	  {
-	      ui->agentList->removeWidget(widg);
-	      delete widg;
-	  }
-	  agentcontainer.clear();
-	}
-	
+    if ( !agentcontainer.empty() )
+    {
+    for ( auto widg:agentcontainer )
+        {
+            ui->agentList->removeWidget ( widg );
+            delete widg;
+        }
+        agentcontainer.clear();
+    }
+
 }
 
 MainWindow::~MainWindow()
@@ -97,22 +104,22 @@ MainWindow::~MainWindow()
         delete ( simulator );
     }
 
-    for ( auto a=agents.begin();a!=agents.end();++a )
+    for ( auto a=agents.begin(); a!=agents.end(); ++a )
     {
         a->second->kill();
         delete ( a->second );
     }
-    
-    if (!agentcontainer.empty())
-	{
-	  for (auto widg:agentcontainer)
-	  {
-	      ui->agentList->removeWidget(widg);
-	      delete widg;
-	  }
-	  agentcontainer.clear();
-	}
-	
+
+    if ( !agentcontainer.empty() )
+    {
+    for ( auto widg:agentcontainer )
+        {
+            ui->agentList->removeWidget ( widg );
+            delete widg;
+        }
+        agentcontainer.clear();
+    }
+
 }
 
 void MainWindow::openFile()
@@ -137,41 +144,41 @@ void MainWindow::openFile()
     file.close();
     try
     {
-      yaml_parser parser;
+        yaml_parser parser;
         world=parser.parse_file ( fileName.toStdString() );
-	if (!world.parsedSuccessfully)
-	{
-	       ui->StartAgents->setText ( "impossibile parsare il file" );
-	       return;
-	}
+        if ( !world.parsedSuccessfully )
+        {
+            ui->StartAgents->setText ( "impossibile parsare il file" );
+            return;
+        }
         QString temp="Agents: ";
         QString num;
-	selectedAgents=world.agents.size();
+        selectedAgents=world.agents.size();
         num.setNum ( selectedAgents );
-	ui->selectAll->setCheckState(Qt::Checked);
-	
-	if (!agentcontainer.empty())
-	{
-	  for (auto widg:agentcontainer)
-	  {
-	      ui->agentList->removeWidget(widg);
-	      delete widg;
-	  }
-	  agentcontainer.clear();
-	}
-	
-	int i=0;
-	for (auto ag:world.agents)
-	{
-	  QCheckBox* temp= new QCheckBox(QString::fromStdString(ag.name));
-	  temp->setTristate(false);
-	  temp->setCheckState(Qt::Checked);
-	   QObject::connect ( temp, SIGNAL ( stateChanged(int) ),
-                       this, SLOT ( agentSelected(int) ) );
-	  agentcontainer.push_back(temp);
-	  ((QVBoxLayout*)ui->agentList)->addWidget(temp,i+1,0);
-	  i++;
-	}
+        ui->selectAll->setCheckState ( Qt::Checked );
+
+        if ( !agentcontainer.empty() )
+        {
+        for ( auto widg:agentcontainer )
+            {
+                ui->agentList->removeWidget ( widg );
+                delete widg;
+            }
+            agentcontainer.clear();
+        }
+
+        int i=0;
+    for ( auto ag:world.agents )
+        {
+            QCheckBox* temp= new QCheckBox ( QString::fromStdString ( ag.name ) );
+            temp->setTristate ( false );
+            temp->setCheckState ( Qt::Checked );
+            QObject::connect ( temp, SIGNAL ( stateChanged ( int ) ),
+                               this, SLOT ( agentSelected ( int ) ) );
+            agentcontainer.push_back ( temp );
+            ( ( QVBoxLayout* ) ui->agentList )->addWidget ( temp,i+1,0 );
+            i++;
+        }
         ui->StartAgents->setText ( temp.append ( num ) );
         ui->ShowFile->setText ( line );
         settings->setValue ( "paths/lastopen",fileName );
@@ -182,33 +189,33 @@ void MainWindow::openFile()
     }
 }
 
-void MainWindow::agentSelected ( int state)
+void MainWindow::agentSelected ( int state )
 {
-  
-        QString temp="Agents: ";
-        QString num;
-	selectedAgents+= (state-1);
-	if (selectedAgents==world.agents.size()) 
-	{
+
+    QString temp="Agents: ";
+    QString num;
+    selectedAgents+= ( state-1 );
+    if ( selectedAgents==world.agents.size() )
+    {
 // 	  	ui->selectAll->setTristate(false);
 
-	  ui->selectAll->setCheckState(Qt::Checked);
-	}
-	else if (selectedAgents>0) 
-	{
+        ui->selectAll->setCheckState ( Qt::Checked );
+    }
+    else if ( selectedAgents>0 )
+    {
 // 	  ui->selectAll->setTristate(true);
-	  disable=true;
-	  ui->selectAll->setCheckState(Qt::PartiallyChecked);
-	  disable=false;
-	}
-	else if (selectedAgents==0)
-	{
+        disable=true;
+        ui->selectAll->setCheckState ( Qt::PartiallyChecked );
+        disable=false;
+    }
+    else if ( selectedAgents==0 )
+    {
 // 	  	ui->selectAll->setTristate(false);
 
-	  ui->selectAll->setCheckState(Qt::Unchecked);
-	}
-        num.setNum ( selectedAgents );
-	ui->StartAgents->setText ( temp.append ( num ) );
+        ui->selectAll->setCheckState ( Qt::Unchecked );
+    }
+    num.setNum ( selectedAgents );
+    ui->StartAgents->setText ( temp.append ( num ) );
 }
 
 
@@ -255,11 +262,11 @@ void MainWindow::on_stopall_clicked()
     if ( !agents.empty() )
     {
 
-    for ( auto a=agents.begin();a!=agents.end();++a )
-    {
-        a->second->kill();
-        delete ( a->second );
-    }
+        for ( auto a=agents.begin(); a!=agents.end(); ++a )
+        {
+            a->second->kill();
+            delete ( a->second );
+        }
         agents.clear();
     }
     if ( simulator )
@@ -304,20 +311,20 @@ void MainWindow::startAgents()
 {
     if ( !agents.empty() )
     {
-for ( auto a=agents.begin();a!=agents.end();++a )
-    {
-        a->second->kill();
-        delete ( a->second );
-    }
+        for ( auto a=agents.begin(); a!=agents.end(); ++a )
+        {
+            a->second->kill();
+            delete ( a->second );
+        }
         agents.clear();
     }
     for ( unsigned int i=0; i<agentcontainer.size(); i++ )
     {
-      if (!agentcontainer.at(i)->isChecked())
-	continue;
+        if ( !agentcontainer.at ( i )->isChecked() )
+            continue;
         QProcess *agent;
         QStringList arguments;
-        arguments<< "-a" <<  agentcontainer.at(i)->text() ;
+        arguments<< "-a" <<  agentcontainer.at ( i )->text() ;
         arguments<< "-f"<< fileName;
         agent=new QProcess ( this );
         QFile file ( fileName );
@@ -325,7 +332,7 @@ for ( auto a=agents.begin();a!=agents.end();++a )
         agent->setWorkingDirectory ( d.absolutePath() );
         agent->setProcessChannelMode ( QProcess::MergedChannels );
         agent->start ( agentPath,arguments );
-		agents[agentcontainer.at(i)->text().toStdString()]=  agent ;
+        agents[agentcontainer.at ( i )->text().toStdString()]=  agent ;
 
     }
 
@@ -361,7 +368,7 @@ void MainWindow::startSimulator()
 
 void MainWindow::on_Updateshell_clicked()
 {
-    for ( auto a=agents.begin();a!=agents.end();++a )
+    for ( auto a=agents.begin(); a!=agents.end(); ++a )
     {
         QString strout= a->second->readAllStandardOutput();
         QFile file ( QString::fromStdString ( a->first ).append ( ".log" ) );
@@ -387,137 +394,145 @@ void MainWindow::on_Updateshell_clicked()
 
 bool MainWindow::startViewer()
 {
-    int viewerType=-1;
+    //int viewerType=-1;
     QStringList arguments;
-
     if ( ui->selectViewType->currentIndex() ==-1 )
         return false;
 
-    if ( ui->selectViewType->currentText().compare ( "Baseball" ) ==0 )
+    /*
+        if ( ui->selectViewType->currentText().compare ( "Baseball" ) ==0 )
+        {
+            viewerType=1;
+        }
+        if ( ui->selectViewType->currentText().compare ( "Grafo" ) ==0 )
+        {
+            viewerType=2;
+        }
+        if ( ui->selectViewType->currentText().compare ( "Vuoto" ) ==0 )
+        {
+            viewerType=3;
+        }
+        if ( ui->selectViewType->currentText().compare ( "TaskAssignment" ) ==0 )
+        {
+            viewerType=4;
+        }
+        if ( ui->selectViewType->currentText().compare ( "Monitor" ) ==0 )
+        {
+            viewerType=5;
+        }*/
+
+    //if ( viewerType>0 )
+    //{
+    if ( insideViewer )
     {
-        viewerType=1;
+        ui->ViewerContainer->removeWidget ( insideViewer );
+        delete insideViewer;
+        insideViewer=0;
     }
-    if ( ui->selectViewType->currentText().compare ( "Grafo" ) ==0 )
+for ( auto plugin:plugins )
+        delete plugin;
+    plugins.clear();
+    if ( !mutex )
     {
-        viewerType=2;
+        std::shared_ptr<std::mutex> temp ( new std::mutex );
+        mutex.swap ( temp );
     }
-    if ( ui->selectViewType->currentText().compare ( "Vuoto" ) ==0 )
+    else
     {
-        viewerType=3;
+        mutex->unlock();
     }
-    if ( ui->selectViewType->currentText().compare ( "TaskAssignment" ) ==0 )
+    if ( !sniffer )
     {
-        viewerType=4;
+        sniffer=std::unique_ptr<zmq_world_sniffer<world_sim_packet> > ( new zmq_world_sniffer<world_sim_packet> ( buffer,mutex ) );
+        sniffer->start_receiving();
     }
-    if ( ui->selectViewType->currentText().compare ( "Monitor" ) ==0 )
+    insideViewer=new Viewer ( buffer,mutex,NULL );
+
+for ( auto plugin: generic_plugins )
     {
-        viewerType=5;
+        if ( ui->selectViewType->currentText().compare(QString::fromStdString(plugin->getType()))==0 )
+        {
+            plugin->createViewerPlugin ( insideViewer );
+            plugins.push_back ( plugin->getViewerPlugin() );
+            plugin->getViewerPlugin()->setfather ( insideViewer );
+            insideViewer->addPlugin ( plugin->getViewerPlugin() );
+        }
     }
 
-    if ( viewerType>0 )
+/*    switch ( viewerType )
     {
-        if ( insideViewer )
-        {
-            ui->ViewerContainer->removeWidget ( insideViewer );
-            delete insideViewer;
-	    insideViewer=0;
-        }
-    for ( auto plugin:plugins )
-            delete plugin;
-    plugins.clear();
-        if ( !mutex )
+
+
+    case 2:
+    {
+        std::string graphname="";
+
+        QFile file ( fileName );
+        QDir d = QFileInfo ( file ).absoluteDir();
+        graphname= ( d.absolutePath().append ( "/" ).append (
+                         QString::fromStdString (
+                             reinterpret_cast<agent_router_parsed_world*> ( world.parsed_items_from_plugins[0] )->graphName
+                         ).toLower()
+                     ) ).toStdString();
+        abstract_viewer_plugin* temp=new agent_router_viewer ( graphname );
+        temp->setfather ( insideViewer );
+        insideViewer->addPlugin ( temp );
+        plugins.push_back ( temp );
+    }
+
+    case 4:
+    {
+        abstract_viewer_plugin* temp=new task_assignment_viewer ( insideViewer->getTime(),mutex,buffer );
+        temp->setfather ( insideViewer );
+        temp->setAgentSize ( 0.2 );
+        temp->setPainterScale ( 1000.0 );
+        insideViewer->addPlugin ( temp );
+        plugins.push_back ( temp );
+    }
+    break;
+
+    case 5:
+    {
+        std::string mapfilename="";
+        if ( !monitor_mutex )
         {
             std::shared_ptr<std::mutex> temp ( new std::mutex );
-            mutex.swap ( temp );
-
+            monitor_mutex.swap ( temp );
         }
         else
         {
-            mutex->unlock();
+            monitor_mutex->unlock();
         }
-        if ( !sniffer )
+        if ( !identifier_sniffer )
         {
-            sniffer=std::unique_ptr<zmq_world_sniffer<world_sim_packet> > ( new zmq_world_sniffer<world_sim_packet> ( buffer,mutex ) );
-            sniffer->start_receiving();
+            identifier_sniffer= std::unique_ptr<zmq_identifier_sniffer> ( new zmq_identifier_sniffer ( monitor_buffer,monitor_mutex ) );
+            identifier_sniffer->start_receiving();
         }
-        insideViewer=new Viewer ( buffer,mutex,NULL );
- 
+        QFile file ( fileName );
+        QDir d = QFileInfo ( file ).absoluteDir();
+        if ( ! ( world.mapfilename=="UNSET" ) )
+            mapfilename= ( d.absolutePath().append ( "/" ).append ( QString::fromStdString ( world.mapfilename ).toLower() ) ).toStdString();
+        abstract_viewer_plugin* temp=new monitor_viewer ( &monitor_buffer,monitor_mutex,mapfilename );
+        temp->setfather ( insideViewer );
+        insideViewer->addPlugin ( temp );
+        plugins.push_back ( temp );
+    }
 
+    default:
+    {
 
-        switch ( viewerType )
-        {
-
-
-        case 2:
-        {
-			std::string graphname="";
-			
-            QFile file ( fileName );
-            QDir d = QFileInfo ( file ).absoluteDir();
-            graphname= ( d.absolutePath().append ( "/" ).append ( 
-            QString::fromStdString ( 
-            reinterpret_cast<agent_router_parsed_world*>(world.parsed_items_from_plugins[0])->graphName
-			).toLower() 
-			) ).toStdString();
-            abstract_viewer_plugin* temp=new agent_router_viewer(graphname);
-            temp->setfather ( insideViewer );
-            insideViewer->addPlugin ( temp );
-            plugins.push_back ( temp );
-        }
-
-        case 4:
-        {
-            abstract_viewer_plugin* temp=new task_assignment_viewer(insideViewer->getTime(),mutex,buffer);
-            temp->setfather ( insideViewer );
-	    temp->setAgentSize(0.2);
-	    temp->setPainterScale(1000.0);
-            insideViewer->addPlugin ( temp );
-            plugins.push_back ( temp );
-        }
-        break;
-
-        case 5:
-        {
-	  std::string mapfilename="";
-            if ( !monitor_mutex )
-            {
-                std::shared_ptr<std::mutex> temp ( new std::mutex );
-                monitor_mutex.swap ( temp );
-            }
-            else
-            {
-                monitor_mutex->unlock();
-            }
-            if ( !identifier_sniffer )
-            {
-                identifier_sniffer= std::unique_ptr<zmq_identifier_sniffer> ( new zmq_identifier_sniffer ( monitor_buffer,monitor_mutex ) );
-                identifier_sniffer->start_receiving();
-            }
-              QFile file ( fileName );
-            QDir d = QFileInfo ( file ).absoluteDir();
-	    if (!(world.mapfilename=="UNSET"))
-		mapfilename= ( d.absolutePath().append ( "/" ).append ( QString::fromStdString ( world.mapfilename ).toLower() ) ).toStdString();
-            abstract_viewer_plugin* temp=new monitor_viewer ( &monitor_buffer,monitor_mutex,mapfilename );
-            temp->setfather ( insideViewer );
-            insideViewer->addPlugin ( temp );
-            plugins.push_back ( temp );
-        }
-
-        default:
-        {
-
-
-        }
-        }
-
-        ui->ViewerContainer->addWidget ( insideViewer );
-        insideViewer->init ( fileName.toStdString() );
-        insideViewer->start();
-
-        return true;
 
     }
-    return false;
+    }*/
+
+    ui->ViewerContainer->addWidget ( insideViewer );
+    insideViewer->init ( fileName.toStdString() );
+    insideViewer->start();
+
+    return true;
+
+    //}
+    //return false;
 
 }
 
@@ -550,31 +565,31 @@ void MainWindow::simulatorExited ( int exitcode, QProcess::ExitStatus exitstatus
     std::cout<<QString ( simulator->readAllStandardOutput() ).toStdString();
 }
 
-void MainWindow::on_selectAll_stateChanged(int arg1)
+void MainWindow::on_selectAll_stateChanged ( int arg1 )
 {
-  if (disable) return;
-  if (arg1==1)
-  {
-    disable=true;
-   ui->selectAll->setCheckState(Qt::Checked);
-  }
-      disable=true;
-
-    for(auto i:agentcontainer)
+    if ( disable ) return;
+    if ( arg1==1 )
     {
-        i->setChecked(arg1>0);
+        disable=true;
+        ui->selectAll->setCheckState ( Qt::Checked );
     }
-       disable=false;
+    disable=true;
+
+for ( auto i:agentcontainer )
+    {
+        i->setChecked ( arg1>0 );
+    }
+    disable=false;
 
 }
 
-void MainWindow::on_speed_sliderMoved(int position) //from 0 to 100
+void MainWindow::on_speed_sliderMoved ( int position ) //from 0 to 100
 {
     if ( simulator )
     {
         char temp[10];
-        snprintf(temp,10,"s%u!",(100-(position))*(100-position)*2);
-	std::cout<<temp<<std::endl;
-        simulator->write(temp);
+        snprintf ( temp,10,"s%u!", ( 100- ( position ) ) * ( 100-position ) *2 );
+        std::cout<<temp<<std::endl;
+        simulator->write ( temp );
     }
 }

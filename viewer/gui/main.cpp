@@ -22,17 +22,12 @@ void center ( QWidget &widget,int WIDTH=800,int HEIGHT=800 )
     int x, y;
     int screenWidth;
     int screenHeight;
-
     QDesktopWidget *desktop = QApplication::desktop();
-
     screenWidth = desktop->width();
     screenHeight = desktop->height();
-
     x = ( screenWidth - WIDTH ) / 2;
     y = ( screenHeight - HEIGHT ) / 2;
-
     widget.setGeometry ( x, y, WIDTH, HEIGHT );
-
 }
 
 
@@ -45,15 +40,10 @@ int main ( int argc, char *argv[] )
         std::string filename;
 	auto generic_plugins=createPlugins();
         logog::Cout out;
-//         if (argc<2)
-//             std::cout<<"inserire il tipo di visualizzazione: 1-baseball 2-grafi 3-vuoto"<<std::endl;
         lemon::ArgParser ap ( argc,argv );
         int viewerType=0;
-
         ap.refOption ( "f","Yaml filename",filename );
-
         ap.synonym ( "filename","f" );
-	
 	std::ostringstream options;
 	int i=1;
 	options<<"0-blank ";
@@ -61,10 +51,7 @@ int main ( int argc, char *argv[] )
 	{
 	  options<<i++<<"-"<<plugin->getType()<<" ";
 	}
-        ap.refOption ( "t",options.str(),viewerType,true );
-	
-//        ap.refOption ( "t"," 1-baseball 2-grafi 3-vuoto 4-Task Assignment 5-monitor",viewerType,true );
-
+        ap.refOption ( "t",options.str(),viewerType,true ); //ap.refOption ( "t"," 1-baseball 2-grafi 3-vuoto 4-Task Assignment 5-monitor",viewerType,true );
         ap.throwOnProblems();
         try
         {
@@ -81,9 +68,8 @@ int main ( int argc, char *argv[] )
             return 0;
         }
 
-
         QApplication app ( argc,argv );
- 
+
         std::vector<abstract_viewer_plugin*> plugins;
         world_sim_packet read;
         std::shared_ptr<std::mutex> read_mutex ( new std::mutex );
@@ -139,15 +125,12 @@ int main ( int argc, char *argv[] )
             throw "tipo di viewer sconosciuto";
         }
 */
-        //TODO:create plugins
         window.init ( filename );
         zmq_world_sniffer<world_sim_packet> sniffer_world ( read,read_mutex );
         window.setWindowTitle ( "Visualizer" );
         window.show();
         QSettings settings ( "K2BRobotics","Viewer" );
-
-        // window.restoreGeometry ( settings.value ( "mainWindowGeometry" ).toByteArray() );
-
+        window.restoreGeometry ( settings.value ( "mainWindowGeometry" ).toByteArray() );
         window.setMinimumSize ( 200,200 );
         sniffer_world.start_receiving();
         window.start();

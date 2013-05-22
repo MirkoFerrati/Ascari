@@ -2,6 +2,7 @@
 #include "task_assignment.h"
 #include <agent.h>
 
+#include "../HACK_KDEVELOP.h"
 
 using namespace task_assignment_namespace;
 

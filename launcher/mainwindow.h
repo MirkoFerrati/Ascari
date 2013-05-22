@@ -11,6 +11,7 @@
 #include <viewer.h>
 #include <udp_world_sniffer.h>
 #include "../shared/types/monitor_packet.h"
+#include "../plugins/abstract_plugin.h"
 namespace Ui
 {
 class MainWindow;
@@ -85,6 +86,7 @@ private:
     QString fileName,simulatorPath,agentPath,yamlsPath;
     int selectedAgents;
     bool disable;
+    std::vector< abstract_plugin* > generic_plugins;
 };
 
 #endif // MAINWINDOW_H

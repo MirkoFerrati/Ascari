@@ -1,6 +1,7 @@
 #ifndef AGENT_H
 #define AGENT_H
 
+#include "../plugins/HACK_KDEVELOP.h"
 
 #include <list>
 #include <vector>

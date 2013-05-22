@@ -2,8 +2,9 @@
 #define ABSTRACT_AGENT_PLUGIN_H
 
 
-#include "abstract_plugin.h"
+#include "HACK_KDEVELOP.h"
 #ifdef ISAGENT
+
 #include "exprtk.hpp"
 #include <vector>
 

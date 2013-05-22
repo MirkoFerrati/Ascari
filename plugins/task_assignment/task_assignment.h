@@ -1,7 +1,9 @@
 //written by Alessandro Settimi
 #ifndef TASK_ASSIGNMENT_H
 #define TASK_ASSIGNMENT_H
-#ifdef ISAGENT
+
+#include "../HACK_KDEVELOP.h"
+ #ifdef ISAGENT
 
 #include <vector>
 
@@ -22,7 +24,7 @@ class task_assignment: public abstract_agent_plugin
 {
 	
 public:
-	task_assignment(const Parsed_World& world, const Parsed_Agent& agent,simulation_time& time, std::map< transition, Events >& events, const std::map<std::string,transition>& events_to_index, const std::map<std::string,task_assignment_task>& tasks);
+	task_assignment( const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events, const std::map< std::string, transition >& events_to_index, const objects_container& tasks );
 	task_assignment(agent* a, Parsed_World* parse);
 	void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
 	void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
@@ -163,7 +165,8 @@ private:
 	
 	//algorithms packets ptr
 
-	objects_container& tasks;
+	const objects_container& objects;
+	std::map<std::string,task_assignment_task> tasks;
 	std::shared_ptr<task_assignment_namespace::subgradient_packet> ptr_subgradient_packet;
 	//
 	
