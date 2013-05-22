@@ -10,7 +10,7 @@ public zmq_simulator_to_agent_communicator<control_command_packet,agent_sim_pack
 public:
 zmq_agent_communicator(unsigned int expected_senders);
 zmq_agent_communicator(unsigned int expected_senders, std::list<std::string>clients);
-std::vector< control_command_packet > receive_control_commands();
+    std::vector< control_command_packet >& receive_control_commands();
 void send_broadcast(const agent_sim_packet& infos);
 void send_target(const agent_sim_packet& infos, const target_abstract& target);
 ~zmq_agent_communicator();	

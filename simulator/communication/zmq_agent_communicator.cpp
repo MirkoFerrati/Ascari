@@ -14,9 +14,15 @@ zmq_agent_communicator::zmq_agent_communicator(unsigned int expected_senders)
 
 
 
-std::vector< control_command_packet > zmq_agent_communicator::receive_control_commands()
+std::vector< control_command_packet >& zmq_agent_communicator::receive_control_commands()
 {
+  try{
 	return receive();
+  }
+  catch (const char* ex)
+  {
+    ERR("errore nella receive control commands %s",ex);
+  }
 }
 
 void zmq_agent_communicator::send_broadcast(const agent_sim_packet& infos)

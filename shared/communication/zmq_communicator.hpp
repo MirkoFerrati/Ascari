@@ -115,7 +115,7 @@ public:
 
 #endif //ZMQDEBUG
 
-    std::vector<receive_type> receive ( int flags = 0 )
+    std::vector<receive_type>& receive ( int flags = 0 )
     {
         if ( !initialized )
         {
@@ -164,7 +164,13 @@ public:
             std::istringstream iss ( receive );
             iss >> tmp;
             boost::archive::text_iarchive archive ( iss );
-            archive >> packet;
+	    try{
+	      archive >> packet;
+	    }
+	    catch (const char* ex)
+	    {
+	      ERR("errore durante la deserializzazione del pacchetto %s",ex);
+	    }
             results.push_back ( packet );
             subscribers++;
         }
@@ -413,7 +419,7 @@ protected:
             sync_socket = new zmq::socket_t ( *static_zmq::context, ZMQ_REQ );
             sync_socket->setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
             sync_socket->connect ( !sync_protocol.compare ( "" ) ? SYNC_PROTOCOL : sync_protocol.c_str() );
-            std::cout  << ".";
+            std::cout  << "."<<std::flush;
             zmq::message_t message ( owner_name.size() );
             memcpy ( message.data(), owner_name.data(), owner_name.size() );
             bool rc = sync_socket->send ( message );

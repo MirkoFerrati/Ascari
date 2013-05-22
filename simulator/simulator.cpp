@@ -168,7 +168,7 @@ void simulator::initialize_agents ( const list<Parsed_Agent>& agents )
     int i=0;
     for ( auto ag:agents)
     {
-      i++;
+     
         agents_name_to_index.insert ( make_pair ( ag.name,i ) );
         agent_state_packet agent_packet_tmp;
         control_command_packet command_packet_tmp;
@@ -209,6 +209,7 @@ void simulator::initialize_agents ( const list<Parsed_Agent>& agents )
         {
             agents_visibility[i]=visibleArea::createVisibilityFromParsedVisibleArea ( ag.visibility,agent_states_to_index );
         }
+         i++;
     }
 
     /*

@@ -14,7 +14,7 @@ const world_sim_packet& zmq_world_communicator::receive_agents_status()
     packet_received.state_agents.internal_map.clear();
     packet_received.bonus_variables=tmp.bonus_variables;
     packet_received.time=tmp.time;
-    packet_received.object_list=tmp.objects;
+    packet_received.object_list.objects.swap(tmp.objects.objects);
     for (auto agent=tmp.state_agents.internal_map.begin();agent!=tmp.state_agents.internal_map.end();++agent){
     packet_received.state_agents.internal_map[agent->first]=*(agent->second);
       

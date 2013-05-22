@@ -3,6 +3,7 @@
 
 #include "../plugins/abstract_agent_plugin.h"
 
+#include "../plugins/HACK_KDEVELOP.h"
 #ifdef ISAGENT
 
 #include <lemon/smart_graph.h>

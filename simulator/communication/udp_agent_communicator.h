@@ -9,7 +9,7 @@ class udp_agent_communicator: public simulator_namespace::agent_communicator_abs
 {
 public:
 	udp_agent_communicator(int num_agents);
-    std::vector< control_command_packet > receive_control_commands();
+    std::vector< control_command_packet >& receive_control_commands();
     void send_broadcast(const simulation_time& time );
     virtual void send_broadcast(const agent_sim_packet& infos);
     void send_target(const agent_sim_packet&  infos, const target_abstract& target);

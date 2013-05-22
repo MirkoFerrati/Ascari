@@ -12,7 +12,7 @@ udp_agent_communicator::udp_agent_communicator(int num_agents):
 
 }
 
-std::vector< control_command_packet > udp_agent_communicator::receive_control_commands()
+std::vector< control_command_packet >& udp_agent_communicator::receive_control_commands()
 {
 	std::vector< control_command_packet> results;
 	for (unsigned int i=0;i<num_agents;i++)

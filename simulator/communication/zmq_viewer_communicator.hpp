@@ -21,7 +21,13 @@ void send_broadcast(const world_sim_packet& infos)
 
 void send_target(const world_sim_packet& infos, const target_abstract& target)
 {
-    send(infos,target);
+  try{
+    send(infos,target); //TODO: crasha qui quando agent parte e smette di stare fermo
+  }
+  catch (const char* ex)
+  {
+    ERR("aiuto TODO %s",ex);
+  }
 }
 
 
