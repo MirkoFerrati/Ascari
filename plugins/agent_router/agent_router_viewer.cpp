@@ -1,11 +1,12 @@
 #include "agent_router_viewer.h"
+#include "agent_router_parsed_world.h"
 #include "viewer.h"
 #include <lemon/lgf_reader.h>
-
+#include <logog.hpp>
 
 using namespace std;
 
-agent_router_viewer::agent_router_viewer(std::string graphname):graphname(graphname)
+agent_router_viewer::agent_router_viewer()
 {
   father=0;
      length=0;
@@ -17,11 +18,12 @@ agent_router_viewer::agent_router_viewer(std::string graphname):graphname(graphn
 agent_router_viewer::agent_router_viewer ( Parsed_World* world )
 {
   father=0;
-     length=0;
-    coord_x=0;
-    coord_y=0;
-    setPainterScale(20);
-
+  length=0;
+  coord_x=0;
+  coord_y=0;
+  setPainterScale(20);
+  auto temp=reinterpret_cast<agent_router_parsed_world*>(world->parsed_items_from_plugins[0]);
+  graphName=boost::to_lower_copy(temp->graphName);
 }
 
 
@@ -31,11 +33,18 @@ void agent_router_viewer::setPainterScale ( double scale )
 }
 
 
-void agent_router_viewer::init(std::string /*filename*/)
+void agent_router_viewer::init(  )
 {
   assert(father);
   Viewer* temp_father=reinterpret_cast<Viewer*>(father);
-    parseGraph (graphname);
+  try{
+    parseGraph (graphName);
+  }
+  catch (const char* ex)
+  {
+    ERR("impossibile parsare il file %s: %s",graphName.c_str(),ex);
+    assert(0);
+  }
 	lemon::SmartDigraph::NodeIt n ( graph );
 	double maxx=( *coord_x ) [n],maxy=( *coord_y ) [n],minx=( *coord_x ) [n],miny=( *coord_y ) [n];
     for ( lemon::SmartDigraph::NodeIt n ( graph ); n!=lemon::INVALID; ++n )
@@ -93,6 +102,8 @@ void agent_router_viewer::parseGraph (std::string graphname)
     }
     catch ( lemon::Exception& er )   // check if there was any error
     {
+      ERR("%s",er.what());
+      throw "error while parsing graph";
     }
 
     std::cout << "A digraph is read from "<<graphname << std::endl;

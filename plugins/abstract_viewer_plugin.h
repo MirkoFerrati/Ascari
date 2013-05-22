@@ -9,6 +9,7 @@
 #include <assert.h>
 #include "types.h"
 #include <types/world_sim_packet.h>
+#include <yaml_parser.h>
 #include <mutex>
 #include <memory>
 
@@ -35,7 +36,7 @@ public:
 			painter.save();
 			painter.setBrush ( QColor ( "red" ) );
 			painter.translate ( it->second.x,it->second.y );
-			//TODO: Pessimo: lo zero degli angoli parte dall'asse y invece che da x
+			//lo zero degli angoli parte dall'asse y invece che da x
 			double tmp=it->second.angle;
 			while ( tmp>M_PI )
 				tmp=tmp-2*M_PI;
@@ -55,7 +56,7 @@ public:
 	};
 	virtual void paintBackground(QPainter &/*painter*/){};
 	virtual void timerEvent(std::shared_ptr<std::mutex>&,const world_sim_packet&){};
-	virtual void init(std::string){};
+	virtual void init(){};
 	virtual void keypress(){};
 	virtual void setAgentShape(QPolygon shape)
 	{

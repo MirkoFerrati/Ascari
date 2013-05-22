@@ -49,7 +49,7 @@ public:
     T receive(bool print=false)
     {
         using namespace std;
-        //unsigned int size=socket_.available();//TODO: what if we have more than one packet in the socket buffer?
+        //unsigned int size=socket_.available();
         // Start to receive the data.
         //inbound_data_.resize(1000);
 

@@ -77,7 +77,7 @@ void monitor_viewer::paintBackground ( QPainter& painter )
 
 }
 
-void monitor_viewer::init ( std::string )
+void monitor_viewer::init (  )
 {
     if ( mapfilename!="" )
     {

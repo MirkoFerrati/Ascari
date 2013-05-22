@@ -57,7 +57,7 @@ abstract_parsed_world_plugin* task_assignment_parser_plugin::parseWorld ( const 
         }
     }
     //return  std::dynamic_pointer_cast<abstract_parsed_world_plugin>(std::make_shared<task_assignment_parsed_world>(wo));
-    return wo;
+    return enabled?wo:0;
 //     return enabled;
 }
 

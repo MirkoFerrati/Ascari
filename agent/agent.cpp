@@ -270,49 +270,33 @@ void agent::main_loop()
     // 		std::cout<<"time: "<<world_comm->receive_time()<<std::endl;
     const world_sim_packet& temp = world_comm->receive_agents_status();
     
-    
-    //state_other_agents.swap(temp.state_agents.internal_map);//TODO(Mirko): si possono evitare le copie e gli swap?
-    time=temp.time;
+        time=temp.time;
 
     for ( std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin(); it!=temp.bonus_variables.end(); ++it )
     {
         bonusVariables.at ( map_bonus_variables_to_id.at ( it->first ) ) =it->second;
     }
 
-    //TODO: non e' ottimizzato, distrugge e ricrea ogni volta, follia!!
+    //TODO(Mirko): non e' ottimizzato, distrugge e ricrea ogni volta, follia!!
     for (auto object:objects.objects)
       delete object;
     objects.objects.clear();
      for ( auto it=temp.object_list.objects.begin(); it!=temp.object_list.objects.end(); ++it )
     {
-      (*it)->print(std::cout);
+      //(*it)->print(std::cout);
         objects.objects.push_back(*it);
 // 	std::cout<<"task ricevuto:"<<it->second<<std::endl;
     }
-
-        for (auto object:objects.objects)
-	    {
-	      object->print(std::cout);
-	    }
    
     if (temp.state_agents.internal_map.find( identifier )==temp.state_agents.internal_map.end()){
        ERR("MANCA IL MIO STATO",NULL);
        throw("MANCA IL MIO STATO");
     }
 
-    //TODO(Mirko): questo ciclo for copia informazioni che in teoria gia' abbiamo, forse non vale la pena di usare la variabile state
     for ( auto it=temp.state_agents.internal_map.at ( identifier ).state.begin();it!=temp.state_agents.internal_map.at ( identifier ).state.end(); ++it )
     {
         state.at ( it->first ) =it->second;
     }
-
-//    if ( ! ( inputs.identifier.size() >1 ) )
-        // cout<<"AGENTE:"<< inputs.identifier<<"-";
-        //else
-//     {
-//         cout<<"AGENTE:"<<identifier<<" -";
-//         cout<<"stato: "<<state.at ( 0 ) <<" "<<state.at ( 1 ) <<" "<<state.at ( 2 ) <<endl<<endl;
-//     }
 
     sleep ( 0 );
     encoder->computeSubEvents ( temp.state_agents.internal_map );
@@ -337,30 +321,17 @@ for ( auto discrete :discreteState )
     //std::cout<< std::endl;
     world_comm->send_control_command ( inputs,identifier );
 
-    string tmp; //TODO(Mirko) non ha senso inizializzare una stringa ad ogni giro solo per stampare lo stato dell'agente, trovare un metodo migliore
     for ( index_map::const_iterator it=map_discreteStateName_to_id.begin(); it!=map_discreteStateName_to_id.end(); ++it )
     {
         if ( it->second==discreteState.front() )
-            tmp=it->first;
+            cout<<it->first<<endl;
     }
-    //cout<<tmp<<endl;
-
-//             cout<<tmp<<" "<<state_other_agents.at(identifier).state.at(0)<<" "<<state_other_agents.at(identifier).state.at(1)
-// 			<<" "<<state_other_agents.at(identifier).state.at(2)<<endl;
-
-// 		if (abs(state_other_agents.at(identifier).state.at(0))>=29.99)
-// 			break;
 }
 
 
 
 agent::~agent()
 {
-    //TODO: il dummy agent non puo' distruggere il comunicatore..... e' a comune nel modulo identificatore. Pero' agent si'!!!!
-
-    //delete world_comm;
-
-
     delete automaton;
     delete encoder;
     delete f_rndom;

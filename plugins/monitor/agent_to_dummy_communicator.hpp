@@ -18,6 +18,8 @@ public:
     
     
     ~agent_to_dummy_communicator (){
+      //TODO(Simone): basta modificare il distruttore del comunicatore dummy per non distruggersi, usando un refcount
+
       buffer_control.clear();
       
     };

@@ -44,3 +44,10 @@ target_link_libraries(launcher ${Boost_LIBRARIES} pthread zmq)
 target_link_libraries(launcher ${QT_LIBRARIES})
 target_link_libraries(launcher ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 target_link_libraries(launcher ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
+
+
+file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/launcher" "../shared/graphs/*.lgf")
+FOREACH(infileName ${yaml_files})
+#MESSAGE(STATUS "Process file: ${infileName}")
+configure_file(${infileName} ./ COPYONLY)
+endforeach(${infileName})

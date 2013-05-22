@@ -47,7 +47,7 @@
   WORLD:
   - bonus_variables: [c]
     c: 1
-    GRAPH_NAME: '../graphs/loading.gml.lgf'
+    GRAPH_NAME: 'loading.gml.lgf'
     GOODS: [33,33,33,33,33,34,34,34,34]
   AGENTS:
   - agent: Agente1

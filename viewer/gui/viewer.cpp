@@ -53,9 +53,9 @@ void Viewer::init ( std::string filename )
     maxY=-500000;
     minX=500000;
     minY=500000;
-
+    
     for (auto plugin:plugins)
-      plugin->init(filename);
+      plugin->init();
 
    // setScalingAndTranslateFactor(0,0,0,0);	
 
@@ -211,10 +211,10 @@ void Viewer::timerEvent ( QTimerEvent */*event*/ )
 void Viewer::keyPressEvent ( QKeyEvent *event )
 {
   
-//   for (plugin:plugins)
-//   {
-//     TODO chiamare keypressevent dei plugin
-//   }
+   for (auto plugin:plugins)
+   {
+     plugin->keypress();
+   }
     switch ( event->key() )
     {
 

@@ -22,7 +22,7 @@ public:
       void drawArrow( int x1, int y1, int x2, int y2, double sze, QPainter* painter );
       void paintAgents ( QPainter& painter,const std::map<std::string,Agent>& agents );
 	bool monitor;
-     void init ( std::string );
+     void init ();
      ~monitor_viewer();
 private:
          std::unique_ptr<world_sniffer_abstract> identifier_sniffer;

@@ -28,7 +28,7 @@ public:
   virtual std::string getObjectType()=0;
   virtual ~abstract_object(){};
   
-  virtual void print(std::ostream& os)const{};
+  virtual void print(std::ostream& /*os*/)const{};
   
 };
 

@@ -37,7 +37,7 @@ int main ( int argc, char *argv[] )
     std::thread exiting;
     static_zmq::context=new zmq::context_t ( 1 );
     {
-        std::string filename;
+        std::string filename="";
 	auto generic_plugins=createPlugins();
         logog::Cout out;
         lemon::ArgParser ap ( argc,argv );
@@ -76,9 +76,20 @@ int main ( int argc, char *argv[] )
         Viewer window ( read,read_mutex,NULL );
 	if (viewerType>generic_plugins.size())
 	  throw "undefined viewer plugin";
+	yaml_parser parser;
+	for (auto plugin:generic_plugins)
+	{
+	  plugin->createParserPlugin();
+	  parser.addPlugin(plugin->getParserPlugin());
+	}
+	Parsed_World* world=0;
+	if (filename!="")
+	  world=new Parsed_World(parser.parse_file(filename));
+	else
+	  world=0;
 	if (viewerType>0)
 	{
-	    generic_plugins.at(viewerType+1)->createViewerPlugin(&window);
+	    generic_plugins.at(viewerType+1)->createViewerPlugin(&window,world);
             plugins.push_back ( generic_plugins.at(viewerType+1)->getViewerPlugin() );
             generic_plugins.at(viewerType+1)->getViewerPlugin()->setfather ( &window );
             window.addPlugin ( generic_plugins.at(viewerType+1)->getViewerPlugin() );

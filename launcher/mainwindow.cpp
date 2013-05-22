@@ -24,8 +24,8 @@ MainWindow::MainWindow ( QWidget *parent ) :
     sniffer=0;
     simulator=0;
     selectedAgents=0;
-    QCoreApplication::setOrganizationName ( "TODO" );
-    QCoreApplication::setOrganizationDomain ( "TODO" );
+    QCoreApplication::setOrganizationName ( "K2bRobotics" );
+    QCoreApplication::setOrganizationDomain ( "K2bRobotics.com" );
     QCoreApplication::setApplicationName ( "Launcher" );
 
     QList<int> sizes;
@@ -46,6 +46,8 @@ MainWindow::MainWindow ( QWidget *parent ) :
     simulatorPath=settings->value ( "paths/simulator","" ).toString();
     yamlsPath=settings->value ( "paths/yamls","" ).toString();
     fileName = settings->value ( "paths/lastopen","" ).toString();
+        generic_plugins=createPlugins();
+
     if ( fileName.compare ( "" ) !=0 )
     {
         try
@@ -57,7 +59,6 @@ MainWindow::MainWindow ( QWidget *parent ) :
             std::cerr<<"impossibile aprire il file "<<fileName.toStdString() <<std::endl;
         }
     }
-    generic_plugins=createPlugins();
     ui->selectViewType->clear();
     ui->selectViewType->addItem ( "Vuoto" );
 for ( auto plugin:generic_plugins )
@@ -145,8 +146,13 @@ void MainWindow::openFile()
     try
     {
         yaml_parser parser;
-        world=parser.parse_file ( fileName.toStdString() );
-        if ( !world.parsedSuccessfully )
+	for (auto plugin:generic_plugins)
+	{
+	  plugin->createParserPlugin();
+	  parser.addPlugin(plugin->getParserPlugin());
+	}
+	world=parser.parse_file ( fileName.toStdString() );
+	if ( !world.parsedSuccessfully )
         {
             ui->StartAgents->setText ( "impossibile parsare il file" );
             return;
@@ -183,9 +189,9 @@ void MainWindow::openFile()
         ui->ShowFile->setText ( line );
         settings->setValue ( "paths/lastopen",fileName );
     }
-    catch ( ... )
+    catch ( std::exception ex )
     {
-        ui->StartAgents->setText ( "impossibile parsare il file" );
+        ui->StartAgents->setText ( ex.what() );
     }
 }
 
@@ -359,8 +365,9 @@ void MainWindow::startSimulator()
     simulator->start ( simulatorPath,arguments );
     if ( !simulator->waitForStarted ( 2000 ) )
     {
-        QMessageBox::warning ( this,"errore","il simulatore non si è avviato" );
-        std::cout<<"errore, il simulatore non si è avviato"<<std::endl;
+        QMessageBox::warning ( this,"errore","il simulatore potrebbe non essersi avviato" );
+        std::cout<<"errore, il simulatore potrebbe non essersi avviato"<<std::endl;
+	return;
     };
     QObject::connect ( simulator, SIGNAL ( finished ( int,QProcess::ExitStatus ) ),
                        this, SLOT ( simulatorExited ( int,QProcess::ExitStatus ) ) );
@@ -395,7 +402,7 @@ void MainWindow::on_Updateshell_clicked()
 bool MainWindow::startViewer()
 {
     //int viewerType=-1;
-    QStringList arguments;
+//     QStringList arguments;
     if ( ui->selectViewType->currentIndex() ==-1 )
         return false;
 
@@ -452,7 +459,7 @@ for ( auto plugin: generic_plugins )
     {
         if ( ui->selectViewType->currentText().compare(QString::fromStdString(plugin->getType()))==0 )
         {
-            plugin->createViewerPlugin ( insideViewer );
+            plugin->createViewerPlugin ( insideViewer, &world );
             plugins.push_back ( plugin->getViewerPlugin() );
             plugin->getViewerPlugin()->setfather ( insideViewer );
             insideViewer->addPlugin ( plugin->getViewerPlugin() );

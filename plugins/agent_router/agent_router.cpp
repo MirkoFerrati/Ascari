@@ -124,7 +124,7 @@ void agent_router::run_plugin()
 
     if ( internal_state==state::EMERGENCY )
     {
-        usleep ( 2000 ); //TODO: serve per dare tempo alla comunicazione di girare
+        usleep ( 2000 ); 
         _io_service.poll();
         _io_service.reset();
         if ( isTimeToNegotiate ( time ) ) //negozio anche sugli archi, basta che sia il momento giusto
@@ -188,7 +188,7 @@ void agent_router::run_plugin()
 
     if ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING || internal_state==state::ARC_HANDSHAKING )
     {
-        usleep ( 2000 ); //TODO: serve per dare tempo alla comunicazione di girare
+        usleep ( 2000 ); //serve per dare tempo alla comunicazione di girare
         _io_service.poll();
         _io_service.reset();
         negotiation_steps++;
@@ -265,14 +265,14 @@ bool agent_router::check_for_overtaking ()
         for ( unsigned int j = 1; j < ( *it ).second.lockedNode.size(); j++ )
         {
             int other_id = ( *it ).second.lockedNode[j - 1] - ( j==1?age * graph_node_size:0 );
-            int other_id1 = ( *it ).second.lockedNode[j];//TODO: Attenzione!! - age * graph_node_size;
+            int other_id1 = ( *it ).second.lockedNode[j];//Attenzione!! - age * graph_node_size;
             if ( other_id1<other_id ) //Impossibile almeno che other_id1 sia al piano terra
             {
                 break;
             }
             for ( unsigned int i = 1; i < node_id.size(); i++ )
             {
-                int my_id=node_id[i-1]- ( i==1?myage*graph_node_size:0 ); //TODO: Attenzione!!
+                int my_id=node_id[i-1]- ( i==1?myage*graph_node_size:0 ); //Attenzione!!
                 int my_id1= node_id[i];
                 if ( my_id1<my_id || my_id>other_id1 ) //Impossibile almeno che my_id1 sia al piano terra
                 {

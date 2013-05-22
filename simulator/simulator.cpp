@@ -78,22 +78,21 @@ void simulator::setCheckCollision ( bool checkCollision )
 
 void simulator::initialize_plugins ( Parsed_World const& wo )
 {
-for ( auto a:wo.agents )
+/*for ( auto a:wo.agents )
     {
-      //TODO
-//         if ( a.active_plugins[0]=="MONITOR" )
-//         {
-//             // throw "not implemented";
-//         }
-//         if ( a.active_plugins[0]=="AGENT_ROUTER" )
-//         {
-//             plugins.push_back ( new agent_router_simulator_plugin() );
-//         }
-//         if ( a.active_plugins[0]=="TASK_ASSIGNMENT" )
-//         {
-//             plugins.push_back ( new task_assignment_simulator(sim_packet) );
-//         }
-    }
+        if ( a.active_plugins[0]=="MONITOR" )
+        {
+            throw "not implemented";
+        }
+        if ( a.active_plugins[0]=="AGENT_ROUTER" )
+        {
+            plugins.push_back ( new agent_router_simulator_plugin() );
+        }
+        if ( a.active_plugins[0]=="TASK_ASSIGNMENT" )
+        {
+            plugins.push_back ( new task_assignment_simulator(sim_packet) );
+        }
+    }*/
 
 for ( auto & plugin:plugins )
         plugin->initialize(wo);
@@ -369,7 +368,7 @@ void simulator::main_loop()
 
 
             agent_state state_tmp;
-            for ( int i=0; i<10; i++ ) //TODO(Mirko): this is 1 second/(sampling time of dynamic)
+            for ( int i=0; i<10; i++ ) 
             {
                 for ( index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end(); ++iter )
                 {

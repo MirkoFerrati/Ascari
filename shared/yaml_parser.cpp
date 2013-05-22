@@ -45,7 +45,7 @@ Parsed_World yaml_parser::parse_file ( string file_name )
     YAML::Node doc;
     parser.GetNextDocument ( doc );
     Parsed_World World;
-
+    World.parsedSuccessfully=true;
     World.plugins=plugins;
 
 

@@ -395,10 +395,7 @@ protected:
 
     bool askSync ( std::string sync_protocol )
     {
-        /** TODO(Mirko): implementare il modello qui sotto, e' più robusto
-              * A more robust model could be:
-
-                 Publisher opens PUB socket and starts sending "Hello" messages (not data).
+        /**      Publisher opens PUB socket and starts sending "Hello" messages (not data).
                  Subscribers connect SUB socket and when they receive a Hello message they tell the publisher via a REQ/REP socket pair.
                  When the publisher has had all the necessary confirmations, it starts to send real data.
                */

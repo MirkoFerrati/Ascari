@@ -80,7 +80,7 @@ public:
     {
         return viewer_plugin;
     };
-    bool createViewerPlugin ( Viewer* v )
+    bool createViewerPlugin ( Viewer* v,Parsed_World* parse=0 )
     {
         if ( viewer_plugin!=0 )
             ERR ( "already created viewer plugin, please check for double calls",NULL )

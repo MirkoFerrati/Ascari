@@ -10,7 +10,7 @@ zmq_world_communicator::zmq_world_communicator(std::string agent_name)
 const world_sim_packet& zmq_world_communicator::receive_agents_status()
 {
   try{
-    agent_sim_packet_receiver tmp=receive().front(); //TODO(Mirko): zerocopy here
+    agent_sim_packet_receiver& tmp=receive().front(); //TODO(Mirko): check if working
     packet_received.state_agents.internal_map.clear();
     packet_received.bonus_variables=tmp.bonus_variables;
     packet_received.time=tmp.time;

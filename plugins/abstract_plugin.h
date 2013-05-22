@@ -37,7 +37,7 @@ public:
 
 #ifdef ISVIEWER
     virtual abstract_viewer_plugin* getViewerPlugin() =0;
-    virtual bool createViewerPlugin ( Viewer* a ){return false;};
+    virtual bool createViewerPlugin ( Viewer* a, Parsed_World* parse=0 ){return false;};
 #endif
 
     virtual abstract_parser_plugin* getParserPlugin() =0;

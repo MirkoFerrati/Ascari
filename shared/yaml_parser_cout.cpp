@@ -6,7 +6,6 @@
 
 using namespace std;
 
-//TODO(Simone): bisogna aggiornare il cout con le ultime cose lette dal file yaml (i behavior)
 
 ostream& operator<< (ostream& os, const Parsed_Agent& ag) {
 

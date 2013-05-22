@@ -86,12 +86,12 @@ public:
     {
         return viewer_plugin;
     };
-    bool createViewerPlugin ( Viewer* v )
+    bool createViewerPlugin ( Viewer* v, Parsed_World* parse )
     {
         if ( viewer_plugin!=0 )
             ERR ( "already created viewer plugin, please check for double calls",NULL )
             else
-                viewer_plugin=new agent_router_viewer ( "TODO" );
+                viewer_plugin=new agent_router_viewer ( parse);
         return viewer_plugin;
     };
 #endif
