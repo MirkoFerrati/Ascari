@@ -348,7 +348,7 @@ void simulator::main_loop()
 
             for (auto object:sim_packet.object_list.objects)
 	    {
-	    object->print(std::cout);
+	   // object->print(std::cout);
 	    }
             viewer_communicator->send_target ( sim_packet,"viewer" );
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
