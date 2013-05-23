@@ -321,11 +321,11 @@ for ( auto discrete :discreteState )
     //std::cout<< std::endl;
     world_comm->send_control_command ( inputs,identifier );
 
-    for ( index_map::const_iterator it=map_discreteStateName_to_id.begin(); it!=map_discreteStateName_to_id.end(); ++it )
-    {
-        if ( it->second==discreteState.front() )
-            cout<<it->first<<endl;
-    }
+//     for ( index_map::const_iterator it=map_discreteStateName_to_id.begin(); it!=map_discreteStateName_to_id.end(); ++it )
+//     {
+//         if ( it->second==discreteState.front() )
+//             cout<<it->first<<endl;
+//     }
 }
 
 

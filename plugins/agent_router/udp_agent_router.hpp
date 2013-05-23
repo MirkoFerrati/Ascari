@@ -24,7 +24,13 @@ class Udp_agent_router
 	void service_thread(void) {
 	while (should_run) {
 		if ( service.stopped() ) break;
+		try{
 		senderTop.send(receiverTop.receive());
+		}
+		catch (const char* ex)
+		{
+		  ERR("%s",ex);
+		}
     }
 }
 	bool should_run;

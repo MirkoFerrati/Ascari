@@ -53,8 +53,15 @@ public:
         // Start to receive the data.
         //inbound_data_.resize(1000);
 
-        unsigned int size=socket_.receive(boost::asio::buffer(inbound_data_));
-		
+	
+        unsigned int size;
+	try{
+	size=socket_.receive(boost::asio::buffer(inbound_data_));
+	}
+	catch (boost::system::system_error& err)
+	{
+	    ERR("errore nella ricezione, cosa puo' essere successo? %s",err.what());
+	}
 		if (print)
 		{	
 		for (unsigned int i=0;i<size;i++)
@@ -77,8 +84,8 @@ public:
 			for (unsigned int i=0;i<size;i++)
 				cout<<inbound_data_[i];
 			cout<<endl;
-// 			ERR("pacchetto sbagliato: %s",inbound_data_);
-            throw "Problema nella ricezione di un pacchetto";
+ 			//ERR("pacchetto sbagliato: %s",inbound_data_);
+            ERR("Problema nella ricezione di un pacchetto",NULL);
         }
 
     }
