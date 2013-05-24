@@ -42,7 +42,7 @@ target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
   
   target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
   
-target_link_libraries(viewer ${Boost_LIBRARIES} pthread zmq)
+target_link_libraries(viewer boost_system boost_thread boost_serialization boost_program_options pthread zmq)
 target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
 file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/agent" "../shared/graphs/*.lgf")
 FOREACH(infileName ${yaml_files})

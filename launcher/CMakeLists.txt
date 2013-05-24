@@ -40,7 +40,7 @@ add_executable(launcher
 )
 find_package(Boost REQUIRED system thread serialization)
 
-target_link_libraries(launcher ${Boost_LIBRARIES} pthread zmq)
+target_link_libraries(launcher boost_system boost_thread boost_serialization boost_program_options  pthread zmq)
 target_link_libraries(launcher ${QT_LIBRARIES})
 target_link_libraries(launcher ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 target_link_libraries(launcher ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)

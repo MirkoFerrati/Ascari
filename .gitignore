@@ -1,6 +1,7 @@
 *.kdev4
 *~
 build
+release
 *.old
 *.png
 *.mpeg

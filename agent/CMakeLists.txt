@@ -52,10 +52,10 @@ include_directories(empty_plugin)
 include_directories(../shared/boost/geometry)
 include_directories(../shared/boost/geometry/*)
 
-find_package(Boost REQUIRED system thread serialization)
+find_package(Boost COMPONENTS REQUIRED system thread serialization program_options)
 
 
-target_link_libraries(agent ${Boost_LIBRARIES} pthread)
+target_link_libraries(agent boost_system boost_thread boost_serialization boost_program_options pthread)
 
 
 #message("Configurazione di ${CMAKE_BUILD_TYPE}")
