@@ -5,57 +5,58 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
-#include <boost/program_options.hpp>
-#include <boost/program_options/variables_map.hpp>
-#include <boost/program_options/options_description.hpp>
+#include <boost/property_tree/info_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include <fstream>
 #include <logog.hpp>
 class configuration_reader{
 public:
   configuration_reader()
   {  
-    boost::program_options::options_description desc;
-    
-    std::ifstream stream("ascari.cfg");
-    if (!stream.is_open())
-    {
-	ERR("impossibile aprire il file ascari.cfg",NULL);
-    }
-    boost::program_options::store(boost::program_options::parse_config_file(stream,desc,true),vm);
-    stream.close();
+
+   boost::property_tree::read_info("/home/mirko/ascari.cfg",map);
+
   };
   std::string getValue(std::string value)
   {
-    return vm.at(value).as<std::string>();
+    return map.get<std::string>(value);
   };
   std::string getValue(const char* value)
   {
-    return vm.at(value).as<std::string>();
+    return map.get<std::string>(value);
   };
+
 private:
-  boost::program_options::variables_map vm;
+    boost::property_tree::ptree map;
 };
 
 static configuration_reader CONFIG;
 
 
 
-#define MULTICAST_PORT  30000
-#define MULTICAST_ADDRESS "239.255.0.1"
-#define SOCKET_BINDING "0.0.0.0"
+// #define MULTICAST_PORT  30000
+// #define MULTICAST_ADDRESS "239.255.0.1"
+// #define SOCKET_BINDING "0.0.0.0"
+// #define SIMULATOR_PORT 10000
+// #define SIMULATOR_ROUTE_PORT 10050
+// #define AGENT_ROUTE_PORT 10051
+// #define SIMULATOR_GRAPH_PORT 10052
+// #define AGENT_GRAPH_PORT 10053
+
+
+
+#define MULTICAST_PORT  atoi(CONFIG.getValue("MULTICAST_PORT").c_str())
+#define MULTICAST_ADDRESS CONFIG.getValue("MULTICAST_ADDRESS")
+#define SOCKET_BINDING CONFIG.getValue("SOCKET_BINDING")
+#define SIMULATOR_PORT atoi(CONFIG.getValue("SIMULATOR_PORT").c_str())
+#define SIMULATOR_ROUTE_PORT atoi(CONFIG.getValue("SIMULATOR_ROUTE_PORT").c_str())
+#define AGENT_ROUTE_PORT atoi(CONFIG.getValue("AGENT_ROUTE_PORT").c_str())
+#define SIMULATOR_GRAPH_PORT atoi(CONFIG.getValue("SIMULATOR_GRAPH_PORT").c_str())
+#define AGENT_GRAPH_PORT atoi(CONFIG.getValue("AGENT_GRAPH_PORT").c_str())
+
+
 #define MAX_PACKET_LENGTH 1024*32
-#define SIMULATOR_PORT 10000
-#define SIMULATOR_ROUTE_PORT 10050
-#define AGENT_ROUTE_PORT 10051
-#define SIMULATOR_GRAPH_PORT 10052
-#define AGENT_GRAPH_PORT 10053
-
-
 #define SYNC_PROTOCOL "tcp://localhost:5761"
-
-
-
-
 #define T_CAMP 0.01
 
 #endif //DEFINE_H

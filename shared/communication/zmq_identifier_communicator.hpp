@@ -4,12 +4,12 @@
 
 
 template <class send_type>
-class identifier_to_viewer_communicator : public zmq_communicator<send_type,send_type,ZMQ_PUB,ZMQ_SUB,NO_SYNC>
+class identifier_to_viewer_communicator : public zmq_send_communicator<send_type,ZMQ_PUB>
 {
 public:
 	void init(std::string agent_name)
 	{
-		this->init_full(agent_name,false,"tcp://127.0.0.1:5580","tcp://127.0.0.1:5581","",1,false,false);
+		this->init_full(agent_name,"tcp://127.0.0.1:5581",false);
 	}
 private:
 	std::vector<send_type> receive()=delete;

@@ -29,7 +29,7 @@ target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cp
 
 target_link_libraries(simulator zmq)
 
- find_package(Boost REQUIRED system thread serialization)
+ find_package(Boost 1.53.0 REQUIRED system thread serialization)
  
 target_link_libraries(simulator pthread)
 target_link_libraries(simulator boost_system boost_thread boost_serialization boost_program_options boost_regex)
