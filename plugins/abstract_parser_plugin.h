@@ -30,6 +30,7 @@ public:
   virtual ~abstract_parser_plugin(){};
   bool isCreated=true;
   virtual bool isEnabled()=0;
+  virtual std::string getType()=0;
 private:
   bool enabled;
 };

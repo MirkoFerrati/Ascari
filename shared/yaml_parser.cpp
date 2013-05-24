@@ -48,7 +48,27 @@ Parsed_World yaml_parser::parse_file ( string file_name )
     World.parsedSuccessfully=true;
     World.plugins=plugins;
 
-
+    if (doc.FindValue("REQUIRED_PLUGINS"))
+    {
+	std::vector<std::string> temp;
+	doc["REQUIRED_PLUGINS"]>>temp;
+	for (auto plugin_name:temp)
+	{
+	  bool found=false;
+	  for (auto plugin:plugins)
+	  {
+	      if (plugin->getType()==plugin_name)
+		found=true;
+	  }
+	  if (!found)
+	  {
+	    ERR("required plugin %s not found,maybe it was not included in this executable?",plugin_name.c_str());
+	    World.parsedSuccessfully=false;
+	    return World;
+	  }
+	}
+    }
+    
     if ( ! ( World.load_from_node ( doc ) ) )
         World.parsedSuccessfully=false;
 

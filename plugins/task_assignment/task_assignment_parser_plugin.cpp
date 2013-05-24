@@ -1,7 +1,7 @@
 #include "task_assignment_parser_plugin.h"
 #include <logog.hpp>
 
-  task_assignment_parser_plugin::task_assignment_parser_plugin()
+  task_assignment_parser_plugin::task_assignment_parser_plugin(std::string type):type(type)
   {
     enabled=false;
   }

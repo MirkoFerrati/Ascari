@@ -102,10 +102,9 @@ public:
         if ( parser_plugin!=0 )
             ERR ( "already created agent plugin, please check for double calls",NULL )
             else
-                parser_plugin=new task_assignment_parser_plugin ( );
+                parser_plugin=new task_assignment_parser_plugin ( getType());
         return parser_plugin;
     };
-
 
 
 private:

@@ -109,7 +109,7 @@ public:
             ERR ( "already created agent plugin, please check for double calls",NULL )
         }
         else
-            parser_plugin=new agent_router_parser_plugin ( );
+            parser_plugin=new agent_router_parser_plugin ( getType());
         return parser_plugin;
     };
 
