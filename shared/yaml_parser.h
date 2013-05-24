@@ -10,7 +10,6 @@
 #include <map>
 #include <yaml-cpp/yaml.h>
 #include "task_assignment_types.h"
-#include "objects/router_graph_good.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/strong_typedef.hpp>
 
@@ -106,7 +105,6 @@ class Parsed_World{
   std::map<std::string,std::unique_ptr< Parsed_Behavior>> behaviors;
   std::string graphName;
   std::string mapfilename;
-  std::map<int,router_graph_good> goods;
   std::vector<task_assignment_namespace::task_id> tasks_id;
   task_assignment_namespace::task_list task_list;
   task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
