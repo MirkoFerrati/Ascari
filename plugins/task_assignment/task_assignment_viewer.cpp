@@ -136,7 +136,7 @@ void task_assignment_viewer::paintAgents(QPainter& painter,const std::map<std::s
 		old_time=now_time;
 		
 		
-		if (*time>0)
+		if (now_time>0)
 		{ 
 			painter.save();
 			painter.translate(initial_pos.at(it->first).at(0),initial_pos.at(it->first).at(1));

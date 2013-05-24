@@ -11,7 +11,6 @@
 #include <types/agent_sim_packet.h>
 #include <types/world_sim_packet.h>
 
-
 using namespace std;
 
 class testSerialize:public testClass
@@ -45,7 +44,7 @@ public:
 	task_assignment_task* ta=new task_assignment_task(app);
 	
 	
-	tasks.objects.push_back(ta);
+	tasks.objects["TASK_ASSIGNMENT"].push_back(ta);
 	
 	agent_sim_packet agent_packet(bonus,t,tasks);
 	agent_packet.state_agents.internal_map[agente1.identifier]=&agente1;

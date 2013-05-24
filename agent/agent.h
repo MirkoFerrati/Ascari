@@ -180,8 +180,9 @@ private:
     double pi;
     std::unique_ptr< Parsed_Behavior > const& behavior;
     Parsed_World const& world;
+        bool isDummy;
+
     bool noStart;
-    bool isDummy;
 };
 
 #endif // AGENT_H

@@ -2,7 +2,7 @@
 #include "task_assignment.h"
 #include "task_assignment_parser_plugin.h"
 #include "../agent/agent.h"
-
+#include "task_assignment_plugin.h"
 
 using namespace task_assignment_namespace;
 
@@ -11,10 +11,11 @@ task_assignment::task_assignment ( agent* a, Parsed_World* parse )
 :time(a->time),my_id(a->identifier),events(a->events),events_to_index(a->events_to_index),objects(a->objects)
 {
 //TODO(Mirko): sistemare il concetto di oggetto nel nuovo sistema di plugin, meglio di cosi' per forza!!
-  for (auto object:objects.objects)
-  {
-   tasks[(reinterpret_cast<const task_assignment_namespace::task*>(object->getState()))->id]=*(reinterpret_cast<const task_assignment_task*>(object->getState())); 
-  }
+  if (objects.objects.count(TA_PLUGIN_IDENTIFIER))
+    for (auto object:objects.objects.at(TA_PLUGIN_IDENTIFIER))
+    {
+    tasks[(reinterpret_cast<const task_assignment_namespace::task*>(object->getState()))->id]=*(reinterpret_cast<const task_assignment_task*>(object->getState())); 
+    }
 x0=parse->agents.front().initial_states.at("X");
 y0=parse->agents.front().initial_states.at("Y");
 initialize(*parse);

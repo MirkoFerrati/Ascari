@@ -31,8 +31,8 @@ agent::agent ( std::string name,const std::unique_ptr<Parsed_Behavior>& behavior
     initialized=false;
 }
 
-agent::agent ( const Parsed_World& world, bool noStart ) :world(world),
-    identifier ( world.agents.front().name ),noStart(noStart),behavior(world.agents.front().behavior),isDummy(false)
+agent::agent ( const Parsed_World& world, bool noStart ) :
+    identifier ( world.agents.front().name ),behavior(world.agents.front().behavior),world(world),isDummy(false),noStart(noStart)
 {
     encoder=0;
 }
@@ -278,14 +278,9 @@ void agent::main_loop()
     }
 
     //TODO(Mirko): non e' ottimizzato, distrugge e ricrea ogni volta, follia!!
-    for (auto object:objects.objects)
-      delete object;
-    objects.objects.clear();
      for ( auto it=temp.object_list.objects.begin(); it!=temp.object_list.objects.end(); ++it )
     {
-      //(*it)->print(std::cout);
-        objects.objects.push_back(*it);
-// 	std::cout<<"task ricevuto:"<<it->second<<std::endl;
+        objects.objects[it->first]=it->second;
     }
    
     if (temp.state_agents.internal_map.find( identifier )==temp.state_agents.internal_map.end()){

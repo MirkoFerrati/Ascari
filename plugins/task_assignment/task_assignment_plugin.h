@@ -1,5 +1,6 @@
 #ifndef TASK_ASSIGNMENT_PLUGIN_H
 #define TASK_ASSIGNMENT_PLUGIN_H
+#define TA_PLUGIN_IDENTIFIER "TASK_ASSIGNMENT"
 
 #include "../plugins/abstract_plugin.h"
 #include "task_assignment_parser_plugin.h"
@@ -54,7 +55,7 @@ public:
 
     std::string getType()
     {
-        return "TASK_ASSIGNMENT";
+        return TA_PLUGIN_IDENTIFIER;
     };
 
 

@@ -49,9 +49,9 @@ simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.tim
 
 
 }
-void simulator::addPlugin ( abstract_simulator_plugin* plugin)
+void simulator::addPlugin ( abstract_simulator_plugin* plugin )
 {
-        plugins.push_back ( plugin );
+    plugins.push_back ( plugin );
 }
 
 
@@ -78,24 +78,24 @@ void simulator::setCheckCollision ( bool checkCollision )
 
 void simulator::initialize_plugins ( Parsed_World const& wo )
 {
-/*for ( auto a:wo.agents )
-    {
-        if ( a.active_plugins[0]=="MONITOR" )
+    /*for ( auto a:wo.agents )
         {
-            throw "not implemented";
-        }
-        if ( a.active_plugins[0]=="AGENT_ROUTER" )
-        {
-            plugins.push_back ( new agent_router_simulator_plugin() );
-        }
-        if ( a.active_plugins[0]=="TASK_ASSIGNMENT" )
-        {
-            plugins.push_back ( new task_assignment_simulator(sim_packet) );
-        }
-    }*/
+            if ( a.active_plugins[0]=="MONITOR" )
+            {
+                throw "not implemented";
+            }
+            if ( a.active_plugins[0]=="AGENT_ROUTER" )
+            {
+                plugins.push_back ( new agent_router_simulator_plugin() );
+            }
+            if ( a.active_plugins[0]=="TASK_ASSIGNMENT" )
+            {
+                plugins.push_back ( new task_assignment_simulator(sim_packet) );
+            }
+        }*/
 
 for ( auto & plugin:plugins )
-        plugin->initialize(wo);
+        plugin->initialize ( wo );
 }
 
 
@@ -149,16 +149,16 @@ void simulator::initialize ( const Parsed_World& wo )
 
 void simulator::createObjects ( const Parsed_World& world )
 {
-  
-  //TODO usare world e chiamare i plugin
-  task_assignment_namespace::task my_task;
-  my_task.task_type=1241;
-  auto temp=new task_assignment_task(my_task);
-sim_packet.object_list.objects.push_back(temp);
-my_task.task_type=3894;
-  temp=new task_assignment_task(my_task);
-  sim_packet.object_list.objects.push_back(temp);
-  
+
+//   //TODO usare world e chiamare i plugin
+//   task_assignment_namespace::task my_task;
+//   my_task.task_type=1241;
+//   auto temp=new task_assignment_task(my_task);
+// sim_packet.object_list.objects.push_back(temp);
+// my_task.task_type=3894;
+//   temp=new task_assignment_task(my_task);
+//   sim_packet.object_list.objects.push_back(temp);
+
 }
 
 
@@ -166,9 +166,9 @@ void simulator::initialize_agents ( const list<Parsed_Agent>& agents )
 {
     num_agents=agents.size();
     int i=0;
-    for ( auto ag:agents)
+for ( auto ag:agents )
     {
-     
+
         agents_name_to_index.insert ( make_pair ( ag.name,i ) );
         agent_state_packet agent_packet_tmp;
         control_command_packet command_packet_tmp;
@@ -209,7 +209,7 @@ void simulator::initialize_agents ( const list<Parsed_Agent>& agents )
         {
             agents_visibility[i]=visibleArea::createVisibilityFromParsedVisibleArea ( ag.visibility,agent_states_to_index );
         }
-         i++;
+        i++;
     }
 
     /*
@@ -346,10 +346,10 @@ void simulator::main_loop()
                 communicator->send_target ( agent_packet,agent->first );
             }
 
-            for (auto object:sim_packet.object_list.objects)
-	    {
-	   // object->print(std::cout);
-	    }
+        for ( auto object:sim_packet.object_list.objects )
+            {
+                // object->print(std::cout);
+            }
             viewer_communicator->send_target ( sim_packet,"viewer" );
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 
@@ -369,7 +369,7 @@ void simulator::main_loop()
 
 
             agent_state state_tmp;
-            for ( int i=0; i<10; i++ ) 
+            for ( int i=0; i<10; i++ )
             {
                 for ( index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end(); ++iter )
                 {
@@ -377,14 +377,14 @@ void simulator::main_loop()
                     for ( agent_state::const_iterator iiter=state_tmp.begin(); iiter!=state_tmp.end(); ++iiter )
                     {
                         sim_packet.state_agents.internal_map.at ( iter->first ).state.at ( iiter->first ) =iiter->second; //metto il nuovo stato nel posto giusto senza copiare i vettori
-
                     }
                 }
             }
 
-            for ( auto object=sim_packet.object_list.objects.begin(); object!=sim_packet.object_list.objects.end(); ++object )
+            for ( auto object_list=sim_packet.object_list.objects.begin(); object_list!=sim_packet.object_list.objects.end(); ++object_list )
             {
-                (*object)->updateState ( sim_packet.time,sim_packet.state_agents,agent_states_to_index );
+            for ( auto object:object_list->second )
+                    object->updateState ( sim_packet.time,sim_packet.state_agents,agent_states_to_index );
             }
 
             collisionChecker->checkCollisions();
