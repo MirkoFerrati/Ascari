@@ -22,7 +22,8 @@
 #include <boost/serialization/map.hpp>
 #include <map>
 #include "../../shared/communication/global.h"
-#define BORDER 0.2
+#include <define.h>
+#define VIEWER_BORDER atof(CONFIG.getValue("VIEWER_BORDER").c_str())
 
 using namespace std;
 
@@ -64,13 +65,13 @@ void Viewer::init ( std::string filename )
 void Viewer::setScalingAndTranslateFactor ( double maxX, double minX, double maxY, double minY )
 {
     if ( this->maxX<maxX )
-        this->maxX=maxX +(maxX+minX)/2.0*BORDER;
+        this->maxX=maxX +(maxX+minX)/2.0*VIEWER_BORDER;
     if ( this->minX>minX )
-		this->minX=minX -(maxX+minX)/2.0*BORDER;
+		this->minX=minX -(maxX+minX)/2.0*VIEWER_BORDER;
     if ( this->minY>minY )
-		this->minY=minY -(maxY+minY)/2.0*BORDER;
+		this->minY=minY -(maxY+minY)/2.0*VIEWER_BORDER;
     if ( this->maxY<maxY )
-		this->maxY=maxY +(maxY+minY)/2.0*BORDER;
+		this->maxY=maxY +(maxY+minY)/2.0*VIEWER_BORDER;
 	
 	setScalingFactor ( this->maxX-this->minX,this->maxY-this->minY );
 	setTranslateFactor ( ( this->maxX+this->minX ) /2.0, ( this->maxY+this->minY ) /2.0 );

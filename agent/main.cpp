@@ -25,9 +25,12 @@ int main ( int argc, char** argv )
         int count;
         std::string agent_name;
         std::string filename;
+	bool filename_obbl=true;
+	if (CONFIG.exists("FILENAME"))
+	  filename_obbl=false;
         ap.refOption ( "n", "Number of simulator cycle", count );
         ap.refOption ( "a", "Agent name", agent_name, true );
-        ap.refOption ( "f", "Yaml filename", filename, true );
+        ap.refOption ( "f", "Yaml filename", filename, filename_obbl );
         ap.synonym ( "filename", "f" );
         ap.synonym ( "agent", "a" );
         ap.throwOnProblems();
@@ -42,8 +45,14 @@ int main ( int argc, char** argv )
         }
         std::cout << "Parameters of '" << ap.commandName() << "':\n";
         std::cout << "  Value of -a: " << agent_name << std::endl;
-        std::cout << "  Value of -f: " << filename << std::endl;
+        if (ap.given("filename"))
+	  std::cout << "  Value of -f: " << filename << std::endl;
 
+	if (!ap.given("filename"))
+	{
+	  filename=CONFIG.getValue("FILENAME");
+  	  INFO("Using %s as filename, read from config file",filename);
+	}
         auto plugins=createPlugins();
 
         yaml_parser parser;

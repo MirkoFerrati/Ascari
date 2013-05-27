@@ -38,9 +38,13 @@ int main ( int argc, char **argv )
         int count,secSleep;
         std::string filename;
         bool checkCollision=false;
+	bool filename_obbl=true;
+	if (CONFIG.exists("FILENAME"))
+	  filename_obbl=false;
+	
         ap.refOption ( "n","Number of simulator cycle",count );
         ap.refOption ( "s","Milliseconds sleep",secSleep );
-        ap.refOption ( "f","Yaml filename",filename,true );
+        ap.refOption ( "f","Yaml filename",filename,filename_obbl );
         ap.refOption ( "check_collision","enables collision checking",checkCollision );
         ap.synonym ( "filename","f" );
         ap.synonym ( "sleep","s" );
@@ -54,8 +58,11 @@ int main ( int argc, char **argv )
             ERR ( "errore nella lettura dei parametri %s",ex.what() );
             return 0;
         }
-        
-        
+        if (!ap.given("filename"))
+	{
+	  filename=CONFIG.getValue("FILENAME");
+  	  INFO("Using %s as filename, read from config file",filename);
+	}
         auto plugins=createPlugins();
 
         yaml_parser parser;
