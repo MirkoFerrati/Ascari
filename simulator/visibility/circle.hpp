@@ -5,7 +5,7 @@
 #include "visibility.h" 
 
 
-#define max_circle_visibility_radius 500
+#define max_circle_visibility_radius 1000
 
 class circle:public visibleArea
 {

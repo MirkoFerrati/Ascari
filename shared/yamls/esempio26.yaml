@@ -1,5 +1,5 @@
 - BEHAVIORS:
-    - name: LGV
+    - name: MON_GOOD
       states: [x,y,theta]
       control_commands: [v,w]
       DYNAMIC_MAP:
@@ -51,7 +51,7 @@
         LEFT:
           - FAST: [free]
           
-    - name: LGV-BAD
+    - name: MON-BAD
       states: [x,y,theta]
       control_commands: [v,w]
       DYNAMIC_MAP:
@@ -111,7 +111,7 @@
     world_map: ../graphs/museum.gml
   AGENTS:
   - agent: Agente01
-    VISIBLE_AREA: circle(x,y,300)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA:  circle(10)
     MONITORING: 0
     #COLLABORATIVE = 1
@@ -123,11 +123,11 @@
       y: '124'
       theta: '-0.1'
     STATE_START: FAST
-    BEHAVIOR: LGV-BAD
+    BEHAVIOR: MON-BAD
     
     
   - agent: Agente02
-    VISIBLE_AREA: circle(x,y,500)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -137,11 +137,11 @@
       y: '151'
       theta: '0.2'
     STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
+    BEHAVIOR: MON_GOOD
+    KNOWN_BEHAVIORS:    [MON_GOOD]
     
   - agent: Agente03
-    VISIBLE_AREA: circle(x,y,500)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -151,11 +151,11 @@
       y: '51'
       theta: '-0.3'
     STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
+    BEHAVIOR: MON_GOOD
+    KNOWN_BEHAVIORS:    [MON_GOOD]
     
   - agent: Agente04
-    VISIBLE_AREA: circle(x,y,500)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -165,11 +165,11 @@
       y: '251'
       theta: '0.4'
     STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
+    BEHAVIOR: MON_GOOD
+    KNOWN_BEHAVIORS:    [MON_GOOD]
     
   - agent: Agente05
-    VISIBLE_AREA: circle(x,y,500)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -179,11 +179,11 @@
       y: '151'
       theta: '-0.5'
     STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
+    BEHAVIOR: MON_GOOD
+    KNOWN_BEHAVIORS:    [MON_GOOD]
     
   - agent: Agente06
-    VISIBLE_AREA: circle(x,y,500)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -193,11 +193,11 @@
       y: '231'
       theta: '0.6'
     STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
+    BEHAVIOR: MON_GOOD
+    KNOWN_BEHAVIORS:    [MON_GOOD]
     
   - agent: Agente07
-    VISIBLE_AREA: circle(x,y,500)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -207,25 +207,25 @@
       y: '221'
       theta: '-0.7'
     STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
+    BEHAVIOR: MON_GOOD
+    KNOWN_BEHAVIORS:    [MON_GOOD]
     
   - agent: Agente08
-    VISIBLE_AREA: circle(x,y,500)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
-    - x: '331'
+    - x: '531'
       y: '41'
       theta: '0.8'
     STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
+    BEHAVIOR: MON_GOOD
+    KNOWN_BEHAVIORS:    [MON_GOOD]
     
   - agent: Agente09
-    VISIBLE_AREA: circle(x,y,500)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -235,11 +235,11 @@
       y: '451'
       theta: '-0.9'
     STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
+    BEHAVIOR: MON_GOOD
+    KNOWN_BEHAVIORS:    [MON_GOOD]
     
   - agent: Agente10
-    VISIBLE_AREA: circle(x,y,500)
+    VISIBLE_AREA: circle(x,y,800)
     COMMUNICATION_AREA: =  circle(10)
     MONITORING: 1
     states: [x,y,theta]
@@ -249,7 +249,7 @@
       y: '10'
       theta: '0'
     STATE_START: FAST
-    BEHAVIOR: LGV
-    KNOWN_BEHAVIORS:    [LGV]
+    BEHAVIOR: MON_GOOD
+    KNOWN_BEHAVIORS:    [MON_GOOD]
     
     
