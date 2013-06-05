@@ -20,7 +20,7 @@ class graph
 
   
     friend std::ostream &operator<<( std::ostream &out, const graph &g );
-    void readGraph(std::fstream* arg1);
+    void readGraph(std::ifstream* arg1);
 
     std::string tolgf();
     

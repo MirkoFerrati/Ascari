@@ -13,7 +13,7 @@ public:
     
   };
 
-  graph read(std::fstream* f)
+  graph read(std::ifstream* f)
   {
       std::string tmp;
             char s[256];

@@ -78,7 +78,7 @@ void map2d::create ( std::string& vis, const index_map& map_statename )
 void map2d::openfile ( std::string filename )
 {
     gmlreader reader;
-    std::fstream f;
+    std::ifstream f;
     f.open ( filename.c_str(),std::ios::in );
     if (!f.is_open())
       ERR("Attenzione, impossibile aprire il file %s",filename.c_str());

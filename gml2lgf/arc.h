@@ -11,7 +11,7 @@ class arc
 
   
   double len;
-  void readLabelGraphics(std::fstream* arg1);
+  void readLabelGraphics( std::ifstream* f );
   
   
 public:
@@ -24,7 +24,7 @@ public:
     virtual ~arc();
     
     friend std::ostream &operator<<( std::ostream &out, const arc &a );
-    void readArc(std::fstream* arg1);
+    void readArc(std::ifstream* arg1);
 
 };
 

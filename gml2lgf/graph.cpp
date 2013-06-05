@@ -13,7 +13,7 @@ graph::graph()
 }
 
 
-void graph::readGraph(fstream* f)
+void graph::readGraph(ifstream* f)
 {
   char s[256];
   f->getline(s,256);

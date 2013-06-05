@@ -14,7 +14,7 @@ node::node()
 }
 
 
-void node::readGraphics(fstream* f)
+void node::readGraphics(ifstream* f)
 {
   char s[256];
   f->getline(s,256);
@@ -63,7 +63,7 @@ void node::readGraphics(fstream* f)
 
 
 
-void node::readNode(fstream* f)
+void node::readNode(ifstream* f)
 {
   char s[256];
   f->getline(s,256);

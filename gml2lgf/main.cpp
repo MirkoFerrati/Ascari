@@ -7,7 +7,7 @@ using namespace std;
 int main(int argc, char **argv) {
   if (true)
   {
-      fstream f;
+      ifstream f;
 	  if (argc<2)
 	  {
 		cout<< "attenzione, inserire il nome del file da convertire"<<endl;
@@ -22,10 +22,10 @@ int main(int argc, char **argv) {
 
       
       f.close();
-      
-      f.open(filename.append(".lgf").c_str(),ios::out);
-      f<<g.tolgf();
-      f.close();
+      ofstream fo;
+      fo.open(filename.append(".lgf").c_str(),ios::out);
+      fo<<g.tolgf();
+      fo.close();
   }
   
   return 0;

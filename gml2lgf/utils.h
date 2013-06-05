@@ -10,7 +10,7 @@ using namespace std;
 class utils
 {
 public:
-  static void skipSection(fstream *f)
+  static void skipSection(ifstream *f)
   {
     char s[256];
     f->getline(s,256);

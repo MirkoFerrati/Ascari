@@ -13,7 +13,7 @@ arc::arc()
   second=0;
 }
 
-void arc::readLabelGraphics(fstream* f)
+void arc::readLabelGraphics(ifstream* f)
 {
   char s[256];
   f->getline(s,256);
@@ -55,7 +55,7 @@ void arc::readLabelGraphics(fstream* f)
 }
 
 
-void arc::readArc(fstream* f)
+void arc::readArc(ifstream* f)
 {
   char s[256];
   f->getline(s,256);

@@ -8,7 +8,7 @@ class node
 {
   
 std::string label;
-    void readGraphics(std::fstream* arg1);
+    void readGraphics( std::ifstream* f );
     void readTextGraphics(std::fstream* arg1);
 
 public:
@@ -19,7 +19,7 @@ public:
   
     
     friend std::ostream &operator<<( std::ostream &out, const node &n );
-    void readNode(std::fstream *arg1);
+    void readNode( std::ifstream* f );
     
 };
 
