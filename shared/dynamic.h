@@ -4,12 +4,13 @@
 #include "exprtk.hpp"
 #include "types.h"
 #include "define.h"
+#include "dynamic_module_abstract.h"
 #include <vector>
 #include <map>
 #include <string>
 
 
-class dynamic
+class dynamic : public dynamic_module_abstract
 {
 public:
     /**

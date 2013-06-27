@@ -15,6 +15,7 @@
 #include <time.h>
 
 #include "streams_utils.h"
+#include <dynamic_remote_localization.h>
 using namespace std;
 
 void simulator::create_communicator ( int communicator_type )
@@ -78,22 +79,6 @@ void simulator::setCheckCollision ( bool checkCollision )
 
 void simulator::initialize_plugins ( Parsed_World const& wo )
 {
-    /*for ( auto a:wo.agents )
-        {
-            if ( a.active_plugins[0]=="MONITOR" )
-            {
-                throw "not implemented";
-            }
-            if ( a.active_plugins[0]=="AGENT_ROUTER" )
-            {
-                plugins.push_back ( new agent_router_simulator_plugin() );
-            }
-            if ( a.active_plugins[0]=="TASK_ASSIGNMENT" )
-            {
-                plugins.push_back ( new task_assignment_simulator(sim_packet) );
-            }
-        }*/
-
 for ( auto & plugin:plugins )
         plugin->initialize ( wo );
 }
@@ -200,10 +185,13 @@ for ( auto ag:agents )
         }
         agent_commands_to_index.push_back ( commands_to_index_tmp );
 
-        dynamic *d= new dynamic ( sim_packet.state_agents.internal_map.at ( ag.name ).state, commands.at ( ag.name ).default_command,
+	if (ag.simulated)
+	  dynamic *d= new dynamic ( sim_packet.state_agents.internal_map.at ( ag.name ).state, commands.at ( ag.name ).default_command,
                                   ag.behavior->expressions, ag.behavior->state,ag.behavior->inputs );
-
-        dynamic_module.push_back ( d );
+	else
+	  dynamic_remote_localization* d= new dynamic_remote_localization(ag.name,sim_packet.state_agents.internal_map.at ( ag.name ).state);
+	
+        dynamic_modules.push_back ( d );
 
         if ( ag.visibility!="" )
         {
@@ -356,17 +344,6 @@ void simulator::main_loop()
 
         for ( auto & plugin:plugins )
                 plugin->run_plugin();
-
-            /*
-             * if (condizione per inizializzare il plugin)
-             * {
-             * 		empty_router_communicator=new empty_router<empty_packet>();
-             * 		empty_router->init(num_agents);
-             * }
-             *
-             */
-
-
 
             agent_state state_tmp;
             for ( int i=0; i<10; i++ )

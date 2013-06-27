@@ -14,7 +14,7 @@ public:
   configuration_reader()
   {  
 
-   boost::property_tree::read_info("~/ascari.cfg",map);
+   boost::property_tree::read_info("ascari.cfg",map);
 
   };
   std::string getValue(std::string value)

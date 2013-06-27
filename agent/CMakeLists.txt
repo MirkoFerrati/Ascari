@@ -35,7 +35,7 @@ target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemo
 target_link_libraries(agent zmq)
 
 #written by Alessandro Settimi
-target_link_libraries(agent glpk)
+#target_link_libraries(agent glpk)
 #written by Alessandro Settimi
 
 include_directories(../agent)
@@ -45,9 +45,6 @@ include_directories(../shared/parserYAML/include)
 include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
 include_directories(decoder)
 include_directories(plugins)
-#written by Alessandro Settimi
-include_directories(task_assignment)
-#written by Alessandro Settimi
 include_directories(empty_plugin)
 include_directories(../shared/boost/geometry)
 include_directories(../shared/boost/geometry/*)

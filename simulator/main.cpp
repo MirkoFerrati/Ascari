@@ -61,7 +61,7 @@ int main ( int argc, char **argv )
         if (!ap.given("filename"))
 	{
 	  filename=CONFIG.getValue("FILENAME");
-  	  INFO("Using %s as filename, read from config file",filename);
+  	  INFO("Using %s as filename, read from config file",filename.c_str());
 	}
         auto plugins=createPlugins();
 

@@ -41,7 +41,7 @@ private:
 	int secSleep;
 	bool checkCollision;
 	CollisionCheckerAbstract *collisionChecker;
-	std::vector<dynamic*> dynamic_module;
+	std::vector<dynamic_module_abstract*> dynamic_modules;
 	simulator_namespace::agent_communicator_abstract* communicator;
 	simulator_namespace::viewer_communicator_abstract* viewer_communicator;
 	
