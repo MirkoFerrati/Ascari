@@ -196,7 +196,7 @@ for ( auto ag:agents )
 	  d= new dynamic ( sim_packet.state_agents.internal_map.at ( ag.name ).state, commands.at ( ag.name ).default_command,
                                   ag.behavior->expressions, ag.behavior->state,ag.behavior->inputs );
 	else
-	  d= new dynamic_remote_localization(ag.name,sim_packet.state_agents.internal_map.at ( ag.name ).state);
+	  d= new dynamic_remote_localization(&localization_receiver,ag.name,sim_packet.state_agents.internal_map.at ( ag.name ).state);
 	
         dynamic_modules.push_back ( d );
 
@@ -357,7 +357,7 @@ void simulator::main_loop()
             {
                 for ( index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end(); ++iter )
                 {
-                    state_tmp=dynamic_module.at ( iter->second )->getNextState();
+                    state_tmp=dynamic_modules.at ( iter->second )->getNextState();
                     for ( agent_state::const_iterator iiter=state_tmp.begin(); iiter!=state_tmp.end(); ++iiter )
                     {
                         sim_packet.state_agents.internal_map.at ( iter->first ).state.at ( iiter->first ) =iiter->second; //metto il nuovo stato nel posto giusto senza copiare i vettori
@@ -431,8 +431,8 @@ simulator::~simulator()
 //     for (unsigned int i=0; i< map_bonus_variables.size();i++)
 //         bonus_expressions.at(i).~expression();
 
-    for ( unsigned int i=0; i<dynamic_module.size(); i++ )
-        delete dynamic_module[i];
+    for ( unsigned int i=0; i<dynamic_modules.size(); i++ )
+        delete dynamic_modules[i];
 
 
     delete f_rndom;

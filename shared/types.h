@@ -2,7 +2,7 @@
 #define TYPES_H
 
 #include <map>
-
+#include <string>
 typedef std::map<int,double> map_int_double;
 typedef std::map<int,double> agent_state;
 typedef std::map<int,double> control_command;

@@ -201,6 +201,7 @@ bool Parsed_Agent::load_from_node ( const YAML::Node& node )
     else
     {
         WARN ( "NO VISIBLE AREA SPECIFIED",NULL );
+    }
      if ( node.FindValue ( "SIMULATED" ) )
     {
 	int tmp_simulated;
@@ -229,7 +230,6 @@ bool Parsed_Agent::load_from_node ( const YAML::Node& node )
     node["COMMUNICATION_AREA"]>>communication;
 
     for ( unsigned int i=0; i<behavior->state.size(); i++ )
-    node["COMMUNICATION_AREA"]>>communication;
     {
         initial_state_value tmp_initial=0;
         node["INITIAL"][0][behavior->state[i]]>>tmp_initial;

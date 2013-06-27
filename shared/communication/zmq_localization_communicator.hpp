@@ -16,7 +16,7 @@ void init(std::string owner_name)
 	{
 		this->init_full(owner_name,false,LOCALIZATION_TO_SIMULATOR,1,true);
 		exiting=false;
-		receiver_loop=new std::thread(&zmq_localization_communicator_receiver::loop,std::ref(this),std::ref(agent_lock),std::ref(agents),std::ref(exiting));
+		receiver_loop=new std::thread(&zmq_localization_communicator_receiver::loop,std::ref(*this),std::ref(agent_lock),std::ref(agents),std::ref(exiting));
 	}
 	
 void stop()
@@ -29,10 +29,10 @@ agent_state getState(std::string agent_name){
       return agents.at(agent_name);
       agent_lock.unlock();
 };	
-    void addAgent(std::string agent_name, std::map< std::string, agent_state > state)
+    void addAgent(std::string name, agent_state  state)
     {
 	agent_lock.lock();
-	agents[agent_name]=state;
+	agents[name]=state;
 	agent_lock.unlock();
     }
 	

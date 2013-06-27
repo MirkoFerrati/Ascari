@@ -7,7 +7,7 @@
 class dynamic_remote_localization : public dynamic_module_abstract
 {
 public:
-    dynamic_remote_localization(zmq_localization_communicator_receiver* receiver, std::string agent_name, std::map< std::string, agent_state > state);
+    dynamic_remote_localization(zmq_localization_communicator_receiver* receiver, std::string agent_name,agent_state  state);
     virtual agent_state getNextState();
 private:
     
