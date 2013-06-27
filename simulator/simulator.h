@@ -45,7 +45,7 @@ private:
 	std::vector<dynamic_module_abstract*> dynamic_modules;
 	simulator_namespace::agent_communicator_abstract* communicator;
 	simulator_namespace::viewer_communicator_abstract* viewer_communicator;
-	zmq_localization_communicator_receiver localization_receiver;
+	
 	agent_sim_packet agent_packet;
 	index_map agent_states_to_index;
 	std::vector<index_map> agent_commands_to_index;

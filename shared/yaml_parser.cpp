@@ -201,10 +201,35 @@ bool Parsed_Agent::load_from_node ( const YAML::Node& node )
     else
     {
         WARN ( "NO VISIBLE AREA SPECIFIED",NULL );
+     if ( node.FindValue ( "SIMULATED" ) )
+    {
+	int tmp_simulated;
+        
+	
+	node["SIMULATED"]>>tmp_simulated;
+	
+	if (tmp_simulated==1)
+	  simulated=true;
+	else
+	{
+	  simulated=false;
+		
+	if ( node.FindValue ( "MARKER" ) )
+      {
+	node["MARKER"]>>marker;
+      }
+      else
+      {
+	ERR ( "AGENT REAL BUT NO MARKER SPECIFIED ");
+	return false;
+      }
+	}
     }
+    
     node["COMMUNICATION_AREA"]>>communication;
 
     for ( unsigned int i=0; i<behavior->state.size(); i++ )
+    node["COMMUNICATION_AREA"]>>communication;
     {
         initial_state_value tmp_initial=0;
         node["INITIAL"][0][behavior->state[i]]>>tmp_initial;
@@ -306,7 +331,6 @@ for ( auto plugin:plugins )
         agents.back().behavior_name=tmp_agent_behavior_name;
         if ( ! ( agents.back().load_from_node ( agent_nodes[i] ) ) )
             return false;
-
     for ( auto plugin:plugins )
         {
             abstract_parsed_agent_plugin* temp_ptr=0;
