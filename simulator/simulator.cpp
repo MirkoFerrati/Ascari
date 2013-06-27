@@ -129,6 +129,9 @@ void simulator::initialize ( const Parsed_World& wo )
         map_bonus_variables.insert ( make_pair ( wo.bonus_variables.at ( i ),i ) );
     }
     setCheckCollision ( false );
+    
+    
+    localization_receiver.init("simulator");
 }
 
 
@@ -185,11 +188,13 @@ for ( auto ag:agents )
         }
         agent_commands_to_index.push_back ( commands_to_index_tmp );
 
+	dynamic_module_abstract* d;
+	
 	if (ag.simulated)
-	  dynamic *d= new dynamic ( sim_packet.state_agents.internal_map.at ( ag.name ).state, commands.at ( ag.name ).default_command,
+	  d= new dynamic ( sim_packet.state_agents.internal_map.at ( ag.name ).state, commands.at ( ag.name ).default_command,
                                   ag.behavior->expressions, ag.behavior->state,ag.behavior->inputs );
 	else
-	  dynamic_remote_localization* d= new dynamic_remote_localization(ag.name,sim_packet.state_agents.internal_map.at ( ag.name ).state);
+	  d= new dynamic_remote_localization(&localization_receiver,ag.name,sim_packet.state_agents.internal_map.at ( ag.name ).state);
 	
         dynamic_modules.push_back ( d );
 
