@@ -47,7 +47,7 @@ private:
       agent_state_packet temp=(this->receive().front());
       agent_lock.lock();
       agents[temp.identifier]=temp.state;
-      std::cout<<"ricevuto agente "<<temp.identifier<<" con stato "<<temp.state<<std::endl;
+      //std::cout<<"ricevuto agente "<<temp.identifier<<" con stato "<<temp.state<<std::endl;
       agent_lock.unlock();
     }
   }
