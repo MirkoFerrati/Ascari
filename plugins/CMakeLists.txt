@@ -5,3 +5,5 @@ include(${QT_USE_FILE})
 add_subdirectory(agent_router)
 #add_subdirectory(monitor)
 
+
+add_subdirectory(nostop)
