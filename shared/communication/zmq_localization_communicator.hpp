@@ -6,7 +6,7 @@
 #include <thread>
 #include "zmq_communicator.hpp"
 #include "types/agent_state_packet.h"
-
+#include "streams_utils.h"
 #define LOCALIZATION_TO_SIMULATOR CONFIG.getValue("LOCALIZATION_TO_SIMULATOR")
 
 class zmq_localization_communicator_receiver: public zmq_receive_communicator<agent_state_packet,ZMQ_PULL>
@@ -43,8 +43,9 @@ private:
     while(!exiting)
     {
       agent_lock.lock();
-      auto temp=this->receive().front();
+      agent_state_packet temp=(this->receive().front());
       agents[temp.identifier]=temp.state;
+      std::cout<<"ricevuto agente "<<temp.identifier<<" con stato "<<temp.state<<std::endl;
       agent_lock.unlock();
     }
   }
