@@ -25,9 +25,11 @@ void stop()
 }
 	
 agent_state getState(std::string agent_name){
+      agent_state temp;
       agent_lock.lock();
-      return agents.at(agent_name);
+      temp= agents.at(agent_name);
       agent_lock.unlock();
+      return temp;
 };	
     void addAgent(std::string name, agent_state  state)
     {
@@ -42,8 +44,8 @@ private:
   {
     while(!exiting)
     {
-      agent_lock.lock();
       agent_state_packet temp=(this->receive().front());
+      agent_lock.lock();
       agents[temp.identifier]=temp.state;
       std::cout<<"ricevuto agente "<<temp.identifier<<" con stato "<<temp.state<<std::endl;
       agent_lock.unlock();

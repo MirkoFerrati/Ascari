@@ -1,7 +1,7 @@
 #include "dynamic_remote_localization.h"
 
 dynamic_remote_localization::dynamic_remote_localization(zmq_localization_communicator_receiver* receiver, std::string agent_name, agent_state state)
-:receiver(receiver){
+:receiver(receiver),my_agent(agent_name){
   receiver->addAgent(agent_name,state);
 }
 
