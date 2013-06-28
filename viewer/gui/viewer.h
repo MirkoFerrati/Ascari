@@ -27,6 +27,7 @@ void addPlugin(abstract_viewer_plugin* plugin);
 
 private:
 	void paintTextPoint( QPainter* painter, double x, double y );
+	void paintAgents(QPainter &painter,const std::map<std::string,Agent>& agents);
     void paintEvent ( QPaintEvent *event );
     void timerEvent ( QTimerEvent *event );
     void keyPressEvent ( QKeyEvent *event );

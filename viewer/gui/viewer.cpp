@@ -142,6 +142,39 @@ void Viewer::paintTextPoint(QPainter *painter,double x,double y)
 	
 }
 
+void Viewer::paintAgents(QPainter &painter,const std::map<std::string,Agent>& agents)
+	{
+	  
+	  auto agentshape=QPolygon(QVector<QPoint>(
+			{
+				QPoint ( 2, -2 ),
+											QPoint ( -2, -2 ),
+											QPoint ( 0, 2 )
+			})); 
+		for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
+		{
+			painter.save();
+			painter.setBrush ( QColor ( "red" ) );
+			painter.translate ( it->second.x,it->second.y );
+			//lo zero degli angoli parte dall'asse y invece che da x
+			double tmp=it->second.angle;
+			while ( tmp>M_PI )
+				tmp=tmp-2*M_PI;
+			painter.rotate ( ( tmp*180/M_PI )-90 );
+			
+			painter.scale(3,3);
+			painter.drawConvexPolygon(agentshape);
+			painter.restore();
+			painter.save();
+			painter.translate ( it->second.x,it->second.y );
+			painter.scale(painter.fontMetrics().height()/1,-painter.fontMetrics().height()/1);
+			painter.drawText(0,0,QString(it->first.substr(6).c_str()));
+			
+			painter.restore();
+			
+		}
+	};
+
 void Viewer::paintEvent ( QPaintEvent */*event*/ )
 {
     double sidex=width();
@@ -162,6 +195,8 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
         painter.drawPixmap ( 0,0,sidex,sidey,pixmap );
     }
 
+    paintAgents(painter,agents);
+    
     for (auto plugin:plugins)
     {
 		painter.save();
