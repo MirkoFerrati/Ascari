@@ -28,6 +28,7 @@ private:
 world_sim_packet packet_received;
 LibSerial::SerialStream serial_port;
 index_map map_inputs_name_to_id;
+control_command command_old;
 
 };
 

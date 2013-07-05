@@ -301,6 +301,7 @@ void agent::main_loop()
     for ( auto it=temp.state_agents.internal_map.at ( identifier ).state.begin();it!=temp.state_agents.internal_map.at ( identifier ).state.end(); ++it )
     {
         state.at ( it->first ) =it->second;
+	cout<<it->first<<":"<<it->second<<endl;
     }
 
     sleep ( 0 );
