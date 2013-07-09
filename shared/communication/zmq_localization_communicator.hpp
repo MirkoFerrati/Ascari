@@ -23,14 +23,6 @@ void stop()
 {
   exiting=true;
 }
-	/*
-	 * 0.1 soglia in salita e discesa
-	 * -10% in discea
-	 * raddoppio in salita
-	 * inserire mittente
-	 * mappa webcam-pesi
-	 * 
-	 */
 agent_state getState(std::string agent_name){
       agent_state temp;
       agent_lock.lock();
@@ -47,6 +39,14 @@ agent_state getState(std::string agent_name){
 	
 private:
   
+  	/*
+	 * 0.1 soglia in salita e discesa
+	 * -10% in discea
+	 * raddoppio in salita
+	 * inserire mittente
+	 * mappa webcam-pesi
+	 * 
+	 */
   void loop(std::mutex& agent_lock,std::map<std::string,agent_state>& agents,bool& exiting)  
   {
     while(!exiting)
