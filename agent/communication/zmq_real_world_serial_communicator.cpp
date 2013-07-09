@@ -59,30 +59,14 @@ zmq_real_world_serial_communicator::zmq_real_world_serial_communicator(std::stri
 const world_sim_packet& zmq_real_world_serial_communicator::receive_agents_status()
 {
     try {
-        bool end=false;
-        bool found=false;
-        agent_sim_packet_receiver tmp;
-        while(!end)
-        {
-            std::vector<agent_sim_packet_receiver>& tmp_vector=receive(ZMQ_NOBLOCK); //TODO(Mirko): check if working
-            if (!tmp_vector.empty())
-            {
-                tmp=tmp_vector.front();
-                found=true;
-            }
-            else {
-                if (found)
-                    end=true;
-                else
-                    tmp=receive().front();
-            }
-        }
+        agent_sim_packet_receiver tmp=receive_last_one();
+
         packet_received.state_agents.internal_map.clear();
-        packet_received.bonus_variables.swap(tmp.bonus_variables(;
-                                             packet_received.time=tmp.time;
-                                             packet_received.object_list.objects.swap(tmp.objects.objects);
+        packet_received.bonus_variables.swap(tmp.bonus_variables);
+        packet_received.time=tmp.time;
+        packet_received.object_list.objects.swap(tmp.objects.objects);
         for (auto agent=tmp.state_agents.internal_map.begin(); agent!=tmp.state_agents.internal_map.end(); ++agent) {
-        packet_received.state_agents.internal_map[agent->first]=*(agent->second);
+            packet_received.state_agents.internal_map[agent->first]=*(agent->second);
         }
 
         return  packet_received;

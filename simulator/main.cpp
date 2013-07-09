@@ -87,7 +87,7 @@ int main ( int argc, char **argv )
         s.initialize ( world );
         initialize_communication ( s );
         if ( ap.given ( "s" ) )
-            s.setSleep ( secSleep );
+            s.setPeriod ( secSleep );
         if ( ap.given ( "check_collision" ) )
             s.setCheckCollision ( checkCollision );
         if ( ap.given ( "n" ) )
