@@ -142,7 +142,10 @@ public:
 
                 if ( !rc )
                 {
-                    ERR ( "brutte cose",NULL );
+		  if (flags==ZMQ_NOBLOCK)
+		    return results;
+		  else
+                    ERR ( "brutte cose, questa scritta non dovrebbe mai comparire",NULL );
                 }
             }
             catch ( zmq::error_t& ex )
