@@ -44,7 +44,7 @@ simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.tim
     num_agents=0;
     world_map=0;
     f_rndom=0;
-    secSleep=5000;
+    cycle_period_millisec=50;
     collisionChecker=0;
     checkCollision=false;
 
@@ -59,9 +59,9 @@ void simulator::addPlugin ( abstract_simulator_plugin* plugin )
 
 
 
-void simulator::setSleep ( unsigned secSleep )
+void simulator::setPeriod ( unsigned cycle_period_millisec )
 {
-    this->secSleep=secSleep;
+    this->cycle_period_millisec=cycle_period_millisec;
 }
 
 void simulator::setCheckCollision ( bool checkCollision )
@@ -220,7 +220,7 @@ for ( auto ag:agents )
         }*/
 }
 
-void simulator::input_loop ( mutex& input_mutex,condition_variable& input_cond,volatile bool& paused,volatile bool& exit,volatile int& secSleep )
+void simulator::input_loop ( mutex& input_mutex,condition_variable& input_cond,volatile bool& paused,volatile bool& exit,volatile int& cycle_period_millisec )
 {
     char c;
     string temp;
@@ -252,7 +252,7 @@ void simulator::input_loop ( mutex& input_mutex,condition_variable& input_cond,v
             isReading=false;
             std::lock_guard<std::mutex> lock ( input_mutex );
             cout<<"letto un carattere:"<<c<<temp<<atoi ( temp.c_str() ) <<endl;
-            secSleep=atoi ( temp.c_str() );
+            cycle_period_millisec=atoi ( temp.c_str() );
             c='0';
             input_cond.notify_one();
         }
@@ -275,12 +275,16 @@ void simulator::main_loop()
         std::condition_variable input_cond;
         volatile bool input_exit=false;
         volatile bool paused=false;
-        std::thread input_thread ( &simulator::input_loop,this,std::ref ( input_mutex ),std::ref ( input_cond ),std::ref ( paused ),std::ref ( input_exit ),std::ref ( secSleep ) );
+        std::thread input_thread ( &simulator::input_loop,this,std::ref ( input_mutex ),std::ref ( input_cond ),std::ref ( paused ),std::ref ( input_exit ),std::ref ( cycle_period_millisec ) );
 
         sim_packet.time=0;
         int clock=0;
+	struct timespec requestStart, requestEnd;
+	double accum;
         while ( !s_interrupted )
         {
+	    clock_gettime ( CLOCK_REALTIME, &requestStart );
+
             {
                 sleep ( 0 );
                 std::unique_lock<std::mutex> lock ( input_mutex );
@@ -302,23 +306,12 @@ void simulator::main_loop()
             sim_packet.time= ( ( simulation_time ) clock ) /10.0;
 //             communicator->send_broadcast(time++);
             update_bonus_variables();
-            //communicator->send_broadcast(sim_packet.state_agents);
-
-            //communicator->send_broadcast(sim_packet);
-            // sim_packet contiene tutte le informazioni che mi servono. Lo personalizzo per ogni agente
-            struct timespec requestStart, requestEnd;
-
-            clock_gettime ( CLOCK_REALTIME, &requestStart );
-
-
 
             for ( auto agent=sim_packet.state_agents.internal_map.begin(); agent!=sim_packet.state_agents.internal_map.end(); agent++ )
             {
-
                 agent_packet.state_agents.internal_map.clear();
                 for ( auto other=sim_packet.state_agents.internal_map.begin(); other!=sim_packet.state_agents.internal_map.end(); other++ )
                 {
-
                     if ( agent->first==other->first ||
                             !agents_visibility.count ( agents_name_to_index.at ( agent->first ) ) ||
                             !agents_visibility.count ( agents_name_to_index.at ( other->first ) ) ||
@@ -333,11 +326,8 @@ void simulator::main_loop()
                     else
                     {
                         continue;
-
                     }
                 }
-
-                //communicator->send_target(agent_packet,agent->first);
                 communicator->send_target ( agent_packet,agent->first );
             }
 
@@ -372,20 +362,7 @@ void simulator::main_loop()
             }
 
             collisionChecker->checkCollisions();
-            usleep ( secSleep );
             vector<control_command_packet> temp=communicator->receive_control_commands();
-
-
-            // Calculate time taken by a request
-            clock_gettime ( CLOCK_REALTIME, &requestEnd );
-
-//             Calculate time it took
-//             double accum = ( requestEnd.tv_sec - requestStart.tv_sec )
-//                            + ( requestEnd.tv_nsec - requestStart.tv_nsec )
-//                            / 1E9;
-
-            //cout<<endl<< "tempo necessario:"<<endl;
-            //printf( "%f\n", accum );
 
 
 //             cout<<"ricevuto pacchetto con i controlli"<<endl;
@@ -398,11 +375,21 @@ void simulator::main_loop()
                 }
 
             }
-// 		if (abs(states_index.internal_map.at("AGENTE1").state.at(0))>30)
-// 				break;
+
             if ( sim_packet.time>max_loops )
                 break;
+            // Calculate time taken by a request
+            clock_gettime ( CLOCK_REALTIME, &requestEnd );
 
+//             Calculate time it took
+             accum = ( requestEnd.tv_sec - requestStart.tv_sec )*1000
+                            + ( requestEnd.tv_nsec - requestStart.tv_nsec )
+                            / 1E6;
+	    if (cycle_period_millisec-accum >0)
+	      usleep ( (cycle_period_millisec-accum)*1000-10 );
+
+            //cout<<endl<< "tempo necessario:"<<endl;
+            //printf( "%f\n", accum );
         }
 
     for ( auto & plugin:plugins )
