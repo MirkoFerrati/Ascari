@@ -14,29 +14,38 @@
 #include "../plugins/abstract_agent_plugin.h"
 #include "../agent/agent.h"
 
-class formation_control_agent: public abstract_agent_plugin
-{
-	
-public:
-	formation_control_agent(agent* a, Parsed_World* parse);
-	
-	void run_plugin();
-	void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
-	void compileExpressions(exprtk::symbol_table< double >& symbol_table);
-	
-	~formation_control_agent();
+#include "formation_control_types.h"
 
+class formation_control_agent : public abstract_agent_plugin
+{
+public:
+  formation_control_agent(agent* a, Parsed_World* parsed_world);
+  ~formation_control_agent();
+
+  
+  void run_plugin();
+  void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
+  void compileExpressions(exprtk::symbol_table< double >& symbol_table);
+  
 private:
-	double v;
-	double w;
-	
-	exprtk::expression<double> x;
-	exprtk::expression<double> y;
-	exprtk::expression<double> theta;
-	std::string my_id;
-	initial_state_value x0;
-	initial_state_value y0;
+  double v;
+  double w;
+
+  std::string my_id;
+  
+  exprtk::expression<double> x;
+  exprtk::expression<double> y;
+  exprtk::expression<double> theta;
+  
+  initial_state_value x_initial;
+  initial_state_value y_initial;
+  initial_state_value theta_initial;
+  
+  agent_state final_state;
+  
+  double vehicle_enabled;
 };
-	#endif
+
+#endif
 
 #endif // FORMATION_CONTROL_AGENT_H

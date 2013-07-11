@@ -12,40 +12,43 @@
     - name: go
       v: v_p
       w: w_p
-    - name: wait
+    - name: stop
       v: 0
       w: 0
     DISCRETE_STATES:
     - name: go
       controller: go
-    - name: wait
-      controller: wait
+    - name: stop
+      controller: stop
     ENCODER:
     - TOPOLOGY:
         - topology: [t1]
-          t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+          t1: '((abs(x-xi)<3) and abs(y-yi)<3)' 
       LAMBDA:
-        - lambda: [Lready,Lfar] 
-          Lready: 'abs(x)<0.1 and abs(y)<0.1'
-          Lfar: 'abs(x)>10 or abs(y)>10'
+        - lambda: [lambda_stop,lambda_start]
+          lambda_start: 'enabled>0'
+          lambda_stop: 'enabled<0'
     EVENTS:
-    - events: [ready, far]
-      ready: 'Lready'
-      far: 'Lfar'
+    - events: [vehicle_enabled, vehicle_disabled]
+      vehicle_enabled: 'lambda_start'
+      vehicle_disabled: 'lambda_stop'
     AUTOMATON:
     - name: aut_machine
       GO:
-        - WAIT: [far]
-      WAIT:
-        - GO: [ready]
-    
+        - STOP: [vehicle_disabled]
+      STOP:
+        - GO: [vehicle_enabled]
+
   AGENTS:
   - agent: Agente1
     COMMUNICATION_AREA:   circle(50)
     INITIAL:
     - &initial
-      x: '0'
-      y: '0'
-      theta: '0'
-    STATE_START: WAIT
+      x: '100'
+      y: '100'
+      theta: '1.3'
+      
+    STATE_START: GO
     BEHAVIOR: dritto
+    FINAL: [0,0,3.1415]
+    

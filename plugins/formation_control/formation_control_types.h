@@ -17,5 +17,8 @@
 #include <forward_list>
 
 
+#define STATE_X 1
+#define STATE_Y 2
+#define STATE_THETA 3
 
 #endif

@@ -6,7 +6,6 @@
 
 #include "yaml_parser.h"
 #include <boost/circular_buffer.hpp>
-#include "objects/task_assignment_task.h"
 #include "../viewer/gui/viewer.h"
 
 

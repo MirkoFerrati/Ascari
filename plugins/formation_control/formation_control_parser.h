@@ -8,14 +8,22 @@
 class formation_control_parsed_agent: public abstract_parsed_agent_plugin
 {
 public:
-      std::string getType(){return "formation_control_parsed_agent";};
+  agent_state final_state;
+  
+  std::string getType()
+  {
+    return "formation_control_parsed_agent";
+  };
 };
 
 
 class formation_control_parsed_world: public abstract_parsed_world_plugin
 {
 public:
-    std::string getType(){return "formation_control_parsed_world";};
+    std::string getType()
+    {
+      return "formation_control_parsed_world";
+    };
 };
 
 
