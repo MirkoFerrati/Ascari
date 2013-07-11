@@ -8,6 +8,7 @@
 #include "lemon/arg_parser.h"
 #include "../plugins/addplugins.h"
 #include "../shared/communication/global.h"
+#include <define.h>
 
 int main ( int argc, char** argv )
 {

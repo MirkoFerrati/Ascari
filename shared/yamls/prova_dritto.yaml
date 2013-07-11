@@ -1,0 +1,51 @@
+- WORLD:
+  BEHAVIORS:
+  - name: dritto
+    states: [x,y,theta]
+    control_commands: [v,w]
+    
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+    CONTROLLERS:
+    - name: go
+      v: v_p
+      w: w_p
+    - name: wait
+      v: 0
+      w: 0
+    DISCRETE_STATES:
+    - name: go
+      controller: go
+    - name: wait
+      controller: wait
+    ENCODER:
+    - TOPOLOGY:
+        - topology: [t1]
+          t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+      LAMBDA:
+        - lambda: [Lready,Lfar] 
+          Lready: 'abs(x)<0.1 and abs(y)<0.1'
+          Lfar: 'abs(x)>10 or abs(y)>10'
+    EVENTS:
+    - events: [ready, far]
+      ready: 'Lready'
+      far: 'Lfar'
+    AUTOMATON:
+    - name: aut_machine
+      GO:
+        - WAIT: [far]
+      WAIT:
+        - GO: [ready]
+    
+  AGENTS:
+  - agent: Agente1
+    COMMUNICATION_AREA:   circle(50)
+    INITIAL:
+    - &initial
+      x: '0'
+      y: '0'
+      theta: '0'
+    STATE_START: WAIT
+    BEHAVIOR: dritto
