@@ -15,19 +15,11 @@
 #include "../agent/agent.h"
 
 #include "formation_control_types.h"
+#include "formation_control_communicator.h"
+
 
 class formation_control_agent : public abstract_agent_plugin
 {
-public:
-  formation_control_agent(agent* a, Parsed_World* parsed_world);
-  ~formation_control_agent();
-
-  
-  void run_plugin();
-  void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
-  void compileExpressions(exprtk::symbol_table< double >& symbol_table);
-  
-private:
   double v;
   double w;
 
@@ -41,9 +33,21 @@ private:
   initial_state_value y_initial;
   initial_state_value theta_initial;
   
-  agent_state final_state;
+  std::string my_leader;
+  std::vector<std::string> wingmen;
   
+  formation_control_communicator* agent_to_simulator_communicator; 
+  formation_control_packet packet_to_send;
+    
   double vehicle_enabled;
+
+public:
+  formation_control_agent(agent* a, Parsed_World* parsed_world);
+  ~formation_control_agent();
+  
+  void run_plugin();
+  void addReservedVariables(exprtk::symbol_table< double >& symbol_table);
+  void compileExpressions(exprtk::symbol_table< double >& symbol_table);
 };
 
 #endif

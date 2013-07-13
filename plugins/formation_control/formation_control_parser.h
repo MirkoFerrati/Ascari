@@ -8,7 +8,8 @@
 class formation_control_parsed_agent: public abstract_parsed_agent_plugin
 {
 public:
-  agent_state final_state;
+  std::string leader;
+  std::vector<std::string> wingmen;
   
   std::string getType()
   {
@@ -29,13 +30,18 @@ public:
 
 class formation_control_parser : public abstract_parser_plugin
 {
-
 public:
-    formation_control_parser(std::string type);
-    abstract_parsed_world_plugin* parseWorld ( const YAML::Node& node);
-    abstract_parsed_agent_plugin* parseAgent ( const YAML::Node& node);
-    bool isEnabled();
-    std::string getType(){return "Formation Control Plugin";};
+  formation_control_parser(std::string type);
+  
+  abstract_parsed_world_plugin* parseWorld(const YAML::Node& node);
+  abstract_parsed_agent_plugin* parseAgent(const YAML::Node& node);
+  
+  bool isEnabled();
+  
+  std::string getType()
+  {
+    return "Formation Control Plugin";
+  };
 };
 
 #endif // FORMATION_CONTROL_PARSER_H
