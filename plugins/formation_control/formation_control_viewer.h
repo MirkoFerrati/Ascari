@@ -9,11 +9,12 @@
 #include "../viewer/gui/viewer.h"
 
 
-class formation_control_viewer : public abstract_viewer_plugin
-{
+class formation_control_viewer 
+: public abstract_viewer_plugin
+{ 
 public:
     formation_control_viewer();
-    ~formation_control_viewer();  
+    ~formation_control_viewer();
 };
 
 #endif

@@ -2,6 +2,7 @@
 set_property(GLOBAL APPEND PROPERTY agent_SOURCES 
 ${CMAKE_CURRENT_SOURCE_DIR}/formation_control_agent.cpp 
 ${CMAKE_CURRENT_SOURCE_DIR}/formation_control_parser.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/formation_control_communicator.cpp
 )
 
 

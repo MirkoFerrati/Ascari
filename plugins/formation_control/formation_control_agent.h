@@ -38,6 +38,7 @@ class formation_control_agent : public abstract_agent_plugin
   
   formation_control_communicator* agent_to_simulator_communicator; 
   formation_control_packet packet_to_send;
+  formation_control_packet packet_received;
     
   double vehicle_enabled;
 
