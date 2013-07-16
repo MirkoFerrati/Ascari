@@ -53,6 +53,7 @@ void formation_control_agent::dubins_trajectory()
    }
 }
 
+
 void formation_control_agent::wingmen_trajectory()
 {
   double leader_gamma = this->phi - this->packet_received.agent_state.state[STATE_THETA];
@@ -77,12 +78,18 @@ void formation_control_agent::wingmen_trajectory()
 
 void formation_control_agent::run_plugin()
 {
-  
+  // CODICE DA AGGIUSTARE E MIGLIORARE!!!!!!
   if(this->agent_to_simulator_communicator == NULL)
-    this->agent_to_simulator_communicator = new formation_control_communicator(this->my_id, &this->packet_to_send, this->my_leader);
-  
-  if(this->agent_to_simulator_communicator->get_new_data(&this->packet_received))
   {
+    this->agent_to_simulator_communicator = new formation_control_communicator(this->my_id, &this->packet_to_send, this->my_leader);
+  this->packet_to_send.agent_state.identifier = this->my_id;	// primo messaggio "vuoto" per sbloccare alla prima esecuzione la run_plugin
+   this->agent_to_simulator_communicator->send();
+    
+  }
+  
+//   if(this->agent_to_simulator_communicator->get_new_data(&this->packet_received))
+//    {
+  this->packet_received = this->agent_to_simulator_communicator->get_leader_data_blocking();  
     std::cout << "New Data!--------------------------------------"  << std::endl;
     std::cout << packet_received.agent_state.identifier << " ";
     std::cout << packet_received.agent_state.state[STATE_X] << " ";
@@ -94,7 +101,7 @@ void formation_control_agent::run_plugin()
     distance += (this->y.value() - packet_received.agent_state.state[STATE_Y])*(this->y.value() - packet_received.agent_state.state[STATE_Y]);
     distance = sqrt(distance);
 //    std::cout << "Distanza agenti: " << distance << std::endl;
-  }
+//   }
   
   if(!this->my_id.compare(this->my_leader))
   {

@@ -32,6 +32,7 @@ public:
   void start_threads();
  
   bool get_new_data(formation_control_packet* packet);
+  formation_control_packet get_leader_data_blocking();
   void send();
 };
 

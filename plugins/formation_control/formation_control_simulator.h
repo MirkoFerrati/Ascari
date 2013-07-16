@@ -4,7 +4,7 @@
 #include <../plugins/abstract_simulator_plugin.h>
 
 #include "formation_control_types.h"
-#include "formation_control_router.hpp"
+#include "formation_control_router.h"
 
 #include <yaml_parser.h>
 #include <types/world_sim_packet.h>

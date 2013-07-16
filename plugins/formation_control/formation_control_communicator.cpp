@@ -10,7 +10,7 @@ formation_control_communicator::formation_control_communicator(std::string my_id
   my_leader(my_leader)
 {
   this->init(this->my_id);
-  this->start_threads();
+//   this->start_threads();
 }
 
 
@@ -26,16 +26,20 @@ void formation_control_communicator::receive_loop(std::vector<formation_control_
     sleep(0);
 
     temp = this->receive(); //blocking call
-      
+    
+    std::cout << "Ricevuti dati!" << std::endl;
     data_mutex.lock();
  
     data_receive.clear();
 
     for(unsigned int i = 0; i < temp.size(); i++)
-    {
       if(!temp[i].agent_state.identifier.compare(my_leader))
-      data_receive.push_back(temp[i]);
-    }
+      {
+	data_receive.clear();
+	data_receive.push_back(temp[i]);
+	break;					// ho un solo leader!
+      }
+  
     data_mutex.unlock();
   }
 }
@@ -76,6 +80,23 @@ bool formation_control_communicator::get_new_data(formation_control_packet* pack
   return new_data;
 }
 
+formation_control_packet formation_control_communicator::get_leader_data_blocking()
+{
+  bool data_received = false;
+  std::vector<formation_control_packet> data;
+  formation_control_packet leader_data;
+  while(!data_received)
+  {
+    data = this->receive();
+    for(unsigned int i = 0; i < data.size(); i++)
+      if(!data.at(i).agent_state.identifier.compare(this->my_leader))
+      {
+	leader_data = data.at(i);
+	data_received = true;
+      }
+  }
+  return leader_data;
+}
 
 void formation_control_communicator::send()
 {
