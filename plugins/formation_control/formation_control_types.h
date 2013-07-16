@@ -26,11 +26,13 @@ class formation_control_packet
 {
 public:
   agent_state_packet agent_state;
-    
+  double omega;
+  
   template <typename Archive>
   void serialize(Archive& ar, const unsigned int /*version*/)
   {
-      ar& agent_state;
+    ar& agent_state;
+    ar& omega;
   }
 };
 

@@ -6,7 +6,7 @@
 
 #include "yaml_parser.h"
 #include <boost/circular_buffer.hpp>
-#include "../viewer/gui/viewer.h"
+#include "../../viewer/gui/viewer.h"
 
 
 class formation_control_viewer 
@@ -15,6 +15,7 @@ class formation_control_viewer
 public:
     formation_control_viewer();
     ~formation_control_viewer();
+    void init();
 };
 
 #endif

@@ -56,17 +56,23 @@ void formation_control_communicator::start_threads()
 bool formation_control_communicator::get_new_data(formation_control_packet* packet)
 {
   formation_control_packet tmp;
-
-  if(this->data_receive.empty())
-    return false;
+  bool new_data;
   
   this->data_receive_mutex.lock();
-  tmp = this->data_receive.back();
-  this->data_receive.clear();
+  
+  if(this->data_receive.empty())
+    new_data = false;
+  else
+  {
+    tmp = this->data_receive.back();
+    this->data_receive.clear();
+    new_data = true;
+  }
+  
   this->data_receive_mutex.unlock();
   
   *packet = tmp;
-  return true;
+  return new_data;
 }
 
 

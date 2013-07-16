@@ -41,6 +41,9 @@ class formation_control_agent : public abstract_agent_plugin
   formation_control_packet packet_received;
     
   double vehicle_enabled;
+  double phi;
+  
+  void dubins_trajectory();
 
 public:
   formation_control_agent(agent* a, Parsed_World* parsed_world);

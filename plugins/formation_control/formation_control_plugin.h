@@ -2,7 +2,7 @@
 #define FORMATION_CONTROL_PLUGIN_H
 #define FORMATION_CONTROL_PLUGIN_IDENTIFIER "formation_control"
 
-#include "../plugins/abstract_plugin.h"
+#include "../abstract_plugin.h"
 #include "formation_control_parser.h"
 
 #ifdef ISAGENT
@@ -86,7 +86,7 @@ public:
         if ( viewer_plugin!=0 )
             ERR ( "already created viewer plugin, please check for double calls",NULL )
             else
-                viewer_plugin=new formation_control_viewer ( );
+                viewer_plugin = new formation_control_viewer();
         return viewer_plugin;
     };
 #endif
@@ -115,13 +115,12 @@ private:
 #ifdef ISVIEWER
     formation_control_viewer* viewer_plugin;
 #endif
-
+    
 #ifdef ISSIMULATOR
     formation_control_simulator* simulator_plugin;
 #endif
-
+    
     formation_control_parser* parser_plugin;
-
 };
 
 
