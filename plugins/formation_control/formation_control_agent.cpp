@@ -35,6 +35,8 @@ void formation_control_agent::dubins_trajectory()
   double phi = atan2(this->y.value(), this->x.value()) + 3.1415;
   double alpha = phi - this->theta.value();
 
+  this-> v = 1;
+  
   if(abs(this->x.value()) < 8 && abs(this->y.value()) < 8)
   {
     this->vehicle_enabled = -10;
@@ -51,14 +53,33 @@ void formation_control_agent::dubins_trajectory()
    }
 }
 
+void formation_control_agent::wingmen_trajectory()
+{
+  double leader_gamma = this->phi - this->packet_received.agent_state.state[STATE_THETA];
+  double my_gamma = this->phi - this->theta.value();
+  
+  this->v = 1;
+   
+  if( (my_gamma-leader_gamma > -0.01) && (my_gamma-leader_gamma < 0.01) )		// ABS() RESTITUISCE PARTE INTERA
+  {
+    /* Case A */
+    this->w = this->packet_received.omega;
+  }
+  else
+  {
+    /* Case B */
+    double k_w = 0.3;
+    this->w = this->packet_received.omega + k_w*(my_gamma-leader_gamma);
+  }
+  
+}
+
 
 void formation_control_agent::run_plugin()
 {
   
   if(this->agent_to_simulator_communicator == NULL)
     this->agent_to_simulator_communicator = new formation_control_communicator(this->my_id, &this->packet_to_send, this->my_leader);
-  
-  this->v = 1;
   
   if(this->agent_to_simulator_communicator->get_new_data(&this->packet_received))
   {
@@ -72,31 +93,18 @@ void formation_control_agent::run_plugin()
     double distance = (this->x.value() - packet_received.agent_state.state[STATE_X])*(this->x.value() - packet_received.agent_state.state[STATE_X]);
     distance += (this->y.value() - packet_received.agent_state.state[STATE_Y])*(this->y.value() - packet_received.agent_state.state[STATE_Y]);
     distance = sqrt(distance);
-    std::cout << "Distanza agenti: " << distance << std::endl;
-    
-    if(!this->my_id.compare(this->my_leader))
-    {
-	this->dubins_trajectory();
-    }
-    else
-    {
-      double leader_gamma = this->phi - this->packet_received.agent_state.state[STATE_THETA];
-      double my_gamma = this->phi - this->theta.value();
-      
-      if(abs(my_gamma - leader_gamma) < 0.01)
-      {
-	/* Case A */
-	this->w = this->packet_received.omega;
-      }
-      else
-      {
-	double k = 10.0;
-	this->w = this->packet_received.omega + k*(my_gamma - leader_gamma);
-	/* Case B */
-      }
-    }
+//    std::cout << "Distanza agenti: " << distance << std::endl;
   }
   
+  if(!this->my_id.compare(this->my_leader))
+  {
+    this->dubins_trajectory();
+  }
+  else
+  {
+    this->wingmen_trajectory();
+  }
+    
   this->packet_to_send.agent_state.identifier = this->my_id;
   this->packet_to_send.agent_state.state[STATE_X] = this->x.value();
   this->packet_to_send.agent_state.state[STATE_Y] = this->y.value();

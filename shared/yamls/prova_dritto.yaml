@@ -44,23 +44,23 @@
     COMMUNICATION_AREA: circle(2000)
     INITIAL:
     - &initial
-      x: '-100'
-      y: '100'
+      x: '50'
+      y: '-50'
       theta: '0'
       
     STATE_START: GO
     BEHAVIOR: dritto
-    LEADER: [Agente2]
-    WINGMEN: [Agente2,Agente3]  
+    LEADER: [Agente1]
+    WINGMEN: [Agente2]  
   - agent: Agente2
     COMMUNICATION_AREA: circle(2000)
     INITIAL:
     - &initial
       x: '100'
-      y: '-100'
-      theta: '3.1415'
+      y: '-50'
+      theta: '0'
     STATE_START: GO
     BEHAVIOR: dritto
     LEADER: [Agente1]
-    WINGMEN: [Agente2,Agente3]
+    WINGMEN: [Agente2]
      

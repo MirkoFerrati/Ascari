@@ -25,4 +25,7 @@ void formation_control_simulator::run_plugin()
 {
   if(this->router == NULL)
     this->router = new formation_control_router(this->num_agents);
+  
+  this->router->sync_messages();
+  
 }

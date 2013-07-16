@@ -66,12 +66,13 @@ bool formation_control_communicator::get_new_data(formation_control_packet* pack
   {
     tmp = this->data_receive.back();
     this->data_receive.clear();
+    *packet = tmp;
     new_data = true;
   }
   
   this->data_receive_mutex.unlock();
   
-  *packet = tmp;
+
   return new_data;
 }
 
