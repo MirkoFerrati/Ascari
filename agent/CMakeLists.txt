@@ -8,7 +8,8 @@ set_property(GLOBAL APPEND PROPERTY agent_SOURCES
   communication/udp_world_communicator.cpp controller/controller.cpp agent.cpp main.cpp
   ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp decoder/decoder.cpp 
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/global.cpp
-	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp 
+	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp  
+	communication/zmq_real_world_serial_communicator.cpp
 	../shared/objects/task_assignment_task.cpp ../shared/objects/router_graph_good.cpp
 )
 #set(agent_SOURCES ${agent_SOURCES} )
@@ -49,6 +50,7 @@ include_directories(plugins)
 find_package(Boost COMPONENTS REQUIRED system thread serialization program_options)
 
 target_link_libraries(agent boost_system boost_thread boost_serialization boost_program_options pthread)
+target_link_libraries(agent serial)
 
 
 #message("Configurazione di ${CMAKE_BUILD_TYPE}")

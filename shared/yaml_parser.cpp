@@ -202,6 +202,24 @@ bool Parsed_Agent::load_from_node ( const YAML::Node& node )
     {
         WARN ( "NO VISIBLE AREA SPECIFIED",NULL );
     }
+
+
+    if (node.FindValue("SIMULATED"))
+    {
+	int tmp_simulated;
+
+	node["SIMULATED"]>>tmp_simulated;
+
+	if (tmp_simulated==1)
+		simulated=true;
+	else
+		simulated=false;
+	}
+
+
+
+
+
     node["COMMUNICATION_AREA"]>>communication;
 
     for ( unsigned int i=0; i<behavior->state.size(); i++ )
