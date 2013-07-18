@@ -19,7 +19,6 @@
 #include "automaton/automatonFSM.h"
 #include "automaton/automatonEFSM.h"
 #include "encoder/encoderDet.h"
-#include "geometry.hpp"
 
 
 using namespace std;

@@ -7,17 +7,9 @@ list ( APPEND CMAKE_CXX_FLAGS "-std=c++0x -Wall -pedantic -Wmissing-field-initia
 add_subdirectory(plugins)
 message(STATUS ${agent_SOURCES})
 add_subdirectory(agent)
-add_subdirectory(simulator)
 add_subdirectory(gml2lgf)
 add_subdirectory(shared)
-add_subdirectory(launcher)
-add_subdirectory(viewer)
 
 include_directories(shared)
-include_directories(shared/logog/include)
 include_directories(../shared/parserYAML/include)
 
-add_subdirectory(testing)
-
-
-#add_subdirectory(yaml_checker)
