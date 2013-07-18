@@ -33,7 +33,7 @@ void sendToSimulator(std::string agent_name, agent_state state,zmq_localization_
     temp.data.state=state;
     std::cout << "Agent "<<temp.data.identifier<<" "<<temp.data.state; //<< id << " x: " << x << " y: " << y << " theta: " << theta << std::endl;
     temp.webcam_id="fake_webcam";
-    communicator.send(temp);
+    //communicator.send(temp);
 
 }
 
@@ -50,24 +50,25 @@ void internalNewCoord(int temp,double& x,double& y)
   else if (i<150)
   {
     x=10;
-    y=5.0-i/50.0*5.0;
+    y=5.0-(i-100)/50.0*5.0;
     
   }
   else if(i<250)
   {
     y=0;
-    x=10.0-i/100.0*10.0;
+    x=10.0-(i-150)/100.0*10.0;
     
   }
   else if(i<300)
   {
     x=0;
-    y=i/50.0*5.0;
+    y=(i-250)/50.0*5.0;
   }  
 }
 
 void getNewCoord(int i,double& x,double& y,double& theta)
 {
+  std::cout<<i<<std::endl;
   internalNewCoord(i,x,y);
   double tempx,tempy;
   internalNewCoord(i+40,tempx,tempy);
@@ -140,8 +141,10 @@ int main ( int argc, char** argv )
     double theta;
     for (int i=0;i<count;i++)
     {
-	getNewCoord(i,x,y,theta);
+      //getNewCoord(i,x,y,theta);
       
+	getNewCoord(get_tick_count()/10000000,x,y,theta);
+      usleep(50000);
         START_TIMING(myTimer);
 	state[agent_state_index["X"]]=x*100+offsetx-maxdelta/2.0+int(maxdelta*rand()/(RAND_MAX + 1.0));
 	state[agent_state_index["Y"]]=y*100+offsety-maxdelta/2.0+int(maxdelta*rand()/(RAND_MAX + 1.0));;
@@ -150,7 +153,7 @@ int main ( int argc, char** argv )
 	sendToSimulator(agent_name,state,communicator);
 	
         STOP_TIMING(myTimer);
-        printf("Execution time: %f ms.\n", GET_TIMING(myTimer) );
+       // printf("Execution time: %f ms.\n", GET_TIMING(myTimer) );
     }
     printf("Average time: %f ms per iteration.\n", GET_AVERAGE_TIMING(myTimer) );
     }
