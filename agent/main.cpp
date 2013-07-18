@@ -3,7 +3,7 @@
 #include <string>
 #include <thread>
 #include "agent.h"
-#include "../shared/logog/include/logog.hpp"
+#include "logog.hpp"
 #include "../shared/communication/global.h"
 #include "lemon/arg_parser.h"
 #include "../plugins/addplugins.h"

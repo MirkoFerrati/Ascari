@@ -74,7 +74,6 @@ public:
     marker_type marker;
     bool simulated=true;
 
-
     
  
     bool load_from_node( const YAML::Node& node);

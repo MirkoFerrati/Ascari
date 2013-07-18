@@ -31,7 +31,7 @@ public:
   bool isCreated=true;
   virtual bool isEnabled()=0;
   virtual std::string getType()=0;
-private:
+protected:
   bool enabled;
 };
 
