@@ -33,7 +33,7 @@ void sendToSimulator(std::string agent_name, agent_state state,zmq_localization_
     temp.data.state=state;
     std::cout << "Agent "<<temp.data.identifier<<" "<<temp.data.state; //<< id << " x: " << x << " y: " << y << " theta: " << theta << std::endl;
     temp.webcam_id="fake_webcam";
-    //communicator.send(temp);
+    communicator.send(temp);
 
 }
 
@@ -77,17 +77,16 @@ void getNewCoord(int i,double& x,double& y,double& theta)
 
 int main ( int argc, char** argv )
 {
-  
+   srand((unsigned)time(0));
       LOGOG_INITIALIZE();
 
-  
     static_zmq::context=new zmq::context_t ( 1 );
     {
         logog::Cout out;
 	zmq_localization_communicator_sender communicator;
 
     lemon::ArgParser ap ( argc, argv );
-    int count;
+    int count,offsetx,offsety,maxdelta;
     std::string agent_name;
           std::string filename;
 	bool filename_obbl=true;
@@ -95,7 +94,10 @@ int main ( int argc, char** argv )
 	  filename_obbl=false;
         ap.refOption ( "f", "Yaml filename", filename, filename_obbl );
         ap.synonym ( "filename", "f" );
-    ap.refOption ( "c", "Number of packets to send", count );
+    ap.intOption ( "c", "Number of packets to send", 100 );
+    ap.intOption("offsetx","offset error on x axis, default: randomized", -25+int(50.0*rand()/(RAND_MAX + 1.0)),false);
+    ap.intOption("offsety","offset error on y axis, default: randomized", -25+int(50.0*rand()/(RAND_MAX + 1.0)),false);
+    ap.intOption("maxdelta","maximum variable error on position, default: 5", 5,false);
     ap.refOption ( "a", "Agent name", agent_name, true );
     ap.synonym ( "agent", "a" );
     ap.throwOnProblems();
@@ -108,6 +110,10 @@ int main ( int argc, char** argv )
         printf ( "errore nella lettura dei parametri %i", ex.reason() );
         return 0;
     }
+    count=ap["c"];
+    offsetx=ap["offsetx"];
+    offsety=ap["offsety"];
+      maxdelta=ap["maxdelta"];
       if (ap.given("filename"))
 	  std::cout << "  Value of -f: " << filename << std::endl;
 
@@ -137,8 +143,8 @@ int main ( int argc, char** argv )
 	getNewCoord(i,x,y,theta);
       
         START_TIMING(myTimer);
-	state[agent_state_index["X"]]=x*100;
-	state[agent_state_index["Y"]]=y*100;
+	state[agent_state_index["X"]]=x*100+offsetx-maxdelta/2.0+int(maxdelta*rand()/(RAND_MAX + 1.0));
+	state[agent_state_index["Y"]]=y*100+offsety-maxdelta/2.0+int(maxdelta*rand()/(RAND_MAX + 1.0));;
 	state[agent_state_index["THETA"]]=theta;
 	
 	sendToSimulator(agent_name,state,communicator);
