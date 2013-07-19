@@ -16,8 +16,8 @@ class objects_container
   template<class Archive>
   void serialize(Archive& ar, const unsigned int /*version*/)
   {
-    ar.register_type(static_cast<task_assignment_task*>(NULL));
-    ar.register_type(static_cast<router_graph_good*>(NULL));
+    //ar.register_type(static_cast<task_assignment_task*>(NULL));
+    //ar.register_type(static_cast<router_graph_good*>(NULL));
     ar& objects;
   }
   

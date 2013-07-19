@@ -33,7 +33,7 @@ zmq_real_world_serial_communicator::zmq_real_world_serial_communicator(std::stri
 
 
     /* Serial Port to Arduino initialization */
-    /*
+    
     serial_port.Open("/dev/ttyACM0");
     assert(serial_port.good());
 
@@ -52,7 +52,7 @@ zmq_real_world_serial_communicator::zmq_real_world_serial_communicator(std::stri
     serial_port.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_NONE );
     assert(serial_port.good());
 
-    */
+    
 }
 
 
@@ -96,7 +96,7 @@ void zmq_real_world_serial_communicator::send_control_command(control_command_pa
         START_TIMING(myTimer);
 
 
-        //serial_port << setprecision(6)<<ARDUINO_COMMAND_CODE<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<";"<<endl;
+        serial_port << setprecision(6)<<ARDUINO_COMMAND_CODE<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<";"<<endl;
         cout << "SerialMessage Sent:" << packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<  endl;
         STOP_TIMING(myTimer);
         printf("Execution time: %f ms.\n", GET_TIMING(myTimer) );

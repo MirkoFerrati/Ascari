@@ -12,6 +12,7 @@
 #include <logog.hpp>
 #include <define.h>
 #include <yaml_parser.h>
+#include </home/mirko/projects/ascari/agent/agent.h>
 
 using namespace std;
 
@@ -34,6 +35,7 @@ int main ( int argc, char **argv )
         logog::Cout out;
         fake_simulator s;
         Parsed_World world;
+	std::string agent_name;
         lemon::ArgParser ap ( argc,argv );
         int count,secSleep;
         std::string filename;
@@ -45,6 +47,7 @@ int main ( int argc, char **argv )
         ap.refOption ( "n","Number of simulator cycle",count );
         ap.refOption ( "s","Milliseconds sleep",secSleep );
         ap.refOption ( "f","Yaml filename",filename,filename_obbl );
+	ap.refOption("a","Agent name",agent_name,true);
         ap.synonym ( "filename","f" );
         ap.synonym ( "sleep","s" );
         ap.throwOnProblems();
@@ -67,7 +70,7 @@ int main ( int argc, char **argv )
 	world = parser.parse_file ( filename );
      
 	
-        s.initialize ( world );
+        s.initialize ( world,agent_name );
         initialize_communication ( s,world );
         if ( ap.given ( "s" ) )
             s.setPeriod ( secSleep );

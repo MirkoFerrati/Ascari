@@ -13,3 +13,5 @@ add_subdirectory(shared)
 include_directories(shared)
 include_directories(../shared/parserYAML/include)
 
+
+add_subdirectory(testing)

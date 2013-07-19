@@ -1,7 +1,7 @@
 #ifndef AGENT_SIM_PACKET_H
 #define AGENT_SIM_PACKET_H
 #include "agent_name_to_ref_states.h"
-#include <objects/task_assignment_task.h>
+//#include <objects/task_assignment_task.h>
 #include <objects/objects_container.hpp>
 
 struct agent_sim_packet{
