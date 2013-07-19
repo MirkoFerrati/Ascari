@@ -18,13 +18,13 @@
 #include <dynamic_remote_localization.h>
 using namespace std;
 
-void simulator::create_communicator ( int communicator_type )
+void simulator::create_communicator ( communicator_types communicator_type,const Parsed_World& world )
 {
-    if ( communicator_type==1 )
+    if ( communicator_type==communicator_types::SIMULATED_UDP )
     {
         communicator=new udp_agent_communicator ( num_agents );
     }
-    else if ( communicator_type==2 )
+    else if ( communicator_type==communicator_types::SIMULATED_TCP )
     {
         std::list<std::string> clients;
         for ( auto it=agents_name_to_index.begin(); it!=agents_name_to_index.end(); ++it )
@@ -33,6 +33,19 @@ void simulator::create_communicator ( int communicator_type )
             std::cout<<it->first<<std::endl;
         }
         communicator=new zmq_agent_communicator ( num_agents,clients );
+    }
+    else if (communicator_type == communicator_types::REAL_TCP)
+    {
+        std::list<std::string> clients;
+        for ( auto ag:world.agents )
+        {
+	  if (ag.simulated)
+	  {
+            clients.push_back ( ag.name );
+            std::cout<<ag.name<<std::endl;
+	  }
+        }
+        communicator=new zmq_agent_communicator ( clients.size(),clients );      
     }
 }
 

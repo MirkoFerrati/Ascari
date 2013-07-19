@@ -16,9 +16,9 @@
 using namespace std;
 
 
-void initialize_communication ( simulator& s )
+void initialize_communication ( simulator& s,const Parsed_World& world, communicator_types type=communicator_types::REAL_TCP )
 {
-    s.create_communicator ( 2 );
+    s.create_communicator ( type,world );
 }
 
 
@@ -78,14 +78,14 @@ int main ( int argc, char **argv )
             if ( plugin->getParserPlugin()->isEnabled() )
             {
                 if ( !plugin->createSimulatorPlugin ( &s ,&world) )
-                    ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() )
+		  {ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() );}
                 else
                     s.addPlugin ( plugin->getSimulatorPlugin() );
             }
         }
 	
         s.initialize ( world );
-        initialize_communication ( s );
+        initialize_communication ( s,world );
         if ( ap.given ( "s" ) )
             s.setPeriod ( secSleep );
         if ( ap.given ( "check_collision" ) )
