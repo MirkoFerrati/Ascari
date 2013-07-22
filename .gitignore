@@ -16,3 +16,4 @@ launcher-build/
 .kdev_ignore
 oldyamls/
 *launcher.pro.user.*
+*.o
