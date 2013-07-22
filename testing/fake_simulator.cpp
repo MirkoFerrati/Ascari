@@ -15,7 +15,7 @@ void fake_simulator::create_communicator(int type, const Parsed_World& world)
         std::list<std::string> clients;
         for ( auto ag:world.agents )
         {
-          if (ag.simulated)
+          if (ag.name==agent_name)
           {
             clients.push_back ( ag.name );
             std::cout<<ag.name<<std::endl;

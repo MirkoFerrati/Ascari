@@ -488,7 +488,7 @@ protected:
         int temp=0;
 
 
-        while ( !exit )
+        while ( !exit && !s_interrupted)
         {
             sync_socket = new zmq::socket_t ( *static_zmq::context, ZMQ_REQ );
             sync_socket->setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
