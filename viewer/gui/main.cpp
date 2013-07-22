@@ -89,10 +89,10 @@ int main ( int argc, char *argv[] )
 	  world=0;
 	if (viewerType>0)
 	{
-	    generic_plugins.at(viewerType+1)->createViewerPlugin(&window,world);
-            plugins.push_back ( generic_plugins.at(viewerType+1)->getViewerPlugin() );
-            generic_plugins.at(viewerType+1)->getViewerPlugin()->setfather ( &window );
-            window.addPlugin ( generic_plugins.at(viewerType+1)->getViewerPlugin() );
+	    generic_plugins.at(viewerType-1)->createViewerPlugin(&window,world);
+            plugins.push_back ( generic_plugins.at(viewerType-1)->getViewerPlugin() );
+            generic_plugins.at(viewerType-1)->getViewerPlugin()->setfather ( &window );
+            window.addPlugin ( generic_plugins.at(viewerType-1)->getViewerPlugin() );
 	}
 	/*
         switch ( viewerType )
