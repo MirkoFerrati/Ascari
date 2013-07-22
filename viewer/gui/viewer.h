@@ -35,7 +35,7 @@ private:
     void closeEvent ( QCloseEvent *event );
     std::vector<abstract_viewer_plugin*> plugins;
     int timerId;
-    int simulation_time;
+
     std::map<std::string,Agent> agents;
     std::string backImage;
     QImage immagine;
@@ -51,6 +51,7 @@ public:
     double minX;
     double maxY;
     double minY;
+        int simulation_time;
 
 };
 

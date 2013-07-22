@@ -1,0 +1,67 @@
+#3_3_TA
+- WORLD:
+  - TASK_ASSIGNMENT_ALGORITHM: SUBGRADIENT #choose SUBGRADIENT or add another algorithm
+    TASK_NUMBER: 1
+    TASK_LIST: [T1,2,2,0,1,100,0,0]
+
+  BEHAVIORS:
+  - name: prova
+    states: [x,y,theta,charge]
+    control_commands: [v,w,c]
+    
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+      charge: 'c'
+    CONTROLLERS:
+    - name: go
+      v: v_t
+      w: w_t_diff
+      c: set_charge
+    - name: wait
+      v: 0
+      w: 0
+      c: set_charge
+    DISCRETE_STATES:
+    - name: go
+      controller: go
+    - name: wait
+      controller: wait
+    - name: wait_for_target
+      controller: wait
+    ENCODER:
+    - TOPOLOGY:
+        - topology: [t1]
+          t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+      LAMBDA:
+        - lambda: [Lreached] 
+          Lreached: 'abs(x-x_task)<0.1 and abs(y-y_task)<0.1'
+    EVENTS:
+    - events: [reached, new_target, stopped, started]
+      reached: 'Lreached'
+      new_target: '!Lreached'
+      stopped: ''
+      started: ''
+    AUTOMATON:
+    - name: aut_machine
+      GO:
+        - WAIT: [stopped]
+          WAIT_FOR_TARGET: [reached]
+      WAIT:
+        - GO: [started]
+      WAIT_FOR_TARGET:
+        - GO: [new_target]
+    
+  AGENTS:
+  - agent: Agente1
+    COMMUNICATION_AREA:   circle(50)
+    INITIAL:
+    - &initial
+      x: '5'
+      y: '3'
+      theta: '0'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: prova
+    TASK_COST_VECTOR: [T1,1]

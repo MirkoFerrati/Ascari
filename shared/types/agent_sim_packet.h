@@ -9,7 +9,6 @@ struct agent_sim_packet{
   const std::map<std::string,double>& bonus_variables;
    agents_name_to_ref_states state_agents;
   const simulation_time& time;
-  //const std::map<std::string, task_assignment_task>& objects;
     
   objects_container& objects;
   

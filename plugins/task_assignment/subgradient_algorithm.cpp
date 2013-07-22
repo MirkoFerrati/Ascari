@@ -1,6 +1,5 @@
 //written by Alessandro Settimi
 #include "task_assignment.h"
-#include <agent.h>
 
 
 using namespace task_assignment_namespace;
@@ -72,6 +71,12 @@ void task_assignment ::control_print()
 	}
 	std::cout<<std::endl<<std::endl;
 	
+	std::cout<<"C: |";
+	for (unsigned int i=0;i<num_task;i++)
+	{
+	      std::cout<<C.at(i)<<'|';
+	}
+	std::cout<<std::endl<<std::endl;
 	
 	
 	std::cout<<"SELECTED TASK: "<<selected_task<<std::endl<<std::endl;
@@ -113,13 +118,12 @@ task_id task_assignment ::subgradient_algorithm()
 			{
 			      F.at(i) = C.at(i) + D.at(i) + mu_T.at(i);
 			      
-			      if(tasks_id.at(i)!="RECHARGE" && (((!reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i)).getState())->executing && reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i)).getState())->available)))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
+			      if(tasks_id.at(i)!="RECHARGE" && (((!reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i))->getState())->executing && reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i))->getState())->available)))) F.at(i) += ((remaining_times_to_deadline.at(tasks_id.at(i))>50)?0:(-DL.at(i)));
 			}
 			
 
 			  
 			ta_problem.set_cost_vector(F);
-
 			
 			
 			ta_problem.solve(solution);
