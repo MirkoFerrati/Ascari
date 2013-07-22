@@ -52,6 +52,14 @@ zmq_real_world_serial_communicator::zmq_real_world_serial_communicator(std::stri
     serial_port.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_NONE );
     assert(serial_port.good());
 
+    std::string temp;
+    serial_port << 1<<";";//<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<";"<<endl;
+//    serial_port>>temp;
+    //cout<<temp<<endl;
+    serial_port << 2<<";";
+//    serial_port>>temp;
+   // cout<<temp<<endl;
+sleep(1);    
     
 }
 
@@ -86,24 +94,25 @@ const world_sim_packet& zmq_real_world_serial_communicator::receive_agents_statu
 
 void zmq_real_world_serial_communicator::send_control_command(control_command_packet& packet, const target_abstract& /*target*/)
 {
+  
+  cout<<"sending packet to simulator"<<endl;
     send(packet);
     DECLARE_TIMING(myTimer);
 
 
-
-    if (abs(packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))-command_old.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE)))>0.01 || abs(packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))-command_old.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE)))>0.01)
-    {
         START_TIMING(myTimer);
 
+    cout<<"sending message to serial port"<<endl;
+    
+        serial_port << setprecision(6)<<ARDUINO_COMMAND_CODE<<","<<
+        packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<
+        packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<";";
+	serial_port.flush();
 
-        serial_port << setprecision(6)<<ARDUINO_COMMAND_CODE<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<";"<<endl;
-        cout << "SerialMessage Sent:" << packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<  endl;
+	cout << "SerialMessage Sent:" << packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<  endl;
         STOP_TIMING(myTimer);
-        printf("Execution time: %f ms.\n", GET_TIMING(myTimer) );
-        printf("Average time: %f ms per iteration.\n", GET_AVERAGE_TIMING(myTimer) );
-    }
-    command_old.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))=packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE));
-    command_old.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))=packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE));
+       // printf("Execution time: %f ms.\n", GET_TIMING(myTimer) );
+        //printf("Average time: %f ms per iteration.\n", GET_AVERAGE_TIMING(myTimer) );
 
 }
 
