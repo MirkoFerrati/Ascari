@@ -16,9 +16,11 @@ class abstract_object
   {
     ar& name;
   }
-    std::string name;
+
 
 public:
+  
+      std::string name;
 
   virtual const void* getState() const=0;
   virtual bool isMovable()=0;
