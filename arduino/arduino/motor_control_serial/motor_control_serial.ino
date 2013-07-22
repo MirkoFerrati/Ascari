@@ -100,17 +100,17 @@ void set_pwm(int value_left,int value_right){
  	analogWrite(E2, abs(value_left));
       	analogWrite(E1, abs(value_right));
 
-      Serial.print("Command EXECUTED:");
-      Serial.print(value_right);
-      Serial.print(",");
-      Serial.println(value_left);
+      //Serial.print("Command EXECUTED:");
+      //Serial.print(value_right);
+      //Serial.print(",");
+      //Serial.println(value_left);
 }
 
 
 void ferma(){
   analogWrite(E1, 0);  
   analogWrite(E2, 0);
-  Serial.println("Command EXECUTED: STOP");
+  //Serial.println("Command EXECUTED: STOP");
 }
 
 
