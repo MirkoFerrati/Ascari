@@ -143,37 +143,32 @@ void Viewer::paintTextPoint(QPainter *painter,double x,double y)
 }
 
 void Viewer::paintAgents(QPainter &painter,const std::map<std::string,Agent>& agents)
-	{
-	  
-	  auto agentshape=QPolygon(QVector<QPoint>(
-			{
-				QPoint ( 2, -2 ),
-											QPoint ( -2, -2 ),
-											QPoint ( 0, 2 )
-			})); 
-		for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
-		{
-			painter.save();
-			painter.setBrush ( QColor ( "red" ) );
-			painter.translate ( it->second.x,it->second.y );
-			//lo zero degli angoli parte dall'asse y invece che da x
-			double tmp=it->second.angle;
-			while ( tmp>M_PI )
-				tmp=tmp-2*M_PI;
-			painter.rotate ( ( tmp*180/M_PI )-90 );
-			
-			painter.scale(3,3);
-			painter.drawConvexPolygon(agentshape);
-			painter.restore();
-			painter.save();
-			painter.translate ( it->second.x,it->second.y );
-			painter.scale(painter.fontMetrics().height()/1,-painter.fontMetrics().height()/1);
-			painter.drawText(0,0,QString(it->first.substr(6).c_str()));
-			
-			painter.restore();
-			
-		}
-	};
+{
+    auto agentshape=QPolygon(QVector<QPoint>({ QPoint ( 2, -2 ),QPoint ( -2, -2 ),QPoint ( 0, 2 )})); 
+    
+    for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
+    {
+	painter.save();
+	painter.setBrush ( QColor ( "red" ) );
+	painter.translate ( it->second.x,it->second.y );
+	//lo zero degli angoli parte dall'asse y invece che da x
+	double tmp=it->second.angle;
+	while ( tmp>M_PI )
+		tmp=tmp-2*M_PI;
+	painter.rotate ( ( tmp*180/M_PI )-90 );
+	
+	painter.scale(3,3);
+	painter.drawConvexPolygon(agentshape);
+	painter.restore();
+	painter.save();
+	painter.translate ( it->second.x,it->second.y );
+	painter.scale(painter.fontMetrics().height()/1,-painter.fontMetrics().height()/1);
+	painter.drawText(0,0,QString(it->first.substr(6).c_str()));
+	
+	painter.restore();
+	    
+    }
+}
 
 void Viewer::paintEvent ( QPaintEvent */*event*/ )
 {
@@ -195,31 +190,35 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
         painter.drawPixmap ( 0,0,sidex,sidey,pixmap );
     }
 
-    paintAgents(painter,agents);
+    if(plugins.size()==0)
+    {
+	paintAgents(painter,agents);
+	
+	painter.save();
+	QFont f = painter.font();
+	f.setPointSizeF (  std::max(height() /2500.0,0.04 ));
+	painter.setFont ( f );
+	painter.setPen ( QColor ( "blue" ) );
+	painter.translate(translateX,maxY-1.1*painter.fontMetrics().height());
+	painter.scale(1,-1);
+	painter.drawText (0,0, QString("").setNum(simulation_time) );
+	painter.restore();
+    }
     
     for (auto plugin:plugins)
     {
-		painter.save();
-     plugin->paintBackground(painter);
-	 painter.restore();
+	painter.save();
+	plugin->paintBackground(painter);
+	painter.restore();
     }
     for (auto plugin:plugins)
     {
-		painter.save();
-      plugin->paintAgents(painter,agents);
-		painter.restore();
-		
-	}
-    
-    painter.save();
-    QFont f = painter.font();
-    f.setPointSizeF ( max(height() /25.0,4.0 ));
-    painter.setFont ( f );
-    painter.setPen ( QColor ( "blue" ) );
-	painter.translate(translateX,maxY-1.1*painter.fontMetrics().height());
-	painter.scale(1,-1);
-    painter.drawText (0,0, QString("").setNum(simulation_time) );
-    painter.restore();
+	painter.save();
+	plugin->paintAgents(painter,agents);
+	painter.restore();	
+    }
+	
+   
     painter.restore();
 }
 
