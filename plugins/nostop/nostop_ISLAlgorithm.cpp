@@ -19,7 +19,7 @@ namespace NoStop
 	//////////////////////////////////////////////////////////////////////////
 	void ISLAlgorithm::initialize(Parsed_World* parse)
 	{
-		auto wo=reinterpret_cast<Parsed_world*>(world.parsed_items_from_plugins[0]);    
+		auto wo=reinterpret_cast<NoStop::Parsed_world*>(parse->parsed_items_from_plugins[0]);    
 		m_numberOfGuards = wo->agents.size() - 1; // per ora un solo agente nocivo, CONTROLLARE
 	}
 

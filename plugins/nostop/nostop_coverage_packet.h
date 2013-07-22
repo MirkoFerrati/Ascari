@@ -2,6 +2,7 @@
 #define NOSTOP_COVERAGE_PACKET_H
 
 #include "nostop_agent_plugin.h"
+#include "nostop_agent_id.h"
 #include "../shared/types.h"
 
 namespace NoStop
@@ -17,7 +18,7 @@ namespace NoStop
 
 	public:
 		NoStop_packet(simulation_time _time, Agent_ID _agent_id, AgentPosition _pos, data_type _data)
-			: _time(_time), m_agent_id(_agent_id), m_pos(_pos), m_data(_data)
+			: m_time(_time), m_agent_id(_agent_id), m_pos(_pos), m_data(_data)
 		{}
 
 		void setData(void *_data)

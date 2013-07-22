@@ -13,19 +13,19 @@ ${CMAKE_CURRENT_SOURCE_DIR}/nostop_thread.hpp ${CMAKE_CURRENT_SOURCE_DIR}/nostop
 endif (${GLPK_FOUND})
 
 set_property(GLOBAL APPEND PROPERTY viewer_SOURCES  
-${CMAKE_CURRENT_SOURCE_DIR}/nostop_viewer.cpp  
+${CMAKE_CURRENT_SOURCE_DIR}/nostop_viewer_plugin.cpp  
 ${CMAKE_CURRENT_SOURCE_DIR}/nostop_parser_plugin.cpp
 
 )
 
 set_property(GLOBAL APPEND PROPERTY launcher_SOURCES  
-${CMAKE_CURRENT_SOURCE_DIR}/nostop_viewer.cpp  
+${CMAKE_CURRENT_SOURCE_DIR}/nostop_viewer_plugin.cpp  
 ${CMAKE_CURRENT_SOURCE_DIR}/nostop_parser_plugin.cpp
 
 )
 
 set_property(GLOBAL APPEND PROPERTY simulator_SOURCES  
-${CMAKE_CURRENT_SOURCE_DIR}/nostop_simulator.cpp  ${CMAKE_CURRENT_SOURCE_DIR}/nostop_router.hpp
+${CMAKE_CURRENT_SOURCE_DIR}/nostop_simulator_plugin.cpp  ${CMAKE_CURRENT_SOURCE_DIR}/nostop_router.hpp
 ${CMAKE_CURRENT_SOURCE_DIR}/nostop_parser_plugin.cpp
 )
 

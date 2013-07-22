@@ -21,13 +21,13 @@ namespace NoStop
 			///	Acquire the state of the semaphore
 			Lock( std::shared_ptr<std::mutex> _mutex ) : m_mutex(_mutex)
 			{
-				m_mutex.lock();
+				m_mutex->lock();
 			}
 
 			///	Release the state of the semaphore
 			~Lock()
 			{
-				m_mutex.unlock();
+				m_mutex->unlock();
 			}
 
 		private:

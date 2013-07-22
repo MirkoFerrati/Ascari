@@ -114,7 +114,7 @@ namespace NoStop
       bool createParserPlugin()
       {
 	  if ( m_parser_plugin!=0 )
-	      ERR ( "Already created agent plugin, please check for double calls",NULL );
+	      ERR ( "Already created agent plugin, please check for double calls",NULL )
 	  else
 	      m_parser_plugin=new Parser_plugin ( getType() );
 	  return m_parser_plugin;

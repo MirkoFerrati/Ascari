@@ -72,7 +72,7 @@ namespace NoStop
 		AgentPosition(Real2D const& point, double const& _orientation) : m_point(point), m_camera() 
 		{ m_camera.m_orientation = _orientation; }
 
-		AgentPosition(Real2D const& point, CameraPosition _camera) : m_point(point), m_camera(_camera) {}
+		AgentPosition(Real2D const& point, CameraPosition _camera = CameraPosition() ) : m_point(point), m_camera(_camera) {}
 
 		/// Update the counter of the lattice visible from that position
 		void updateCounter(std::shared_ptr<DiscretizedArea> area);

@@ -37,7 +37,7 @@ namespace NoStop
 			std::vector<int> const& numVertInObs );
 
 		/// Reading number of vertex for every obstacles from configuration file
-		static std::vector<int> Parsed_world::readingObstaclesVertices( 
+		static std::vector<int> readingObstaclesVertices( 
 			const YAML::Node& node,
 			int const& l_numObs);
 

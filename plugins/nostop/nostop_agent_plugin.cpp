@@ -10,31 +10,31 @@
 namespace NoStop 
 {
 	//////////////////////////////////////////////////////////////////////////
-	void Agent_plugin::createDiscretizedArea(const Parsed_World& world)
+	void Agent_plugin::createDiscretizedArea(Parsed_World* world)
 	{
+		auto wo=reinterpret_cast<NoStop::Parsed_world*>(world->parsed_items_from_plugins[0]);
 		//	Get vertex from Parsed World:
-		std::vector<Real2D> l_vertices = world.getExternalVertices();
-		std::set< std::vector<Real2D> > l_obstacles = world.getObstaclesVertices();
-		int l_num_col = world.getDiscretization();
-		int l_num_row = world.getDiscretization();
+		std::vector<Real2D> l_vertices = wo->getExternalVertices();
+		std::set< std::vector<Real2D> > l_obstacles = wo->getObstaclesVertices();
+		int l_num_col = wo->getDiscretization();
+		int l_num_row = wo->getDiscretization();
 
 		m_area = std::make_shared<DiscretizedArea>(l_vertices, l_obstacles, l_num_col, l_num_row);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Agent_plugin::colletOtherAgentsInfo(const Parsed_World& world)
+	void Agent_plugin::colletOtherAgentsInfo(Parsed_World* world)
 	{
-		auto wo=reinterpret_cast<Parsed_world*>(world.parsed_items_from_plugins[0]);    
-
-		for (unsigned int i=0;i<wo->agents.size();i++)
-			m_other_agents_id.push_back(wo->agents.at(i));
+		auto wo=reinterpret_cast<NoStop::Parsed_world*>(world->parsed_items_from_plugins[0]);
+		for (unsigned int i=0;i<world->agents.size();i++)
+			m_other_agents_id.push_back(world->agents.at(i));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Agent_plugin::intializeLearningAlgorithm(Parsed_World* parse)
+	void Agent_plugin::intializeLearningAlgorithm(Parsed_World* world)
 	{
 		m_algorithm = std::make_shared<ISLAlgorithm>(m_area, this);
-		m_algorithm->initialize(parsed_world);
+		m_algorithm->initialize(world);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -45,17 +45,17 @@ namespace NoStop
 		m_mutex(nullptr),
 		m_initialized(false)
 	{
-		initialize(*parse);
+		initialize(parse);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Agent_plugin::initialize(const Parsed_World& world)
+	void Agent_plugin::initialize(Parsed_World* world)
 	{
 		m_mutex = std::make_shared<std::mutex>();
 
 		/// Collect agent initial position
-		double x0=parse->agents.front().initial_states.at("X");
-		double y0=parse->agents.front().initial_states.at("Y");
+		double x0=world->agents.front().initial_states.at("X");
+		double y0=world->agents.front().initial_states.at("Y");
 		m_position = AgentPosition( Real2D(x0, y0) );
 
 		//	Create agent area Map
@@ -65,7 +65,7 @@ namespace NoStop
 		colletOtherAgentsInfo(world);
 
 		// Initialize ISL Algorithm
-		intializeLearningAlgorithm(m_area);
+		intializeLearningAlgorithm(world);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

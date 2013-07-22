@@ -24,6 +24,8 @@
 
 namespace NoStop
 {
+	class ISLAlgorithm;
+  
 	/// Struct representing memory of an agent
 	struct MemoryAgentPosition
 	{
@@ -112,7 +114,7 @@ namespace NoStop
 
 	protected:
 		/// Initialize world variable to create discretization map and get Number of other agents
-		void initialize(const Parsed_World& world);
+		void initialize(Parsed_World* parse);
 
 		/// Compute Speed to avoid collisions
 		void compute_speeds(double x_t,double y_t);
@@ -133,10 +135,10 @@ namespace NoStop
 		bool isNeighbor(AgentPosition const& other);
 
 		/// Create area 
-		void createDiscretizedArea(const Parsed_World& world);
+		void createDiscretizedArea(Parsed_World* parse);
 
 		/// Collect other agents information (IDs and positions)
-		void colletOtherAgentsInfo(const Parsed_World& world);
+		void colletOtherAgentsInfo(Parsed_World* parse);
 
 		/// Receive packet from other agents
 		void receiveDataFromOthers();
