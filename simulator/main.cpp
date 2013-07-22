@@ -16,9 +16,9 @@
 using namespace std;
 
 
-void initialize_communication ( simulator& s )
+void initialize_communication ( simulator& s,const Parsed_World& world, communicator_types type=communicator_types::REAL_TCP )
 {
-    s.create_communicator ( 2 );
+    s.create_communicator ( type,world );
 }
 
 
@@ -58,7 +58,7 @@ int main ( int argc, char **argv )
             ERR ( "errore nella lettura dei parametri %s",ex.what() );
             return 0;
         }
-        if (!ap.given("filename"))
+        if (!ap.given("f"))
 	{
 	  filename=CONFIG.getValue("FILENAME");
   	  INFO("Using %s as filename, read from config file",filename.c_str());
@@ -78,16 +78,16 @@ int main ( int argc, char **argv )
             if ( plugin->getParserPlugin()->isEnabled() )
             {
                 if ( !plugin->createSimulatorPlugin ( &s ,&world) )
-                    ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() )
+		  {ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() );}
                 else
                     s.addPlugin ( plugin->getSimulatorPlugin() );
             }
         }
 	
         s.initialize ( world );
-        initialize_communication ( s );
+        initialize_communication ( s,world );
         if ( ap.given ( "s" ) )
-            s.setSleep ( secSleep );
+            s.setPeriod ( secSleep );
         if ( ap.given ( "check_collision" ) )
             s.setCheckCollision ( checkCollision );
         if ( ap.given ( "n" ) )

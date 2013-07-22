@@ -40,9 +40,9 @@ template<typename receive_type, int sock_recv_type>
 class zmq_receive_communicator
 {
 public:
-    zmq_receive_communicator() 
+    zmq_receive_communicator()
     {
-      	receiver_socket=std::unique_ptr<zmq::socket_t> (new zmq::socket_t(*static_zmq::context, sock_recv_type ));
+        receiver_socket=std::unique_ptr<zmq::socket_t> (new zmq::socket_t(*static_zmq::context, sock_recv_type ));
         assert ( sock_recv_type == ZMQ_PULL || sock_recv_type == ZMQ_SUB );
         clientsNamed=false;
         initialized = false;
@@ -54,13 +54,13 @@ public:
 
     ~zmq_receive_communicator()
     {
-      if (receiver_socket)
-      {
-	  receiver_socket->close();
-	   delete(receiver_socket.release());
-      }
+        if (receiver_socket)
+        {
+            receiver_socket->close();
+            delete(receiver_socket.release());
+        }
 //       std::cout<<"chiamato distruttore di zmq_communicator"<<std::endl;
-      
+
     }
 
 protected:
@@ -108,7 +108,111 @@ protected:
         return true;
     }
 
+
+    bool internal_receive(zmq::message_t* buffer,int flags=0)
+    {
+
+#ifdef ZMQDEBUG
+        bool fail = !check_for_unique_call.try_lock();
+        if ( fail )
+        {
+            ERR ( "receive e' gia' in esecuzione,probabilmente ci sono due thread concorrenti che chiamano la stessa receive", NULL );
+        }
+#endif //ZMQDEBUG
+// 	      std::cout<<"mi sto per bloccare su una receive"<<std::endl;
+        bool rc=receiver_socket->recv ( buffer,flags );
+// 			      std::cout<<"sbloccato da una receive"<<std::endl;
+
+        if ( !rc )
+        {
+            if (flags==ZMQ_NOBLOCK)
+                return false;
+            else
+                ERR ( "brutte cose, questa scritta non dovrebbe mai comparire",NULL );
+        }
+#ifdef ZMQDEBUG
+        check_for_unique_call.unlock();
+#endif //ZMQDEBUG
+        return rc;
+
+    }
+
+    void internal_translate(std::vector<std::string>& received_strings)
+    {
+        receive_type packet;
+        results.clear();
+for (auto receive:received_strings)
+        {   
+	  std::string tmp;
+            std::istringstream iss ( receive );
+            iss >> tmp;
+            boost::archive::text_iarchive archive ( iss );
+            try {
+                archive >> packet;
+            }
+            catch (const char* ex)
+            {
+                ERR("errore durante la deserializzazione del pacchetto %s",ex);
+            }
+            results.push_back ( packet );
+        }
+    }
+
+
 public:
+
+
+
+    receive_type receive_last_one()
+    {
+        if ( !initialized )
+        {
+            ERR ( "receive chiamata senza avere inizializzato il communicator", NULL );
+            throw "receive chiamata senza avere inizializzato il communicator";
+        }
+
+        received_strings.clear();
+        received_strings.resize(1);
+        results.clear();
+        bool end=false;
+        bool found=false;
+        while(!end)
+        {
+            try
+            {
+                bool rc=internal_receive(&receive_buffer,ZMQ_NOBLOCK);
+                if(rc)
+                {
+                    found=true;
+                    received_strings[0]=( reinterpret_cast<char*> ( receive_buffer.data() ));
+                }
+                else if (!found)
+                {
+                    bool rc=internal_receive(&receive_buffer);
+                    if(rc)
+                    {
+                        received_strings[0]=( reinterpret_cast<char*> ( receive_buffer.data() ));
+                    }
+                }
+                else
+                {
+                    end=true;
+                }
+            }
+            catch ( zmq::error_t& ex )
+            {
+                if ( zmq_errno () == ETERM )
+                {
+                    WARN ( "programma terminato o qualcosa del genere",NULL );
+                    receiver_socket->close();
+                    delete(receiver_socket.release());
+                    return results.at(0);//TODO solve undefined behavior
+                }
+            }
+        }
+        internal_translate(received_strings);
+        return results.at(0);
+    }
 
 #ifdef ZMQDEBUG
     std::mutex check_for_unique_call;
@@ -122,62 +226,31 @@ public:
             ERR ( "receive chiamata senza avere inizializzato il communicator", NULL );
             throw "receive chiamata senza avere inizializzato il communicator";
         }
-#ifdef ZMQDEBUG
-        bool fail = !check_for_unique_call.try_lock();
-        if ( fail )
-        {
-            ERR ( "receive e' gia' in esecuzione,probabilmente ci sono due thread concorrenti che chiamano la stessa receive", NULL );
-        }
-#endif //ZMQDEBUG
+
         unsigned int subscribers = 0;
-        receive_type packet;
-        results.clear();
+
+        received_strings.clear();
         while ( subscribers < expected_senders )
         {
             try
             {
-// 	      std::cout<<"mi sto per bloccare su una receive"<<std::endl;
-                bool rc=receiver_socket->recv ( &receive_buffer,flags );
-// 			      std::cout<<"sbloccato da una receive"<<std::endl;
-
-                if ( !rc )
-                {
-                    ERR ( "brutte cose",NULL );
-                }
+                internal_receive(&receive_buffer,flags);
             }
             catch ( zmq::error_t& ex )
             {
-// 	      	      std::cout<<"sbloccato da una receive"<<std::endl;
-
                 if ( zmq_errno () == ETERM )
                 {
                     WARN ( "programma terminato o qualcosa del genere",NULL );
-		    receiver_socket->close();
-		    delete(receiver_socket.release());
-		    return results;
+                    receiver_socket->close();
+                    delete(receiver_socket.release());
+                    return results;
                 }
             }
-
-            char* receive = reinterpret_cast<char*> ( receive_buffer.data() );
-	    //std::cout<<"receive basso livello"<<receive<<std::endl;
-            std::string tmp;
-            std::istringstream iss ( receive );
-            iss >> tmp;
-            boost::archive::text_iarchive archive ( iss );
-	    try{
-	      archive >> packet;
-	    }
-	    catch (const char* ex)
-	    {
-	      ERR("errore durante la deserializzazione del pacchetto %s",ex);
-	    }
-            results.push_back ( packet );
+            received_strings.push_back( reinterpret_cast<char*> ( receive_buffer.data() ));
             subscribers++;
         }
-#ifdef ZMQDEBUG
-        check_for_unique_call.unlock();
 
-#endif //ZMQDEBUG
+        internal_translate(received_strings);
         return results;
 
     };
@@ -186,6 +259,7 @@ private:
     std::unique_ptr<zmq::socket_t>  receiver_socket;
     zmq::message_t receive_buffer;
     std::vector <receive_type> results;
+    std::vector<std::string> received_strings;
     std::string owner_name;
     unsigned int expected_senders;
     bool initialized;
@@ -210,7 +284,7 @@ public:
 
     ~zmq_send_communicator()
     {
-      
+
     }
 
 protected:
@@ -253,7 +327,7 @@ public:
         memcpy ( send_buffer.data(), tmp.c_str(),tmp.length() +1 );
         std::string temp=reinterpret_cast<char*> ( send_buffer.data() );
         //std::cout<<temp<<std::endl;
-	sender_socket->send ( send_buffer );
+        sender_socket->send ( send_buffer );
     };
 
 
