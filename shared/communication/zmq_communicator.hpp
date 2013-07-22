@@ -191,6 +191,7 @@ public:
                     bool rc=internal_receive(&receive_buffer);
                     if(rc)
                     {
+			found=true;
                         received_strings[0]=( reinterpret_cast<char*> ( receive_buffer.data() ));
                     }
                 }
