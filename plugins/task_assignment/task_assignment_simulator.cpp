@@ -15,29 +15,54 @@ task_assignment_simulator::task_assignment_simulator(simulator* s):sim_packet(s-
 
 bool task_assignment_simulator::initialize ( const Parsed_World& w )
 {
+    
     auto world=reinterpret_cast<task_assignment_parsed_world*>(w.parsed_items_from_plugins[0]);
-  //written by Alessandro Settimi
+    this->world=*world;
+
     task_assignment_algorithm = world->task_assignment_algorithm;
     num_agents=w.agents.size();
     
-    auto tasklist=world->task_list;
-    auto tasks_id=world->tasks_id;
-
-    for ( unsigned int i=0; i<tasks_id.size(); i++ )
-    {
-        task_assignment_task tmp ( world->task_list.at ( tasks_id.at ( i ) ) );
-//         sim_packet.objects[tasks_id.at ( i )]=tmp;
-    }
-
-//     std::cout<<sim_packet.objects<<std::endl;
-    
     return true;
-    //written by Alessandro Settimi
 }
 
 void task_assignment_simulator::stop()
 {
 //TODO
+}
+
+
+std::list<abstract_object*>* task_assignment_simulator::create_objects()
+{
+    std::vector<std::string> tasks_id=world.tasks_id;
+    
+    std::cout<<"CREO OGGETTI - "<<tasks_id<<std::endl;
+    
+    std::list<abstract_object*>* list=new std::list<abstract_object*>;
+    
+    for ( unsigned int i=0; i<tasks_id.size();i++ )
+    {
+	abstract_object* temp;
+	
+	task_assignment_task* temp2 = new task_assignment_task();
+      
+	temp2->object_type="TASK_ASSIGNMENT";
+	
+	temp2->name=tasks_id.at(i);
+	
+	temp2->state=world.task_list.at(tasks_id.at(i));
+	
+	temp2->state.done=false;
+
+// 	std::cout<<temp2<<std::endl;
+	
+ 	temp=temp2;
+	
+// 	std::cout<<" - abstract - ";temp->print(std::cout);
+	
+	list->push_back(temp);
+    }
+    
+    return list;
 }
 
 

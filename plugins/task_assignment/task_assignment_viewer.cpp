@@ -25,17 +25,21 @@ void task_assignment_viewer::timerEvent ( std::shared_ptr< std::mutex >& mutex, 
     Viewer* temp_father=reinterpret_cast<Viewer*>(father);
     mutex->lock();
     old_time=now_time;
-now_time=infos.time;
-    for(auto i=infos.object_list.objects.begin(); i!=infos.object_list.objects.end(); ++i)
+    now_time=infos.time;
+    
+    if (infos.object_list.objects.count("TASK_ASSIGNMENT"))
     {
-      //TODO: controllare che SIA UN TASK
-      //TODO: far funzionare queste righe
-// 	tasks[reinterpret_cast<const task_assignment_namespace::task*>(*i->getState())->id]=*(reinterpret_cast<const task_assignment_namespace::task*>(*i->getState()));
-// 	
-// 	if ( temp_father->maxX< tasks[i->first].task_position[0] ) temp_father->maxX= tasks[i->first].task_position[0] +2;
-// 	if ( temp_father->maxY< tasks[i->first].task_position[1] ) temp_father->maxY= tasks[i->first].task_position[1] +2;
-// 	if ( temp_father->minX> tasks[i->first].task_position[0] ) temp_father->minX= tasks[i->first].task_position[0] -2;
-// 	if ( temp_father->minY> tasks[i->first].task_position[1] ) temp_father->minY= tasks[i->first].task_position[1] -2;
+	for(auto i:infos.object_list.objects.at("TASK_ASSIGNMENT"))
+	{
+	  //TODO: controllare che SIA UN TASK
+	  //TODO: far funzionare queste righe
+	  tasks[i->name]=(reinterpret_cast<task_assignment_task*>(i))->state;
+	  
+	  if ( temp_father->maxX< tasks[i->name].task_position[0] ) temp_father->maxX= tasks[i->name].task_position[0] +2;
+	  if ( temp_father->maxY< tasks[i->name].task_position[1] ) temp_father->maxY= tasks[i->name].task_position[1] +2;
+	  if ( temp_father->minX> tasks[i->name].task_position[0] ) temp_father->minX= tasks[i->name].task_position[0] -2;
+	  if ( temp_father->minY> tasks[i->name].task_position[1] ) temp_father->minY= tasks[i->name].task_position[1] -2;
+	}
     }
     
     mutex->unlock();
@@ -44,6 +48,18 @@ now_time=infos.time;
 
 void task_assignment_viewer::paintBackground (QPainter& painter)
 {  
+	Viewer* temp_father=reinterpret_cast<Viewer*>(father);
+  
+	painter.save();
+	QFont f = painter.font();
+	f.setPointSizeF (  std::max(temp_father->height() /2500.0,0.04 ));
+	painter.setFont ( f );
+	painter.setPen ( QColor ( "blue" ) );
+	painter.translate(temp_father->translateX,temp_father->maxY-1.1*painter.fontMetrics().height());
+	painter.scale(1,-1);
+	painter.drawText (0,0, QString("").setNum(temp_father->simulation_time) );
+	painter.restore();
+  
 	std::stringstream app(std::stringstream::out);
 	app.str("");
 	
