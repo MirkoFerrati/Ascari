@@ -94,8 +94,8 @@ void simulator::initialize ( const Parsed_World& wo )
         this->world_map=new map2d ( wo.mapfilename );
     }
     initialize_agents ( wo.agents );
-    createObjects ( wo );
     initialize_plugins ( wo );
+    createObjects ( wo );
     bonus_symbol_table.add_constants();
     int i=0;
     for ( map<bonusVariable,bonus_expression>::const_iterator it=wo.bonus_expressions.begin(); it!=wo.bonus_expressions.end(); ++it )
@@ -139,16 +139,14 @@ void simulator::initialize ( const Parsed_World& wo )
 
 void simulator::createObjects ( const Parsed_World& world )
 {
-
-//   //TODO usare world e chiamare i plugin
-//   task_assignment_namespace::task my_task;
-//   my_task.task_type=1241;
-//   auto temp=new task_assignment_task(my_task);
-// sim_packet.object_list.objects.push_back(temp);
-// my_task.task_type=3894;
-//   temp=new task_assignment_task(my_task);
-//   sim_packet.object_list.objects.push_back(temp);
-
+     for ( auto & plugin:plugins )
+     {
+	    sim_packet.object_list.objects[plugin->get_objects_type()] = *plugin->create_objects();
+	    
+	    std::cout<<plugin->get_objects_type()<<" objects : "<<sim_packet.object_list.objects[plugin->get_objects_type()].size()<<std::endl;
+	    
+	    //for(auto i:sim_packet.object_list.objects[plugin->get_objects_type()])i->print(std::cout);
+     }
 }
 
 
@@ -340,11 +338,7 @@ void simulator::main_loop()
                 //communicator->send_target(agent_packet,agent->first);
                 communicator->send_target ( agent_packet,agent->first );
             }
-
-        for ( auto object:sim_packet.object_list.objects )
-            {
-                // object->print(std::cout);
-            }
+            
             viewer_communicator->send_target ( sim_packet,"viewer" );
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 
@@ -367,8 +361,10 @@ void simulator::main_loop()
 
             for ( auto object_list=sim_packet.object_list.objects.begin(); object_list!=sim_packet.object_list.objects.end(); ++object_list )
             {
-            for ( auto object:object_list->second )
-                    object->updateState ( sim_packet.time,sim_packet.state_agents,agent_states_to_index );
+		for ( auto object:object_list->second )
+		{
+		    object->updateState ( sim_packet.time,sim_packet.state_agents,agent_states_to_index );
+		}
             }
 
             collisionChecker->checkCollisions();
