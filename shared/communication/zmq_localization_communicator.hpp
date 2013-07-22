@@ -9,7 +9,7 @@
 #include "streams_utils.h"
 #define LOCALIZATION_TO_SIMULATOR CONFIG.getValue("LOCALIZATION_TO_SIMULATOR")
 
-class zmq_localization_communicator_receiver: public zmq_receive_communicator<agent_state_packet,ZMQ_PULL>
+class zmq_localization_communicator_receiver: public zmq_receive_communicator<agent_state_packet_from_webcam,ZMQ_PULL>
 {
   public:
 void init(std::string owner_name)
@@ -23,7 +23,6 @@ void stop()
 {
   exiting=true;
 }
-	
 agent_state getState(std::string agent_name){
       agent_state temp;
       agent_lock.lock();
@@ -40,25 +39,86 @@ agent_state getState(std::string agent_name){
 	
 private:
   
+  	/*
+	 * 0.1 soglia in salita e discesa
+	 * -10% in discea
+	 * raddoppio in salita
+	 * inserire mittente
+	 * mappa webcam-pesi
+	 * 
+	 */
   void loop(std::mutex& agent_lock,std::map<std::string,agent_state>& agents,bool& exiting)  
   {
     while(!exiting)
     {
-      agent_state_packet temp=(this->receive().front());
+      //reiceve data
+      agent_state_packet_from_webcam temp=(this->receive().front());
+      
+      //create new webcam in the database
+      if (!webcams.count(temp.webcam_id))
+	webcams[temp.webcam_id];
+      
+      //for each webcam, create new weights in the database
+      for (auto single_webcam:webcams)
+      if (!single_webcam.second.count(temp.data.identifier))
+      {
+	weights[single_webcam.first][temp.data.identifier]=0;
+	single_webcam.second[temp.data.identifier];
+      }
+      
+      //evolve the new received weight
+      auto& value=weights[temp.webcam_id][temp.data.identifier];
+      if (value>0.1)
+      {
+	value=2*value;
+	if (value>1)
+	  value=1;
+      }
+      else
+	value=0.1;
+      
+      //evolve other weights
+      for (auto weight:weights)
+      {
+	if (weight.first!=temp.webcam_id)
+	                   weight.second.at(temp.data.identifier)*=0.9;
+	if (weight.second.at(temp.data.identifier)<=0.1)
+	                   weight.second.at(temp.data.identifier)=0;
+      }
+      
+      //create agent state
+      webcams.at(temp.webcam_id).at(temp.data.identifier)=temp.data.state;
+      agent_state medium_state=temp.data.state;
+      for (auto coordinate:medium_state)
+      {	
+	coordinate.second=0;
+	int num_webcams=0;
+	
+	//make the weighted mean of the coordinates
+	for(auto single_webcam=webcams.begin();single_webcam!=webcams.end();++single_webcam)
+	{ 
+	  num_webcams++;
+	  coordinate.second+=single_webcam->second.at(temp.data.identifier).at(coordinate.first);
+	} 
+	coordinate.second=coordinate.second/num_webcams;
+	
+      }
       agent_lock.lock();
-      agents[temp.identifier]=temp.state;
-      std::cout<<"ricevuto agente "<<temp.identifier<<" con stato "<<temp.state<<std::endl;
+      agents[temp.data.identifier]=medium_state;
+      //std::cout<<"ricevuto agente "<<temp.identifier<<" con stato "<<temp.state<<std::endl;
       agent_lock.unlock();
     }
   }
   bool exiting;
   std::thread* receiver_loop;
   std::mutex agent_lock;
-  std::map<std::string,agent_state> agents;
+  std::map<std::string,std::map<std::string , double>> weights;
+  std::map<std::string, std::map<std::string,agent_state>> webcams;
+  std::map<std::string,agent_state>  agents;
   
 };
 
-class zmq_localization_communicator_sender : public zmq_send_communicator<agent_state_packet,ZMQ_PUSH>
+class zmq_localization_communicator_sender : public zmq_send_communicator<agent_state_packet_from_webcam,ZMQ_PUSH>
 {
 public:
 void init(std::string owner_name)

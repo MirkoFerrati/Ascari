@@ -11,7 +11,6 @@ struct world_sim_packet {
     std::map<std::string,double> bonus_variables;
     agents_name_to_states state_agents;
     simulation_time time;
-//    std::map<std::string, task_assignment_task> objects;
   	objects_container object_list;
   
     template <typename Archive>

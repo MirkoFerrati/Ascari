@@ -1,0 +1,66 @@
+- WORLD:
+  BEHAVIORS:
+  - name: dritto
+    states: [x,y,theta]
+    control_commands: [v,w]
+    
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+    CONTROLLERS:
+    - name: go
+      v: v_p
+      w: w_p
+    - name: stop
+      v: 0
+      w: 0
+    DISCRETE_STATES:
+    - name: go
+      controller: go
+    - name: stop
+      controller: stop
+    ENCODER:
+    - TOPOLOGY:
+        - topology: [t1]
+          t1: '((abs(x-xi)<3) and abs(y-yi)<3)' 
+      LAMBDA:
+        - lambda: [lambda_stop,lambda_start]
+          lambda_start: 'enabled>0'
+          lambda_stop: 'enabled<0'
+    EVENTS:
+    - events: [vehicle_enabled, vehicle_disabled]
+      vehicle_enabled: 'lambda_start'
+      vehicle_disabled: 'lambda_stop'
+    AUTOMATON:
+    - name: aut_machine
+      GO:
+        - STOP: [vehicle_disabled]
+      STOP:
+        - GO: [vehicle_enabled]
+
+  AGENTS:
+  - agent: Agente1
+    COMMUNICATION_AREA: circle(2000)
+    INITIAL:
+    - &initial
+      x: '50'
+      y: '-50'
+      theta: '0'
+      
+    STATE_START: GO
+    BEHAVIOR: dritto
+    LEADER: [Agente1]
+    WINGMEN: [Agente2]  
+  - agent: Agente2
+    COMMUNICATION_AREA: circle(2000)
+    INITIAL:
+    - &initial
+      x: '100'
+      y: '-50'
+      theta: '0'
+    STATE_START: GO
+    BEHAVIOR: dritto
+    LEADER: [Agente1]
+    WINGMEN: [Agente2]
+     

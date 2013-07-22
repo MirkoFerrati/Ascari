@@ -13,6 +13,7 @@
 #include <map>
 #include "communication/udp_world_communicator.h"
 #include "communication/zmq_world_communicator.h"
+#include "communication/zmq_real_world_serial_communicator.h"
 
 
 #include "logog.hpp"
@@ -95,7 +96,16 @@ void agent::init ( const std::unique_ptr<Parsed_Behavior> & behavior, bool noSta
         encoder=new encoderDet ( sub_events, identifier,state,map_statename_to_id,bonusVariables,
                                  map_bonus_variables_to_id, behavior->topology_expressions,
                                  sub_events_to_index,behavior->lambda_expressions,encoder_symbol_table );
-        if ( !noStart ) world_comm=std::make_shared<zmq_world_communicator> ( identifier );
+        
+	if ( !noStart ) 
+        {
+			if ( world.agents.front().simulated )
+				world_comm=std::make_shared<zmq_world_communicator> ( identifier );
+			else{
+				world_comm=std::make_shared<zmq_real_world_serial_communicator> ( identifier,map_inputs_name_to_id );
+				//world_comm=std::make_shared<zmq_world_communicator> ( identifier );
+			}
+		}
     }
     else
     {
@@ -278,7 +288,13 @@ void agent::main_loop()
     }
 
     //TODO(Mirko): non e' ottimizzato, distrugge e ricrea ogni volta, follia!!
-     for ( auto it=temp.object_list.objects.begin(); it!=temp.object_list.objects.end(); ++it )
+    
+    for ( auto it=objects.objects.begin(); it!=objects.objects.end(); ++it )
+    {
+	for( auto inner_it:it->second) delete inner_it;
+    }
+    
+    for ( auto it=temp.object_list.objects.begin(); it!=temp.object_list.objects.end(); ++it )
     {
         objects.objects[it->first]=it->second;
     }
@@ -291,6 +307,7 @@ void agent::main_loop()
     for ( auto it=temp.state_agents.internal_map.at ( identifier ).state.begin();it!=temp.state_agents.internal_map.at ( identifier ).state.end(); ++it )
     {
         state.at ( it->first ) =it->second;
+	cout<<it->first<<":"<<it->second<<endl;
     }
 
     sleep ( 0 );
