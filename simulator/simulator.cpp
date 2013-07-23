@@ -57,7 +57,7 @@ simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.tim
     num_agents=0;
     world_map=0;
     f_rndom=0;
-    cycle_period_millisec=50;
+    cycle_period_millisec=5;
     collisionChecker=0;
     checkCollision=false;
 
@@ -394,9 +394,8 @@ void simulator::main_loop()
              accum = ( requestEnd.tv_sec - requestStart.tv_sec )*1000
                             + ( requestEnd.tv_nsec - requestStart.tv_nsec )
                             / 1E6;
-	    if (cycle_period_millisec-accum >0)
+	    if ((cycle_period_millisec-accum)*1000-10 >0)
 	      usleep ( (cycle_period_millisec-accum)*1000-10 );
-
             //cout<<endl<< "tempo necessario:"<<endl;
             //printf( "%f\n", accum );
         }
