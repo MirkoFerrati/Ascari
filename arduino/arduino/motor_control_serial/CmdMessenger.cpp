@@ -151,7 +151,7 @@ void CmdMessenger::handleMessage()
 
 void CmdMessenger::feedinSerialData()
 {
-  while ( !pauseProcessing && comms->available( ) ) 
+  while ( !pauseProcessing && comms->available( ) )
     process(comms->read( ) );
 }
 

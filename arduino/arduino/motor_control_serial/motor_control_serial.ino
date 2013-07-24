@@ -40,6 +40,9 @@ int E1 = 5;
 int M1 = 4;                           
 unsigned long timer = 0;                //print manager timer
 
+long now;
+long time_last_cmd;
+
 // Attach a new CmdMessenger object to the default Serial port
 CmdMessenger cmdMessenger = CmdMessenger(Serial, field_separator, command_separator);
 
@@ -90,6 +93,7 @@ void gest_motors()
   //cmdMessenger.sendCmd(kACK,"cmd received");
   if ( cmdMessenger.available() )
   {
+      time_last_cmd=millis();
         set_pwm(pwm_serial(),pwm_serial());
       
     }
@@ -136,8 +140,10 @@ void led_blinking()
  
 void v2pwm_cmd()
 {
+    
 	if ( cmdMessenger.available() )
     {
+      time_last_cmd=millis();
 		double v = get_v();
 		double w = get_w();
         vw2pwm(v,w);
@@ -351,6 +357,9 @@ void setup()
   pinMode(M2, OUTPUT);
 
   pinMode(13, OUTPUT);
+  
+  now=0;
+  time_last_cmd=0;
 }
 
 
@@ -359,9 +368,19 @@ void setup()
 void loop() 
 {
   // Process incoming serial data, if any
+  
+  now=millis();
+  
+  if(time_last_cmd!=0)
+  if (now - time_last_cmd > 500)
+  {
+        stop_motors();
+        Serial.print(now - time_last_cmd);
+        Serial.print(" - ");
+        time_last_cmd=0;
+  }
+  
   cmdMessenger.feedinSerialData();
-  
-  
 
   //if( ((millis() - timer) > Tprint) && prn_enc==1 ){                   
     //Serial.print("Elapsed time: ");
