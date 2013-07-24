@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 
 add_executable(fake_simulator fake_simulator.cpp main.cpp ../shared/communication/global.cpp ../shared/yaml_parser.cpp zmq_agent_communicator.cpp ../shared/dynamic.cpp
-../shared/communication/zmq_localization_communicator.hpp ../shared/dynamic_remote_localization.cpp)
+../shared/communication/zmq_localization_communicator.hpp ../shared/dynamic_remote_localization.cpp ../shared/objects/task_assignment_task.cpp)
 
 target_link_libraries(fake_simulator ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 target_link_libraries(fake_simulator zmq)

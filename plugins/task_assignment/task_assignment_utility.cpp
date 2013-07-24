@@ -1,6 +1,5 @@
 //written by Alessandro Settimi
 #include "task_assignment.h"
-#include <agent.h>
 
 
 using namespace task_assignment_namespace;
@@ -67,7 +66,7 @@ void task_assignment ::setTaskStop(bool stop)
  
 bool task_assignment ::task_made()
 {
-	return (reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task).getState())->done);
+	return (reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(my_task)->getState())->done);
 }
 
 
@@ -80,7 +79,7 @@ bool task_assignment ::task_made()
 // }
  
  
- void task_assignment ::copy_cost_vector_to_C()
+void task_assignment ::copy_cost_vector_to_C()
 {
 	for (unsigned int j=0;j<num_task;j++)
 	{

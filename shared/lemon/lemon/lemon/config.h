@@ -1,8 +1,8 @@
 #define LEMON_VERSION ""
 #define LEMON_HAVE_LONG_LONG 1
-/* #undef LEMON_HAVE_LP */
-/* #undef LEMON_HAVE_MIP */
-/* #undef LEMON_HAVE_GLPK */
+#define LEMON_HAVE_LP 1
+#define LEMON_HAVE_MIP 1
+#define LEMON_HAVE_GLPK 1
 /* #undef LEMON_HAVE_CPLEX */
 /* #undef LEMON_HAVE_CLP */
 /* #undef LEMON_HAVE_CBC */

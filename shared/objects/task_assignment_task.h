@@ -19,11 +19,12 @@ void serialize(Archive &ar, const unsigned int /*version*/)
   ar& state;
   ar& object_type;
 }
-  
+ 
+public: 
   task_assignment_namespace::task state;
   std::string object_type;
   
-public:
+
     inline bool canCollide()
     {
       return false;
@@ -57,15 +58,13 @@ public:
     
     friend std::ostream& operator<<( std::ostream& os,const task_assignment_task& t)
     {
-	os << std::endl << "TASK " << t.state.id <<':'<< std::endl;
-	os << "- posizione: " << t.state.task_position[0] <<' '<< t.state.task_position[1]<<' '<< t.state.task_position[2] << std::endl;
-	os << "- tipo: " << t.state.task_type << std::endl;
-	os << "- execution time: " << t.state.task_execution_time << std::endl;
-	os << "- time: " << t.state.time << std::endl;
-	os << "- period: " << t.state.period<< std::endl;
-	os << "- deadline: " << t.state.task_deadline << std::endl << std::endl;
-
-	os<<std::endl;
+	os << std::endl;
+	
+	os<< "Name: "<<t.name<<std::endl;
+	os<< "Type: "<<t.object_type;
+	os<< t.state;
+	
+	os<< std::endl;
 	return os;
     }
    

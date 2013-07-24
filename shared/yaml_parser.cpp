@@ -1,6 +1,8 @@
 #include "yaml_parser.h"
-#include <parserYAML/include/yaml-cpp/node.h>
-
+#include "parserYAML/include/yaml-cpp/node.h"
+#include "../plugins/task_assignment/task_assignment_parser_plugin.h"
+#include "../plugins/agent_router/agent_router_parser_plugin.h"
+#include "../plugins/monitor/monitor_parser_plugin.h"
 
 using namespace std;
 

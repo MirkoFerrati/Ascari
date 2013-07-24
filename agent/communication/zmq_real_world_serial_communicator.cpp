@@ -94,8 +94,6 @@ const world_sim_packet& zmq_real_world_serial_communicator::receive_agents_statu
 
 void zmq_real_world_serial_communicator::send_control_command(control_command_packet& packet, const target_abstract& /*target*/)
 {
-  
-  cout<<"sending packet to simulator"<<endl;
     send(packet);
     DECLARE_TIMING(myTimer);
 

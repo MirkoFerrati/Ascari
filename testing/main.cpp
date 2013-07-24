@@ -12,7 +12,7 @@
 #include <logog.hpp>
 #include <define.h>
 #include <yaml_parser.h>
-#include </home/mirko/projects/ascari/agent/agent.h>
+#include <../agent/agent.h>
 
 using namespace std;
 

@@ -48,10 +48,9 @@ class task_assignment_communicator: public agent_to_simulator_ta_communicator<re
 			    
 			    data_receive.clear();
 
-			    std::cout<<"Ricevo da ";
-			    
 			    for (unsigned int i=0;i<temp.size();i++)
 			    {
+				std::cout<<"Ricevo da ";
 				if(temp[i].agent_id!=my_id )
 				{
 				    if (!(received_from_agents.count(temp[i].agent_id)))
