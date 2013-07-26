@@ -2,7 +2,7 @@
 #include "nostop_discretized_area.h"
 #include "nostop_agent_plugin.h"
 #include "nostop_probability.h"
-#include "nostop_coverage_utility.h"
+//#include "nostop_coverage_utility.h"
 
 #include <sstream>
 #include <string>
@@ -20,7 +20,7 @@ namespace NoStop
 	void ISLAlgorithm::initialize(Parsed_World* parse)
 	{
 		auto wo=reinterpret_cast<NoStop::Parsed_world*>(parse->parsed_items_from_plugins[0]);    
-		m_numberOfGuards = wo->agents.size() - 1; // per ora un solo agente nocivo, CONTROLLARE
+		m_numberOfGuards = wo->m_agents.size() - 1; // per ora un solo agente nocivo, CONTROLLARE
 	}
 
 	//////////////////////////////////////////////////////////////////////////

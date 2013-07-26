@@ -8,9 +8,8 @@
 
 namespace NoStop
 {
-	class Agent;
-	class StructuredArea;
-	class UnStructuredArea;
+	class ISLAlgorithm_packet;
+	class AgentPosition;
 
 	struct AreaCoordinate
 	{
@@ -73,7 +72,10 @@ namespace NoStop
 		bool isChanged() const;
 		/// Set the value to zero.
 		void resetValue();
-
+		
+		Real2D vertex(int i) const;
+		Real2D agentVertex(int i) const;
+	      
 		//bool equals(std::shared_ptr<Square> _other) const;
 	};
 
@@ -100,9 +102,6 @@ namespace NoStop
 
 		/// Copy constructor
 		DiscretizedArea( DiscretizedArea const&_other );
-
-		/// Update index of lattice covered by the given agent
-		void updateSquaresCounter(std::shared_ptr<Agent> agent);
 
 		/// Set all the lattice indexes to zero.
 		void resetCounter();
@@ -140,8 +139,10 @@ namespace NoStop
 		int getNumCol() const {return m_numCol;}
 
 		int numberOfSquaresCoveredByGuards() const;
+		
+		void mergeReceivedData(ISLAlgorithm_packet* _data);
 
-		friend class NoStop::ISLAlgorithm;
+		friend class ISLAlgorithm;
 	};
 }
 

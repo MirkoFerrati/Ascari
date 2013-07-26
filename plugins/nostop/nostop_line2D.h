@@ -202,7 +202,7 @@ namespace NoStop {
 		*    different from 1, but must not be zero or an exception of type
 		*    DegenerateGeometry will be thrown.
 		*/
-		Line2D(const Real2D& origin,const Real2D& direction);
+// 		Line2D(const Real2D& origin,const Real2D& direction);
 
 	private:
 		Real2D m_origin;

@@ -4,6 +4,10 @@
 #include "nostop_parser_plugin.h"
 #include "nostop_plugin.hpp"
 #include "nostop_thread.hpp"
+#include "nostop_ISLAlgorithm.h"
+#include "nostop_packet.hpp"
+#include "nostop_discretized_area.h"
+#include "nostop_probability.h"
 
 #include "../agent/agent.h"
 
@@ -26,8 +30,8 @@ namespace NoStop
 	void Agent_plugin::colletOtherAgentsInfo(Parsed_World* world)
 	{
 		auto wo=reinterpret_cast<NoStop::Parsed_world*>(world->parsed_items_from_plugins[0]);
-		for (unsigned int i=0;i<world->agents.size();i++)
-			m_other_agents_id.push_back(world->agents.at(i));
+		for (unsigned int i=0;i<wo->m_agents.size();i++)
+			m_other_agents_id.push_back(wo->m_agents.at(i));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -43,7 +47,9 @@ namespace NoStop
 		m_id(a->identifier),
 		m_area(nullptr),
 		m_mutex(nullptr),
-		m_initialized(false)
+		m_initialized(false),
+		m_events(a->events),
+		m_events_to_index(a->events_to_index)
 	{
 		initialize(parse);
 	}
@@ -76,7 +82,7 @@ namespace NoStop
 		{
 			if(m_other_agents_id[i] != m_id)
 			{
-				std::map<Agent_ID, AgentPosition> it = m_other_agents_position.find(m_other_agents_id[i]);
+				std::map<Agent_ID, AgentPosition>::iterator it = m_other_agents_position.find(m_other_agents_id[i]);
 				if( it != m_other_agents_position.end() )
 					/// l'agente m_other_agents_id[i] esiste nella memoria di questo agente:
 				{
@@ -99,7 +105,7 @@ namespace NoStop
 		{
 			if(m_other_agents_id[i] != m_id)
 			{
-				std::map<Agent_ID, AgentPosition> it = m_other_agents_position.find(m_other_agents_id[i]);
+				std::map<Agent_ID, AgentPosition>::iterator it = m_other_agents_position.find(m_other_agents_id[i]);
 				if( it != m_other_agents_position.end() )
 					/// l'agente m_other_agents_id[i] esiste nella memoria di questo agente:
 				{
@@ -150,7 +156,8 @@ namespace NoStop
 
 		double beta_p = -0.1;
 
-		double lambda_u += beta_p * (m_angSpeed - l_angSpeed);
+		double lambda_u = 0.;
+		lambda_u += beta_p * (m_angSpeed - l_angSpeed);
 
 		if(fabs(m_angSpeed) > m_max_angSpeed) 
 			m_angSpeed = copysign(m_max_angSpeed,m_angSpeed);
@@ -168,7 +175,7 @@ namespace NoStop
 				std::map<Agent_ID,AgentPosition>::iterator it = m_other_agents_position.find(m_other_agents_id.at(i));
 				if(it == m_other_agents_position.end() )
 					continue;
-				double d = (m_position.getPoint2D() - it->second).sqrmod();
+				double d = ( m_position.getPoint2D() - it->second.getPoint2D() ).sqrmod();
 				min_d=std::min(d,min_d);
 				if(d > 0) 
 				{
@@ -197,12 +204,12 @@ namespace NoStop
 		for (unsigned int i=0;i<l_data_receive.size();i++)
 		{
 			Agent_ID l_name = l_data_receive.at(i).getAgentID();
-			if ( !( l_name == "" ) && ( l_name != m_id ) )
+			if ( /*( l_name != "" ) &&*/ !( l_name != m_id ) )
 			{
 				// with simulation time it's possible to select right packets
 				simulation_time l_time = l_data_receive.at(i).getTime();
 
-				ISLAlgorithm_packet l_temp = *( (ISLAlgorithm_packet*) data_receive.at(i).get_data() );
+				ISLAlgorithm_packet* l_temp = (ISLAlgorithm_packet*) l_data_receive.at(i).getData();
 
 				mergeReceivedData(l_temp);
 
@@ -216,6 +223,11 @@ namespace NoStop
 		m_mutex->unlock();
 	}
 
+	///
+	void Agent_plugin::mergeReceivedData(ISLAlgorithm_packet* _data)
+	{
+		m_area->mergeReceivedData(_data);
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Agent_plugin::run_plugin()
@@ -226,14 +238,15 @@ namespace NoStop
 		{
 			if(m_algorithm)
 			{
+				bool l_fresh = false;
 				// Initialize the packet necessary to communicate
 				m_packet = std::make_shared<Coverage_packet>( 0., m_id, m_position, ISLAlgorithm_packet() );
-				m_communicator = std::make_shared<Communicator<Coverage_packet,Coverage_packet> >(
+				m_communicator = std::make_shared<Communicator>(
 					m_mutex,
 					m_packet.get(),
 					m_other_agents_id.size(),
-					m_id,
-					false);
+					m_id.str(),
+					l_fresh);
 
 				std::cout<<"NOSTOP ISL ALGORITHM"<<std::endl;
 				m_initialized = true;
@@ -268,8 +281,8 @@ namespace NoStop
 			else
 			{
 				receiveDataFromOthers();
-				m_packet.get()->m_pos = AgentPosition( Real2D(m_x.value(), m_y.value()), m_packet.get()->m_pos.m_camera);
-				m_packet.get()->m_pos->setOrientation( m_theta.value() );
+				m_packet.get()->m_pos = AgentPosition( Real2D(m_x.value(), m_y.value()), m_packet.get()->m_pos.getCameraPosition());
+				m_packet.get()->m_pos.setOrientation( m_theta.value() );
 			}
 
 			m_communicator->send();

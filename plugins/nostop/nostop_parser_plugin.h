@@ -10,7 +10,7 @@ namespace NoStop
 	class Parsed_agent: public abstract_parsed_agent_plugin
 	{
 	public:
-		std::string getType(){return "NoStop_parsed_agent";};
+		std::string getType(){return "NoStop::Parsed_agent";};
 		
 		friend class Parser_plugin;
 	};
@@ -19,7 +19,7 @@ namespace NoStop
 	class Parsed_world: public abstract_parsed_world_plugin
 	{
 	public:
-		std::string getType() { return "NoStop_parsed_world"; }
+		std::string getType() { return "NoStop::Parsed_world"; }
 
 		/// Get world external boundaries
 		std::vector<Real2D> getExternalVertices();
@@ -44,12 +44,14 @@ namespace NoStop
 		/// Get discretization factor
 		int getDiscretization();
 
+	public:
+	  
+	  std::vector<std::string> m_agents;
+		
 	protected:
 		std::vector<Real2D> m_external;
 		std::set< std::vector<Real2D> > m_obstacles;
 		int m_numDiscretization;
-		
-		std::vector<std::string> m_agents;
 
 		friend class Parser_plugin;
 	};

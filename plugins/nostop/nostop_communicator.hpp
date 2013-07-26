@@ -2,6 +2,7 @@
 #define NOSTOP_COMMUNICATOR_HPP
 #ifdef ISAGENT
 #include <../shared/communication/zmq_nostop_communicator.hpp>
+#include "nostop_packet.hpp"
 
 #include <mutex>
 #include <thread>
@@ -9,12 +10,11 @@
 
 namespace NoStop
 {
-	template <class receive_type, class send_type>
-	class Communicator: public agent_to_simulator_nostop_communicator<receive_type,send_type>
+  	class Communicator: public agent_to_simulator_nostop_communicator<Coverage_packet,Coverage_packet>
 	{	
 		std::shared_ptr<std::mutex>& data_receive_mutex;
-		std::vector<receive_type> data_receive;
-		send_type& data_send;
+		std::vector<Coverage_packet> data_receive;
+		Coverage_packet& data_send;
 
 		std::thread* receiver;
 
@@ -24,13 +24,13 @@ namespace NoStop
 		std::map< std::string, bool > received_from_agents;
 
 		void receive_loop(
-			std::vector<receive_type>& data_receive,
+			std::vector<Coverage_packet>& data_receive,
 			std::shared_ptr<std::mutex>& ptr_data_mutex,
 			unsigned int neighbour,
 			std::string my_id,
 			bool& fresh_data)
 		{
-			std::vector<receive_type> temp;
+			std::vector<Coverage_packet> temp;
 
 			while(!s_interrupted)
 			{
@@ -48,12 +48,12 @@ namespace NoStop
 
 					for (unsigned int i=0;i<temp.size();i++)
 					{
-						if(temp[i].agent_id!=my_id )
+						if(temp[i].m_agent_id.str()!=my_id )
 						{
-							if (!(received_from_agents.count(temp[i].agent_id)))
-								received_from_agents.insert(std::make_pair(temp[i].agent_id,true));
+							if (!(received_from_agents.count(temp[i].m_agent_id.str())))
+								received_from_agents.insert(std::make_pair(temp[i].m_agent_id.str(),true));
 							data_receive.push_back(temp[i]);
-							std::cout<<temp[i].agent_id<<',';
+							std::cout<<temp[i].m_agent_id.str()<<',';
 						}
 					}
 
@@ -79,7 +79,7 @@ namespace NoStop
 
 		Communicator(
 			std::shared_ptr<std::mutex>& data_receive_mutex,
-			send_type* data_send,
+			Coverage_packet* data_send,
 			unsigned int neighbour,
 			std::string my_id,
 			bool& fresh_data)
@@ -95,7 +95,7 @@ namespace NoStop
 
 		void init(std::string agent_id)
 		{
-			agent_to_simulator_nostop_communicator<receive_type,send_type>::init(agent_id);
+			agent_to_simulator_nostop_communicator<Coverage_packet,Coverage_packet>::init(agent_id);
 		}
 
 		void start_threads()
@@ -117,13 +117,15 @@ namespace NoStop
 
 		void send()
 		{
-			this->agent_to_simulator_nostop_communicator<receive_type,send_type>::send(data_send);
+			this->agent_to_simulator_nostop_communicator<Coverage_packet,Coverage_packet>::send(data_send);
 		}
 
 		~Communicator()
 		{
 
 		}
+		protected:
+		void ref(std::shared_ptr< std::mutex > data_receive_mutex);
 	};
 }
 

@@ -20,6 +20,22 @@ namespace NoStop
 
 		/// Operator minor to use Agent_ID as a key in STL container
 		bool operator<(Agent_ID const& other) const;
+		
+		/// Operator desigual between two Agent_IDs!
+		bool operator!=(Agent_ID const& other) const;
+		
+		/// Operator equal between two Agent_IDs!
+		bool operator==(Agent_ID const& other) const;
+		
+		/// To String
+		std::string str() const;
+		
+		template <typename Archive>
+		void serialize(Archive& ar,const unsigned int /*version*/)
+		{
+			ar& m_id;
+			ar& m_team;
+		}
 	};
 }
 

@@ -1,9 +1,8 @@
 #include "nostop_discretized_area.h"
 
-#include "CoverageUtility.h"
-#include "StructuredArea.h"
-#include "UnStructuredArea.h"
-#include "Agent.h"
+#include "nostop_ISLAlgorithm_packet.h"
+#include "nostop_agent_position.h"
+#include "nostop_line2D.h"
 
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
@@ -18,10 +17,13 @@ using namespace NoStop;
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-void DiscretizedArea::updateSquaresCounter(AgentPtr agent)
+void DiscretizedArea::mergeReceivedData(ISLAlgorithm_packet* _data)
 {
-	AgentPosition l_position = agent->getPosition();
-	l_position.updateCounter( this->shared_from_this() );
+	for(size_t i = 0; i < m_lattice.size(); ++i)
+	{
+		if(_data->m_area[i] > 0)
+			m_lattice[i]->increaseCounter();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -58,7 +60,7 @@ AgentPosition DiscretizedArea::getRandomPosition() const
 //////////////////////////////////////////////////////////////////////////
 bool DiscretizedArea::isOut(AgentPosition const& _pos) const
 {
-	Real2D l_point = _pos.getReal2D();
+	Real2D l_point = _pos.getPoint2D();
 	AreaCoordinate l_coord = this->getCoordinate( l_point );
 	SquarePtr l_square = this->getSquare(l_coord);
 	if(!l_square)
@@ -99,7 +101,7 @@ bool isInside(
 		}
 	}
 
-	l_inside = Math::polygonContains(_external, contains(_box.center());
+	l_inside = Math::polygonContains(_external, _box.center());
 	if(l_inside)
 	{
 		bool l_outFromObstacle = true;
@@ -184,18 +186,18 @@ DiscretizedArea::DiscretizedArea(
 //////////////////////////////////////////////////////////////////////////
 Real2D DiscretizedArea::getOrigin() const
 {
-	return m_lattice.at(0)->getBoundingBox().minCoord();
+	return m_lattice.at(0)->getBoundingBox().minCoord;
 }
 
 //////////////////////////////////////////////////////////////////////////
 AreaCoordinate DiscretizedArea::getCoordinate(Real2D const& point) const
 {
-	const Real2D l_bottomLeft = m_lattice[0]->getBoundingBox().minCoord();
+	const Real2D l_bottomLeft = m_lattice[0]->getBoundingBox().minCoord;
 	const Real2D l_bottomRight = m_lattice[0]->getBoundingBox().corner(1);
 	const Real2D l_topLeft = m_lattice[0]->getBoundingBox().corner(2);
 
-	const Line2D l_xDir = makeLine( l_bottomLeft, l_bottomRight );
-	const Line2D l_yDir = makeLine( l_bottomLeft, l_topLeft );
+	const Line2D l_xDir( l_bottomLeft, l_bottomRight );
+	const Line2D l_yDir( l_bottomLeft, l_topLeft );
 
 	Real2D l_prjVertical = l_yDir.projectPoint( point );
 	Real2D l_prjOrizontal = l_xDir.projectPoint( point );
@@ -298,7 +300,7 @@ void DiscretizedArea::addSpecialApproachableValidSquares(AreaCoordinate const& _
 				_loci.push_back(pos);
 		}
 
-		if(_current.row != DISCRETIZATION_ROW)
+		if(_current.row != m_numRow)
 		{
 			AreaCoordinate pos;
 			pos.col = _current.col-1;
@@ -308,7 +310,7 @@ void DiscretizedArea::addSpecialApproachableValidSquares(AreaCoordinate const& _
 		}
 	}
 
-	if(_current.col != DISCRETIZATION_COL)
+	if(_current.col != m_numCol)
 	{
 		if(_current.row != 0)
 		{
@@ -319,7 +321,7 @@ void DiscretizedArea::addSpecialApproachableValidSquares(AreaCoordinate const& _
 				_loci.push_back(pos);
 		}
 
-		if(_current.row != DISCRETIZATION_ROW)
+		if(_current.row != m_numRow)
 		{
 			AreaCoordinate pos;
 			pos.col = _current.col+1;
@@ -333,7 +335,7 @@ void DiscretizedArea::addSpecialApproachableValidSquares(AreaCoordinate const& _
 //////////////////////////////////////////////////////////////////////////
 std::set< std::shared_ptr<Square> > DiscretizedArea::getVisibleSquares(AgentPosition const& _pos) const
 {
-	AreaCoordinate l_currentPos = this->getCoordinate(_pos.getReal2D());
+	AreaCoordinate l_currentPos = this->getCoordinate(_pos.getPoint2D());
 
 	std::set< std::shared_ptr<Square> > result;
 	for( int row = 0; row < m_numRow; ++row )
@@ -357,13 +359,13 @@ void DiscretizedArea::resetValue()
 //////////////////////////////////////////////////////////////////////////
 void DiscretizedArea::setThiefPosition(AgentPosition const& _pos)
 {
-	SquarePtr l_square = this->getSquare( _pos.getReal2D() );
+	SquarePtr l_square = this->getSquare( _pos.getPoint2D() );
 	if(l_square)
 		l_square->setValue(100.);
 	else
 		assert(1 == 0);
 
-	AreaCoordinate l_coord = this->getCoordinate( _pos.getReal2D() );
+	AreaCoordinate l_coord = this->getCoordinate( _pos.getPoint2D() );
 
 	for(int i = -4; i < 5; ++i)
 	{
@@ -427,13 +429,13 @@ Real2D Square::agentVertex(int i) const
 	else if(i == 3)
 		index = 2;
 	Real2D l_center = m_box.center();
-	Line2D l_line = m_box.corner( index ).lineTo(l_center);
-	double l_dist = m_box.corner( index ).distance(l_center);
+	Line2D l_line(m_box.corner( index ), l_center);
+	double l_dist = (m_box.corner( index ) - l_center).mod();
 	return l_line.pointFromOrigin(l_dist/2.);
 }
 
 //////////////////////////////////////////////////////////////////////////
-void Square::setBoundingBox(IDS::BaseGeometry::Box const& _box)
+void Square::setBoundingBox(Box const& _box)
 {
 	m_box = _box;
 }

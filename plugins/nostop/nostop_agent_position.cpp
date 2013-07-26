@@ -1,14 +1,7 @@
-#include "Agent.h"
-#include "Area.h"
-#include "DiscretizedArea.h"
-#include "Guard.h"
-#include "Thief.h"
-
 #include <memory>
 
-#include "BaseGeometry/Point2D.h"
-#include "BaseGeometry/Shape2D.h"
-#include "BaseGeometry/Arc2D.h"
+#include "nostop_agent_position.h"
+#include "nostop_discretized_area.h"
 
 using namespace std;
 
@@ -17,7 +10,7 @@ namespace NoStop
 	//////////////////////////////////////////////////////////////////////////
 	bool CameraArea::contains(Real2D const& pt) const
 	{
-		return fabs(radius - (center - pt).mod() );
+		return fabs(m_farRadius - (m_center - pt).mod() );
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -44,17 +37,11 @@ namespace NoStop
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool AgentPosition::communicable(std::shared_ptr<Agent> _otherAgent) const
-	{
-		return m_point.distance( _otherAgent->getPosition().getPoint2D() ) < 2 * m_camera.getFarRadius() + IDSMath::TOLERANCE;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	bool AgentPosition::visible(std::shared_ptr<Square> _area) const
 	{
-		CameraArea sh = m_camera.getVisibleArea(m_point);
-		if(sh.isValid())
-			return sh.contains( _area->getBoundingBox().center() );
+		std::shared_ptr<CameraArea> sh = m_camera.getVisibleArea(m_point);
+		if(sh)
+			return sh->contains( _area->getBoundingBox().center() );
 		else
 			return false;
 	}

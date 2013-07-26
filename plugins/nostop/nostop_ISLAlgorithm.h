@@ -7,15 +7,20 @@
 #define NOSTOP_ISL_ALGORITHM_H
 #pragma once
 
+#include "../shared/types.h"
+
 //	Coverage
+#include  "nostop_packet.hpp"
+
 #include <memory>
 #include <set>
 
+class Parsed_World;
+
 namespace NoStop
 	{
-		class Agent;
+		class Agent_plugin;
 		class DiscretizedArea;
-		class Thief;
 
 		/**
 		*	\brief	Inhomogeneous Synchronous Learning Algorithm
@@ -56,7 +61,7 @@ namespace NoStop
 			ISLAlgorithm(std::shared_ptr<DiscretizedArea> _space, Agent_plugin* _agent);
 
 			/// Initialize algorithm
-			void initialize();
+			void initialize(Parsed_World* parse);
 
 			/// Compute one step movement
 			void forwardOneStep( 

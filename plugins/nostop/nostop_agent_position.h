@@ -17,11 +17,13 @@ namespace NoStop
 	class CameraArea
 	{
 		/// Center.
-		Real2D center;
+		Real2D m_center;
 		/// Radius.
 		double m_farRadius;
-
-		bool contains(Real2D const& pt) const;
+	public:
+		 bool contains(Real2D const& pt) const;
+		 
+		 CameraArea(const Real2D & _center, const double & _farRad) : m_center(_center), m_farRadius(_farRad) {}
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -54,12 +56,21 @@ namespace NoStop
 		void setOrientation(double const& _orientation) { m_orientation = _orientation;}
 
 		friend class AgentPosition;
+		
+		template <typename Archive>
+		void serialize(Archive& ar,const unsigned int /*version*/)
+		{
+			ar& m_farRadius;
+			ar& m_nearRadius;
+			ar& m_orientation;
+			ar& m_angle;
+		}
 	};
 
 	//////////////////////////////////////////////////////////////////////////
 	class AgentPosition
 	{
-	protected:
+	public:
 		/// The position of the agent.
 		Real2D m_point;
 
@@ -93,6 +104,16 @@ namespace NoStop
 		double getOrientation() const {return m_camera.getOrientation(); }
 
 		void setOrientation(double const& _orientation) { m_camera.setOrientation(_orientation); }
+		
+		CameraPosition getCameraPosition() {return m_camera;}
+		
+		template <typename Archive>
+		void serialize(Archive& ar,const unsigned int /*version*/)
+		{
+			ar& m_point[0];
+			ar& m_point[1];
+			ar& m_camera;
+		}
 	};
 }
 #endif

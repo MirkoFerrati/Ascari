@@ -6,7 +6,7 @@
 #define NOSTOP_BOUNDING_BOX_HPP
 #pragma once
 
-#include "nostop_Real2D.h"
+#include "nostop_real2D.h"
 
 namespace NoStop
 {

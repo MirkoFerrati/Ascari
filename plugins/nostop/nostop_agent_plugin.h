@@ -10,9 +10,10 @@
 #include <yaml_parser.h>
 
 #include "nostop_agent_position.h"
+#include "nostop_agent_id.h"
 
 #include "nostop_communicator.hpp"
-#include "nostop_coverage_packet.h"
+#include "nostop_packet.hpp"
 #include <random.hpp>
 #include <types/events.h>
 
@@ -60,7 +61,7 @@ namespace NoStop
 		std::shared_ptr<std::mutex> m_mutex;
 
 		/// Communication from agent to simulator
-		std::shared_ptr< Communicator<Coverage_packet,Coverage_packet> > m_communicator;
+		std::shared_ptr< Communicator > m_communicator;
 
 		/// Coverage packet
 		std::shared_ptr<Coverage_packet> m_packet;
@@ -123,7 +124,7 @@ namespace NoStop
 		void avoid_collision(double& a);
 
 		/// Merge received data with existing data
-		void mergeReceivedData(Coverage_packet* _packet);
+		void mergeReceivedData(ISLAlgorithm_packet* _packet);
 
 		/// Reset data in the discretized area
 		void resetDiscretizedAreaCounter();
@@ -154,6 +155,9 @@ namespace NoStop
 
 		/// Get set of feasible actions
 		std::vector<AgentPosition> getFeasibleActions();
+		
+		/// Get Random feasible action
+		void selectRandomFeasibleAction();
 
 		/// The set of square can be controlled by this agent
 		std::set<std::shared_ptr<Square> > getVisibleSquares( );
@@ -162,7 +166,7 @@ namespace NoStop
 
 		/// Constructor
 		Agent_plugin(agent* a, Parsed_World* parse);
-
+		~Agent_plugin();
 		/// inherit from abstract agent
 		void addReservedVariables(exprtk::symbol_table< double >& symbol_table_reference);
 		/// inherit from abstract agent
