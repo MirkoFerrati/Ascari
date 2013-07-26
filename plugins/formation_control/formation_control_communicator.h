@@ -16,7 +16,7 @@ class formation_control_communicator
   std::vector<formation_control_packet> data_receive;
   formation_control_packet& data_send;
 
-  std::string my_leader; 
+  std::string my_leader; 		// DA CAMBIARE
   std::string my_id;
   
   std::thread* receiver;
