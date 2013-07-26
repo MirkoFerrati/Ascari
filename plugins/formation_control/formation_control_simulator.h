@@ -18,6 +18,8 @@ public:
   bool initialize(Parsed_World const& w);
   void run_plugin();
   void stop();
+  std::list<abstract_object*>* create_objects();
+  std::string get_objects_type(){return "";};
   
 private:
   int num_agents;
