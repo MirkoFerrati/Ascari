@@ -58,7 +58,26 @@ struct task
       ar& available;
       ar& done;
     }
+    
+    friend std::ostream& operator<<( std::ostream& os,const task& t)
+    {
+	os << std::endl << "TASK " << t.id <<':'<< std::endl;
+	os << "- posizione: " << t.task_position[0] <<' '<< t.task_position[1]<<' '<< t.task_position[2] << std::endl;
+	os << "- tipo: " << t.task_type << std::endl;
+	os << "- execution time: " << t.task_execution_time << std::endl;
+	os << "- period: " << t.period<< std::endl;
+	os << "- deadline: " << t.task_deadline << std::endl;
+	os << "- executing: " << t.executing << std::endl;
+	os << "- time: " << t.time << std::endl;
+	os << "- owner: " << t.owner << std::endl;
+	os << "- available: " << t.available << std::endl;
+	os << "- done: " << t.done << std::endl;
+	os<<std::endl;
+	return os;
+    }
 };
+
+
 typedef std::map<task_id,task> task_list;
 
 

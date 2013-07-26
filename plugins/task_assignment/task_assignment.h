@@ -3,7 +3,7 @@
 #define TASK_ASSIGNMENT_H
 
 #include "../HACK_KDEVELOP.h"
- #ifdef ISAGENT
+#ifdef ISAGENT
 
 #include <vector>
 
@@ -15,8 +15,6 @@
 #include "../shared/objects/task_assignment_task.h"
 #include <types/events.h>
 
-//TODO (Alessandro): che semafori uso? per ora quelli di simone
-#include "../shared/named_semaphore.hpp"
 #include "../plugins/abstract_agent_plugin.h"
 #include "../agent/agent.h"
 
@@ -24,7 +22,7 @@ class task_assignment: public abstract_agent_plugin
 {
 	
 public:
-	task_assignment( const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events, const std::map< std::string, transition >& events_to_index, const objects_container& tasks );
+ 	task_assignment( const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events, const std::map< std::string, transition >& events_to_index, const objects_container& tasks );
 	task_assignment(agent* a, Parsed_World* parse);
 	void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
 	void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
@@ -79,9 +77,7 @@ private:
 	task_assignment_namespace::task_id my_task;
 	
 	double my_task_x,my_task_y;
-	
-	task_assignment_namespace::task empty_task;
-	
+		
 	std::vector<task_assignment_namespace::agent_id> agents_id;
 	
 	std::vector<task_assignment_namespace::task_id> tasks_id;
@@ -166,7 +162,7 @@ private:
 	//algorithms packets ptr
 
 	const objects_container& objects;
-	std::map<std::string,task_assignment_task> tasks;
+	std::map<std::string,task_assignment_task*> tasks;
 	std::shared_ptr<task_assignment_namespace::subgradient_packet> ptr_subgradient_packet;
 	//
 	
@@ -179,7 +175,7 @@ private:
 	void copy_solution_to_TA_vector(std::vector<double>& solution);
 	void copy_cost_vector_to_C();
 	void control_print();
-    void initialize( const Parsed_World& world );
+	void initialize( const Parsed_World& world );
 
 	std::map<task_assignment_namespace::agent_id,std::vector< double >> others_subgradient;
 };

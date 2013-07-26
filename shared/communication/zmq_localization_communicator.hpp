@@ -51,11 +51,22 @@ private:
   {
     while(!exiting)
     {
+      //reiceve data
       agent_state_packet_from_webcam temp=(this->receive().front());
+      
+      //create new webcam in the database
       if (!webcams.count(temp.webcam_id))
 	webcams[temp.webcam_id];
-      if (!webcams.at(temp.webcam_id).count(temp.data.identifier))
-	webcams[temp.webcam_id][temp.data.identifier];
+      
+      //for each webcam, create new weights in the database
+      for (auto single_webcam:webcams)
+      if (!single_webcam.second.count(temp.data.identifier))
+      {
+	weights[single_webcam.first][temp.data.identifier]=0;
+	single_webcam.second[temp.data.identifier];
+      }
+      
+      //evolve the new received weight
       auto& value=weights[temp.webcam_id][temp.data.identifier];
       if (value>0.1)
       {
@@ -65,25 +76,32 @@ private:
       }
       else
 	value=0.1;
+      
+      //evolve other weights
       for (auto weight:weights)
       {
 	if (weight.first!=temp.webcam_id)
-	                   weight.second.at(temp.data.identifier)=weight.second.at(temp.data.identifier)*0.9;
+	                   weight.second.at(temp.data.identifier)*=0.9;
 	if (weight.second.at(temp.data.identifier)<=0.1)
 	                   weight.second.at(temp.data.identifier)=0;
       }
+      
+      //create agent state
       webcams.at(temp.webcam_id).at(temp.data.identifier)=temp.data.state;
       agent_state medium_state=temp.data.state;
       for (auto coordinate:medium_state)
       {	
 	coordinate.second=0;
 	int num_webcams=0;
+	
+	//make the weighted mean of the coordinates
 	for(auto single_webcam=webcams.begin();single_webcam!=webcams.end();++single_webcam)
 	{ 
 	  num_webcams++;
 	  coordinate.second+=single_webcam->second.at(temp.data.identifier).at(coordinate.first);
 	} 
 	coordinate.second=coordinate.second/num_webcams;
+	
       }
       agent_lock.lock();
       agents[temp.data.identifier]=medium_state;

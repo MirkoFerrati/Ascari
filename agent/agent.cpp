@@ -288,7 +288,13 @@ void agent::main_loop()
     }
 
     //TODO(Mirko): non e' ottimizzato, distrugge e ricrea ogni volta, follia!!
-     for ( auto it=temp.object_list.objects.begin(); it!=temp.object_list.objects.end(); ++it )
+    
+    for ( auto it=objects.objects.begin(); it!=objects.objects.end(); ++it )
+    {
+	for( auto inner_it:it->second) delete inner_it;
+    }
+    
+    for ( auto it=temp.object_list.objects.begin(); it!=temp.object_list.objects.end(); ++it )
     {
         objects.objects[it->first]=it->second;
     }
