@@ -57,7 +57,7 @@ simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.tim
     num_agents=0;
     world_map=0;
     f_rndom=0;
-    cycle_period_millisec=5;
+    cycle_period_millisec=50;
     collisionChecker=0;
     checkCollision=false;
 

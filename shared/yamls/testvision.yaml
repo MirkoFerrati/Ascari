@@ -123,7 +123,8 @@
     VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA:  circle(10)
     MONITORING: 0
-    SIMULATED:  1
+    SIMULATED:  0
+    MARKER:     1
     #COLLABORATIVE = 1
     states: [x,y,theta]
     control_commands: [v,w]

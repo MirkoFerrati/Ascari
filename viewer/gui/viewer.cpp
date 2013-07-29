@@ -162,7 +162,7 @@ void Viewer::paintAgents(QPainter &painter,const std::map<std::string,Agent>& ag
 	painter.restore();
 	painter.save();
 	painter.translate ( it->second.x,it->second.y );
-	painter.scale(painter.fontMetrics().height()/1,-painter.fontMetrics().height()/1);
+	painter.scale(painter.fontMetrics().height()/100,-painter.fontMetrics().height()/100);
 	painter.drawText(0,0,QString(it->first.substr(6).c_str()));
 	
 	painter.restore();

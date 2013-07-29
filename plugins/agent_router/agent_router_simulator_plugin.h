@@ -13,6 +13,7 @@ class agent_router_simulator_plugin : public abstract_simulator_plugin
 {
 
 public:
+    
     virtual ~agent_router_simulator_plugin();
     virtual void stop();
     virtual bool initialize ( const Parsed_World& w );
