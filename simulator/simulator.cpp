@@ -37,15 +37,15 @@ void simulator::create_communicator ( communicator_types communicator_type,const
     else if (communicator_type == communicator_types::REAL_TCP)
     {
         std::list<std::string> clients;
-        for ( auto ag:world.agents )
+for ( auto ag:world.agents )
         {
-	  if (ag.simulated)
-	  {
-            clients.push_back ( ag.name );
-            std::cout<<ag.name<<std::endl;
-	  }
+            if (ag.simulated)
+            {
+                clients.push_back ( ag.name );
+                std::cout<<ag.name<<std::endl;
+            }
         }
-        communicator=new zmq_agent_communicator ( clients.size(),clients );      
+        communicator=new zmq_agent_communicator ( clients.size(),clients );
     }
 }
 
@@ -60,7 +60,9 @@ simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.tim
     cycle_period_millisec=50;
     collisionChecker=0;
     checkCollision=false;
-
+    T_integration=0.01;
+    if (CONFIG.exists("T_INTEGRATION"))
+      T_integration=atof(CONFIG.getValue("T_INTEGRATION").c_str());
 
 }
 void simulator::addPlugin ( abstract_simulator_plugin* plugin )
@@ -144,24 +146,24 @@ void simulator::initialize ( const Parsed_World& wo )
         map_bonus_variables.insert ( make_pair ( wo.bonus_variables.at ( i ),i ) );
     }
     setCheckCollision ( false );
-    
-    
+
+
     localization_receiver.init("simulator");
 }
 
 
 void simulator::createObjects ( const Parsed_World& world )
 {
-     for ( auto & plugin:plugins )
-     {
-	    std::list<abstract_object*>* app = plugin->create_objects();
-	    
-	    if(app!=NULL) sim_packet.object_list.objects[plugin->get_objects_type()] = *app;
-	    
-	    std::cout<<plugin->get_objects_type()<<" objects : "<<sim_packet.object_list.objects[plugin->get_objects_type()].size()<<std::endl;
-	    
-	    //for(auto i:sim_packet.object_list.objects[plugin->get_objects_type()])i->print(std::cout);
-     }
+for ( auto & plugin:plugins )
+    {
+        std::list<abstract_object*>* app = plugin->create_objects();
+
+        if(app!=NULL) sim_packet.object_list.objects[plugin->get_objects_type()] = *app;
+
+        std::cout<<plugin->get_objects_type()<<" objects : "<<sim_packet.object_list.objects[plugin->get_objects_type()].size()<<std::endl;
+
+        //for(auto i:sim_packet.object_list.objects[plugin->get_objects_type()])i->print(std::cout);
+    }
 }
 
 
@@ -183,6 +185,11 @@ for ( auto ag:agents )
         command_packet.identifier=ag.name;
 
 
+        //We will not use a simulated time if there are any real agents in the environment
+        if (!ag.simulated)
+        {
+            timeSimulated=false;
+        }
 
         index_map commands_to_index_tmp;
 
@@ -203,14 +210,17 @@ for ( auto ag:agents )
         }
         agent_commands_to_index.push_back ( commands_to_index_tmp );
 
-	dynamic_module_abstract *d;
-	
-	if (ag.simulated)
-	  d= new dynamic ( sim_packet.state_agents.internal_map.at ( ag.name ).state, commands.at ( ag.name ).default_command,
-                                  ag.behavior->expressions, ag.behavior->state,ag.behavior->inputs );
-	else
-	  d= new dynamic_remote_localization(&localization_receiver,ag.name,sim_packet.state_agents.internal_map.at ( ag.name ).state);
-	
+        dynamic_module_abstract *d;
+
+        if (ag.simulated)
+        {
+            d= new dynamic ( sim_packet.state_agents.internal_map.at ( ag.name ).state, commands.at ( ag.name ).default_command,
+                             ag.behavior->expressions, ag.behavior->state,ag.behavior->inputs,T_integration );
+        }
+        else
+        {
+            d= new dynamic_remote_localization(&localization_receiver,ag.name,sim_packet.state_agents.internal_map.at ( ag.name ).state);
+        }
         dynamic_modules.push_back ( d );
 
         if ( ag.visibility!="" )
@@ -292,22 +302,26 @@ void simulator::main_loop()
 
         sim_packet.time=0;
         int clock=0;
-	struct timespec requestStart, requestEnd;
-	double accum;
+        struct timespec requestStart, requestEnd, simulationStart;
+        clock_gettime ( CLOCK_REALTIME, &simulationStart );
+        double total_accum, step_accum;
         while ( !s_interrupted )
         {
-	    clock_gettime ( CLOCK_REALTIME, &requestStart );
+            clock_gettime ( CLOCK_REALTIME, &requestStart );
 
+            //Check for input loop
             {
                 sleep ( 0 );
                 std::unique_lock<std::mutex> lock ( input_mutex );
                 while ( paused )
                 {
-                    //cout<<"sono dentro il while della condition_variable"<<endl;
                     input_cond.wait ( lock );
                     // cout<<paused<<endl;
                 }
             }
+
+
+
             clock++;
             if ( ( clock%10 ) !=0 )
             {
@@ -316,8 +330,20 @@ void simulator::main_loop()
             }
             else
                 cout<<endl<<sim_packet.time;
-            sim_packet.time= ( ( simulation_time ) clock ) /10.0;
-//             communicator->send_broadcast(time++);
+
+            if (timeSimulated)
+            {
+                sim_packet.time= ( ( simulation_time ) clock ) /10.0;
+            }
+            else
+            {
+                total_accum= ( requestStart.tv_sec - simulationStart.tv_sec )*1000
+                       + ( requestStart.tv_nsec - simulationStart.tv_nsec )/ 1E6;
+                sim_packet.time=total_accum/1000.0;
+            }
+
+
+
             update_bonus_variables();
 
             for ( auto agent=sim_packet.state_agents.internal_map.begin(); agent!=sim_packet.state_agents.internal_map.end(); agent++ )
@@ -343,16 +369,17 @@ void simulator::main_loop()
                 }
                 communicator->send_target ( agent_packet,agent->first );
             }
-            
+
             viewer_communicator->send_target ( sim_packet,"viewer" );
 // 	    cout<<"inviato pacchetto con gli stati"<<endl;
 
 
-        for ( auto & plugin:plugins )
+	    for ( auto & plugin:plugins )
                 plugin->run_plugin();
 
             agent_state state_tmp;
-            for ( int i=0; i<10; i++ )
+	    unsigned integration_times=step_accum/T_integration; //TODO(Mirko): dovrebbe essere max(cycle_period_millisec, step_accum)
+            for ( int i=0; i<integration_times; i++ )
             {
                 for ( index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end(); ++iter )
                 {
@@ -366,10 +393,10 @@ void simulator::main_loop()
 
             for ( auto object_list=sim_packet.object_list.objects.begin(); object_list!=sim_packet.object_list.objects.end(); ++object_list )
             {
-		for ( auto object:object_list->second )
-		{
-		    object->updateState ( sim_packet.time,sim_packet.state_agents,agent_states_to_index );
-		}
+	    for ( auto object:object_list->second )
+                {
+                    object->updateState ( sim_packet.time,sim_packet.state_agents,agent_states_to_index );
+                }
             }
 
             collisionChecker->checkCollisions();
@@ -393,16 +420,21 @@ void simulator::main_loop()
             clock_gettime ( CLOCK_REALTIME, &requestEnd );
 
 //             Calculate time it took
-             accum = ( requestEnd.tv_sec - requestStart.tv_sec )*1000
-                            + ( requestEnd.tv_nsec - requestStart.tv_nsec )
-                            / 1E6;
-	    if ((cycle_period_millisec-accum)*1000-10 >0)
-	      usleep ( (cycle_period_millisec-accum)*1000-10 );
+            step_accum = ( requestEnd.tv_sec - requestStart.tv_sec )*1000
+                    + ( requestEnd.tv_nsec - requestStart.tv_nsec )/ 1E6;
+            if ((cycle_period_millisec-step_accum)*1000-10 >0)
+	    {
+                usleep ( (cycle_period_millisec-step_accum)*1000-10 );
+	    }
+	    else
+	    {
+		WARN("this timestep %d took too much time: %d",sim_packet.time,step_accum);
+	    }
             //cout<<endl<< "tempo necessario:"<<endl;
             //printf( "%f\n", accum );
         }
 
-    for ( auto & plugin:plugins )
+for ( auto & plugin:plugins )
             plugin->stop();
         input_exit=true;
         tcsetattr ( STDIN_FILENO, TCSANOW, &before );

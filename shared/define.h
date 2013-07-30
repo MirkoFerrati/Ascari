@@ -66,6 +66,5 @@ static configuration_reader CONFIG;
 
 
 #define MAX_PACKET_LENGTH 1024*32
-#define T_CAMP 0.01
 
 #endif //DEFINE_H
