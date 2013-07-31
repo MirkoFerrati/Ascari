@@ -41,4 +41,39 @@ namespace NoStop
 			m_router_started=true;
 		}
 	}
+
+	/// 	
+	std::list<abstract_object*>* /*Simulator_plugin::*/create_objects()
+	{
+		//std::vector<std::string> tasks_id=world.tasks_id;
+    
+	    std::cout<<"CREO OGGETTI - " << std::endl; //<<tasks_id<<std::endl;
+	    
+	    std::list<abstract_object*>* list=new std::list<abstract_object*>;
+	    
+	    //for ( unsigned int i=0; i<tasks_id.size();i++ )
+	   // {
+		//abstract_object* temp;
+
+		//task_assignment_task* temp2 = new task_assignment_task();
+	      
+		//temp2->object_type="TASK_ASSIGNMENT";
+
+		//temp2->name=tasks_id.at(i);
+
+		//temp2->state=world.task_list.at(tasks_id.at(i));
+
+		//temp2->state.done=false;
+
+	// 	std::cout<<temp2<<std::endl;
+
+	 	//temp=temp2;
+	
+	// 	std::cout<<" - abstract - ";temp->print(std::cout);
+	
+		//list->push_back(temp);
+    //}
+    
+    return list;
+	}
 }

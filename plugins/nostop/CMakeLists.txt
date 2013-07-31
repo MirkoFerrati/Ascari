@@ -31,5 +31,11 @@ set_property(GLOBAL APPEND PROPERTY simulator_SOURCES
 ${CMAKE_CURRENT_SOURCE_DIR}/nostop_simulator_plugin.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/nostop_router.hpp
 ${CMAKE_CURRENT_SOURCE_DIR}/nostop_parser_plugin.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/nostop_agent_position.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/nostop_agent_id.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/nostop_discretized_area.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/nostop_math.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/nostop_real2D.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/nostop_line2D.cpp
 )
 

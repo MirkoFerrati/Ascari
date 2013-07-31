@@ -1,6 +1,5 @@
 #ifndef NOSTOP_COMMUNICATOR_HPP
 #define NOSTOP_COMMUNICATOR_HPP
-#ifdef ISAGENT
 #include <../shared/communication/zmq_nostop_communicator.hpp>
 
 #include <mutex>
@@ -137,5 +136,4 @@ namespace NoStop
 	};
 }
 
-#endif //ISAGENT
 #endif //NOSTOP_COMMUNICATOR_HPP

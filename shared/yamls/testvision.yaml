@@ -129,8 +129,8 @@
     control_commands: [v,w]
     INITIAL:
     - &initial
-      x: '42'
-      y: '424'
+      x: '4'
+      y: '4'
       theta: '0.5'
     STATE_START: FAST
     BEHAVIOR: LGV-BAD
@@ -138,15 +138,14 @@
     VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA:  circle(10)
     MONITORING: 0
-    SIMULATED:  0
-    MARKER:     2
+    SIMULATED:  1
     #COLLABORATIVE = 1
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
     - &initial
-      x: '42'
-      y: '424'
+      x: '3'
+      y: '3'
       theta: '0.5'
     STATE_START: FAST
     BEHAVIOR: LGV
@@ -154,15 +153,14 @@
     VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA:  circle(10)
     MONITORING: 0
-    SIMULATED:  0
-    MARKER:     3
+    SIMULATED:  1
     #COLLABORATIVE = 1
     states: [x,y,theta]
     control_commands: [v,w]
     INITIAL:
     - &initial
-      x: '42'
-      y: '424'
+      x: '5'
+      y: '5'
       theta: '0.5'
     STATE_START: FAST
     BEHAVIOR: LGV

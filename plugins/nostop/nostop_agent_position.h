@@ -79,7 +79,7 @@ namespace NoStop
 		CameraPosition m_camera;
 
 	public:
-		AgentPosition() {};
+		AgentPosition();
 
 		AgentPosition(Real2D const& point, double const& _orientation) : m_point(point), m_camera() 
 		{ m_camera.m_orientation = _orientation; }

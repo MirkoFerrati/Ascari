@@ -26,6 +26,11 @@ namespace NoStop
 		/// Stop NoStop Simulator plugin
 		void stop();
 
+		/// 	
+		//std::list<abstract_object*>* create_objects();
+		
+		///
+		std::string get_objects_type() {return "NO_STOP";}
 	private:
 
 		std::shared_ptr<DiscretizedArea> m_area;

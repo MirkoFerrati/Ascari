@@ -10,8 +10,8 @@ public:
   virtual void run_plugin()=0;
   virtual bool initialize(Parsed_World const& w)=0;
   virtual void stop()=0;
-  virtual std::list<abstract_object*>* create_objects()=0;
-  virtual std::string get_objects_type()=0;
+  virtual std::list<abstract_object*>* create_objects(){return new std::list<abstract_object*>();}
+  virtual std::string get_objects_type() {return "Error Abstract Object!";};
   virtual ~abstract_simulator_plugin(){};
 };
 

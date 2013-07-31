@@ -1,7 +1,9 @@
-#include "nostop_viewer_plugin.h.h"
+#include "nostop_viewer_plugin.h"
+#include "nostop_agent_position.h"
 
 #ifdef ISVIEWER
-
+namespace NoStop
+{
 Viewer_plugin::Viewer_plugin( std::shared_ptr<std::mutex>& mutex,const world_sim_packet& infos)//:time(infos.time),mutex(mutex),infos(infos)
 {
 	m_started=false;
@@ -22,8 +24,7 @@ Viewer_plugin::Viewer_plugin()
 void Viewer_plugin::timerEvent ( std::shared_ptr< std::mutex >& mutex, const world_sim_packet& infos )
 {
 	Viewer_plugin* temp_father=reinterpret_cast<Viewer_plugin*>(father);
-	Lock 
-		mutex->lock();
+	mutex->lock();
 	m_old_time=m_now_time;
 	m_now_time=infos.time;
 	for(auto i=infos.object_list.objects.begin(); i!=infos.object_list.objects.end(); ++i)
@@ -174,6 +175,7 @@ void Viewer_plugin::paintAgents(QPainter& painter,const std::map<std::string,Age
 Viewer_plugin::~Viewer_plugin()
 {
 
+}
 }
 
 #endif
