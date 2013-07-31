@@ -77,7 +77,7 @@ std::vector<SquarePtr> DiscretizedArea::getSquares() const
 //////////////////////////////////////////////////////////////////////////
 bool isInside( 
 	std::vector<Real2D> const& _external, 
-	std::set< std::vector<Real2D> > const& _obstacles, 
+	std::list< std::vector<Real2D> > const& _obstacles, 
 	Box const& _box)
 {
 	bool l_inside = false;
@@ -87,7 +87,7 @@ bool isInside(
 		if(l_inside)
 		{
 			bool l_outFromObstacle = true;
-			for(std::set< std::vector<Real2D> >::iterator it = _obstacles.begin(); it != _obstacles.end(); ++it)
+			for(std::list< std::vector<Real2D> >::const_iterator it = _obstacles.begin(); it != _obstacles.end(); ++it)
 			{
 				l_outFromObstacle = !Math::polygonContains(*it, _box.corner(i));
 				if(!l_outFromObstacle)
@@ -105,7 +105,7 @@ bool isInside(
 	if(l_inside)
 	{
 		bool l_outFromObstacle = true;
-		for(std::set< std::vector<Real2D> >::iterator it = _obstacles.begin(); it != _obstacles.end(); ++it)
+		for(std::list< std::vector<Real2D> >::const_iterator it = _obstacles.begin(); it != _obstacles.end(); ++it)
 		{
 			l_outFromObstacle = !Math::polygonContains(*it,_box.center());
 			if(!l_outFromObstacle)
@@ -124,7 +124,7 @@ bool isInside(
 //////////////////////////////////////////////////////////////////////////
 DiscretizedArea::DiscretizedArea(
 	std::vector<Real2D> const& _external, 
-	std::set< std::vector<Real2D> > const& _obstacles, 
+	std::list< std::vector<Real2D> > const& _obstacles, 
 	int _numCol, 
 	int _numRow)
 {

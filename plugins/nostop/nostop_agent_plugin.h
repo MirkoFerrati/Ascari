@@ -12,8 +12,9 @@
 #include "nostop_agent_position.h"
 #include "nostop_agent_id.h"
 
-#include "nostop_communicator.hpp"
 #include "nostop_packet.hpp"
+#include "nostop_communicator.hpp"
+
 #include <random.hpp>
 #include <types/events.h>
 
@@ -26,7 +27,10 @@
 namespace NoStop
 {
 	class ISLAlgorithm;
-  
+	class Square;
+
+	struct ISLAlgorithm_packet;
+
 	/// Struct representing memory of an agent
 	struct MemoryAgentPosition
 	{
@@ -61,7 +65,7 @@ namespace NoStop
 		std::shared_ptr<std::mutex> m_mutex;
 
 		/// Communication from agent to simulator
-		std::shared_ptr< Communicator > m_communicator;
+		std::shared_ptr< Communicator<Coverage_packet,Coverage_packet> > m_communicator;
 
 		/// Coverage packet
 		std::shared_ptr<Coverage_packet> m_packet;
@@ -155,12 +159,6 @@ namespace NoStop
 
 		/// Get set of feasible actions
 		std::vector<AgentPosition> getFeasibleActions();
-		
-		/// Get Random feasible action
-		void selectRandomFeasibleAction();
-
-		/// The set of square can be controlled by this agent
-		std::set<std::shared_ptr<Square> > getVisibleSquares( );
 
 	public:
 
@@ -185,6 +183,26 @@ namespace NoStop
 		simulation_time getSimulationTime() {return m_time;}
 
 		void setCurrentPayoff( double l_benefit );
+
+		std::vector<MemoryAgentPosition> getMemory() {return m_memory;}
+
+		/// Set next target position
+		void setNextPosition(std::vector< MemoryAgentPosition > const& memory);
+
+		/// Compute cost of sensor 
+		double computeCosts();
+
+		/// Select best memory action
+		void selectBestMemoryAction();
+
+		/// Get Random feasible action
+		void selectRandomFeasibleAction();
+
+		/// Get current position
+		AgentPosition getPosition();
+
+		/// The set of square can be controlled by this agent
+		std::set< std::shared_ptr<Square> > getVisibleSquares( );
 	};
 }
 #endif

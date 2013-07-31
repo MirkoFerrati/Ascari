@@ -38,13 +38,13 @@ namespace NoStop
 				{
 					m_enabled=true;
 
-					if( node[0]["WORLD"][0]["NOSTOP_AREA"][0].find("NOSTOP_DISCRETIZATION") )
+					if( node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_DISCRETIZATION") )
 					{
 						node[0]["WORLD"][0]["NOSTOP_AREA"][0]["NOSTOP_DISCRETIZATION"] >> wo->m_numDiscretization;
 					}
 
-					if( node[0]["WORLD"][0]["NOSTOP_AREA"][0].find("NOSTOP_NUMBER_OF_VERTEX_EXTERNAL") &&
-						node[0]["WORLD"][0]["NOSTOP_AREA"][0].find("NOSTOP_VERTICES_EXTERNAL") )
+					if( node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_NUMBER_OF_VERTEX_EXTERNAL") &&
+						node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_VERTICES_EXTERNAL") )
 					{
 						int l_numVert = 0;
 						node[0]["WORLD"][0]["NOSTOP_AREA"][0]["NOSTOP_NUMBER_OF_VERTEX_EXTERNAL"] >> l_numVert;
@@ -52,9 +52,9 @@ namespace NoStop
 						wo->m_external = Parsed_world::createExternalVertexList( node[0]["WORLD"][0]["NOSTOP_VERTICES_EXTERNAL"], l_numVert );
 					}
 
-					if( node[0]["WORLD"][0]["NOSTOP_AREA"][0].find("NOSTOP_NUMBER_OF_OBSTACLES") &&
-						node[0]["WORLD"][0]["NOSTOP_AREA"][0].find("NOSTOP_NUMBER_OF_VERTEX_OBSTACLES") &&
-						node[0]["WORLD"][0]["NOSTOP_AREA"][0].find("NOSTOP_VERTICES_OBSTACLES"))
+					if( node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_NUMBER_OF_OBSTACLES") &&
+						node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_NUMBER_OF_VERTEX_OBSTACLES") &&
+						node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_VERTICES_OBSTACLES"))
 					{
 						int l_numObs = 0;
 						node[0]["WORLD"][0]["NOSTOP_AREA"][0]["NOSTOP_NUMBER_OF_OBSTACLES"] >> l_numObs;
@@ -81,12 +81,12 @@ namespace NoStop
 			return 0;
 
 		if ( node.FindValue ( "NOSTOP_ID" ) &&
-			 node.FindValue( "NOSTOP_CAMERA" ) )
+			node.FindValue( "NOSTOP_CAMERA" ) )
 		{
 			Parsed_agent* ag	=	new Parsed_agent();
 			node["NOSTOP_ID"] >> ag->m_id;
 			node["NOSTOP_CAMERA"] >> ag->m_camera;
-			
+
 			return ag;
 		}
 		else
@@ -96,7 +96,7 @@ namespace NoStop
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	std::vector<Real2D> Parsed_world::createExternalVertexList( 
 		const YAML::Node& node, 
@@ -124,13 +124,13 @@ namespace NoStop
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::set< std::vector<Real2D> > Parsed_world::createObstaclesVertexList( 
-		const YAML::Node& node, 
+	std::list< std::vector<Real2D> > Parsed_world::createObstaclesVertexList( 
+		const YAML::Node& node,
 		int const& numObs,
 		std::vector<int> const& numVertInObs)
 	{
 		int index = 0;
-		std::set< std::vector<Real2D> > result;
+		std::list< std::vector<Real2D> > result;
 		for(unsigned int i = 0; i < numObs; ++i)
 		{
 			std::vector<Real2D> l_bound;
@@ -142,8 +142,26 @@ namespace NoStop
 				node[2*index + 1] >> l_bound[j][1];
 				index++;
 			}
-			result.insert( l_bound );
+			result.insert( result.end(), l_bound );
 		}
 		return result;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	std::vector<Real2D> Parsed_world::getExternalVertices()
+	{
+		return m_external;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	std::list< std::vector<Real2D> > Parsed_world::getObstaclesVertices()
+	{
+		return m_obstacles;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	int Parsed_world::getDiscretization()
+	{
+		return m_numDiscretization;
 	}
 }

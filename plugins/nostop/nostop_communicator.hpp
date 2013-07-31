@@ -2,7 +2,6 @@
 #define NOSTOP_COMMUNICATOR_HPP
 #ifdef ISAGENT
 #include <../shared/communication/zmq_nostop_communicator.hpp>
-#include "nostop_packet.hpp"
 
 #include <mutex>
 #include <thread>
@@ -10,11 +9,12 @@
 
 namespace NoStop
 {
-  	class Communicator: public agent_to_simulator_nostop_communicator<Coverage_packet,Coverage_packet>
+	template <class receive_type, class send_type>
+	class Communicator: public agent_to_simulator_nostop_communicator<receive_type,send_type>
 	{	
 		std::shared_ptr<std::mutex>& data_receive_mutex;
-		std::vector<Coverage_packet> data_receive;
-		Coverage_packet& data_send;
+		std::vector<receive_type> data_receive;
+		send_type& data_send;
 
 		std::thread* receiver;
 
@@ -23,14 +23,15 @@ namespace NoStop
 		bool& fresh_data; // if not all data are available, do not use packet
 		std::map< std::string, bool > received_from_agents;
 
+		///
 		void receive_loop(
-			std::vector<Coverage_packet>& data_receive,
+			std::vector<receive_type>& data_receive,
 			std::shared_ptr<std::mutex>& ptr_data_mutex,
 			unsigned int neighbour,
 			std::string my_id,
 			bool& fresh_data)
 		{
-			std::vector<Coverage_packet> temp;
+			std::vector<receive_type> temp;
 
 			while(!s_interrupted)
 			{
@@ -77,9 +78,10 @@ namespace NoStop
 
 	public:
 
+		///
 		Communicator(
 			std::shared_ptr<std::mutex>& data_receive_mutex,
-			Coverage_packet* data_send,
+			send_type* data_send,
 			unsigned int neighbour,
 			std::string my_id,
 			bool& fresh_data)
@@ -93,11 +95,13 @@ namespace NoStop
 			this->start_threads();
 		}
 
+		///
 		void init(std::string agent_id)
 		{
-			agent_to_simulator_nostop_communicator<Coverage_packet,Coverage_packet>::init(agent_id);
+			agent_to_simulator_nostop_communicator<receive_type,send_type>::init(agent_id);
 		}
 
+		///
 		void start_threads()
 		{
 			receiver=new std::thread(
@@ -110,22 +114,26 @@ namespace NoStop
 				std::ref(fresh_data) );
 		}
 
+		///
 		void* get_data()
 		{
 			return (void*) &data_receive;
 		}
 
+		///
 		void send()
 		{
-			this->agent_to_simulator_nostop_communicator<Coverage_packet,Coverage_packet>::send(data_send);
+			this->agent_to_simulator_nostop_communicator<receive_type,send_type>::send(data_send);
 		}
 
+		///
 		~Communicator()
 		{
 
 		}
-		protected:
-		void ref(std::shared_ptr< std::mutex > data_receive_mutex);
+
+	protected:
+		// 		void ref(std::shared_ptr< std::mutex > data_receive_mutex);
 	};
 }
 

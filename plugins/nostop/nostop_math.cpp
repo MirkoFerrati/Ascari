@@ -641,7 +641,7 @@ namespace NoStop
 						points.push_back(std::make_pair(param, seg[j]) );
 				}
 
-				// il segmento di overlap è quello compreso tra il secondo e il terzo punto
+				// il segmento di overlap ï¿½ quello compreso tra il secondo e il terzo punto
 				std::list<std::pair<double,Real2D> >::iterator it = points.begin()++;
 				intersection[0] = it->second;
 				it++;
@@ -653,7 +653,7 @@ namespace NoStop
 				intersection[countIntersection] = inters;
 				countIntersection++;
 
-				// se ho già trovato due punti di intersezione, ho il segmento di overlap
+				// se ho giï¿½ trovato due punti di intersezione, ho il segmento di overlap
 				if( countIntersection == 2 )
 					return 2;
 			}
@@ -1267,17 +1267,17 @@ the_village:
 		}
 	}
 
-	// Get the angle between this line and a target line.
-	double angleBetween(const Real2D& source_line, const Real2D& target_line) const
-	{
-		double a = Math::polarPhi2D(source_line);
-		double b = Math::polarPhi2D(target_line);
-		double diff = a - b;
-		while (diff > Math::Pi) diff -= Math::TwoPi;
-		while (diff <= -Math::Pi) diff += Math::TwoPi;
-		return Math::toDeg(diff);
-	}
-	
+	// 	// Get the angle between this line and a target line.
+	// 	double angleBetween(const Real2D& source_line, const Real2D& target_line)
+	// 	{
+	// 		double a = Math::polarPhi2D(source_line);
+	// 		double b = Math::polarPhi2D(target_line);
+	// 		double diff = a - b;
+	// 		while (diff > Math::Pi) diff -= Math::TwoPi;
+	// 		while (diff <= -Math::Pi) diff += Math::TwoPi;
+	// 		return Math::toDeg(diff);
+	// 	}
+
 	bool Math::polygonContains(std::vector<Real2D> const& vertex, Real2D const& test)
 	{
 		double l_angleTot = 0.;
@@ -1286,7 +1286,7 @@ the_village:
 			l_angleTot+= angleBetween(vertex[i] - test, vertex[(i+1) % vertex.size()] - test);
 		}
 
-		return fabs(l_angleTot Math::TwoPi) < Math::TOLERANCE;
+		return fabs(l_angleTot * Math::TwoPi) < Math::TOLERANCE;
 	}
 
 }

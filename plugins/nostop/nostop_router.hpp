@@ -62,7 +62,7 @@ namespace NoStop
 			sender_receiver=new std::thread(&Router::loop,std::ref(*this),std::ref(data));
 		}
 
-		~task_assignment_router()
+		~Router()
 		{}
 	};
 }

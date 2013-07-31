@@ -5,6 +5,7 @@
 #include "nostop_real2D.h"
 
 #include <vector>
+#include <memory>
 
 namespace NoStop
 {
@@ -21,9 +22,9 @@ namespace NoStop
 		/// Radius.
 		double m_farRadius;
 	public:
-		 bool contains(Real2D const& pt) const;
-		 
-		 CameraArea(const Real2D & _center, const double & _farRad) : m_center(_center), m_farRadius(_farRad) {}
+		bool contains(Real2D const& pt) const;
+
+		CameraArea(const Real2D & _center, const double & _farRad) : m_center(_center), m_farRadius(_farRad) {}
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -52,11 +53,11 @@ namespace NoStop
 		std::shared_ptr<CameraArea> getVisibleArea(Real2D const& point) const;
 
 		double computeCosts() const {return 0.;}
-		
+
 		void setOrientation(double const& _orientation) { m_orientation = _orientation;}
 
 		friend class AgentPosition;
-		
+
 		template <typename Archive>
 		void serialize(Archive& ar,const unsigned int /*version*/)
 		{
@@ -104,9 +105,9 @@ namespace NoStop
 		double getOrientation() const {return m_camera.getOrientation(); }
 
 		void setOrientation(double const& _orientation) { m_camera.setOrientation(_orientation); }
-		
+
 		CameraPosition getCameraPosition() {return m_camera;}
-		
+
 		template <typename Archive>
 		void serialize(Archive& ar,const unsigned int /*version*/)
 		{

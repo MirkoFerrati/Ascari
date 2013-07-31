@@ -72,10 +72,10 @@ namespace NoStop
 		bool isChanged() const;
 		/// Set the value to zero.
 		void resetValue();
-		
+
 		Real2D vertex(int i) const;
 		Real2D agentVertex(int i) const;
-	      
+
 		//bool equals(std::shared_ptr<Square> _other) const;
 	};
 
@@ -97,7 +97,7 @@ namespace NoStop
 		/// Constructor
 		DiscretizedArea(
 			std::vector<Real2D> const& _external, 
-			std::set< std::vector<Real2D> > const& _obstacles, 
+			std::list< std::vector<Real2D> > const& _obstacles, 
 			int numCol, int numRow);
 
 		/// Copy constructor
@@ -139,7 +139,7 @@ namespace NoStop
 		int getNumCol() const {return m_numCol;}
 
 		int numberOfSquaresCoveredByGuards() const;
-		
+
 		void mergeReceivedData(ISLAlgorithm_packet* _data);
 
 		friend class ISLAlgorithm;

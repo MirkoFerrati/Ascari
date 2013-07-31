@@ -3,38 +3,41 @@
 #ifdef ISSIMULATOR
 #include <../plugins/abstract_simulator_plugin.h>
 #include "nostop_router.hpp"
+#include "nostop_packet.hpp"
 #include <yaml_parser.h>
 #include <types/world_sim_packet.h>
 #include "../simulator/simulator.h"
 
 namespace NoStop
 {
-  class Simulator_plugin : public abstract_simulator_plugin
-  {
-  public:
-    Simulator_plugin( simulator* s );
-	
-	/// Get world information and initialize simulator
-    bool initialize(Parsed_World const& w);
+	class DiscretizedArea;
+  
+	class Simulator_plugin : public abstract_simulator_plugin
+	{
+	public:
+		Simulator_plugin( simulator* s );
 
-	/// Run NoStop Simulator plugin
-    void run_plugin();
+		/// Get world information and initialize simulator
+		bool initialize(Parsed_World const& w);
 
-	/// Stop NoStop Simulator plugin
-    void stop();
+		/// Run NoStop Simulator plugin
+		void run_plugin();
 
-  private:
+		/// Stop NoStop Simulator plugin
+		void stop();
 
-	  std::shared_ptr<DiscretizedArea> m_area;
+	private:
 
-    int num_agents;
+		std::shared_ptr<DiscretizedArea> m_area;
 
-    bool ta_router_started;
-	  
-	  task_assignment_namespace::task_assignment_algorithm task_assignment_algorithm;
-	  std::shared_ptr<task_assignment_router_base> ta_router;
-      world_sim_packet sim_packet;
-  };
+		int m_num_agents;
+
+		bool m_router_started;
+
+		std::shared_ptr< Router<Coverage_packet> > m_router;
+		world_sim_packet sim_packet;
+	};
 }
 
-#
+#endif
+#endif

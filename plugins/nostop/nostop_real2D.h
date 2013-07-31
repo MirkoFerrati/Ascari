@@ -136,7 +136,7 @@ namespace NoStop
 			double sqmod = (double)(v[0]*v[0] + v[1]*v[1]);
 			return (REAL)sqrt(sqmod);
 		}
-		
+
 		REAL distance(const Real2D& other)
 		{
 			return (*this - other).mod();

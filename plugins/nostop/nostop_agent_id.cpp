@@ -1,41 +1,46 @@
 #include "nostop_agent_id.h"
 
+#include <vector>
+#include <sstream>
+
+#include <boost/tokenizer.hpp>
+
 namespace NoStop
 {
 	/// 
 	std::vector<std::string> tokenize(std::string const& name)
 	{
 		std::vector<std::string> l_res;
-		char_separator<char> sep(", ");
-		tokenizer<char_separator<char>> tokens(name, sep);
+		boost::char_separator<char> sep(", ");
+		boost::tokenizer< boost::char_separator<char> > tokens(name, sep);
 		for (const auto& t : tokens) 
 		{
-		    l_res.push_back(t);
+			l_res.push_back(t);
 		}
 		return l_res;
 	}
-  
+
 	/// Construct Identifier from configuration file string
 	Agent_ID::Agent_ID(std::string const& name)
 	{
 		std::vector<std::string> l_value = tokenize(name);
-	  	  
+
 		m_team = 1;
 		for(size_t i = 0; i < l_value.size(); ++i)
 		{
-		  if(i == 1)
-		    m_id = atoi(l_value[i]);
-		  else if(i == 3)
-		    m_team == l_value[i];
+			if(i == 1)
+				m_id = atoi( l_value[i].c_str() );
+			else if(i == 3)
+				m_team == atoi( l_value[i].c_str() );
 		}
 	}
-	
+
 	///
 	std::string Agent_ID::str() const
 	{
-	    std::stringstream out;
-	    out << "Agent_" << m_id << "_Team_" << m_team;
-	    return out;
+		std::stringstream out;
+		out << "Agent_" << m_id << "_Team_" << m_team;
+		return out.str();
 	}
 
 	/// Get the name of the agent
@@ -62,22 +67,22 @@ namespace NoStop
 
 		return false;
 	}
-	
+
 	///
 	bool Agent_ID::operator!=(Agent_ID const& other) const
 	{
-	  if(other < *this)
-	    return true;
-	  else if(*this < other)
-	    return true;
-	  else
-	    return false;
+		if(other < *this)
+			return true;
+		else if(*this < other)
+			return true;
+		else
+			return false;
 	}
-	
+
 	///
 	bool Agent_ID::operator==(Agent_ID const& other) const
 	{
-	  return !(other!=*this);
+		return !(other!=*this);
 	}
-  
+
 }

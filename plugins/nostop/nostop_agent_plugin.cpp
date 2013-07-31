@@ -16,10 +16,10 @@ namespace NoStop
 	//////////////////////////////////////////////////////////////////////////
 	void Agent_plugin::createDiscretizedArea(Parsed_World* world)
 	{
-		auto wo=reinterpret_cast<NoStop::Parsed_world*>(world->parsed_items_from_plugins[0]);
+		NoStop::Parsed_world* wo=reinterpret_cast<NoStop::Parsed_world*>(world->parsed_items_from_plugins[0]);
 		//	Get vertex from Parsed World:
 		std::vector<Real2D> l_vertices = wo->getExternalVertices();
-		std::set< std::vector<Real2D> > l_obstacles = wo->getObstaclesVertices();
+		std::list< std::vector<Real2D> > l_obstacles = wo->getObstaclesVertices();
 		int l_num_col = wo->getDiscretization();
 		int l_num_row = wo->getDiscretization();
 
@@ -133,6 +133,12 @@ namespace NoStop
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	double Agent_plugin::computeCosts()
+	{
+		return m_position.computeCosts();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	void Agent_plugin::compute_speeds(double x_t,double y_t) //CONTROLLARE
 	{
 		double l_angle = Math::polarPhi2D( Real2D(x_t, y_t) - m_position.getPoint2D() );
@@ -207,7 +213,7 @@ namespace NoStop
 			if ( /*( l_name != "" ) &&*/ !( l_name != m_id ) )
 			{
 				// with simulation time it's possible to select right packets
-				simulation_time l_time = l_data_receive.at(i).getTime();
+				// 				simulation_time l_time = l_data_receive.at(i).getTime();
 
 				ISLAlgorithm_packet* l_temp = (ISLAlgorithm_packet*) l_data_receive.at(i).getData();
 
@@ -241,7 +247,7 @@ namespace NoStop
 				bool l_fresh = false;
 				// Initialize the packet necessary to communicate
 				m_packet = std::make_shared<Coverage_packet>( 0., m_id, m_position, ISLAlgorithm_packet() );
-				m_communicator = std::make_shared<Communicator>(
+				m_communicator = std::make_shared< Communicator<Coverage_packet,Coverage_packet> >(
 					m_mutex,
 					m_packet.get(),
 					m_other_agents_id.size(),
@@ -382,6 +388,30 @@ namespace NoStop
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void Agent_plugin::setNextPosition(std::vector< MemoryAgentPosition > const& memory)
+	{
+		Lock lock(m_mutex);
+		if( memory.empty() )
+		{
+			m_nextPosition = m_position;
+		}
+		else
+		{
+			double l_bestPayoff = memory.at(0).m_payoff;
+			m_nextPosition = memory.at(0).m_action;
+			for(size_t i= 1; i < memory.size(); ++i)
+			{
+				if(memory[i].m_payoff > l_bestPayoff)
+				{
+					m_nextPosition = memory[i].m_action;
+					l_bestPayoff = memory[i].m_payoff;
+				}
+			}
+		}	
+		return;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	std::vector<AgentPosition> Agent_plugin::getFeasibleActions()
 	{
 		AreaCoordinate l_currCoord = m_area->getCoordinate( m_position.getPoint2D() );
@@ -414,4 +444,18 @@ namespace NoStop
 	{
 		m_currentPayoff = l_benefit;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Agent_plugin::selectBestMemoryAction()
+	{
+		std::vector< MemoryAgentPosition > l_memory = this->getMemory();
+		this->setNextPosition(l_memory);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	AgentPosition Agent_plugin::getPosition()
+	{
+		return m_position;
+	}
+
 }

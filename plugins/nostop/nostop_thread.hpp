@@ -8,35 +8,35 @@
 
 namespace NoStop
 {
-		/**
-		*	A lock is a clever object that you construct on the stack
-		*	and for the duration of its lifetime your object is protected
-		*	from any other threads.
-		*	You have to put Locks inside all the methods of your object that
-		*	access data shared with the captive thread.
-		*/
-		class Lock
+	/**
+	*	A lock is a clever object that you construct on the stack
+	*	and for the duration of its lifetime your object is protected
+	*	from any other threads.
+	*	You have to put Locks inside all the methods of your object that
+	*	access data shared with the captive thread.
+	*/
+	class Lock
+	{
+	public:
+		///	Acquire the state of the semaphore
+		Lock( std::shared_ptr<std::mutex> _mutex ) : m_mutex(_mutex)
 		{
-		public:
-			///	Acquire the state of the semaphore
-			Lock( std::shared_ptr<std::mutex> _mutex ) : m_mutex(_mutex)
-			{
-				m_mutex->lock();
-			}
+			m_mutex->lock();
+		}
 
-			///	Release the state of the semaphore
-			~Lock()
-			{
-				m_mutex->unlock();
-			}
+		///	Release the state of the semaphore
+		~Lock()
+		{
+			m_mutex->unlock();
+		}
 
-		private:
-			std::shared_ptr<std::mutex> m_mutex;
+	private:
+		std::shared_ptr<std::mutex> m_mutex;
 
-			// Prevent copying
-			Lock(const Lock&);
-			Lock& operator=(const Lock&);
-		};
+		// Prevent copying
+		Lock(const Lock&);
+		Lock& operator=(const Lock&);
+	};
 }
 #endif
 

@@ -1,8 +1,9 @@
 #ifndef NOSTOP_PACKET_H
 #define NOSTOP_PACKET_H
 
-#include "nostop_agent_plugin.h"
+// #include "nostop_agent_plugin.h"
 #include "nostop_agent_id.h"
+#include "nostop_agent_position.h"
 #include "nostop_ISLAlgorithm_packet.h"
 #include "../shared/types.h"
 
@@ -21,7 +22,7 @@ namespace NoStop
 		Packet()
 			: m_time(), m_agent_id(""), m_pos(), m_data()
 		{}
-	  
+
 		Packet(simulation_time _time, Agent_ID _agent_id, AgentPosition _pos, data_type _data)
 			: m_time(_time), m_agent_id(_agent_id), m_pos(_pos), m_data(_data)
 		{}
@@ -45,7 +46,7 @@ namespace NoStop
 		{
 			return m_pos;
 		}
-		
+
 		Agent_ID getAgentID()
 		{
 			return m_agent_id;
@@ -60,7 +61,7 @@ namespace NoStop
 			ar& m_data;
 		}
 	};
-	
+
 	typedef Packet<ISLAlgorithm_packet> Coverage_packet;
 }
 
