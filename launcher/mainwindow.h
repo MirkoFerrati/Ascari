@@ -73,8 +73,12 @@ private:
     //std::vector<char> buffer;
     world_sim_packet buffer;
     std::map<std::string,monitor_packet> monitor_buffer;
+    std::map<std::string,int> config_to_row;
     std::shared_ptr<std::mutex> mutex, monitor_mutex;
     void openFile();
+    void addConfigRow(std::string name, QString value);
+    void addConfigRow(std::string name, std::string value);
+
     QSettings *settings;
     Parsed_World world;
     Viewer * insideViewer;
