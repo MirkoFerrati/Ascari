@@ -1,0 +1,72 @@
+#LOADING/UNLOADING
+- BEHAVIORS:
+  - name: LGV
+    states: [x,y,theta]
+    control_commands: [v,w]
+    DYNAMIC_MAP:
+    - x: 'v*cos(w)'
+      y: 'v*sin(w)'
+      theta: '5*sin(w-theta)'
+    CONTROLLERS:
+    - name: go
+      v: v_router
+      w: atan2(ytarget-y,xtarget-x)
+    - name: wait
+      v: 0
+      w: 0
+    DISCRETE_STATES:
+    - name: go
+      controller: go
+    - name: wait
+      controller: wait
+    - name: wait_for_target
+      controller: wait
+    ENCODER:
+    - TOPOLOGY:
+      - topology: [t1]
+        t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+      LAMBDA:
+      - lambda: [Lreached] 
+        Lreached: 'abs(x-xtarget)<3 and abs(y-ytarget)<3'
+    EVENTS:
+    - events: [reached, new_target, stopped, started]
+      reached: 'Lreached'
+      new_target: '!Lreached'
+      stopped: ''
+      started: ''
+    AUTOMATON:
+    - name: aut_machine
+      GO:
+      - WAIT: [stopped]
+        WAIT_FOR_TARGET: [reached]
+      WAIT:
+      - GO: [started]
+      WAIT_FOR_TARGET:
+      - GO: [new_target]
+
+  WORLD:
+  - bonus_variables: [c]
+    c: 1
+    GRAPH_NAME: 'basicx.lgf'
+    GOODS: [33,33,33,33,33,34,34,34,34]
+  AGENTS:
+  - agent: Agente1
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '266'
+      y: '167'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [0,6]
+    BEHAVIOR: LGV
+
+  - agent: Agente2
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '709'
+      y: '167'
+      theta: '0'
+    STATE_START: GO
+    TARGET_LIST: [7,12]
+    BEHAVIOR: LGV
+
