@@ -476,7 +476,7 @@ protected:
 
     bool askSync ( std::string sync_protocol )
     {
-        /**      Publisher opens PUB socket and starts sending "Hello" messages (not data).
+        /**   TODO(Mirko): Publisher opens PUB socket and starts sending "Hello" messages (not data).
                  Subscribers connect SUB socket and when they receive a Hello message they tell the publisher via a REQ/REP socket pair.
                  When the publisher has had all the necessary confirmations, it starts to send real data.
                */
@@ -496,9 +496,11 @@ protected:
             sync_socket->connect ( !sync_protocol.compare ( "" ) ? SYNC_PROTOCOL : sync_protocol.c_str() );
             std::cout  << "."<<std::flush;
             zmq::message_t message ( owner_name.size() );
+	    usleep(250000); //HACK:between connect and send we need some time, or we delete the socket too early
             memcpy ( message.data(), owner_name.data(), owner_name.size() );
             bool rc = sync_socket->send ( message );
-            assert ( rc );
+	    usleep(250000); //HACK:between send and receive we need some time, or we delete the socket too early
+            if (!rc) assert ( rc ); //When we compile without assertion, do not warn about unused variable
             message.rebuild ( MAX_PACKET_LENGTH );
             try
             {
