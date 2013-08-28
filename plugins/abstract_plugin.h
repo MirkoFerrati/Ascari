@@ -27,17 +27,17 @@ class abstract_plugin
 public:
 #ifdef ISAGENT
     virtual abstract_agent_plugin* getAgentPlugin() =0;
-    virtual bool createAgentPlugin ( agent* a,Parsed_World* parse ){return false;};
+    virtual bool createAgentPlugin ( agent* ,Parsed_World* ){return false;};
 #endif
 
 #ifdef ISSIMULATOR
     virtual abstract_simulator_plugin* getSimulatorPlugin() =0;
-    virtual bool createSimulatorPlugin ( simulator* a,Parsed_World* parse ){return false;};
+    virtual bool createSimulatorPlugin ( simulator* ,Parsed_World* ){return false;};
 #endif
 
 #ifdef ISVIEWER
     virtual abstract_viewer_plugin* getViewerPlugin() =0;
-    virtual bool createViewerPlugin ( Viewer* a, Parsed_World* parse=0 ){return false;};
+    virtual bool createViewerPlugin ( Viewer*, Parsed_World* parse=0 ){return false;};
 #endif
 
     virtual abstract_parser_plugin* getParserPlugin() =0;
