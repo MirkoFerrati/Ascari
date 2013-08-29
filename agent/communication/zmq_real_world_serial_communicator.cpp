@@ -25,7 +25,7 @@ int64_t get_tick_count()
 zmq_real_world_serial_communicator::zmq_real_world_serial_communicator(std::string agent_name, index_map& input_map)
     :map_inputs_name_to_id(input_map)
 {
-    init(agent_name);
+    init_full(agent_name,true,AGENT_TO_SIMULATOR,1,false);
 
     command_old[map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE)]=0;
     command_old[map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE)]=0;
@@ -76,7 +76,6 @@ const world_sim_packet& zmq_real_world_serial_communicator::receive_agents_statu
         for (auto agent=tmp.state_agents.internal_map.begin(); agent!=tmp.state_agents.internal_map.end(); ++agent) {
             packet_received.state_agents.internal_map[agent->first]=*(agent->second);
         }
-
         return  packet_received;
     }
     catch (zmq::error_t ex)
@@ -94,24 +93,16 @@ const world_sim_packet& zmq_real_world_serial_communicator::receive_agents_statu
 
 void zmq_real_world_serial_communicator::send_control_command(control_command_packet& packet, const target_abstract& /*target*/)
 {
-    send(packet);
     DECLARE_TIMING(myTimer);
-
-
         START_TIMING(myTimer);
-
-    cout<<"sending message to serial port"<<endl;
-    
-        serial_port << setprecision(6)<<ARDUINO_COMMAND_CODE<<","<<
-        packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<
-        packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<";";
-	serial_port.flush();
-
-	cout << "SerialMessage Sent:" << packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<  endl;
+        //serial_port << setprecision(6)<<ARDUINO_COMMAND_CODE<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<";"<<endl;
+        cout << "SerialMessage Sent:" << packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<  endl;
         STOP_TIMING(myTimer);
-       // printf("Execution time: %f ms.\n", GET_TIMING(myTimer) );
-        //printf("Average time: %f ms per iteration.\n", GET_AVERAGE_TIMING(myTimer) );
-
+        printf("Execution time: %f ms.\n", GET_TIMING(myTimer) );
+        printf("Average time: %f ms per iteration.\n", GET_AVERAGE_TIMING(myTimer) );
+    }
+    command_old.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))=packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE));
+    command_old.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))=packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE));
 }
 
 
