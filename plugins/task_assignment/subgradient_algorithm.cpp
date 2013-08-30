@@ -39,7 +39,7 @@ bool task_assignment::convergence_control_routine()
 	  step=0;
      }
       
-     a = a && (step>10);
+     a = a && (step>50);
 	 
      if(a)
      {
@@ -126,9 +126,28 @@ task_id task_assignment ::subgradient_algorithm()
 			ta_problem.set_cost_vector(F);
 			
 			
-			ta_problem.solve(solution);
-		
-		      
+			//ta_problem.solve(solution);
+			//***********************************
+			double prev=0;
+			int min=-1;
+			
+			for(int i=0;i<F.size();i++)
+			{
+			    if (prev > F[i])
+			    {
+				prev=F[i];
+				min=i;
+			    }
+			    
+			    solution.push_back(0);
+			}
+			
+			if (min != -1)
+			{
+			    solution[min]=1;
+			}
+			//***********************************
+			
 			for(unsigned int j=0;j<num_task;j++)//copy_solution_to_TA_vector
 			{
 				agent_task_assignment_vector->at(tasks_id.at(j))=solution.at(j);
@@ -194,7 +213,7 @@ task_id task_assignment ::subgradient_algorithm()
 						
 			control_print();
 						
-			converge=convergence_control_routine();
+			//converge=convergence_control_routine();
 			
 			passi++;
 		}
@@ -203,6 +222,7 @@ task_id task_assignment ::subgradient_algorithm()
 		ptr_subgradient_packet.get()->y=y.value();
 		ptr_subgradient_packet.get()->theta=theta.value();
 		ta_communicator->send();
+// 		std::cout<<std::endl<<"size of sent packet: "<<sizeof(*ptr_subgradient_packet.get())<<std::endl<<std::endl;
 		//std::cout<<"MANDO "<<((ptr_subgradient_packet.get()->busy)?("occupato"):("libero"))<<std::endl;
 // 		std::cout<<"MANDO x:"<<x.value()<<" y:"<<y.value()<<std::endl;
 
