@@ -51,6 +51,8 @@
     GOODS: [33,33,33,33,33,34,34,34,34]
   AGENTS:
   - agent: Agente1
+    SIMULATED: 0
+    MARKER: 1
     COMMUNICATION_AREA: =  circle(10)
     INITIAL:
     - x: '266'
