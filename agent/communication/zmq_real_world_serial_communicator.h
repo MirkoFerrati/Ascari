@@ -11,7 +11,7 @@
 #define DEFAULT_OMEGA_VARIABLE "W"
 
 class zmq_real_world_serial_communicator : public agent_namespace::world_communicator_abstract,
-public zmq_agent_to_simulator_communicator<agent_sim_packet_receiver,control_command_packet>
+public zmq_receive_communicator<agent_sim_packet_receiver,ZMQ_SUB>
 {
 public:
 zmq_real_world_serial_communicator(std::string agent_name,index_map& input_map);

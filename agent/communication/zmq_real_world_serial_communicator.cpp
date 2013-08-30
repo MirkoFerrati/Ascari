@@ -25,7 +25,7 @@ int64_t get_tick_count()
 zmq_real_world_serial_communicator::zmq_real_world_serial_communicator(std::string agent_name, index_map& input_map)
     :map_inputs_name_to_id(input_map)
 {
-    init(agent_name);
+    init_full(agent_name,true,AGENT_TO_SIMULATOR,1,false);
 
     command_old[map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE)]=0;
     command_old[map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE)]=0;
@@ -33,7 +33,7 @@ zmq_real_world_serial_communicator::zmq_real_world_serial_communicator(std::stri
 
 
     /* Serial Port to Arduino initialization */
-    /*
+    
     serial_port.Open("/dev/ttyACM0");
     assert(serial_port.good());
 
@@ -52,7 +52,7 @@ zmq_real_world_serial_communicator::zmq_real_world_serial_communicator(std::stri
     serial_port.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_NONE );
     assert(serial_port.good());
 
-    */
+    
 }
 
 
@@ -68,7 +68,6 @@ const world_sim_packet& zmq_real_world_serial_communicator::receive_agents_statu
         for (auto agent=tmp.state_agents.internal_map.begin(); agent!=tmp.state_agents.internal_map.end(); ++agent) {
             packet_received.state_agents.internal_map[agent->first]=*(agent->second);
         }
-
         return  packet_received;
     }
     catch (zmq::error_t ex)
@@ -86,16 +85,10 @@ const world_sim_packet& zmq_real_world_serial_communicator::receive_agents_statu
 
 void zmq_real_world_serial_communicator::send_control_command(control_command_packet& packet, const target_abstract& /*target*/)
 {
-    send(packet);
     DECLARE_TIMING(myTimer);
-
-
-
     if (abs(packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))-command_old.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE)))>0.01 || abs(packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))-command_old.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE)))>0.01)
     {
         START_TIMING(myTimer);
-
-
         //serial_port << setprecision(6)<<ARDUINO_COMMAND_CODE<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<";"<<endl;
         cout << "SerialMessage Sent:" << packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<  endl;
         STOP_TIMING(myTimer);
@@ -104,7 +97,6 @@ void zmq_real_world_serial_communicator::send_control_command(control_command_pa
     }
     command_old.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))=packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE));
     command_old.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))=packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE));
-
 }
 
 

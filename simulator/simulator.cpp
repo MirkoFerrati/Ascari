@@ -60,6 +60,7 @@ simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.tim
     cycle_period_millisec=50;
     collisionChecker=0;
     checkCollision=false;
+    timeSimulated=true;
     T_integration=0.01;
     if (CONFIG.exists("T_INTEGRATION"))
       T_integration=atof(CONFIG.getValue("T_INTEGRATION").c_str());
@@ -299,7 +300,7 @@ void simulator::main_loop()
         volatile bool input_exit=false;
         volatile bool paused=false;
         std::thread input_thread ( &simulator::input_loop,this,std::ref ( input_mutex ),std::ref ( input_cond ),std::ref ( paused ),std::ref ( input_exit ),std::ref ( cycle_period_millisec ) );
-
+	simulation_time old_time=0;
         sim_packet.time=0;
         int clock=0;
         struct timespec requestStart, requestEnd, simulationStart;
@@ -378,8 +379,12 @@ void simulator::main_loop()
                 plugin->run_plugin();
 
             agent_state state_tmp;
-	    unsigned integration_times=step_accum/T_integration; //TODO(Mirko): dovrebbe essere max(cycle_period_millisec, step_accum)
-            for ( int i=0; i<integration_times; i++ )
+	    //TODO(Mirko): attenzione, si perdono passi di integrazione per colpa del round, uno dovrebbe salvarsi il resto del round e usarlo al passo successivo
+	    //unsigned int integration_times=round(max(step_accum/1000.0,cycle_period_millisec/1000.0)/T_integration); 
+	    unsigned int integration_times=round((sim_packet.time-old_time)/T_integration);
+	    old_time=sim_packet.time;
+	    cout<<"integration_times:"<<integration_times<<endl;
+            for ( unsigned int i=0; i<integration_times; i++ )
             {
                 for ( index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end(); ++iter )
                 {
@@ -428,7 +433,7 @@ void simulator::main_loop()
 	    }
 	    else
 	    {
-		WARN("this timestep %d took too much time: %d",sim_packet.time,step_accum);
+		WARN("this timestep %f took too much time: %f",sim_packet.time,step_accum);
 	    }
             //cout<<endl<< "tempo necessario:"<<endl;
             //printf( "%f\n", accum );
