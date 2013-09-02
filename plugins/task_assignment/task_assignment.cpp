@@ -99,7 +99,8 @@ void task_assignment::initialize(const Parsed_World& world)
     
     alpha=-1;
     
-    set_charge=-0.05;
+    if(recharge_is_present()) set_charge=-0.05;
+    else set_charge=0;
     
     lambda_u=0;
 }
@@ -109,7 +110,7 @@ void task_assignment ::initialize_assignment_problem()
 {	
 	copy_cost_vector_to_C();
 	
-	ta_problem.initialize_problem("Task_Assignment",GLP_MIN,(int)num_task,C);
+	//ta_problem.initialize_problem("Task_Assignment",GLP_MIN,(int)num_task,C);
 }
 
  
@@ -348,7 +349,7 @@ void task_assignment::receive_from_others()
 		  {
 			agent_task_cost_vector->at(data_receive.at(i).taken_task)=INF;
 			copy_cost_vector_to_C();
-			std::cout<<"task "<<data_receive.at(i).taken_task<<" e' preso"<<std::endl;
+// 			std::cout<<"task "<<data_receive.at(i).taken_task<<" e' preso"<<std::endl;
 			taken_tasks.at(name)=data_receive.at(i).taken_task;
 			if (my_task==taken_tasks.at(name)) converge=false;
 		  }
@@ -356,17 +357,17 @@ void task_assignment::receive_from_others()
 		  if (data_receive.at(i).busy)
 		  {
 			busy_robots.at(name)=true;
-			std::cout<<"robot "<<name<<" e' occupato, "<<data_receive.at(i).busy<<std::endl;
+// 			std::cout<<"robot "<<name<<" e' occupato, "<<data_receive.at(i).busy<<std::endl;
 		  }
 		  else
 		  {
 			busy_robots.at(name)=false;
-			std::cout<<"robot "<<name<<" e' libero, "<<data_receive.at(i).busy<<std::endl;
+// 			std::cout<<"robot "<<name<<" e' libero, "<<data_receive.at(i).busy<<std::endl;
 		  }
 		  
 		  std::vector<double> appv;
 		  appv.push_back(data_receive.at(i).x);
-		  appv.push_back(data_receive.at(i).y);
+// 		  appv.push_back(data_receive.at(i).y);
 		  appv.push_back(data_receive.at(i).theta);;
 		  positions[name]=appv;
 		  appv.clear();
@@ -389,7 +390,7 @@ void task_assignment::receive_from_others()
 
 
 void task_assignment ::run_plugin()
-{
+{ 
 	if (objects.objects.count(TA_PLUGIN_IDENTIFIER))
 	{	    
 	    for (auto object:objects.objects.at(TA_PLUGIN_IDENTIFIER))
@@ -429,9 +430,9 @@ void task_assignment ::run_plugin()
 		}
 
 
-		std::cout<<"CARICA: "<<charge_.value()<<'%'<<std::endl;
+		if(recharge_is_present()) std::cout<<"CARICA: "<<charge_.value()<<'%'<<std::endl;
 
-		if(charge_.value() <= 0)
+		if(recharge_is_present() && charge_.value() <= 0)
 		{
 		    std::cout<<"BATTERIA SCARICA... SHUTDOWN..."<<std::endl;
 		    set_charge=0;
@@ -441,7 +442,8 @@ void task_assignment ::run_plugin()
 		    stop=true;
 		}
 		      
-		bool a=(fabs(dec-0.0) < 0.001)||(fabs(dec-0.5) < 0.001);
+		bool a=(fabs(dec-0.0) < 0.001)||(fabs(dec-0.5) < 0.001); //TODO: BEWARE OF REAL TIME!!
+		a=1;
 		if(a)
 		{
 			  std::cout<<"[TA - "<<time<<']'<<std::endl;
@@ -473,9 +475,9 @@ void task_assignment ::run_plugin()
 					      else if(charge_.value()>=97)set_charge=0.1;
 						  else set_charge=2;
 					  }
-					  else set_charge=-0.1;
+					  else if (recharge_is_present()) set_charge=-0.1;
 				      }
-				      else set_charge=-0.05;
+				      else if (recharge_is_present()) set_charge=-0.05;
 				      
 				      if(task_made())
 				      {
@@ -554,7 +556,7 @@ void task_assignment ::run_plugin()
 					  
 					  if((my_task=="TASK_ASSIGNMENT_FAILED") || (my_task==""))
 					  {
-					      set_charge=-0.05;
+					      if (recharge_is_present()) set_charge=-0.05;
 					      std::cout<<"NO TASK HAS BEEN ASSIGNED TO ME"<<std::endl;
 					      task_assigned=false;
 					      my_task_x=x0;
