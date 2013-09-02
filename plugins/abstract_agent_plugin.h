@@ -14,7 +14,8 @@ class abstract_agent_plugin
   public:
 	virtual void run_plugin()=0;
 	virtual ~abstract_agent_plugin(){};
-    virtual void addReservedVariables(exprtk::symbol_table< double >& arg1)=0;
+	virtual void addReservedVariables(exprtk::symbol_table< double >& arg1)=0;
+	virtual bool initialize(){return true;};
 	virtual void compileExpressions(exprtk::symbol_table< double >& arg1)=0;
 
 };

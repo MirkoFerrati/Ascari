@@ -53,6 +53,12 @@ void agent::initialize()
         discreteState.push_front ( disc_state.second );
       else
 	discreteState.push_front(map_discreteStateName_to_id.at(world.agents.front().state_start));
+      
+     for ( unsigned int i=0; i<plugins.size(); i++ )
+    {
+        plugins[i]->initialize();
+    } 
+      
 }
 
 void agent::setCommunicator ( std::shared_ptr<agent_namespace::world_communicator_abstract>& communicator )
