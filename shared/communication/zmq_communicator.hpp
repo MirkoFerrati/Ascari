@@ -65,7 +65,7 @@ public:
 
 protected:
 
-    std::list<std::string> clients;
+    std::list<std::string> clients,acceptedClients;
 
     void setClientsName ( const std::list<std::string>& clients )
     {
@@ -426,6 +426,11 @@ protected:
                     rejected=true;
                 }
             }
+            else
+	    {
+	        auto client = std::find ( this->acceptedClients.begin(), this->acceptedClients.end(), name );
+                rejected= ( client != this->acceptedClients.end()); //if i found it, I reject the same name
+   	    }
             agent_simulator_handshake_packet infos;
             if ( !rejected || !this->clientsNamed )
             {
@@ -437,6 +442,7 @@ protected:
                 infos.message = result;
                 std::cout << name << " accepted" << std::endl;
                 subscribers++;
+		this->acceptedClients.push_back(name);
             }
             else
             {
