@@ -23,8 +23,10 @@ int Graph_creator::createGraph ( int floors, string graphName )
     this->floors=floors;
     try
     {
-        parseGraph ( graphName );
-        return graph_node_size;
+        if (parseGraph ( graphName ))
+	  return graph_node_size;
+	else
+	  return 0;
     }
     catch ( lemon::Exception const& e )
     {
@@ -136,7 +138,7 @@ void Graph_creator::finalizeFloor ( lemon::SmartDigraph::NodeMap<lemon::dim2::Po
     }
 }
 
-void Graph_creator::parseGraph ( string graphName )
+bool Graph_creator::parseGraph ( string graphName )
 {
     using namespace lemon;
     boost::algorithm::to_lower ( graphName );
@@ -152,6 +154,7 @@ void Graph_creator::parseGraph ( string graphName )
     catch ( Exception& er )   // check if there was any error
     {
         ERR ( "parsing exception %s",er.what() );
+	return false;
     }
     graph_node_size=graph.nodeNum();
     SmartDigraph::NodeMap<dim2::Point<int> > coords ( _3Dgraph );
@@ -183,4 +186,5 @@ void Graph_creator::parseGraph ( string graphName )
     std::cout << "A digraph is read from "<<graphName << std::endl;
     std::cout << "Number of nodes: " << lemon::countNodes ( _3Dgraph ) << std::endl;
     std::cout << "Number of arcs: " << lemon::countArcs ( _3Dgraph ) << std::endl;
+    return true;
 }
