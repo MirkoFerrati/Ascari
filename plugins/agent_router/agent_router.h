@@ -115,6 +115,7 @@ private:
     Udp_graph_communicator communicator;
     std::string priority;
     bool started;
+    bool initialized;
 
 	
 	

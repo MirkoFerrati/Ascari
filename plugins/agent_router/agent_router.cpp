@@ -35,7 +35,7 @@ agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, E
        coord_x ( graph ), coord_y ( graph ),
        targets ( tarlist ),time ( time ),identifier ( identifier ),communicator ( _mutex, &info, _io_service,identifier )
 {
- initialize(graphName);
+ initialized=initialize(graphName);
 }
 
 agent_router::agent_router ( agent* a, Parsed_World* parse ):  events ( a->events ), events_to_index ( a->events_to_index ), length ( graph ),
@@ -44,7 +44,7 @@ agent_router::agent_router ( agent* a, Parsed_World* parse ):  events ( a->event
 {
   targets=(reinterpret_cast<agent_router_parsed_agent*>(parse->agents.front().parsed_items_from_plugins[0]))->target_list; //funziona perche' rimane un solo agente nel mondo(gli altri vengono eliminati dal main)
   std::string graphName=(reinterpret_cast<agent_router_parsed_world*>(parse->parsed_items_from_plugins[0]))->graphName;
-initialize(graphName);
+initialized=initialize(graphName);
 }
 
 bool agent_router::initialize(std::string graphName)
@@ -52,9 +52,15 @@ bool agent_router::initialize(std::string graphName)
    Graph_creator c ( graph, length, coord_x, coord_y );
     graph_node_size = c.createGraph ( MAXFLOORS, graphName );
     if ( !graph_node_size )
+    {
         ERR ( "attenzione, impossibile creare il grafo", 0 );
+	return false;
+    }
     if ( targets.size() < 2 )
-        ERR ( "attenzione, la lista dei target e' troppo corta", 0 );
+    {
+      ERR ( "attenzione, la lista dei target e' troppo corta", 0 );
+      return false;
+    }
     source = graph.nodeFromId ( targets[0] );
     target = graph.nodeFromId ( targets[1] );
     node_id.push_back ( targets[0] ); //next = source;
@@ -79,6 +85,8 @@ bool agent_router::initialize(std::string graphName)
 
 void agent_router::run_plugin()
 {
+  if (!initialized)
+    return;
     priority=identifier;
 
     if ( internal_state==state::STOPPED )

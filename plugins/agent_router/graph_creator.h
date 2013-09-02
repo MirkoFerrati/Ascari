@@ -31,7 +31,7 @@ private:
     lemon::SmartDigraph::ArcMap<int> length;
     lemon::SmartDigraph::NodeMap<int> coord_x, coord_y;
 	
-	void parseGraph(std::string graphName);
+	bool parseGraph(std::string graphName);
 	void addFloor(lemon::SmartDigraph::NodeMap< lemon::dim2::Point< int > >& coords,
 					lemon::SmartDigraph::NodeMap< int >& ncolors, lemon::SmartDigraph::ArcMap< int >& acolors,
 					int startId);
