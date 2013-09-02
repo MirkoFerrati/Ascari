@@ -175,9 +175,10 @@ private:
 	void copy_solution_to_TA_vector(std::vector<double>& solution);
 	void copy_cost_vector_to_C();
 	void control_print();
-	void initialize( const Parsed_World& world );
+	bool initialize(  );
 
 	std::map<task_assignment_namespace::agent_id,std::vector< double >> others_subgradient;
+    const Parsed_World* world;
 };
 	#endif
 

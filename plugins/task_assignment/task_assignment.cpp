@@ -8,36 +8,36 @@ using namespace task_assignment_namespace;
 
 
 task_assignment::task_assignment ( agent* a, Parsed_World* parse )
-:time(a->time),my_id(a->identifier),events(a->events),events_to_index(a->events_to_index),objects(a->objects)
+:time(a->time),my_id(a->identifier),events(a->events),events_to_index(a->events_to_index),objects(a->objects),world(parse)
 {    
     x0=parse->agents.front().initial_states.at("X");
     y0=parse->agents.front().initial_states.at("Y");
-    initialize(*parse);
+   // initialize(*parse);
 }
 
   
 task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events,
 				   const std::map< std::string, transition >& events_to_index, const objects_container& objects)
-:time(time),my_id(agent.name),x0(agent.initial_states.at("X")),y0(agent.initial_states.at("Y")),events(events),events_to_index(events_to_index), objects(objects)
+:time(time),my_id(agent.name),x0(agent.initial_states.at("X")),y0(agent.initial_states.at("Y")),events(events),events_to_index(events_to_index), objects(objects),world(&world)
 {
-    initialize(world);  
+    //initialize(world);  
 }
 
 
-void task_assignment::initialize(const Parsed_World& world)
+bool task_assignment::initialize()
 {
     std::shared_ptr<std::mutex> temp(new std::mutex);
     ptr_receive_mutex.swap(temp);
     
-    createAgentIdAndTaskIdVectorFromParsedWorld(world);
+    createAgentIdAndTaskIdVectorFromParsedWorld(*world);
     
     num_robot=agents_id.size();
     num_task=tasks_id.size();
     
-    createTaskCostMatrixFromParsedWorld(world.agents.front());
+    createTaskCostMatrixFromParsedWorld(world->agents.front());
     inizializeTaskAssignmentMatrix();
     
-    task_assignment_algorithm=reinterpret_cast<task_assignment_parsed_world*>(world.parsed_items_from_plugins[0])->task_assignment_algorithm;
+    task_assignment_algorithm=reinterpret_cast<task_assignment_parsed_world*>(world->parsed_items_from_plugins[0])->task_assignment_algorithm;
     
     my_task="";
     my_task_x=x0;
@@ -103,6 +103,26 @@ void task_assignment::initialize(const Parsed_World& world)
     else set_charge=0;
     
     lambda_u=0;
+    createAusiliarVariables(); 
+			  
+		      if(task_assignment_algorithm==SUBGRADIENT)
+		      {
+			      std::shared_ptr<subgradient_packet> temp(new subgradient_packet);
+			      ptr_subgradient_packet.swap(temp);
+			      ptr_subgradient_packet.get()->busy=false;
+			      ptr_subgradient_packet.get()->taken_task="";
+			      ta_communicator = new task_assignment_communicator<subgradient_packet,subgradient_packet>(ptr_receive_mutex,ptr_subgradient_packet.get(),num_robot-1,my_id,fresh_data);
+
+			      std::cout<<"TASK ASSIGNMENT ALGORITHM: SUBGRADIENT"<<std::endl;
+			      //start thread
+			      not_started=false;
+		      }
+
+		      if(task_assignment_algorithm==-1)
+		      {
+			    std::cout<<"attenzione, algoritmo per il task assignment non selezionato"<<std::endl;;
+		      }
+    return true;
 }
 
  
@@ -408,25 +428,7 @@ void task_assignment ::run_plugin()
 
 		if (not_started)
 		{
-		      createAusiliarVariables(); 
-			  
-		      if(task_assignment_algorithm==SUBGRADIENT)
-		      {
-			      std::shared_ptr<subgradient_packet> temp(new subgradient_packet);
-			      ptr_subgradient_packet.swap(temp);
-			      ptr_subgradient_packet.get()->busy=false;
-			      ptr_subgradient_packet.get()->taken_task="";
-			      ta_communicator = new task_assignment_communicator<subgradient_packet,subgradient_packet>(ptr_receive_mutex,ptr_subgradient_packet.get(),num_robot-1,my_id,fresh_data);
-
-			      std::cout<<"TASK ASSIGNMENT ALGORITHM: SUBGRADIENT"<<std::endl;
-			      //start thread
-			      not_started=false;
-		      }
-
-		      if(task_assignment_algorithm==-1)
-		      {
-			    std::cout<<"attenzione, algoritmo per il task assignment non selezionato"<<std::endl;;
-		      }
+		      
 		}
 
 
