@@ -123,7 +123,7 @@ task_id task_assignment ::subgradient_algorithm()
 			
 
 			  
-			ta_problem.set_cost_vector(F);
+			//ta_problem.set_cost_vector(F);
 			
 			
 			//ta_problem.solve(solution);

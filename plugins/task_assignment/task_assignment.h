@@ -10,7 +10,7 @@
 #include <yaml_parser.h>
  
 #include "task_assignment_communicator.h"
-#include "assignment_problem.h"
+//#include "assignment_problem.h"
 #include <random.hpp>
 #include "../shared/objects/task_assignment_task.h"
 #include <types/events.h>
@@ -39,7 +39,7 @@ public:
 	void update_remaining_times();
 	bool recharge_is_present();
 	double dubins_dist(double Ax,double Ay, double theta, double Tx, double Ty, double r);
-	void solve_assignment_problem(assignment_problem& p, task_assignment_namespace::task_assignment_vector& a, std::vector<task_assignment_namespace::task_id>& t,unsigned int n);
+	//void solve_assignment_problem(assignment_problem& p, task_assignment_namespace::task_assignment_vector& a, std::vector<task_assignment_namespace::task_id>& t,unsigned int n);
 	double norm2(double x1,double y1,double x2,double y2);
 	void receive_from_others();
 	~task_assignment();
@@ -166,7 +166,7 @@ private:
 	std::shared_ptr<task_assignment_namespace::subgradient_packet> ptr_subgradient_packet;
 	//
 	
-	assignment_problem ta_problem;
+	//assignment_problem ta_problem;
 	void initialize_assignment_problem();
 	std::vector<double> C;
 	std::vector<double> D;

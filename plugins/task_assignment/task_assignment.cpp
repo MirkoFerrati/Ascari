@@ -110,7 +110,7 @@ void task_assignment ::initialize_assignment_problem()
 {	
 	copy_cost_vector_to_C();
 	
-	ta_problem.initialize_problem("Task_Assignment",GLP_MIN,(int)num_task,C);
+	//ta_problem.initialize_problem("Task_Assignment",GLP_MIN,(int)num_task,C);
 }
 
  
@@ -443,6 +443,7 @@ void task_assignment ::run_plugin()
 		}
 		      
 		bool a=(fabs(dec-0.0) < 0.001)||(fabs(dec-0.5) < 0.001); //TODO: BEWARE OF REAL TIME!!
+		a=1;
 		if(a)
 		{
 			  std::cout<<"[TA - "<<time<<']'<<std::endl;
