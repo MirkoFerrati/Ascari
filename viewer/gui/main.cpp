@@ -67,7 +67,11 @@ int main ( int argc, char *argv[] )
             ERR ( "errore nella lettura dei parametri %s",ex.reason() );
             return 0;
         }
-
+	if (!ap.given("f"))
+	{
+	  filename=CONFIG.getValue("FILENAME");
+  	  INFO("Using %s as filename, read from config file",filename.c_str());
+	}
         QApplication app ( argc,argv );
 
         std::vector<abstract_viewer_plugin*> plugins;
