@@ -83,9 +83,10 @@ int main ( int argc, char **argv )
                     s.addPlugin ( plugin->getSimulatorPlugin() );
             }
         }
-	
+        
+	initialize_communication ( s,world );
         s.initialize ( world );
-        initialize_communication ( s,world );
+        
         if ( ap.given ( "s" ) )
             s.setPeriod ( secSleep );
         if ( ap.given ( "check_collision" ) )
