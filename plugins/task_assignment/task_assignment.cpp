@@ -103,25 +103,22 @@ bool task_assignment::initialize()
     else set_charge=0;
     
     lambda_u=0;
-    createAusiliarVariables(); 
 			  
-		      if(task_assignment_algorithm==SUBGRADIENT)
-		      {
-			      std::shared_ptr<subgradient_packet> temp(new subgradient_packet);
-			      ptr_subgradient_packet.swap(temp);
-			      ptr_subgradient_packet.get()->busy=false;
-			      ptr_subgradient_packet.get()->taken_task="";
-			      ta_communicator = new task_assignment_communicator<subgradient_packet,subgradient_packet>(ptr_receive_mutex,ptr_subgradient_packet.get(),num_robot-1,my_id,fresh_data);
+    if(task_assignment_algorithm==SUBGRADIENT)
+    {
+	    std::shared_ptr<subgradient_packet> temp(new subgradient_packet);
+	    ptr_subgradient_packet.swap(temp);
+	    ptr_subgradient_packet.get()->busy=false;
+	    ptr_subgradient_packet.get()->taken_task="";
+	    ta_communicator = new task_assignment_communicator<subgradient_packet,subgradient_packet>(ptr_receive_mutex,ptr_subgradient_packet.get(),num_robot-1,my_id,fresh_data);
 
-			      std::cout<<"TASK ASSIGNMENT ALGORITHM: SUBGRADIENT"<<std::endl;
-			      //start thread
-			      not_started=false;
-		      }
+	    std::cout<<"TASK ASSIGNMENT ALGORITHM: SUBGRADIENT"<<std::endl;
+    }
 
-		      if(task_assignment_algorithm==-1)
-		      {
-			    std::cout<<"attenzione, algoritmo per il task assignment non selezionato"<<std::endl;;
-		      }
+    if(task_assignment_algorithm==-1)
+    {
+	  std::cout<<"attenzione, algoritmo per il task assignment non selezionato"<<std::endl;;
+    }
     return true;
 }
 
@@ -428,7 +425,8 @@ void task_assignment ::run_plugin()
 
 		if (not_started)
 		{
-		      
+		      createAusiliarVariables();
+		      not_started=false;
 		}
 
 
