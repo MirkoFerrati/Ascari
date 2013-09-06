@@ -79,5 +79,3 @@
     STATE_START: GO
     BEHAVIOR: dubins
     TASK_COST_VECTOR: [T1,2,T2,8]
-    SIMULATED: 0
-    MARKER: 2
