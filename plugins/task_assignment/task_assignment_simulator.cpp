@@ -23,7 +23,7 @@ bool task_assignment_simulator::initialize ( const Parsed_World& w )
     num_agents=w.agents.size();
      if ( task_assignment_algorithm == SUBGRADIENT )
                 {
-                    ta_router = std::make_shared<task_assignment_router<task_assignment_namespace::subgradient_packet>> ( num_agents );
+                    ta_router = std::make_shared<task_assignment_router<task_assignment_namespace::subgradient_packet>> ( num_agents,world->agents );
                     ta_router_started=true;
 
                 }
