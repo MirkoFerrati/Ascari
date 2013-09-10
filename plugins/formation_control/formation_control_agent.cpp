@@ -17,13 +17,13 @@ formation_control_agent::formation_control_agent(agent* a, Parsed_World* parsed_
   
 //   DA SPOSTARE NEL FILE YAML
   this->theta_final = (3.14151)/4;
-  this->phi_final = 0;
+  this->phi_final = (3.14151)/6;    // prima pi/6
   this->R   = 1;
   this->D   = 5;
   this->v   = 1;
   this->w_min = (-1/this->R) + (4/this->D) + 0.05;		// -0.15
   this->w_max = (1/this->R) - (4/this->D) - 0.05; 		//  0.15
-
+// TORNA IL RAGIONAMENTO LOGICO, IN PRATICA SE SI ARRIVA A GAMMA=0.18 SI HA CHE W_SYMM = 0 E SI BLOCCA TUTTO, MENTRE PHI DECRESCE SEMPRE FINO A 0.17 PER POI RISALIRE
 }
 
 formation_control_agent::~formation_control_agent(){}
@@ -58,19 +58,21 @@ void formation_control_agent::dubins_trajectory()
 
 void formation_control_agent::wingman_code()
 {
-  double leader_gamma = this->phi_final - this->formation_packet.agent_state.state[STATE_THETA];
-  double my_gamma = this->phi_final - this->theta.value();
+  // Giovanni: ho cambiato i due phi_final qui sotto con phi e sembra andare (gamma è calcolato
+  // usando il phi corrente).
+  double leader_gamma = this->phi - this->formation_packet.agent_state.state[STATE_THETA];
+  double my_gamma = this->phi - this->theta.value();
    
   if( (my_gamma-leader_gamma > -0.01) && (my_gamma-leader_gamma < 0.01) )
   {
     if (my_gamma*leader_gamma >= 0)
     {
-       /* Case A: gamma1 == gamma2 */
+      /* Case A: gamma1 == gamma2 */
       this->w = this->formation_packet.omega;
     }
     else
     {
-       /* Case B: gamma1 == -gamma2 */
+      /* Case B: gamma1 == -gamma2 */
       this->w = (4*sin(leader_gamma))/this->D - this->formation_packet.omega;
     }
   }
@@ -85,99 +87,145 @@ void formation_control_agent::wingman_code()
 
 void formation_control_agent::update_leader_state()
 {
-  double tol = 0.12; //0.03; // REGOLARE IN FUNZIONE DI W_MAX
-  double delta_theta_max = -0.5;
-std::cout << "STATE: " << this->motion_planning_state << std::endl;
+  double tol = 0.03; //0.12; // REGOLARE IN FUNZIONE DI W_MAX
+  double k = 0.3;
+  double gamma_tilde_max = 3.14151/(30/5); // MAX: 0.1886 rad = 10.8°
+
+  std::cout << "STATE: " << this->motion_planning_state << std::endl;
+  
   switch(this->motion_planning_state)
   {
     case STATE_INITIAL:
-	this->initial_gamma_correction = this->gamma;
-	this->motion_planning_state = STATE_GAMMA_CORRECTION;
+      
+      this->initial_gamma_correction = this->gamma;
+      this->motion_planning_state = STATE_GAMMA_CORRECTION;
+      
       break;
-    case STATE_GAMMA_CORRECTION:    
-std::cout << "GAMMA: " << this->gamma << std::endl;      
-      if(fabs(this->gamma) < tol){
+    
+    case STATE_GAMMA_CORRECTION:        
+      
+      if(fabs(this->gamma) < 0.12/*tol*/)
+      {
 	this->delta_theta = this->phi_final - this->theta.value();	// phi = theta because gamma = 0
-//	if (fabs(this->delta_theta - delta_theta_max) > 0)
-//	  this->delta_theta = delta_theta_max;	
-	this->gamma_tilde = acos((this->D*this->w_symmetric_max*this->delta_theta)/4 + 1);
+	this->gamma_tilde = k*this->delta_theta; //acos((this->D*this->w_symmetric_max*this->delta_theta)/4 + 1);
+	
+	if(this->gamma_tilde > gamma_tilde_max) 
+	  this->gamma_tilde = gamma_tilde_max;
+	else if(this->gamma_tilde < -gamma_tilde_max) 
+	  this->gamma_tilde = -gamma_tilde_max;
+	
       	this->motion_planning_state = STATE_PHI_CORRECTION_1;	
       }      
+      
       break;
+      
     case STATE_PHI_CORRECTION_1: 
-std::cout << "GAMMA_TILDE: " << this->gamma_tilde << " GAMMA: " << this->gamma << std::endl;
-std::cout << "W_SYMM: " << this->w_symmetric_max << " D_TH: " << this->delta_theta <<std::endl; 
-std::cout << "PHI: " << this->phi << std::endl;  
+
+      std::cout << "GAMMA_TILDE: " << this->gamma_tilde << " GAMMA: " << this->gamma << std::endl;
+      std::cout << "W_SYMM: " << this->w_symmetric_max << " D_TH: " << this->delta_theta <<std::endl; 
+      std::cout << "PHI: " << this->phi << std::endl;  
+      
       if(fabs(this->gamma_tilde - this->gamma) < tol)
 	this->motion_planning_state = STATE_PHI_CORRECTION_2;
+      
       break;
+    
     case STATE_PHI_CORRECTION_2:      
-std::cout << "PHI: " << this->phi << " GAMMA: " << this->gamma << std::endl;  
-      if( fabs(this->gamma) < tol ){			// SE GAMMA=0, ALLORA GUARDO PHI
-	if(fabs(this->phi_final - this->phi) < tol)
+
+      std::cout << "GAMMA_TILDE: " << this->gamma_tilde << " GAMMA: " << this->gamma << std::endl;
+      std::cout << "W_SYMM: " << this->w_symmetric_max << " D_TH: " << this->delta_theta <<std::endl; 
+      std::cout << "PHI: " << this->phi << std::endl; 
+      
+      if(fabs(this->gamma) < 0.03/*tol*/) // SE GAMMA=0, ALLORA GUARDO PHI
+      {
+	if(fabs(this->phi_final - this->phi) < 0.01/*tol*/)
 	  this->motion_planning_state = STATE_THETA_CORRECTION;
 	else
 	{
 	  this->delta_theta = this->phi_final - this->theta.value();
-//	  if (fabs(this->delta_theta - delta_theta_max) > 0)
-//	    this->delta_theta = delta_theta_max;
-	  this->gamma_tilde = acos((this->D*this->w_symmetric_max*this->delta_theta)/4 + 1);
+	  this->gamma_tilde = k*this->delta_theta; //acos((this->D*this->w_symmetric_max*this->delta_theta)/4 + 1);
+	  
+	  if(this->gamma_tilde > gamma_tilde_max) 
+	    this->gamma_tilde = gamma_tilde_max;
+	  else if(this->gamma_tilde < -gamma_tilde_max) 
+	    this->gamma_tilde = -gamma_tilde_max;
+	  
 	  this->motion_planning_state = STATE_PHI_CORRECTION_1;
 	}
       }
+      
       break;
+      
     case STATE_THETA_CORRECTION:
+      
       if(fabs(this->theta_final - this->theta.value()) < tol)
 	this->motion_planning_state = STATE_FINAL;
+      
       break;
+    
     case STATE_FINAL:
+      
       std::cout << "GAMMA FINAL: " << this->gamma << std::endl;  
       std::cout << "PHI FINAL: " << this->phi << std::endl;  
-      std::cout << "THETA FINAL: " << this->theta.value() << std::endl;  
+      std::cout << "THETA FINAL: " << this->theta.value() << std::endl; 
+      std::cout << "V: " << this->v << std::endl;
+      std::cout << "W: " << this->w << std::endl;
+      
       break;
   }
 }
 
 void formation_control_agent::leader_code()
 {
-  
   switch(this->motion_planning_state)
   {
     case STATE_INITIAL:
+      
       this->w = 0;
+      
       break;
       
-    case STATE_GAMMA_CORRECTION:
-      if (this->initial_gamma_correction > 0)	// SE VADO PIANO OK, ALTRIMENTI SE VADO OLTRE, W NON CAMBIA VERSO
-	this->w = -(1/this->R)+(2/this->D)*(sin(this->initial_gamma_correction)-sin(this->gamma));
+    case STATE_GAMMA_CORRECTION:     
+      
+      if (this->initial_gamma_correction < 0)	//CAMBIATO VERSO RISPETTO AD ARTICOLO (FORSE PER DEFINIZIONE VERSO ANGOLI?)
+	this->w = -(1/this->R)+(2/this->D)*(sin(this->initial_gamma_correction)) + (2/this->D)*sin(this->gamma);
       else
-	this->w = (1/this->R)-(2/this->D)*(sin(this->initial_gamma_correction)-sin(this->gamma));
+	this->w =  (1/this->R)-(2/this->D)*(sin(this->initial_gamma_correction)) + (2/this->D)*sin(this->gamma);
+      
       break;
       
     case STATE_PHI_CORRECTION_1:    
+      
       if (this->delta_theta > 0)				
-	this->w = this->w_min + (2/this->D)*fabs(sin(this->gamma)) + (2/this->D)*sin(this->gamma);
+	this->w = -this->w_symmetric_max + (2/this->D)*sin(this->gamma);
       else
-	this->w = this->w_max -(2/this->D)*fabs(sin(this->gamma)) + (2/this->D)*sin(this->gamma);
+	this->w =  this->w_symmetric_max + (2/this->D)*sin(this->gamma);
+      
       break;
       
     case STATE_PHI_CORRECTION_2:      
-      if (this->delta_theta > 0)		
-	this->w = this->w_max -(2/this->D)*fabs(sin(this->gamma)) + (2/this->D)*sin(this->gamma);
+      
+      if (this->delta_theta > 0)
+	this->w =  this->w_symmetric_max + (2/this->D)*sin(this->gamma);
       else
-	this->w = this->w_min + (2/this->D)*fabs(sin(this->gamma)) + (2/this->D)*sin(this->gamma);
+	this->w = -this->w_symmetric_max + (2/this->D)*sin(this->gamma);
+      
       break;
       
     case STATE_THETA_CORRECTION:
+      
       if (this->theta_final - this->theta.value() > 0)
 	this->w = this->w_max;
       else
 	this->w = this->w_min;
+      
       break;
       
     case STATE_FINAL:
-	this->w = 0;
+      
+      this->w = 0;
 //      this->dubins_trajectory();
+      
       break;
   }
   
@@ -201,7 +249,8 @@ void formation_control_agent::leader_code()
 
 void formation_control_agent::update_formation_variables()
 {
-  this->phi = atan2(fabs(this->y.value() - formation_packet.agent_state.state[STATE_Y]), fabs(this->x.value() - formation_packet.agent_state.state[STATE_X]));
+  //this->phi = atan2(fabs(this->y.value() - formation_packet.agent_state.state[STATE_Y]), fabs(this->x.value() - formation_packet.agent_state.state[STATE_X]));
+  this->phi = atan2(this->y.value() - formation_packet.agent_state.state[STATE_Y], this->x.value() - formation_packet.agent_state.state[STATE_X]);
   this->gamma = this->phi - this->theta.value();
   this->w_symmetric_max = this->w_max - (2/this->D)*fabs(sin(this->gamma));
 }
@@ -219,7 +268,7 @@ void formation_control_agent::send_formation_control_information()
 
 void formation_control_agent::run_plugin()
 {
-   if(this->agent_to_simulator_communicator == NULL)
+  if(this->agent_to_simulator_communicator == NULL)
   {
     if(!this->my_id.compare(this->my_leader))
       this->agent_to_simulator_communicator = new formation_control_communicator(this->my_id, &this->packet_to_send, this->wingmen.at(0));
@@ -244,6 +293,7 @@ void formation_control_agent::run_plugin()
   double distance = (this->x.value() - formation_packet.agent_state.state[STATE_X])*(this->x.value() -formation_packet.agent_state.state[STATE_X]);
   distance += (this->y.value() - formation_packet.agent_state.state[STATE_Y])*(this->y.value() - formation_packet.agent_state.state[STATE_Y]);
   distance = sqrt(distance);
+
   
   this->update_formation_variables();
   
