@@ -20,13 +20,6 @@ bool formation_control_simulator::initialize(const Parsed_World& w)
 
 void formation_control_simulator::stop(){}
 
-std::list<abstract_object*>* formation_control_simulator::create_objects()
-{
-  std::list<abstract_object*>* obj = new std::list<abstract_object*>;
-  return obj;
-  
-}
-  
   
 void formation_control_simulator::run_plugin()
 {
