@@ -10,15 +10,15 @@ using namespace task_assignment_namespace;
 task_assignment::task_assignment ( agent* a, Parsed_World* parse )
 :time(a->time),my_id(a->identifier),events(a->events),events_to_index(a->events_to_index),objects(a->objects),world(parse)
 {    
-    x0=parse->agents.front().initial_states.at("X");
-    y0=parse->agents.front().initial_states.at("Y");
+    x0=reinterpret_cast<task_assignment_parsed_agent*>(world->agents.front().parsed_items_from_plugins[0])->home_x;
+    y0=reinterpret_cast<task_assignment_parsed_agent*>(world->agents.front().parsed_items_from_plugins[0])->home_y;
    // initialize(*parse);
 }
 
   
 task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events,
 				   const std::map< std::string, transition >& events_to_index, const objects_container& objects)
-:time(time),my_id(agent.name),x0(agent.initial_states.at("X")),y0(agent.initial_states.at("Y")),events(events),events_to_index(events_to_index), objects(objects),world(&world)
+:time(time),my_id(agent.name),x0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_x),y0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_y),events(events),events_to_index(events_to_index), objects(objects),world(&world)
 {
     //initialize(world);  
 }

@@ -30,6 +30,7 @@ private:
     std::map<task_assignment_namespace::task_id,task_assignment_namespace::task> tasks;
    // const std::shared_ptr< std::mutex >& mutex;
    // const world_sim_packet& infos;
+    double size;
 
 };
 

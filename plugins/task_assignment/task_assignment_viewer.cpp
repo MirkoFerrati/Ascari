@@ -9,6 +9,7 @@ task_assignment_viewer::task_assignment_viewer( std::shared_ptr<std::mutex>& mut
     old_time=0;
     setAgentSize ( 0.2 );
     setPainterScale ( 1000.0 );
+    size=0.0;
 }
 task_assignment_viewer::task_assignment_viewer()
 {
@@ -16,7 +17,7 @@ task_assignment_viewer::task_assignment_viewer()
     old_time=0;
         setAgentSize ( 0.2 );
     setPainterScale ( 1000.0 );
-
+    size=0.0;
 }
 
 
@@ -35,10 +36,26 @@ void task_assignment_viewer::timerEvent ( std::shared_ptr< std::mutex >& mutex, 
 	  //TODO: far funzionare queste righe
 	  tasks[i->name]=(reinterpret_cast<task_assignment_task*>(i))->state;
 	  
-	  if ( temp_father->maxX< tasks[i->name].task_position[0] ) temp_father->maxX= tasks[i->name].task_position[0] +2;
-	  if ( temp_father->maxY< tasks[i->name].task_position[1] ) temp_father->maxY= tasks[i->name].task_position[1] +2;
-	  if ( temp_father->minX> tasks[i->name].task_position[0] ) temp_father->minX= tasks[i->name].task_position[0] -2;
-	  if ( temp_father->minY> tasks[i->name].task_position[1] ) temp_father->minY= tasks[i->name].task_position[1] -2;
+	  if ( temp_father->maxX< tasks[i->name].task_position[0] ) temp_father->maxX= tasks[i->name].task_position[0] + 3*size;
+	  if ( temp_father->maxY< tasks[i->name].task_position[1] ) temp_father->maxY= tasks[i->name].task_position[1] + 3*size;
+	  if ( temp_father->minX> tasks[i->name].task_position[0] ) temp_father->minX= tasks[i->name].task_position[0] - 3*size;
+	  if ( temp_father->minY> tasks[i->name].task_position[1] ) temp_father->minY= tasks[i->name].task_position[1] - 3*size;
+	  
+	  double diff1=fabs(temp_father->maxX-temp_father->minX);
+	  double diff2=fabs(temp_father->maxY-temp_father->minY);
+          int count=1;
+	
+	  if(diff1 < diff2) diff1=diff2;
+
+	  while(diff1>10){diff1/=10.0;count++;}  
+	  
+	  size=diff1*count/10.0;
+	  
+	  setAgentSize(size);
+	  
+	  setPainterScale(size*2.0);
+	
+	  setAgentShape();
 	}
     }
     
@@ -52,7 +69,7 @@ void task_assignment_viewer::paintBackground (QPainter& painter)
   
 	painter.save();
 	QFont f = painter.font();
-	f.setPointSizeF (  std::max(temp_father->height() /2500.0,0.04 ));
+	f.setPointSizeF (  std::max(temp_father->height() /125.0,0.8 ));
 	painter.setFont ( f );
 	painter.setPen ( QColor ( "blue" ) );
 	painter.translate(temp_father->translateX,temp_father->maxY-1.1*painter.fontMetrics().height());
@@ -88,7 +105,7 @@ void task_assignment_viewer::paintBackground (QPainter& painter)
 			}
 		}
 
-		painter.drawRect(-1,-1,2,2);
+		painter.drawRect(-size*2,-size*2,4*size,4*size);
 		painter.restore();
 
 
@@ -128,12 +145,11 @@ void task_assignment_viewer::paintBackground (QPainter& painter)
 }
 
 void task_assignment_viewer::paintAgents(QPainter& painter,const std::map<std::string,Agent>& agents)
-{
+{ 
 	abstract_viewer_plugin::paintAgents(painter,agents);
 	
 	for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
-	{
-    
+	{   
 		if(!agents.empty() && (!started || old_time>now_time))
 		{
 			  for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
@@ -148,6 +164,19 @@ void task_assignment_viewer::paintAgents(QPainter& painter,const std::map<std::s
 			  
 			  started=true;
 		}
+		
+		if(now_time<10)
+		{
+			  for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
+			  {
+				    std::vector<double> app;
+			  
+				    app.push_back(it->second.x);
+				    app.push_back(it->second.y);
+				    
+				    initial_pos[it->first]=app;
+			  }
+		}
 	    
 		old_time=now_time;
 		
@@ -156,7 +185,7 @@ void task_assignment_viewer::paintAgents(QPainter& painter,const std::map<std::s
 		{ 
 			painter.save();
 			painter.translate(initial_pos.at(it->first).at(0),initial_pos.at(it->first).at(1));
-			painter.drawArc(-1,-1,2,2,0,16*360);
+			painter.drawArc(-size*2,-size*2,4*size,4*size,0,16*360);
 			painter.restore();
 			
 			std::stringstream tm(std::stringstream::out);
