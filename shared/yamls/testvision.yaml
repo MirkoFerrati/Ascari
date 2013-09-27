@@ -8,14 +8,14 @@
         theta: 'w'
       CONTROLLERS:
       - name: FAST
-        v: 3
+        v: 0.5
         w: 0
       - name: BACK
-        v: 3
+        v: -0.5
         w: '(sin(atan2(dim/2-y,dim/2-x)-theta)+0.01)%pi'
       - name: LEFT
-        v: 3
-        w: 0.5
+        v: 0.5
+        w: 5
       DISCRETE_STATES:
       - name: FAST
         controller: FAST
@@ -29,7 +29,7 @@
             co: 'abs((atan2(yi-y,xi-x))%(2*pi)-theta%(2*pi))<angle and (x-xi)*(x-xi)+(y-yi)*(y-yi)<dst*dst '
         LAMBDA:
           - lambda: [L1,out]
-            out: '(x>500 or x<0 or y>500 or y<0)'
+            out: '(x>185 or x<20 or y>285 or y<20)'
             L1: '1'
       EVENTS:
       - events: [out,in, co,free]
@@ -119,7 +119,7 @@
     dst: 50
     angle: 1.1
   AGENTS:
-  - agent: Agente01
+  - agent: Agente1
     VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA:  circle(10)
     MONITORING: 0
@@ -134,29 +134,13 @@
       y: '424'
       theta: '0.5'
     STATE_START: FAST
-    BEHAVIOR: LGV-BAD
-  - agent: Agente02
+    BEHAVIOR: LGV
+  - agent: Agente2
     VISIBLE_AREA: circle(x,y,400)
     COMMUNICATION_AREA:  circle(10)
     MONITORING: 0
     SIMULATED:  0
     MARKER:     2
-    #COLLABORATIVE = 1
-    states: [x,y,theta]
-    control_commands: [v,w]
-    INITIAL:
-    - &initial
-      x: '42'
-      y: '424'
-      theta: '0.5'
-    STATE_START: FAST
-    BEHAVIOR: LGV
-  - agent: Agente03
-    VISIBLE_AREA: circle(x,y,400)
-    COMMUNICATION_AREA:  circle(10)
-    MONITORING: 0
-    SIMULATED:  0
-    MARKER:     3
     #COLLABORATIVE = 1
     states: [x,y,theta]
     control_commands: [v,w]
