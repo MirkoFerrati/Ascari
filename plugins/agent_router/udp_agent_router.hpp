@@ -9,7 +9,6 @@
 #include <map>
 #include <string>
 
-#include <typedefs_topology.h>
 
 typedef std::thread* thread_ptr;
 

@@ -2,7 +2,6 @@
 #include "parserYAML/include/yaml-cpp/node.h"
 #include "../plugins/task_assignment/task_assignment_parser_plugin.h"
 #include "../plugins/agent_router/agent_router_parser_plugin.h"
-#include "../plugins/monitor/monitor_parser_plugin.h"
 
 using namespace std;
 
@@ -86,106 +85,10 @@ bool Parsed_Behavior::load_from_node ( const YAML::Node& node )
     for ( unsigned int i=0; i<state.size(); i++ ) //behavior->state.size(); i++ )
     {
         dynamic_expression tmp_exp;
-        //node["DYNAMIC_MAP"][0][behavior->state[i]]>>tmp_exp;
         node["DYNAMIC_MAP"][0][state[i]]>>tmp_exp;
-        //behavior->
         expressions.insert ( std::pair<stateVariable,dynamic_expression> ( state[i],tmp_exp ) );
     }
 
-    const YAML::Node& control = node["CONTROLLERS"];
-    string temp;
-    for ( unsigned int i=0; i<control.size(); i++ )
-    {
-        map<int,string> temp1;
-        control[i]["NAME"]>>temp;
-        //behavior->
-        controllers.insert ( pair<controller_name, map<int,controllerRule> > ( temp,temp1 ) );
-        for ( unsigned int j=0; j<inputs.size(); j++ )
-        {
-            control[i][inputs[j]]>> controllers[temp][j];
-        }
-    }
-
-    const YAML::Node& disc_states = node["DISCRETE_STATES"];
-    for ( unsigned int i=0; i<disc_states.size(); i++ )
-    {
-        string n_state;
-        disc_states[i]["NAME"]>>n_state;
-        string c_name;
-        disc_states[i]["CONTROLLER"]>>c_name;
-        discrete_states.insert ( pair<string,string> ( n_state,c_name ) );
-    }
-
-    const YAML::Node& encoder = node["ENCODER"][0];
-    if ( encoder.FindValue ( "TOPOLOGY" ) )
-    {
-        const YAML::Node& topo=encoder["TOPOLOGY"][0];
-        topo["TOPOLOGY"]>> topology;
-        for ( unsigned int i=0; i<topology.size(); i++ )
-        {
-            string topology_exp;
-            topo[topology[i]]>>topology_exp;
-            topology_expressions.insert ( pair<string,string> ( topology[i],topology_exp ) );
-        }
-    }
-
-    if ( encoder.FindValue ( "LAMBDA" ) )
-    {
-        const YAML::Node& lam=encoder["LAMBDA"][0];
-        lam["LAMBDA"]>> lambda;
-        for ( unsigned int i=0; i<lambda.size(); i++ )
-        {
-            string lambda_exp;
-            lam[lambda[i]]>>lambda_exp;
-            lambda_expressions.insert ( pair<string,string> ( lambda[i],lambda_exp ) );
-        }
-    }
-
-    const YAML::Node& decoder = node["EVENTS"][0];
-    decoder["EVENTS"]>> events;
-
-    for ( unsigned int i=0; i<events.size(); i++ )
-    {
-        string events_exp;
-        decoder[events[i]]>>events_exp;
-        events_expressions.insert ( pair<string,string> ( events[i],events_exp ) );
-    }
-
-    const YAML::Node& automa = node["AUTOMATON"];
-
-    for ( unsigned int i=0; i<automa.size(); i++ )
-    {
-        for ( map< discreteState_Name, controller_name >::const_iterator iter=discrete_states.begin(); iter!=discrete_states.end(); ++iter )
-        {
-            string actual_state;
-            actual_state= ( ( *iter ).first );
-            if ( automa[i].FindValue ( actual_state ) )
-            {
-                map<string,string> temp1;
-                automaton.insert ( pair<string, map<string,string> > ( actual_state,temp1 ) );
-                const YAML::Node& transition = automa[i][actual_state][0];
-                for ( map< discreteState_Name, controller_name >::const_iterator iiter=discrete_states.begin(); iiter!=discrete_states.end(); ++iiter )
-                {
-                    string new_state;
-                    new_state= ( *iiter ).first;
-                    if ( transition.FindValue ( new_state ) )
-                    {
-                        vector<event_name> tran_ev;
-                        transition[new_state]>> tran_ev;
-                        for ( unsigned int j=0; j< tran_ev.size(); j++ )
-                        {
-                            if ( automaton[actual_state].count ( tran_ev[j] ) )
-                            {
-                                ERR ( "DUPLICATED EVENT %s", tran_ev[j].c_str() );
-                                return false;
-                            }
-                            automaton[actual_state].insert ( pair<event_name, discreteState_Name> ( tran_ev[j],new_state ) );
-                        }
-                    }
-                }
-            }
-        }
-    }
     return true;
 }
 
@@ -221,7 +124,7 @@ bool Parsed_Agent::load_from_node ( const YAML::Node& node )
       }
       else
       {
-	ERR ( "AGENT REAL BUT NO MARKER SPECIFIED ");
+	ERR ( "AGENT REAL BUT NO MARKER SPECIFIED ",NULL);
 	return false;
       }
 	}
@@ -234,14 +137,6 @@ bool Parsed_Agent::load_from_node ( const YAML::Node& node )
         initial_state_value tmp_initial=0;
         node["INITIAL"][0][behavior->state[i]]>>tmp_initial;
         initial_states.insert ( pair<stateVariable,initial_state_value> ( behavior->state[i],tmp_initial ) );
-    }
-
-    node["STATE_START"]>> state_start;
-
-    if ( !behavior->discrete_states.count ( state_start ) )
-    {
-        ERR ( "UNDEFINED START DISCRETE STATE %s", state_start.c_str() );
-        return false;
     }
     return true;
 }

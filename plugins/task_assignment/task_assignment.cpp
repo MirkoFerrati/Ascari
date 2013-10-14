@@ -8,7 +8,7 @@ using namespace task_assignment_namespace;
 
 
 task_assignment::task_assignment ( agent* a, Parsed_World* parse )
-:time(a->time),my_id(a->identifier),events(a->events),events_to_index(a->events_to_index),objects(a->objects),world(parse)
+:time(a->time),my_id(a->identifier),objects(a->objects),world(parse)
 {    
     x0=reinterpret_cast<task_assignment_parsed_agent*>(world->agents.front().parsed_items_from_plugins[0])->home_x;
     y0=reinterpret_cast<task_assignment_parsed_agent*>(world->agents.front().parsed_items_from_plugins[0])->home_y;
@@ -16,9 +16,9 @@ task_assignment::task_assignment ( agent* a, Parsed_World* parse )
 }
 
   
-task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events,
-				   const std::map< std::string, transition >& events_to_index, const objects_container& objects)
-:time(time),my_id(agent.name),x0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_x),y0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_y),events(events),events_to_index(events_to_index), objects(objects),world(&world)
+task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, const objects_container& objects)
+:time(time),my_id(agent.name),x0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_x),
+y0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_y), objects(objects),world(&world)
 {
     //initialize(world);  
 }
@@ -509,7 +509,7 @@ void task_assignment ::run_plugin()
 				  }
 				  else
 				  {
-					  if (my_task=="" && events.at(events_to_index.at("REACHED"))==Events::_TRUE)
+					  if (my_task=="" && /*TODO*/ false)
 					  {
 						  converge=false;
 						  reset_mu_T();
@@ -574,7 +574,7 @@ void task_assignment ::run_plugin()
 				  }
 				  else ta_communicator->send();
 				  
-				  if(!busy_robots.at(my_id) && my_task!="RECHARGE" && count_undone_task()==0 && events.at(events_to_index.at("REACHED"))==Events::_TRUE)
+				  if(!busy_robots.at(my_id) && my_task!="RECHARGE" && count_undone_task()==0 && /*TODO*/ false)
 				  {
 					    std::cout<<"TASK ESAURITI"<<std::endl;
 					    my_task="";

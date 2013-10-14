@@ -1,13 +1,11 @@
 #ifndef UDP_GRAPH_COMMUNICATOR_H
 #define UDP_GRAPH_COMMUNICATOR_H
-#include "../communication/agent_communicator_abstract.h"
 #include <mutex>
 
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
 #include "boost/bind.hpp"
-#include <typedefs_topology.h>
 #include <communication/udp_sender.hpp>
 #include <thread>
 #include "define.h"

@@ -27,24 +27,14 @@
 using namespace std;
 using namespace lemon;
 
-agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, Events >& events,
-                             const std::map<std::string, transition>& events_to_index, string identifier,
-                             simulation_time& time, std::string graphName
-                           )
-    :  events ( events ), events_to_index ( events_to_index ), length ( graph ),
-       coord_x ( graph ), coord_y ( graph ),
-       targets ( tarlist ),time ( time ),identifier ( identifier ),communicator ( _mutex, &info, _io_service,identifier )
-{
- initialized=initialize(graphName);
-}
-
-agent_router::agent_router ( agent* a, Parsed_World* parse ):  events ( a->events ), events_to_index ( a->events_to_index ), length ( graph ),
-       coord_x ( graph ), coord_y ( graph ),
-       /*targets ( tarlist ),*/time ( a->time ),identifier ( a->identifier ),communicator ( _mutex, &info, _io_service,identifier )
+agent_router::agent_router ( agent* a, Parsed_World* parse ):  length ( graph ),
+	coord_x ( graph ), coord_y ( graph ), speed(a->inputs.command.at(a->map_inputs_name_to_id.at("V"))), omega(a->inputs.command.at(a->map_inputs_name_to_id.at("W"))),
+       time ( a->time ),identifier ( a->identifier ),x(a->state.at(a->map_statename_to_id.at("X"))),y(a->state.at(a->map_statename_to_id.at("Y"))),
+       theta(a->state.at(a->map_statename_to_id.at("THETA"))),communicator ( _mutex, &info, _io_service,identifier )
 {
   targets=(reinterpret_cast<agent_router_parsed_agent*>(parse->agents.front().parsed_items_from_plugins[0]))->target_list; //funziona perche' rimane un solo agente nel mondo(gli altri vengono eliminati dal main)
   std::string graphName=(reinterpret_cast<agent_router_parsed_world*>(parse->parsed_items_from_plugins[0]))->graphName;
-initialized=initialize(graphName);
+  initialized=initialize(graphName);
 }
 
 bool agent_router::initialize(std::string graphName)
@@ -494,6 +484,12 @@ void agent_router::prepare_loading_packet()
     last_time_updated = time;
 }
 
+double agent_router::distance_to_target()
+{
+//TODO
+  return 0;
+}
+
 
 void agent_router::setSpeed()
 {
@@ -505,8 +501,9 @@ void agent_router::setSpeed()
     started=true;
     assert ( node_id.size() >1 );
     simulation_time delta = getNextTime() - time;
-    double length = distance_to_target.value();
+    double length = distance_to_target();
     speed=length/delta;
+    omega=5*sin(atan2(ytarget-y,xtarget-x)-theta);
     //cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
 }
 

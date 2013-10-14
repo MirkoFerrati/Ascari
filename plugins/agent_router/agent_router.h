@@ -14,7 +14,6 @@
 
 #include <lemon/random.h>
 #include "../../shared/types/graph_informations.h"
-#include <types/events.h>
 #include "udp_graph_communicator.h"
 #include "../agent/agent.h"
 #include <thread>
@@ -39,17 +38,13 @@ class agent_router: public abstract_agent_plugin
 {
 
 public:
-    agent_router ( std::vector< int > tarlist, std::map< transition, Events >& events,
-                   const std::map<std::string,transition>& events_to_index, std::string identifier,
+    agent_router ( std::vector< int > tarlist, std::string identifier,
                    simulation_time& time,std::string graphName );
     agent_router( agent* a, Parsed_World* parse );
     void setGraph ( lemon::SmartDigraph& g );
     void run_plugin();
-    void addReservedVariables ( exprtk::symbol_table< double >& symbol_table );
-    void compileExpressions ( exprtk::symbol_table< double >& symbol_table );
     void setSource ( lemon::SmartDigraph::Node s );
     void setTarget ( lemon::SmartDigraph::Node t );
-    //std::pair<int,int> getTargetCoords();
     ~agent_router();
 
 private:
@@ -75,15 +70,14 @@ private:
 	void prepare_loading_packet();
 	void print_state( state s );
     simulation_time getNextTime();
+    double distance_to_target();
 private:
     state internal_state;
     bool next_target_reachable;
     int negotiation_steps;
-    double xtarget, ytarget,speed;   //usato dal plugin per controllare il robot
-    exprtk::expression<double> distance_to_target;  //usato dal plugin per impostare le velocità
-    std::map< transition, Events >& events;
-    const std::map<std::string,transition>& events_to_index;
-
+    double xtarget, ytarget;
+    double &speed, &omega;   //usato dal plugin per controllare il robot
+    double &x,&y,&theta;
     /**Informazioni del grafo*/
         lemon::SmartDigraph graph; //grafo completo
 
@@ -116,9 +110,6 @@ private:
     std::string priority;
     bool started;
     bool initialized;
-
-	
-	
 };
 
 #endif

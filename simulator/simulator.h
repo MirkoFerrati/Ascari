@@ -72,9 +72,12 @@ private:
 	std::map<std::string,int> map_bonus_variables;
 	void createObjects(const Parsed_World& world);
 	void initialize_plugins ( const Parsed_World& world );
+	bool isVisible(std::map< std::string, agent_state_packet >::iterator agent, std::map< std::string, agent_state_packet >::iterator other);
 	std::vector<abstract_simulator_plugin*> plugins;
 	std::map<int,std::shared_ptr<visibleArea> > agents_visibility;
 	visibleArea* world_map;
+	void printTime(int clock);
+	   termios initializeKeyboardInput();
     double T_integration;
 };
 

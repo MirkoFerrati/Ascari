@@ -18,17 +18,7 @@ typedef std::string bonus_expression;
 typedef std::string stateVariable;
 typedef std::string controlVariable;
 typedef double initial_state_value;
-typedef std::string controller_name;
-typedef std::string controllerRule;
 typedef std::string dynamic_expression;
-typedef std::map<int,controllerRule> controller_MapRules;
-typedef std::string discreteState_Name;
-typedef std::string topology_name;
-typedef std::string topology_expression;
-typedef std::string lambda_name;
-typedef std::string lambda_expression;
-typedef std::string event_name;
-typedef std::string event_expression;
 typedef std::string communication_area;
 typedef int marker_type;
 
@@ -38,15 +28,6 @@ public:
    std::vector<stateVariable> state;
     std::vector<controlVariable> inputs;
     std::map<stateVariable, dynamic_expression> expressions;
-   std::map<controller_name,controller_MapRules> controllers;
-    std::map<discreteState_Name, controller_name> discrete_states;
-   std::vector<topology_name>	topology;
-    std::map<topology_name, topology_expression> topology_expressions;
-    std::vector<lambda_name> lambda;
-    std::map<lambda_name, lambda_expression> lambda_expressions;
-	std::vector<event_name> events;
-    std::map<event_name, event_expression> events_expressions;
-    std::map<discreteState_Name, std::map<event_name,discreteState_Name> > automaton;
     bool load_from_node( const YAML::Node& node);
 
 };
@@ -62,9 +43,7 @@ public:
     std::string name;
    
     std::map<stateVariable,initial_state_value> initial_states;
-   
-    discreteState_Name state_start;
-   
+      
     std::string visibility;
     communication_area communication;
 
@@ -74,9 +53,6 @@ public:
     marker_type marker;
     bool simulated=true;
 
-
-    
- 
     bool load_from_node( const YAML::Node& node);
     std::vector<abstract_parsed_agent_plugin*> parsed_items_from_plugins;
 };

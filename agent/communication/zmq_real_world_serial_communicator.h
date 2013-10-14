@@ -4,8 +4,6 @@
 #include "../shared/communication/zmq_full_communicator.hpp"
 #include <types/agent_sim_packet.h>
 
-#include <SerialStream.h>
-
 #define ARDUINO_COMMAND_CODE 7
 #define DEFAULT_VELOCITY_VARIABLE "V"
 #define DEFAULT_OMEGA_VARIABLE "W"
@@ -26,7 +24,6 @@ inline const world_sim_packet& get_last_received()
 
 private:
 world_sim_packet packet_received;
-LibSerial::SerialStream serial_port;
 index_map map_inputs_name_to_id;
 control_command command_old;
 

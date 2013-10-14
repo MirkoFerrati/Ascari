@@ -74,23 +74,6 @@ int main ( int argc, char** argv )
             throw "agent name not found in configuration file, please check for agent names";
         }
 
-
-        //TODO(Simone): questo codice NON DEVE STARE QUA
-//         std::vector<std::string>tmp_erase_behavior;
-//         if ( world.agents.at ( myAgent ).known_behaviors.size() !=0 )
-//         {
-//             for ( auto behavior=world.behaviors.begin(); behavior!=world.behaviors.end(); behavior++ )
-//             {
-//                 if ( ! ( find ( world.agents.at ( myAgent ).known_behaviors.begin(),world.agents.at ( myAgent ).known_behaviors.end(),behavior->first ) !=world.agents.at ( myAgent ).known_behaviors.end() ) )
-//                     tmp_erase_behavior.push_back ( behavior->first );
-//             }
-// 
-//             for ( unsigned ii=0; ii< tmp_erase_behavior.size(); ii++ )
-//             {
-//                 world.behaviors.erase ( tmp_erase_behavior.at ( ii ) );
-//             }
-//         }
-
 	    for ( auto it=world.agents.begin();it!=world.agents.end(); )
             if ( it->name.compare ( agent_name )!=0)
 	    {
@@ -106,11 +89,15 @@ int main ( int argc, char** argv )
             if ( plugin->getParserPlugin()->isEnabled() )
             {
                 if ( !plugin->createAgentPlugin ( &a1 ,&world) )
-		   ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() )
+		{ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() );}
                 else
                     a1.addPlugin ( plugin->getAgentPlugin() );
             }
         }
+        if(a1.plugins.empty())
+	{
+	  WARN("Attenzione, nessun plugin è stato caricato, l'agente resterà immobile",NULL);
+	}
         a1.initialize();
         a1.start();
         std::cout << agent_name <<" e' terminato" << std::endl;

@@ -2,7 +2,9 @@
 #ifndef TASK_ASSIGNMENT_H
 #define TASK_ASSIGNMENT_H
 
+//Open the following file in kdevelop to enable the parser
 #include "../HACK_KDEVELOP.h"
+
 #ifdef ISAGENT
 
 #include <vector>
@@ -13,7 +15,6 @@
 //#include "assignment_problem.h"
 #include <random.hpp>
 #include "../shared/objects/task_assignment_task.h"
-#include <types/events.h>
 
 #include "../plugins/abstract_agent_plugin.h"
 #include "../agent/agent.h"
@@ -22,7 +23,7 @@ class task_assignment: public abstract_agent_plugin
 {
 	
 public:
- 	task_assignment( const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events, const std::map< std::string, transition >& events_to_index, const objects_container& tasks );
+ 	task_assignment( const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, const objects_container& objects );
 	task_assignment(agent* a, Parsed_World* parse);
 	void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
 	void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
@@ -105,8 +106,6 @@ private:
 	exprtk::expression<double> y;
 	exprtk::expression<double> theta;
 	exprtk::expression<double> charge_;
-	std::map< transition, Events >& events;
-	const std::map<std::string,transition>& events_to_index;
 	
 	
 	

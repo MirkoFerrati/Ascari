@@ -59,8 +59,7 @@ void task_assignment ::compileExpressions(exprtk::symbol_table< double >& symbol
  
 void task_assignment ::setTaskStop(bool stop)
 {
-	events.at(events_to_index.at("STOPPED"))=stop?Events::_TRUE:Events::_FALSE;
-	events.at(events_to_index.at("STARTED"))=!stop?Events::_TRUE:Events::_FALSE;
+ //TODO 
 }
 
  

@@ -40,26 +40,6 @@ void agent_router::print_state(state s)
 	
 }
 
-void agent_router::addReservedVariables(exprtk::symbol_table< double >& symbol_table)
-{
-	symbol_table.add_variable("XTARGET",xtarget,false);
-	symbol_table.add_variable("YTARGET",ytarget,false);
-	symbol_table.add_variable("V_ROUTER",speed,false);
-}
-
-
-void agent_router::compileExpressions(exprtk::symbol_table< double >& symbol_table)
-{
-	exprtk::parser<double> parser;
-	
-	distance_to_target.register_symbol_table(symbol_table);
-	if (!parser.compile("sqrt((XTARGET-X)^2+(YTARGET-Y)^2)",distance_to_target))
-	{
-		ERR("impossibile creare l'espressione: %s %s","sqrt(sqr(XTARGET)+sqr(YTARGET))",parser.error().c_str());
-// 		throw "impossibile creare l'espressione";
-	}
-	
-}
 
 int agent_router::findAge(simulation_time present_time, simulation_time old_time)
 {
@@ -84,21 +64,19 @@ void agent_router::print_path()
 
 void agent_router::stopAgent()
 {
-	events.at(events_to_index.at("STOPPED"))=(Events::_TRUE);
-	events.at(events_to_index.at("STARTED"))=(Events::_FALSE);
+ //TODO 
 }
 
 void agent_router::startAgent()
 {
-	events.at(events_to_index.at("STOPPED"))=(Events::_FALSE);
-	events.at(events_to_index.at("STARTED"))=(Events::_TRUE);
+//TODO
+  
 }
 
 
 bool agent_router::target_reached()
 {
-	return events.at(events_to_index.at("REACHED"))==Events::_TRUE;
-	
+//TODO	
 }
 
 

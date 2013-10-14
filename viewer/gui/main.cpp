@@ -7,11 +7,10 @@
 #include "lemon/arg_parser.h"
 #include "logog.hpp"
 #include "../gml2lgf/graph.h"
-#include "../communication/zmq_identifier_sniffer.hpp"
+
 #include <QSettings>
-#include "../../shared/types/monitor_packet.h"
+
 #include "../plugins/task_assignment/task_assignment_viewer.h"
-#include "../plugins/monitor/monitor_viewer.h"
 #include <ostream>
 #include <sstream>
 #include "../plugins/addplugins.h"

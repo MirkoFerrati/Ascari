@@ -4,14 +4,13 @@
 
 struct control_command_packet
 {
-    std::map<automaton_state ,control_command> commands;
-    control_command default_command;
+    control_command command;
     std::string identifier;
 
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int /*version*/)
     {
-	ar& default_command;
+	ar& command;
         ar& identifier;
     }
 };
