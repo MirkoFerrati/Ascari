@@ -63,10 +63,11 @@ public:
 
 private:
 #ifdef ISAGENT
-    agent_router* agent_plugin;
+    avoidObstacles_agent_plugin* agent_plugin;
 #endif
 
-    agent_router_parser_plugin* parser_plugin;
+    avoidobstacles_parser_plugin* parser_plugin;
 
 };
 
+#endif

@@ -23,3 +23,4 @@ abstract_parsed_world_plugin* avoidobstacles_parser_plugin::parseWorld(const YAM
   return wo;
 }
 
+

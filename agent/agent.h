@@ -55,6 +55,9 @@ public:
 	 * The continuos state of the agent, used in the dynamic
 	 */
 	agent_state state;
+	
+	const world_sim_packet* agents;
+	
 	index_map map_statename_to_id;
 	
 	std::map<int,double> bonusVariables;

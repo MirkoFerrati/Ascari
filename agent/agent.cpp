@@ -15,11 +15,13 @@ agent::agent ( std::string name,const std::unique_ptr<Parsed_Behavior>& behavior
     :identifier ( name ),behavior(behavior),world(world),noStart(false)
 {
     initialized=false;
+    agents=0;
 }
 
 agent::agent ( const Parsed_World& world, bool noStart ) :
     identifier ( world.agents.front().name ),behavior(world.agents.front().behavior),world(world),noStart(noStart)
 {
+  agents=0;
 }
 
 void agent::initialize()
@@ -133,9 +135,9 @@ void agent::createStateFromParsedAgent ( const unique_ptr<Parsed_Behavior>& beha
 
 void agent::main_loop()
 {
-    const world_sim_packet& temp = world_comm->receive_agents_status();
+    const world_sim_packet &temp = world_comm->receive_agents_status();
     time=temp.time;
-
+    agents=&temp;
     for ( std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin(); it!=temp.bonus_variables.end(); ++it )
     {
         bonusVariables.at ( map_bonus_variables_to_id.at ( it->first ) ) =it->second;
