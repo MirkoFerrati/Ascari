@@ -14,6 +14,13 @@ public:
     double &theta;
     double &speed;
     double &omega;
+private:
+    int x_index;
+    int y_index;
+    int theta_index;
+
+    bool collision(double x, double y, double theta,double xa,double ya);
+    
 };
 
 #endif // AVOIDOBSTACLES_AGENT_PLUGIN_H
