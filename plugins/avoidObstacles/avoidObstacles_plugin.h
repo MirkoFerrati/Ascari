@@ -59,13 +59,21 @@ public:
         return parser_plugin;
     };
 
+#ifdef ISSIMULATOR
+    virtual abstract_simulator_plugin* getSimulatorPlugin(){return 0;};
+#endif
 
+#ifdef ISVIEWER
+    virtual abstract_viewer_plugin* getViewerPlugin(){return 0;};
+#endif
 
 private:
 #ifdef ISAGENT
     avoidObstacles_agent_plugin* agent_plugin;
 #endif
 
+    
+    
     avoidobstacles_parser_plugin* parser_plugin;
 
 };

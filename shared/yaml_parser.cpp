@@ -130,7 +130,7 @@ bool Parsed_Agent::load_from_node ( const YAML::Node& node )
 	}
     }
     
-    node["COMMUNICATION_AREA"]>>communication;
+//    node["COMMUNICATION_AREA"]>>communication;
 
     for ( unsigned int i=0; i<behavior->state.size(); i++ )
     {

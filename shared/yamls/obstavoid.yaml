@@ -1,0 +1,20 @@
+- WORLD:
+  BEHAVIORS:
+  - name: 'uniciclo'
+    states: [x,y,theta]
+    control_commands: [v,w]
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+
+  AGENTS:
+  - agent: Agente1
+    INITIAL:
+    - &initial
+      x: '1'
+      y: '1'
+      theta: '1.5708'
+    BEHAVIOR: 'uniciclo'
+    SIMULATED: 1
+    MARKER: 1

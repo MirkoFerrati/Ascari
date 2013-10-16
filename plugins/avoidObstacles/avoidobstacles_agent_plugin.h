@@ -10,14 +10,15 @@ public:
     virtual void run_plugin();
     virtual bool initialize();
     const world_sim_packet* agents;
-    double &x,&y;
-    double &theta;
-    double &speed;
-    double &omega;
+    double *x,*y;
+    double *theta;
+    double *speed;
+    double *omega;
 private:
     int x_index;
     int y_index;
     int theta_index;
+    agent *a;
 
     bool collision(double x, double y, double theta,double xa,double ya);
     

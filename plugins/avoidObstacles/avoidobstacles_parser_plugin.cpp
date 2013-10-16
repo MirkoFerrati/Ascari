@@ -10,10 +10,7 @@ abstract_parsed_agent_plugin* avoidobstacles_parser_plugin::parseAgent(const YAM
 {
     enabled=false;
     auto ag=new avoidobstacles_parsed_agent();
-    if ( node.FindValue ( "AVOID_OBSTACLES" ) )
-    {
       enabled=true;
-    }
     return ag;
 }
 

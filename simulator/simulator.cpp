@@ -273,7 +273,7 @@ termios simulator::initializeKeyboardInput()
 
 void simulator::printTime(int clock)
 {
-            clock++;
+            
             if ( ( clock%10 ) !=0 )
             {
                 cout<<".";
@@ -330,7 +330,7 @@ void simulator::main_loop()
                     input_cond.wait ( lock );
                 }
             }
-
+	    clock++;
             printTime(clock);
 
 	    //Update simulation time inside sim_packet
