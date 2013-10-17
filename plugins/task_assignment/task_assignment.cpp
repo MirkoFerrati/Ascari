@@ -509,7 +509,7 @@ void task_assignment ::run_plugin()
 				  }
 				  else
 				  {
-					  if (my_task=="" && events.at(events_to_index.at("REACHED"))==Events::_TRUE)
+					  if (my_task=="" && reached())
 					  {
 						  converge=false;
 						  reset_mu_T();
@@ -518,7 +518,6 @@ void task_assignment ::run_plugin()
 				  
 				  if (stop)
 				  {
-				      setTaskStop(true);
 				      return;
 				  }
 				  
@@ -574,7 +573,7 @@ void task_assignment ::run_plugin()
 				  }
 				  else ta_communicator->send();
 				  
-				  if(!busy_robots.at(my_id) && my_task!="RECHARGE" && count_undone_task()==0 && events.at(events_to_index.at("REACHED"))==Events::_TRUE)
+				  if(!busy_robots.at(my_id) && my_task!="RECHARGE" && count_undone_task()==0 && reached())
 				  {
 					    std::cout<<"TASK ESAURITI"<<std::endl;
 					    my_task="";

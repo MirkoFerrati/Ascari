@@ -195,7 +195,7 @@ task_id task_assignment ::subgradient_algorithm()
 		}
 		std::cout<<std::endl;
 		
-		alpha=-0.1;
+		alpha=compute_alpha();
 		
 		if(1) //TODO: RIFLETTERE SUL FATTO CHE MU_T NON CONVERGE SE CI SONO PIU' TASKS
 		{
@@ -231,4 +231,34 @@ task_id task_assignment ::subgradient_algorithm()
 	if (selected_task=="") return "TASK_ASSIGNMENT_FAILED";
 	else return selected_task;
 	
+}
+
+double task_assignment::compute_alpha()
+{	
+        //così converge più in fretta, c'è da vedere se dal punto di vista teorico da problemi per convergere all'ottimo
+        //la convergenza all'ottimo è garantita se i robot hanno alpha diversi?
+        
+	double alpha;
+	
+	double min=INF;
+	
+	for(int i=0;i<F.size();i++)
+	{
+	    if (min > F[i])
+	    {
+		min=F[i];
+	    }
+	}
+	
+	if((min/10)>1)
+	{
+	     alpha=-10;
+	}
+	else if(min>1)
+	{
+	     alpha=-1;
+	}
+	else alpha=-0.1;
+	
+	return alpha;
 }

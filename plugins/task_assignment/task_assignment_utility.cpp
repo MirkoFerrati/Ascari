@@ -56,11 +56,10 @@ void task_assignment ::compileExpressions(exprtk::symbol_table< double >& symbol
 	}
 }
 
- 
-void task_assignment ::setTaskStop(bool stop)
+
+bool task_assignment::reached()
 {
-	events.at(events_to_index.at("STOPPED"))=stop?Events::_TRUE:Events::_FALSE;
-	events.at(events_to_index.at("STARTED"))=!stop?Events::_TRUE:Events::_FALSE;
+	return ((fabs(x.value()-my_task_x)<0.1) && (fabs(y.value()-my_task_y)<0.1));
 }
 
  
