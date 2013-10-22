@@ -66,6 +66,7 @@
     STATE_START: GO
     BEHAVIOR: dubins
     TASK_COST_VECTOR: [T1,6,T2,2]
+    HOME: [4,4]
     
   - agent: Agente2
     COMMUNICATION_AREA:   circle(50)
@@ -77,3 +78,4 @@
     STATE_START: GO
     BEHAVIOR: dubins
     TASK_COST_VECTOR: [T1,2,T2,8]
+    HOME: [8,8]
