@@ -47,6 +47,8 @@ public:
 	void avoid_collision(double& a);
 	void compute_speeds(double x_t, double y_t);
 	void createAusiliarVariables();
+	bool reached();
+	double compute_alpha();
 
 	
 private:
@@ -147,7 +149,6 @@ private:
 
 	//
 	
-	void setTaskStop(bool stop);
 	bool task_made();
 	
 	std::shared_ptr<std::mutex> ptr_receive_mutex;

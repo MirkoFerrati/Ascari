@@ -56,10 +56,10 @@ void task_assignment ::compileExpressions(exprtk::symbol_table< double >& symbol
 	}
 }
 
- 
-void task_assignment ::setTaskStop(bool stop)
+
+bool task_assignment::reached()
 {
- //TODO 
+	return ((fabs(x.value()-my_task_x)<0.1) && (fabs(y.value()-my_task_y)<0.1));
 }
 
  
