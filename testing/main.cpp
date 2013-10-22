@@ -1,14 +1,8 @@
-#include "testautomaton.hpp"
-#include "testcontroller.hpp"
+
 #include "testdynamic.hpp"
-#include "testudpsenderreceiver.hpp"
-#include "testencoder.hpp"
-#include "testdecoder.hpp"
 #include "testClass.h"
-#include "testsimulator.hpp"
 #include "testrandom.hpp"
  #include "time.h"
-#include "testagentudpcommunicator.hpp"
 #include "testserialize.hpp"
 #include "testregex.hpp"
 #include "testvisibility.hpp"
@@ -58,20 +52,11 @@ int main ( int /*argc*/, char** /*argv*/ )
 
         vector<pair<testClass*,string> > tests;
         tests.push_back ( make_pair ( new testRandom(),"random" ) );
-        tests.push_back ( make_pair ( new testController(),"controllore" ) );
         tests.push_back ( make_pair ( new testDynamic(),"dinamica" ) );
-        tests.push_back ( make_pair ( new testUDPSenderReceiver(),"UDP sender receiver" ) );
-        tests.push_back ( make_pair ( new testEncoder(),"Encoder" ) );
-        tests.push_back ( make_pair ( new testAutomaton(),"automaton" ) );
-        tests.push_back ( make_pair ( new testDecoder(),"Decoder" ) );
         tests.push_back ( make_pair ( new testSerialize(),"Serialize" ) );
         tests.push_back ( make_pair ( new testRegex(),"Regex" ) );
         tests.push_back ( make_pair ( new testVisibility(),"Visibility" ) );
-	//tests.push_back(make_pair(new testobjectserialization(),"object serialization"));
-        //tests.push_back(make_pair(new testAgentUDPCommunicator(),"Agent Udp Communicator"));
-// 	tests.push_back(make_pair(new testGeometry(),"Geometry"));
 
-// 	tests.push_back(make_pair(new testSimulator(),"Simulator"));
 
         for ( unsigned int i=0; i<tests.size(); i++ )
         {

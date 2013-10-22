@@ -11,6 +11,9 @@
 #include <types/agent_sim_packet.h>
 #include <types/world_sim_packet.h>
 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
 using namespace std;
 
 class testSerialize:public testClass
@@ -37,21 +40,12 @@ public:
 	agente2.state[1]=2.1;
 	
 	objects_container tasks;	
-	task_assignment_namespace::task app;
-	
-	app.id="T1";
-	
-	task_assignment_task* ta=new task_assignment_task(app);
-	
-	
-	tasks.objects["TASK_ASSIGNMENT"].push_back(ta);
-	
+		
 	agent_sim_packet agent_packet(bonus,t,tasks);
 	agent_packet.state_agents.internal_map[agente1.identifier]=&agente1;
 	agent_packet.state_agents.internal_map[agente2.identifier]=&agente2;
 	
 	world_sim_packet world_packet;
-	world_packet.object_list=tasks;
 	world_packet.bonus_variables=agent_packet.bonus_variables;
 	world_packet.state_agents.internal_map["AGENTE1"]=agente1;
 	world_packet.state_agents.internal_map["AGENTE2"]=agente2;
