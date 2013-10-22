@@ -2,7 +2,7 @@
 #include "parserYAML/include/yaml-cpp/node.h"
 #include "../plugins/task_assignment/task_assignment_parser_plugin.h"
 #include "../plugins/agent_router/agent_router_parser_plugin.h"
-
+#include "logog.hpp"
 using namespace std;
 
 yaml_parser::yaml_parser ( std::vector< abstract_parser_plugin* > plugins ) :plugins ( plugins )

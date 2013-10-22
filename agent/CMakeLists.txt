@@ -2,8 +2,16 @@ cmake_minimum_required(VERSION 2.8)
 
 add_definitions(-DISAGENT)
 
+if(AGENT_LIGHT_FLAG STREQUAL "YES")
+add_definitions(-DAGENT_LIGHT=1)
+else()
+add_definitions(-DAGENT=1)
+remove_definitions(-DAGENT_LIGHT)
+endif()
+
+
 set_property(GLOBAL APPEND PROPERTY agent_SOURCES 
-  ../shared/dynamic.cpp agent.cpp main.cpp
+   agent.cpp main.cpp
   ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp  
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/global.cpp
 	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp 
@@ -16,14 +24,19 @@ set_property(GLOBAL APPEND PROPERTY agent_SOURCES
 get_property(sources GLOBAL PROPERTY agent_SOURCES)
 add_executable(agent ${sources})
 
+if(AGENT_LIGHT_FLAG STREQUAL "YES")
+
+else()
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
+include_directories(../shared/logog/include)
+endif()
+
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
 target_link_libraries(agent zmq)
 
 include_directories(../agent)
 include_directories(../shared)
-include_directories(../shared/logog/include)
 include_directories(../shared/parserYAML/include)
 include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
 include_directories(plugins)

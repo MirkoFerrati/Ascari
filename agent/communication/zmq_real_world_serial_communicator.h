@@ -3,6 +3,14 @@
 #include "world_communicator_abstract.h"
 #include "../shared/communication/zmq_full_communicator.hpp"
 #include <types/agent_sim_packet.h>
+#include <errno.h>
+#include <termios.h>
+#include <unistd.h>
+#include <string.h>
+#include <string>
+#include <ostream>
+#include <stdio.h>
+#include <fcntl.h>
 
 #define ARDUINO_COMMAND_CODE 7
 #define DEFAULT_VELOCITY_VARIABLE "V"
@@ -26,6 +34,11 @@ private:
 world_sim_packet packet_received;
 index_map map_inputs_name_to_id;
 control_command command_old;
+int set_interface_attribs (int fd, int speed, int parity);
+void set_blocking (int fd, int should_block);
+
+int fd; //File descriptor
+
 
 };
 
