@@ -20,7 +20,7 @@
 #include "graph_creator.h"
 #include "agent_router_parsed_agent.h"
 #include "agent_router_parsed_world.h"
-
+#include "agent_router_plugin.h"
 
 
 
@@ -32,8 +32,8 @@ agent_router::agent_router ( agent* a, Parsed_World* parse ):  length ( graph ),
        time ( a->time ),identifier ( a->identifier ),x(a->state.at(a->map_statename_to_id.at("X"))),y(a->state.at(a->map_statename_to_id.at("Y"))),
        theta(a->state.at(a->map_statename_to_id.at("THETA"))),communicator ( _mutex, &info, _io_service,identifier )
 {
-  targets=(reinterpret_cast<agent_router_parsed_agent*>(parse->agents.front().parsed_items_from_plugins[0]))->target_list; //funziona perche' rimane un solo agente nel mondo(gli altri vengono eliminati dal main)
-  std::string graphName=(reinterpret_cast<agent_router_parsed_world*>(parse->parsed_items_from_plugins[0]))->graphName;
+    targets=(reinterpret_cast<agent_router_parsed_agent*>(parse->agents.front().parsed_items_from_plugins.at(AGENT_ROUTER_NAME)))->target_list; //funziona perche' rimane un solo agente nel mondo(gli altri vengono eliminati dal main)
+    std::string graphName=(reinterpret_cast<agent_router_parsed_world*>(parse->parsed_items_from_plugins.at(AGENT_ROUTER_NAME)))->graphName;
   initialized=initialize(graphName);
 }
 

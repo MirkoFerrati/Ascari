@@ -54,7 +54,7 @@ public:
     bool simulated=true;
 
     bool load_from_node( const YAML::Node& node);
-    std::vector<abstract_parsed_agent_plugin*> parsed_items_from_plugins;
+    std::map<std::string,abstract_parsed_agent_plugin*> parsed_items_from_plugins;
 };
 
 class Parsed_World{
@@ -73,7 +73,7 @@ class Parsed_World{
   std::vector<abstract_parser_plugin*> plugins; 
 
 
-  std::vector<abstract_parsed_world_plugin*> parsed_items_from_plugins;
+  std::map<std::string,abstract_parsed_world_plugin*> parsed_items_from_plugins;
   bool load_from_node(const YAML::Node& node);
 
 };

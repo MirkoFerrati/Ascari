@@ -10,15 +10,15 @@ using namespace task_assignment_namespace;
 task_assignment::task_assignment ( agent* a, Parsed_World* parse )
 :time(a->time),my_id(a->identifier),objects(a->objects),world(parse)
 {    
-    x0=reinterpret_cast<task_assignment_parsed_agent*>(world->agents.front().parsed_items_from_plugins[0])->home_x;
-    y0=reinterpret_cast<task_assignment_parsed_agent*>(world->agents.front().parsed_items_from_plugins[0])->home_y;
+    x0=reinterpret_cast<task_assignment_parsed_agent*>(world->agents.front().parsed_items_from_plugins.at(TA_PLUGIN_IDENTIFIER))->home_x;
+    y0=reinterpret_cast<task_assignment_parsed_agent*>(world->agents.front().parsed_items_from_plugins.at(TA_PLUGIN_IDENTIFIER))->home_y;
    // initialize(*parse);
 }
 
   
 task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, const objects_container& objects)
-:time(time),my_id(agent.name),x0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_x),
-y0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_y), objects(objects),world(&world)
+:time(time),my_id(agent.name),x0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins.at(TA_PLUGIN_IDENTIFIER))->home_x),
+y0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins.at(TA_PLUGIN_IDENTIFIER))->home_y), objects(objects),world(&world)
 {
     //initialize(world);  
 }
@@ -37,7 +37,7 @@ bool task_assignment::initialize()
     createTaskCostMatrixFromParsedWorld(world->agents.front());
     inizializeTaskAssignmentMatrix();
     
-    task_assignment_algorithm=reinterpret_cast<task_assignment_parsed_world*>(world->parsed_items_from_plugins[0])->task_assignment_algorithm;
+    task_assignment_algorithm=reinterpret_cast<task_assignment_parsed_world*>(world->parsed_items_from_plugins.at(TA_PLUGIN_IDENTIFIER))->task_assignment_algorithm;
     
     my_task="";
     my_task_x=x0;
@@ -133,7 +133,7 @@ void task_assignment ::initialize_assignment_problem()
  
 void task_assignment ::createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& world)
 {
-  auto wo=reinterpret_cast<task_assignment_parsed_world*>(world.parsed_items_from_plugins[0]);    
+    auto wo=reinterpret_cast<task_assignment_parsed_world*>(world.parsed_items_from_plugins.at(TA_PLUGIN_IDENTIFIER));    
     for (unsigned int i=0;i<wo->task_list.size();i++)
 	tasks_id.push_back(wo->tasks_id.at(i));
     
@@ -155,7 +155,7 @@ void task_assignment ::createAusiliarVariables()
  
 void task_assignment ::createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a)
 {   
-    task_cost_matrix[my_id]=(reinterpret_cast<task_assignment_parsed_agent*>(a.parsed_items_from_plugins[0]))->agent_task_cost_vector;
+    task_cost_matrix[my_id]=(reinterpret_cast<task_assignment_parsed_agent*>(a.parsed_items_from_plugins.at(TA_PLUGIN_IDENTIFIER)))->agent_task_cost_vector;
     
     task_cost_vector app;
     
