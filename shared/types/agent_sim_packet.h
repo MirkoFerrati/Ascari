@@ -32,7 +32,7 @@ struct agent_sim_packet{
 struct agent_sim_packet_receiver{
   //pacchetto personalizzato per ogni agente in base alla visibilita'
   std::map<std::string,double> bonus_variables;
-   agents_name_to_ref_states state_agents;
+   agents_name_to_states state_agents;
   simulation_time time;
    objects_container objects;
     

@@ -9,7 +9,7 @@ struct agents_name_to_ref_states
 //TODO(MIRKO): Controllare se questa struttura serve oppure puo' essere inclusa in World_sim_packet
 {
   friend class boost::serialization::access;
-  std::map<std::string,agent_state_packet*> internal_map;
+  std::map<std::string,agent_state_packet&> internal_map;
 
 private:
     template <typename Archive>

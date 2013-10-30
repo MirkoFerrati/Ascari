@@ -13,8 +13,9 @@
 #include "../plugins/agent_router/agent_router_simulator_plugin.h"
 #include "../plugins/task_assignment/task_assignment_simulator.h"
 #include <time.h>
-
+#include <utility>
 #include "streams_utils.h"
+
 #include <dynamic_remote_localization.h>
 using namespace std;
 
@@ -347,6 +348,8 @@ void simulator::main_loop()
 
             update_bonus_variables();
 
+            agent_sim_packet temp_buffer(sim_packet.bonus_variables,sim_packet.time,sim_packet.object_list);
+            
 	    //Compute new agent simulated sensors result
             for ( auto agent=sim_packet.state_agents.internal_map.begin(); agent!=sim_packet.state_agents.internal_map.end(); agent++ )
             {
@@ -355,7 +358,7 @@ void simulator::main_loop()
                 {
                     if (isVisible(agent,other))
                     {
-                        agent_packet.state_agents.internal_map[other->first]=&other->second;
+                        agent_packet.state_agents.internal_map.insert(std::make_pair(other->first,std::ref(other->second)));
                     }
                 }
                 communicator->send_target ( agent_packet,agent->first );
