@@ -33,6 +33,10 @@ public:
   {
     return map.count(value);
   };
+    const boost::property_tree::ptree& getMap()
+    {
+        return map;
+    }
 
 private:
     boost::property_tree::ptree map;
