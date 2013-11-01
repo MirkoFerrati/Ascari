@@ -6,7 +6,6 @@
 #include "agent.h"
 #include "logog.hpp"
 #include "../shared/communication/global.h"
-//#include "lemon/arg_parser.h"
 #include "../plugins/addplugins.h"
 #include "../shared/communication/global.h"
 #include <define.h>
@@ -35,13 +34,13 @@ int main ( int argc, char** argv )
         {
             filename=CONFIG.getValue("FILENAME");
             desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename), "Yaml filename");
-            std::cout<<"found filename inside config file: "<<filename<<std::endl;
+            INFO("Using %s as filename, read from config file",filename.c_str());
         }
-        else if (CONFIG.exists("FILENAME"))
+        else if (CONFIG.exists("filename"))
         {
             filename=CONFIG.getValue("filename");
             desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename), "Yaml filename");
-            std::cout<<"found filename inside config file: "<<filename<<std::endl;
+            INFO("Using %s as filename, read from config file",filename.c_str());
         }    
         else
             desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename)->required(), "Yaml filename");
