@@ -29,10 +29,60 @@ using namespace std;
 
 
 Viewer::Viewer ( const world_sim_packet& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent) :
-    QWidget ( parent ),infos ( read ), mutex ( read_mutex )
+    QGraphicsView ( parent ),infos ( read ), mutex ( read_mutex )
 {
     simulation_time=0;
+    agentshape=QPolygon(QVector<QPoint>({ QPoint ( 20, -20 ),QPoint ( -20, -20 ),QPoint ( 0, 20 )})); 
+    
+    setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    
+    //Set-up the scene
+     Scene = new QGraphicsScene(this);
+    setScene(Scene);
+    
+    //Populate the scene
+    for(int x = 0; x < 1000; x = x + 25) {
+        for(int y = 0; y < 1000; y = y + 25) {
+            
+            if(x % 100 == 0 && y % 100 == 0) {
+                Scene->addRect(x, y, 2, 2);
+                
+                QString pointString;
+                QTextStream stream(&pointString);
+                stream << "(" << x << "," << y << ")";
+                QGraphicsTextItem* item = Scene->addText(pointString);
+                item->setPos(x, y);
+            } else {
+                Scene->addRect(x, y, 1, 1);
+            }
+        }
+    }
+    
+    //Set-up the view
+    setSceneRect(0, 0, 1000, 1000);
+    
+    //Use ScrollHand Drag Mode to enable Panning
+    setDragMode(ScrollHandDrag);
 }
+
+void Viewer::wheelEvent(QWheelEvent* event)
+{        
+        setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+        
+        // Scale the view / do the zoom
+        double scaleFactor = 1.15;
+        if(event->delta() > 0) {
+            // Zoom in
+            scale(scaleFactor, scaleFactor);
+        } else {
+            // Zooming out
+            scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+        }       
+        // Don't call superclass handler here
+        // as wheel is normally used for moving scrollbars
+        // QGraphicsView::wheelEvent(event);
+}
+
 
 void Viewer::addPlugin ( abstract_viewer_plugin* plugin )
 {
@@ -142,20 +192,21 @@ void Viewer::paintTextPoint(QPainter *painter,double x,double y)
 	
 }
 
-void Viewer::paintAgents(QPainter &painter,const std::map<std::string,Agent>& agents)
-{
-    auto agentshape=QPolygon(QVector<QPoint>({ QPoint ( 2, -2 ),QPoint ( -2, -2 ),QPoint ( 0, 2 )})); 
-    
+void Viewer::paintAgents(const std::map<std::string,Agent>& agents)
+{       
     for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
     {
-	painter.save();
+        std::cout<<it->first<<std::endl;
+        /*	painter.save();
 	painter.setBrush ( QColor ( "red" ) );
 	painter.translate ( it->second.x,it->second.y );
-	//lo zero degli angoli parte dall'asse y invece che da x
+*/	//lo zero degli angoli parte dall'asse y invece che da x
 	double tmp=it->second.angle;
 	while ( tmp>M_PI )
 		tmp=tmp-2*M_PI;
-	painter.rotate ( ( tmp*180/M_PI )-90 );
+        it->second.shape->setPos(it->second.x,it->second.y);
+        it->second.shape->setRotation(tmp*180/M_PI-90);
+        /*	painter.rotate ( ( tmp*180/M_PI )-90 );
 	
 	painter.scale(3,3);
 	painter.drawConvexPolygon(agentshape);
@@ -166,16 +217,17 @@ void Viewer::paintAgents(QPainter &painter,const std::map<std::string,Agent>& ag
 	painter.drawText(0,0,QString(it->first.substr(6).c_str()));
 	
 	painter.restore();
-	    
+*/
+
     }
 }
 
-void Viewer::paintEvent ( QPaintEvent */*event*/ )
+void Viewer::paintEvent ( QPaintEvent *event )
 {
     double sidex=width();
     double sidey=height();
-    QPainter painter ( this );
-    painter.save();
+    //QPainter painter ( this );
+    /*painter.save();
     painter.translate ( sidex/2,sidey/2 );
     painter.scale ( sidex/scalingFactorX,-sidey/scalingFactorY );
     painter.translate ( -translateX,-translateY );
@@ -191,10 +243,10 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
     }
 
     if(plugins.size()==0)
-    {
-	paintAgents(painter,agents);
+    {*/
+	paintAgents(agents);
 	
-	painter.save();
+	/*painter.save();
 	QFont f = painter.font();
 	f.setPointSizeF (  std::max(height() /2500.0,0.04 ));
 	painter.setFont ( f );
@@ -202,9 +254,9 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
 	painter.translate(translateX,maxY-1.1*painter.fontMetrics().height());
 	painter.scale(1,-1);
 	painter.drawText (0,0, QString("").setNum(simulation_time) );
-	painter.restore();
-    }
-    
+	painter.restore();*/
+   /* }
+  
     for (auto plugin:plugins)
     {
 	painter.save();
@@ -219,12 +271,14 @@ void Viewer::paintEvent ( QPaintEvent */*event*/ )
     }
 	
    
-    painter.restore();
+    painter.restore();*/
+  QGraphicsView::paintEvent(event);
 }
 
 
 void Viewer::timerEvent ( QTimerEvent */*event*/ )
 {
+    
     mutex->lock();
     for ( map<string, agent_state_packet>::const_iterator it=infos.state_agents.internal_map.begin(); it!=infos.state_agents.internal_map.end(); ++it )
     {
@@ -232,8 +286,17 @@ void Viewer::timerEvent ( QTimerEvent */*event*/ )
         setScalingAndTranslateFactor ( agents[it->first].getMaxX(),agents[it->first].getMinX(),agents[it->first].getMaxY(),agents[it->first].getMinY() );
     }
     simulation_time=infos.time;
+    //mutex->unlock();
+        for ( std::map<std::string,Agent>::iterator it=agents.begin(); it!=agents.end(); ++it )
+        {
+            if (!it->second.created)
+            {   
+            QGraphicsPolygonItem *agent=Scene->addPolygon(agentshape);
+            it->second.shape=agent;
+            it->second.created=true;
+            }
+    }
     mutex->unlock();
-    
     for (auto plugin:plugins)
     {
       plugin->timerEvent(mutex,infos);

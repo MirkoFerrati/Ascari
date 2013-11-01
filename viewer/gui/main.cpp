@@ -97,59 +97,16 @@ int main ( int argc, char *argv[] )
             generic_plugins.at(viewerType-1)->getViewerPlugin()->setfather ( &window );
             window.addPlugin ( generic_plugins.at(viewerType-1)->getViewerPlugin() );
 	}
-	/*
-        switch ( viewerType )
-        {
-        case 1:
-        {
-
-        }
-        break;
-        case 2:
-        {
-            abstract_viewer_plugin* router_viewer = new agent_router_viewer ( filename );
-            plugins.push_back ( router_viewer );
-            router_viewer->setfather ( &window );
-            window.addPlugin ( router_viewer );
-
-        }
-        break;
-	  case 5:
-        {
-            abstract_viewer_plugin* temp=new monitor_viewer ( filename );
-            temp->setfather ( &window );
-            window.addPlugin ( temp );
-            plugins.push_back ( temp );
-        }
-        break;
-        case 3:
-        {
-
-        }
-        case 4:
-        {
-            abstract_viewer_plugin* ta_viewer = new task_assignment_viewer ();
-            plugins.push_back ( ta_viewer );
-            ta_viewer->setfather ( &window );
-           
-            window.addPlugin ( ta_viewer );
-        }
-        break;
-        default:
-            throw "tipo di viewer sconosciuto";
-        }
-*/
         window.init ( filename );
         zmq_world_sniffer<world_sim_packet> sniffer_world ( read,read_mutex );
         window.setWindowTitle ( "Visualizer" );
         window.show();
-        QSettings settings ( "K2BRobotics","Viewer" );
+        QSettings settings ( "Ascari","Viewer" );
         window.restoreGeometry ( settings.value ( "mainWindowGeometry" ).toByteArray() );
         window.setMinimumSize ( 200,200 );
         sniffer_world.start_receiving();
         window.start();
         app.exec();
-// 	std::cout<<"la main window si è chiusa"<<std::endl;
         sniffer_world.stop_receiving();
 
     for ( auto plugin:plugins )
@@ -161,7 +118,6 @@ int main ( int argc, char *argv[] )
         {
             delete ( static_zmq::context );
         } );
-//     	std::cout<<"contesto chiuso"<<std::endl;
     }
     exiting.join();
     return 0;

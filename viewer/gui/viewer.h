@@ -6,9 +6,17 @@
 #include "../../plugins/abstract_viewer_plugin.h"
 #include <QtGui/QWidget>
 #include <QtGui/QKeyEvent>
+#include <QGraphicsView>
 #include <mutex>
 #include <map>
-class Viewer : public QWidget
+#include <QGraphicsScene>
+#include <QGraphicsTextItem>
+#include <QTextStream>
+#include <QScrollBar>
+#include <QMouseEvent>
+#include <QWheelEvent>
+#include <QDebug>
+class Viewer : public QGraphicsView//QWidget
 {
 
 public:
@@ -25,9 +33,15 @@ void addPlugin(abstract_viewer_plugin* plugin);
 
  int * getTime(){return &simulation_time;}
 
+protected:
+    
+    virtual void wheelEvent(QWheelEvent* event);
+    
+ 
+ 
 private:
 	void paintTextPoint( QPainter* painter, double x, double y );
-	void paintAgents(QPainter &painter,const std::map<std::string,Agent>& agents);
+	void paintAgents(const std::map< std::string, Agent >& agents);
     void paintEvent ( QPaintEvent *event );
     void timerEvent ( QTimerEvent *event );
     void keyPressEvent ( QKeyEvent *event );
@@ -43,6 +57,8 @@ private:
     //const std::vector<char>& buffer;
     const world_sim_packet& infos;
     std::shared_ptr<std::mutex> mutex;
+    QGraphicsScene* Scene;
+    QPolygon agentshape;
 public:
     double scalingFactorX, scalingFactorY, translateX, translateY;
 	void setScalingAndTranslateFactor ( double maxX,double minX,double maxY,double minY );

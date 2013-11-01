@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <qgraphicsitem.h>
 #include <types/agent_state_packet.h>
 
 
@@ -67,7 +68,10 @@ class Agent
     double charge;
     
     //written by Alessandro Settimi
-
+    
+    QGraphicsPolygonItem *shape;
+    bool created;
+    
 private:
     std::string agent_name;
 	double maxX,maxY,minX,minY;
@@ -76,7 +80,6 @@ private:
     int y_index;
     int charge_index;
     void init();
-
 	
 };
 
