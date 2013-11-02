@@ -70,7 +70,7 @@ class Agent
     //written by Alessandro Settimi
     
     QGraphicsPolygonItem *shape;
-    bool created;
+    bool created=false;
     
 private:
     std::string agent_name;

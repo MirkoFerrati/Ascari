@@ -3,8 +3,8 @@
 
 
 #include "HACK_KDEVELOP.h"
+#include <qt4/QtGui/QPainter>
 
-#include <QPainter>
 #include "../viewer/gui/Agent.h"
 #include <assert.h>
 #include "types.h"
@@ -12,6 +12,11 @@
 #include <yaml_parser.h>
 #include <mutex>
 #include <memory>
+#include <qt4/QtGui/QGraphicsScene>
+#include <qt4/QtGui/QGraphicsItem>
+
+#define TYPE_AGENT 1234
+#define TYPE_TEXT 5678
 
 class abstract_viewer_plugin
 {
@@ -19,9 +24,7 @@ public:
 	
 	abstract_viewer_plugin()
 	{
-		setAgentShape();
-		setAgentSize();
-		setPainterScale();
+            
 	}
 	void setfather ( void* father )
 	{
@@ -29,66 +32,42 @@ public:
 		this->father=father;
 	};
 	
-	virtual void paintAgents(QPainter &painter,const std::map<std::string,Agent>& agents)
+	virtual void paintAgents(QGraphicsScene* Scene, std::map<std::string,Agent>& agents)
 	{
-		for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
-		{
-			painter.save();
-			painter.setBrush ( QColor ( "red" ) );
-			painter.translate ( it->second.x,it->second.y );
-			//lo zero degli angoli parte dall'asse y invece che da x
-			double tmp=it->second.angle;
-			while ( tmp>M_PI )
-				tmp=tmp-2*M_PI;
-			painter.rotate ( ( tmp*180/M_PI )-90 );
-			
-			painter.scale(agentsize,agentsize);
-			painter.drawConvexPolygon(agentshape);
-			painter.restore();
-			painter.save();
-			painter.translate ( it->second.x,it->second.y );
-			painter.scale(painter.fontMetrics().height()/painterscale,-painter.fontMetrics().height()/painterscale);
-			painter.drawText(0,0,QString(it->first.substr(6).c_str()));
-			
-			painter.restore();
-			
-		}
-	};
-	virtual void paintBackground(QPainter &/*painter*/){};
+            for ( std::map<std::string,Agent>::iterator it=agents.begin(); it!=agents.end(); ++it )
+            {
+                if (!it->second.created)
+                {
+                    QGraphicsPolygonItem *agent=Scene->addPolygon(agentshape);
+                    std::cout<<"creato nuovo agente"<<std::endl;
+                    QBrush b;
+                    b.setColor(QColor("red"));
+                    b.setStyle( Qt::SolidPattern);
+                    agent->setBrush(b);
+                    agent->setData(0,TYPE_AGENT);
+                    agent->setFlag(QGraphicsItem::ItemIsMovable,false);
+                    agent->setFlag(QGraphicsItem::ItemIsSelectable,true); //TODO: show item details on selection (x,y,theta)?
+                    it->second.shape=agent;
+                    it->second.created=true;
+                }
+                double tmp=it->second.angle;
+                while ( tmp>M_PI )
+                    tmp=tmp-2*M_PI;
+                it->second.shape->setPos(it->second.x,it->second.y);
+                it->second.shape->setRotation(tmp*180/M_PI-90);
+            }
+        };
+	virtual void paintBackground(QGraphicsScene */*painter*/){};
 	virtual void timerEvent(std::shared_ptr<std::mutex>&,const world_sim_packet&){};
 	virtual void init(){};
 	virtual void keypress(){};
-	virtual void setAgentShape(QPolygon shape)
-	{
-		agentshape=shape;
-	}
-	virtual void setAgentShape()
-	{
-		agentshape=QPolygon(QVector<QPoint>(
-			{
-				QPoint ( 2, -2 ),
-											QPoint ( -2, -2 ),
-											QPoint ( 0, 2 )
-			})); 
-	}
-	virtual void setAgentSize(double size=2.0)
-	{
-		agentsize=size; 
-	}
-	
-	virtual void setPainterScale(double scale=70.0)
-	{
-		painterscale=scale;
-	}
 	virtual ~abstract_viewer_plugin()
 	{
 	};
 	void* father;
 	
-private:
+protected:
 	QPolygon agentshape;
-	double agentsize;
-	double painterscale;
 	
 };
 
