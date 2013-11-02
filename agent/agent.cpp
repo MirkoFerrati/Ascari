@@ -138,9 +138,9 @@ void agent::main_loop()
     const world_sim_packet &temp = world_comm->receive_agents_status();
     time=temp.time;
     agents=&temp;
-    for ( std::map<std::string,double>::const_iterator it=temp.bonus_variables.begin(); it!=temp.bonus_variables.end(); ++it )
-    {
-        bonusVariables.at ( map_bonus_variables_to_id.at ( it->first ) ) =it->second;
+    for ( std::map<std::string,int>::const_iterator it=map_bonus_variables_to_id.begin(); it!=map_bonus_variables_to_id.end(); ++it )
+    {        
+        bonusVariables.at(it->second) =temp.bonus_variables.at(it->first);
     }
 
     //TODO(Mirko): non e' ottimizzato, distrugge e ricrea ogni volta, follia!!    
