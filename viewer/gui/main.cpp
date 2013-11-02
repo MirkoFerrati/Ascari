@@ -1,18 +1,18 @@
 #include <QtGui/QApplication>
 #include "viewer.h"
-#include "../plugins/agent_router/agent_router_viewer.h"
+//#include "../plugins/agent_router/agent_router_viewer.h"
 #include <QtGui/QDesktopWidget>
-#include "udp_world_sniffer.h"
+//#include "udp_world_sniffer.h"
 #include "../communication/zmq_world_sniffer.hpp"
-#include "lemon/arg_parser.h"
 #include "logog.hpp"
 #include "../gml2lgf/graph.h"
 
 #include <QSettings>
 
-#include "../plugins/task_assignment/task_assignment_viewer.h"
+//#include "../plugins/task_assignment/task_assignment_viewer.h"
 #include <ostream>
 #include <sstream>
+#include <boost/program_options.hpp>
 #include "../plugins/addplugins.h"
 
 
@@ -37,40 +37,69 @@ int main ( int argc, char *argv[] )
     static_zmq::context=new zmq::context_t ( 1 );
     {
         std::string filename="";
+        int viewerType=0;
+        
 	auto generic_plugins=createPlugins();
         logog::Cout out;
-        lemon::ArgParser ap ( argc,argv );
-        int viewerType=0;
-        ap.refOption ( "f","Yaml filename",filename );
-        ap.synonym ( "filename","f" );
-	std::ostringstream options;
+
+        boost::program_options::options_description desc;
+        boost::program_options::variables_map options;
+        desc.add_options()("help,h","Get help");
+        
+        if (CONFIG.exists("FILENAME"))
+        {
+            filename=CONFIG.getValue("FILENAME");
+            desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename), "Yaml filename");
+            INFO("Using %s as filename, read from config file",filename.c_str());
+        }
+        else if (CONFIG.exists("filename"))
+        {
+            filename=CONFIG.getValue("filename");
+            desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename), "Yaml filename");
+            INFO("Using %s as filename, read from config file",filename.c_str());
+        }    
+        else
+            desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename)->required(), "Yaml filename");
+        
+        std::ostringstream options_desc;
 	int i=1;
-	options<<"0-blank ";
+	options_desc<<"0-blank ";
 	for (auto plugin:generic_plugins)
 	{
-	  options<<i++<<"-"<<plugin->getType()<<" ";
+	  options_desc<<i++<<"-"<<plugin->getType()<<" ";
 	}
-        ap.refOption ( "t",options.str(),viewerType,true ); //ap.refOption ( "t"," 1-baseball 2-grafi 3-vuoto 4-Task Assignment 5-monitor",viewerType,true );
-        ap.throwOnProblems();
+        
+        desc.add_options()("type,t", boost::program_options::value<int>(&viewerType)->required(),options_desc.str().c_str());
+ 
+        for (auto config_value:CONFIG.getMap())
+        {
+            if (config_value.first!="filename")
+                desc.add_options()(config_value.first.c_str(),config_value.second.data().c_str());
+        }
+        
+        boost::program_options::positional_options_description p;
+        p.add("type",-1);
+        
+        
         try
         {
-            ap.parse();
-//             if ( ( viewerType==2 ) && !ap.given ( "f" ) )
-//             {
-//                 ERR ( "inserire il nome del file%s","" );
-//                 return 0;
-//             }
+            boost::program_options::store(boost::program_options::command_line_parser(argc,argv).options(desc).positional(p).run(),options);//Overwrite default file values with shell one
+            
+            if (options.count("help"))
+            {
+                std::cout << "Basic Command Line Parameter App" << std::endl 
+                << desc << std::endl;
+                return 0;
+            }
+            boost::program_options::notify(options);
         }
-        catch ( lemon::ArgParserException const& ex )
+        catch (boost::program_options::error& e)
         {
-            ERR ( "errore nella lettura dei parametri %s",ex.reason() );
-            return 0;
+            std::cerr << "ERROR: " << e.what() << std::endl << std::endl; 
+            std::cerr << desc << std::endl; 
+            return 2;    
         }
-	if (!ap.given("f"))
-	{
-	  filename=CONFIG.getValue("FILENAME");
-  	  INFO("Using %s as filename, read from config file",filename.c_str());
-	}
+        
         QApplication app ( argc,argv );
 
         std::vector<abstract_viewer_plugin*> plugins;
@@ -78,7 +107,10 @@ int main ( int argc, char *argv[] )
         std::shared_ptr<std::mutex> read_mutex ( new std::mutex );
         Viewer window ( read,read_mutex,NULL );
 	if (viewerType>generic_plugins.size())
-	  throw "undefined viewer plugin";
+        {
+            std::cout << "Basic Command Line Parameter App" << std::endl << desc << std::endl;
+            return 0;
+        }
 	yaml_parser parser;
 	for (auto plugin:generic_plugins)
 	{
