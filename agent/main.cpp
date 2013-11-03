@@ -61,7 +61,7 @@ int main ( int argc, char** argv )
         for (auto config_value:CONFIG.getMap())
         {
             if ((config_value.first!="agent")&&(config_value.first!="filename"))
-            desc.add_options()(config_value.first.c_str(),config_value.second.data().c_str());
+            desc.add_options()(config_value.first.c_str(),boost::program_options::value<std::string>()->default_value(config_value.second.data().c_str()),"");
         }
         
         
@@ -97,9 +97,11 @@ int main ( int argc, char** argv )
   	  INFO("Using %s as filename, read from config file",filename.c_str());
 	}*/
 	
-	
-	
-	
+       for (auto config_value:options)
+       {
+           CONFIG.getMap().put(config_value.first,config_value.second.as<std::string>());
+       }
+       
         auto plugins=createPlugins();
 
         yaml_parser parser;

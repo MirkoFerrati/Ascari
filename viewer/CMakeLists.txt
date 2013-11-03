@@ -13,7 +13,7 @@ include(${QT_USE_FILE})
 
 set(viewer_HEADERS gui/Agent.h gui/viewer.h ../shared/communication/global.h)
 set_property(GLOBAL APPEND PROPERTY viewer_SOURCES gui/baseball_viewer.cpp 
- gui/main.cpp gui/Agent.cpp gui/viewer.cpp
+ gui/main.cpp gui/Agent.cpp gui/viewer.cpp ../shared/define.cpp
  communication/zmq_world_sniffer.hpp  ../shared/objects/router_graph_good.cpp
 ../simulator/visibility/map2d.cpp ../gml2lgf/utils.cpp ../gml2lgf/gmlreader.hpp  ../gml2lgf/node.cpp ../gml2lgf/graph.cpp ../gml2lgf/arc.cpp
 ../shared/communication/global.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../shared/objects/task_assignment_task.cpp)

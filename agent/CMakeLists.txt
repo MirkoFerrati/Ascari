@@ -11,7 +11,7 @@ endif()
 
 
 set_property(GLOBAL APPEND PROPERTY agent_SOURCES 
-   agent.cpp main.cpp
+   agent.cpp main.cpp ../shared/define.cpp
   ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp  
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/global.cpp
 	../shared/communication/zmq_communicator.hpp communication/zmq_world_communicator.cpp 
