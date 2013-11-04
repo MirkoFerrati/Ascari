@@ -3,11 +3,10 @@
 #include <string>
 #include <vector>
 #include <sstream>
-
+#include <boost/program_options.hpp>
 #include "debug_constants.h"
 #include "simulator.h"
 #include "time.h"
-#include "lemon/arg_parser.h"
 #include <communication/global.h>
 #include "../plugins/addplugins.h"
 
@@ -34,35 +33,62 @@ int main ( int argc, char **argv )
         logog::Cout out;
         simulator s;
         Parsed_World world;
-        lemon::ArgParser ap ( argc,argv );
+        boost::program_options::options_description desc;
+        boost::program_options::variables_map options;
+        desc.add_options()("help,h","Get help");
+        
         int count,secSleep;
         std::string filename;
         bool checkCollision=false;
-	bool filename_obbl=true;
-	if (CONFIG.exists("FILENAME"))
-	  filename_obbl=false;
 	
-        ap.refOption ( "n","Number of simulator cycle",count );
-        ap.refOption ( "s","Milliseconds sleep",secSleep );
-        ap.refOption ( "f","Yaml filename",filename,filename_obbl );
-        ap.refOption ( "check_collision","enables collision checking",checkCollision );
-        ap.synonym ( "filename","f" );
-        ap.synonym ( "sleep","s" );
-        ap.throwOnProblems();
+        if (CONFIG.exists("FILENAME"))
+        {
+            filename=CONFIG.getValue("FILENAME");
+            desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename), "Yaml filename");
+            INFO("Using %s as filename, read from config file",filename.c_str());
+        }
+        else if (CONFIG.exists("filename"))
+        {
+            filename=CONFIG.getValue("filename");
+            desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename), "Yaml filename");
+            INFO("Using %s as filename, read from config file",filename.c_str());
+        }    
+        else
+            desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename)->required(), "Yaml filename");
+        
+            
+        desc.add_options()( "cycles,n",boost::program_options::value<int>(&count),"Number of simulator cycles")
+        ( "sleep,s",boost::program_options::value<int>(&secSleep),"Milliseconds sleep")
+        ( "check_collision,c",boost::program_options::value<bool>(&checkCollision),"enables collision checking");
+        
+        
+        
+        for (auto config_value:CONFIG.getMap())
+        {
+            if (config_value.first!="filename")
+                desc.add_options()(config_value.first.c_str(),config_value.second.data().c_str());
+        }
+                
         try
         {
-            ap.parse();
+            boost::program_options::store(boost::program_options::command_line_parser(argc,argv).options(desc).run(),options);//Overwrite default file values with shell one
+            
+            if (options.count("help"))
+            {
+                std::cout << "Basic Command Line Parameter App" << std::endl 
+                << desc << std::endl;
+                return 0;
+            }
+            boost::program_options::notify(options);
         }
-        catch ( lemon::ArgParserException const& ex )
+        catch (boost::program_options::error& e)
         {
-            ERR ( "errore nella lettura dei parametri %s",ex.what() );
-            return 0;
+            std::cerr << "ERROR: " << e.what() << std::endl << std::endl; 
+            std::cerr << desc << std::endl; 
+            return 2;    
         }
-        if (!ap.given("f"))
-	{
-	  filename=CONFIG.getValue("FILENAME");
-  	  INFO("Using %s as filename, read from config file",filename.c_str());
-	}
+        
+        
         auto plugins=createPlugins();
 
         yaml_parser parser;
@@ -78,7 +104,7 @@ int main ( int argc, char **argv )
             if ( plugin->getParserPlugin()->isEnabled() )
             {
                 if ( !plugin->createSimulatorPlugin ( &s ,&world) )
-		  {ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() );}
+		  {ERR ( "failed to create plugin %s",plugin->getType().c_str() );}
                 else
                     s.addPlugin ( plugin->getSimulatorPlugin() );
             }
@@ -87,16 +113,15 @@ int main ( int argc, char **argv )
 	initialize_communication ( s,world );
         s.initialize ( world );
         
-        if ( ap.given ( "s" ) )
+        if ( options.count( "sleep" ) )
             s.setPeriod ( secSleep );
-        if ( ap.given ( "check_collision" ) )
+        if ( options.count ( "check_collision" ) )
             s.setCheckCollision ( checkCollision );
-        if ( ap.given ( "n" ) )
+        if ( options.count ( "cycles" ) )
             s.start_sim ( count );
         else
             s.start_sim();
-
-        std::cout << "Hello, world! simulator" << std::endl;
+        
         exiting=std::thread ( []()
         {
             delete ( static_zmq::context );

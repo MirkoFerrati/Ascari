@@ -22,7 +22,7 @@ include_directories(plugins)
  find_package(Boost REQUIRED system thread serialization)
  include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
 
-add_executable(fake_localization fake_localization.cpp ../shared/communication/zmq_localization_communicator.hpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../shared/communication/global.cpp)
+add_executable(fake_localization fake_localization.cpp ../shared/define.cpp ../shared/communication/zmq_localization_communicator.hpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../shared/communication/global.cpp)
 #add_executable(fake_simulator fake_simulator.cpp main.cpp ../shared/communication/global.cpp ../shared/yaml_parser.cpp zmq_agent_communicator.cpp ../shared/dynamic.cpp
 #../shared/communication/zmq_localization_communicator.hpp ../shared/dynamic_remote_localization.cpp ../simulator/visibility/visibility.cpp ../shared/objects/objects_container.hpp)
 #target_link_libraries(fake_simulator ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)

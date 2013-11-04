@@ -18,7 +18,6 @@ public:
 	agent_router_viewer (Parsed_World* world);
     void init(  );
     void paintBackground ( QPainter& painter );
-    void setPainterScale ( double scale );
     ~agent_router_viewer();
 private:
     void parseGraph (std::string);

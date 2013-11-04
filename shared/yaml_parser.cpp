@@ -177,7 +177,7 @@ for ( auto plugin:plugins )
         abstract_parsed_world_plugin* temp=0;
 	temp=plugin->parseWorld ( node );
         if ( temp!=0 )
-            parsed_items_from_plugins.push_back (temp  );
+            parsed_items_from_plugins[plugin->getType()]=temp;
     }
 
     const YAML::Node &behaviors_nodes=node[0]["BEHAVIORS"];
@@ -232,7 +232,7 @@ for ( auto plugin:plugins )
 	    temp_ptr=plugin->parseAgent ( agent_nodes[i] );
             if ( temp_ptr!=0 )
 	    {
-                agents.back().parsed_items_from_plugins.push_back (temp_ptr);
+                agents.back().parsed_items_from_plugins[plugin->getType()]=temp_ptr;
 	    }
         }
     }

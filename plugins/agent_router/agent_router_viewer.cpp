@@ -12,7 +12,6 @@ agent_router_viewer::agent_router_viewer()
      length=0;
     coord_x=0;
     coord_y=0;
-    setPainterScale(20);
 }
 
 agent_router_viewer::agent_router_viewer ( Parsed_World* world )
@@ -21,16 +20,10 @@ agent_router_viewer::agent_router_viewer ( Parsed_World* world )
   length=0;
   coord_x=0;
   coord_y=0;
-  setPainterScale(20);
   auto temp=reinterpret_cast<agent_router_parsed_world*>(world->parsed_items_from_plugins[0]);
   graphName=boost::to_lower_copy(temp->graphName);
 }
 
-
-void agent_router_viewer::setPainterScale ( double scale )
-{
-    abstract_viewer_plugin::setPainterScale ( scale );
-}
 
 
 void agent_router_viewer::init(  )

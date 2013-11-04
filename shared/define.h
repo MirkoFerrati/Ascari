@@ -13,9 +13,7 @@ class configuration_reader{
 public:
   configuration_reader()
   {  
-
    boost::property_tree::read_info("ascari.cfg",map);
-
   };
   std::string getValue(std::string value)
   {
@@ -33,12 +31,16 @@ public:
   {
     return map.count(value);
   };
+     boost::property_tree::ptree& getMap()
+    {
+        return map;
+    }
 
 private:
     boost::property_tree::ptree map;
 };
 
-static configuration_reader CONFIG;
+extern configuration_reader CONFIG;
 
 
 
