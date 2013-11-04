@@ -218,13 +218,13 @@ task_id task_assignment ::subgradient_algorithm()
 			passi++;
 		}
 		
-		ptr_subgradient_packet.get()->x=x.value();
-		ptr_subgradient_packet.get()->y=y.value();
-		ptr_subgradient_packet.get()->theta=theta.value();
+		ptr_subgradient_packet.get()->x=*x;
+		ptr_subgradient_packet.get()->y=*y;
+		ptr_subgradient_packet.get()->theta=*theta;
 		ta_communicator->send();
 // 		std::cout<<std::endl<<"size of sent packet: "<<sizeof(*ptr_subgradient_packet.get())<<std::endl<<std::endl;
 		//std::cout<<"MANDO "<<((ptr_subgradient_packet.get()->busy)?("occupato"):("libero"))<<std::endl;
-// 		std::cout<<"MANDO x:"<<x.value()<<" y:"<<y.value()<<std::endl;
+// 		std::cout<<"MANDO x:"<<x<<" y:"<<y<<std::endl;
 
 	}
 

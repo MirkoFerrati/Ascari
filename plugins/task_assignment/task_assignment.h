@@ -23,7 +23,7 @@ class task_assignment: public abstract_agent_plugin
 {
 	
 public:
- 	task_assignment( const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, const objects_container& objects );
+//  	task_assignment( const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, const objects_container& objects );
 	task_assignment(agent* a, Parsed_World* parse);
 	void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
 	void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
@@ -49,14 +49,25 @@ public:
 	void createAusiliarVariables();
 	bool reached();
 	double compute_alpha();
+	double distance_to_target();
+	bool initialize();
+	double compute_speed(double x_t, double y_t);
+	double compute_omega(double x_t, double y_t);
 
+	double *x,*y,*theta,*charge_;
+	
+	double *speed;
+	double omega;
+	double *omega_dubins;
+	double *set_charge;
+	double my_task_x,my_task_y;
 	
 private:
   
 	std::map<task_assignment_namespace::agent_id,std::vector<double>> positions;
 
-	double set_charge;
 	
+	agent* a;
 	double lambda_u;
 	double omega_tilde;
 	double beta_p;
@@ -79,7 +90,7 @@ private:
 	
 	task_assignment_namespace::task_id my_task;
 	
-	double my_task_x,my_task_y;
+	
 		
 	std::vector<task_assignment_namespace::agent_id> agents_id;
 	
@@ -99,15 +110,15 @@ private:
 	bool task_started;
 	bool stop;
 	
-	double speed;
-	double omega;
-	double omega_dubins;
+	
 	double max_omega=0.2;
-	exprtk::expression<double> distance_to_target;
-	exprtk::expression<double> x;
-	exprtk::expression<double> y;
-	exprtk::expression<double> theta;
-	exprtk::expression<double> charge_;
+	//exprtk::expression<double> distance_to_target;
+	//exprtk::expression<double> x;
+	//exprtk::expression<double> y;
+	//exprtk::expression<double> theta;
+	//exprtk::expression<double> charge_;
+	
+	
 	
 	
 	
@@ -175,7 +186,6 @@ private:
 	void copy_solution_to_TA_vector(std::vector<double>& solution);
 	void copy_cost_vector_to_C();
 	void control_print();
-	bool initialize(  );
 
 	std::map<task_assignment_namespace::agent_id,std::vector< double >> others_subgradient;
     const Parsed_World* world;
