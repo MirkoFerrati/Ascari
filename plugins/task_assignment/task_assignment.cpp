@@ -7,25 +7,34 @@
 using namespace task_assignment_namespace;
 
 
-task_assignment::task_assignment ( agent* a, Parsed_World* parse )
-:time(a->time),my_id(a->identifier),objects(a->objects),world(parse)
+task_assignment::task_assignment ( agent* ag, Parsed_World* parse )
+:time(ag->time),my_id(ag->identifier),objects(ag->objects),world(parse)
 {    
     x0=reinterpret_cast<task_assignment_parsed_agent*>(world->agents.front().parsed_items_from_plugins[0])->home_x;
     y0=reinterpret_cast<task_assignment_parsed_agent*>(world->agents.front().parsed_items_from_plugins[0])->home_y;
-   // initialize(*parse);
+    a=ag;
 }
 
   
-task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, const objects_container& objects)
-:time(time),my_id(agent.name),x0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_x),
-y0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_y), objects(objects),world(&world)
-{
-    //initialize(world);  
-}
+// task_assignment :: task_assignment(const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, const objects_container& objects)
+// :time(time),my_id(agent.name),x0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_x),
+// y0(reinterpret_cast<task_assignment_parsed_agent*>(agent.parsed_items_from_plugins[0])->home_y), objects(objects),world(&world)
+// {
+//     //initialize(world);  
+// }
 
 
 bool task_assignment::initialize()
-{
+{	
+    x=&(a->state.at(a->map_statename_to_id.at("X")));
+    y=&(a->state.at(a->map_statename_to_id.at("Y")));
+    theta=&(a->state.at(a->map_statename_to_id.at("THETA")));
+    charge_=&(a->state.at(a->map_statename_to_id.at("CHARGE")));
+    speed=&(a->inputs.command.at(a->map_inputs_name_to_id.at("V")));
+    omega_dubins=&(a->inputs.command.at(a->map_inputs_name_to_id.at("W")));
+    set_charge=&(a->inputs.command.at(a->map_inputs_name_to_id.at("C")));
+  
+  
     std::shared_ptr<std::mutex> temp(new std::mutex);
     ptr_receive_mutex.swap(temp);
     
@@ -46,9 +55,6 @@ bool task_assignment::initialize()
     task_assigned=false;
     task_started=false;
     stop=false;
-    speed=0;
-    omega=0;
-    omega_dubins=0;
     
     converge=false;
     fresh_data=true;
@@ -99,7 +105,7 @@ bool task_assignment::initialize()
     
     alpha=-1;
     
-    if(recharge_is_present()) set_charge=-0.05;
+    if(recharge_is_present()) *set_charge=-0.05;
     else set_charge=0;
     
     lambda_u=0;
@@ -147,8 +153,8 @@ void task_assignment ::createAusiliarVariables()
 { 
     for (unsigned int i=0; i< tasks.size();i++)
     {	
-	    DL.push_back(reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i))->getState())->task_deadline);
-	    remaining_times_to_deadline[tasks_id.at(i)]=0;
+	DL.push_back(reinterpret_cast<const task_assignment_namespace::task*>(tasks.at(tasks_id.at(i))->getState())->task_deadline);
+	remaining_times_to_deadline[tasks_id.at(i)]=0;
     }
 }
 
@@ -296,28 +302,27 @@ void task_assignment::compute_speeds(double x_t,double y_t)
 {
 	 lambda_u=0; //per la max_dist
 	 
-	 omega=-1*sin(theta.value()-atan2(y_t-y.value(),x_t-x.value())) + lambda_u;
+	 omega=-1.0*sin(*theta-atan2(y_t-*y,x_t-*x)) + lambda_u;
 	 	 
 	 if((my_task!="TASK_ASSIGNMENT_FAILED") && (my_task!=""))
 	 {
-	      speed=((distance_to_target()>2)?0.2:(distance_to_target()/10));
+	      *speed=((distance_to_target()>2.0)?0.2:(distance_to_target()/10.0));
 	 }
 	 else
 	 {
-	      speed=((norm2(x.value(),y.value(),x0,y0)>2)?0.2:(norm2(x.value(),y.value(),x0,y0)/10));
+	      *speed=((norm2(*x,*y,x0,y0)>2.0)?0.2:(norm2(*x,*y,x0,y0)/10.0));
 	 }
-	 	 
-// 	 if(distance_to_target()>0.1) avoid_collision();
-	 
+	 	 	 
 	 avoid_collision(omega_tilde);
 	 
 	 beta_p=-0.1;
 	 
 	 lambda_u += beta_p* (omega-omega_tilde);
 	 	 
-	 if(fabs(omega)>max_omega) omega_dubins=copysign(max_omega,omega);
-	 else omega_dubins=omega;
+	 if(fabs(omega)>max_omega) *omega_dubins=copysign(max_omega,omega);
+	 else *omega_dubins=omega;
 }
+
 
 void task_assignment::avoid_collision(double& a)
 {
@@ -327,9 +332,9 @@ void task_assignment::avoid_collision(double& a)
 	{
 	      if(agents_id.at(i)!=my_id)
 	      {
-		      double d=norm2(x.value(),y.value(),positions.at(agents_id.at(i)).at(0),positions.at(agents_id.at(i)).at(1));
+		      double d=norm2(*x,*y,positions.at(agents_id.at(i)).at(0),positions.at(agents_id.at(i)).at(1));
 		      min_d=std::min(d,min_d);
-		      if(d > 0) a += ((2)/(d))*sin(theta.value()-atan2(positions.at(agents_id.at(i)).at(1)-y.value(),positions.at(agents_id.at(i)).at(0)-x.value()));
+		      if(d > 0.0) a += ((2.0)/(d))*sin(*theta-atan2(positions.at(agents_id.at(i)).at(1)-*y,positions.at(agents_id.at(i)).at(0)-*x));
 	      }
 	}
 	
@@ -430,15 +435,15 @@ void task_assignment ::run_plugin()
 		}
 
 
-		if(recharge_is_present()) std::cout<<"CARICA: "<<charge_.value()<<'%'<<std::endl;
+		if(recharge_is_present()) std::cout<<"CARICA: "<<charge_<<'%'<<std::endl;
 
-		if(recharge_is_present() && charge_.value() <= 0)
+		if(recharge_is_present() && charge_ <= 0)
 		{
 		    std::cout<<"BATTERIA SCARICA... SHUTDOWN..."<<std::endl;
 		    set_charge=0;
-		    speed=0;
+		    *speed=0;
 		    omega=0;
-		    omega_dubins=0;
+		    *omega_dubins=0;
 		    stop=true;
 		}
 		      
@@ -471,13 +476,13 @@ void task_assignment ::run_plugin()
 					  
 					  if(my_task=="RECHARGE")
 					  {
-					      if(charge_.value()>=100)set_charge=0;
-					      else if(charge_.value()>=97)set_charge=0.1;
-						  else set_charge=2;
+					      if(*charge_>=100)*set_charge=0;
+					      else if(*charge_>=97)*set_charge=0.1;
+						  else *set_charge=2;
 					  }
-					  else if (recharge_is_present()) set_charge=-0.1;
+					  else if (recharge_is_present()) *set_charge=-0.1;
 				      }
-				      else if (recharge_is_present()) set_charge=-0.05;
+				      else if (recharge_is_present()) *set_charge=-0.05;
 				      
 				      if(task_made())
 				      {
@@ -523,7 +528,7 @@ void task_assignment ::run_plugin()
 				  
 				  if(recharge_is_present() && my_task!="RECHARGE")
 				  {
-					  if(!busy_robots.at(my_id) && reinterpret_cast<const task_assignment_namespace::task*>(tasks.at("RECHARGE")->getState())->available && charge_.value() <= 30)
+					  if(!busy_robots.at(my_id) && reinterpret_cast<const task_assignment_namespace::task*>(tasks.at("RECHARGE")->getState())->available && *charge_ <= 30)
 					  {
 					      agent_task_cost_vector->at("RECHARGE")=-INF; //così da farlo per forza
 					      copy_cost_vector_to_C();
@@ -555,7 +560,7 @@ void task_assignment ::run_plugin()
 					  
 					  if((my_task=="TASK_ASSIGNMENT_FAILED") || (my_task==""))
 					  {
-					      if (recharge_is_present()) set_charge=-0.05;
+					      if (recharge_is_present()) *set_charge=-0.05;
 					      std::cout<<"NO TASK HAS BEEN ASSIGNED TO ME"<<std::endl;
 					      task_assigned=false;
 					      my_task_x=x0;
@@ -588,14 +593,15 @@ void task_assignment ::run_plugin()
 		else
 		{
 			receive_from_others();
-			ptr_subgradient_packet.get()->x=x.value();
-			ptr_subgradient_packet.get()->y=y.value();
-			ptr_subgradient_packet.get()->theta=theta.value();
+			ptr_subgradient_packet.get()->x=*x;
+			ptr_subgradient_packet.get()->y=*y;
+			ptr_subgradient_packet.get()->theta=*theta;
 			ta_communicator->send();
-			//std::cout<<"MANDO x:"<<x.value()<<" y:"<<y.value()<<std::endl;
+			//std::cout<<"MANDO x:"<<x<<" y:"<<y<<std::endl;
 		}
 		
 		compute_speeds(my_task_x,my_task_y);
+
 		//std::cout<<"speed= "<<speed<<" omega= "<<omega<<" omega_dubins "<<omega_dubins<<" set_charge= "<<set_charge<<std::endl;
 	}      
 }
