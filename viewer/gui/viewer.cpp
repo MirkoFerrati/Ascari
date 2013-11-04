@@ -33,7 +33,7 @@ Viewer::Viewer ( const world_sim_packet& read, std::shared_ptr<std::mutex>& read
     QGraphicsView ( parent ),infos ( read ), mutex ( read_mutex )
 {
     simulation_time=0;
-    agentshape=QPolygon(QVector<QPoint>( { QPoint ( 20, -20 ),QPoint ( -20, -20 ),QPoint ( 0, 20 )}));
+    agentshape=QPolygon(QVector<QPoint>( { QPoint ( -10, 10 ),QPoint ( -10, -10 ),QPoint ( 30, 0 )}));
 
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 
@@ -41,9 +41,31 @@ Viewer::Viewer ( const world_sim_packet& read, std::shared_ptr<std::mutex>& read
     Scene = new QGraphicsScene(this);
     setScene(Scene);
     scale(1,-1);
-    //Populate the scene
-    for(int x = 0; x < 1000; x = x + 25) {
-        for(int y = 0; y < 1000; y = y + 25) {
+    
+    /*
+     * Use the following set of instruction to see the coordinate system of viewer.
+     */
+    /*for (double theta=0;theta<M_PI;theta=theta+0.4)
+    {
+        auto line=Scene->addLine(0,0,50,0);
+        line->setRotation(theta*180.0/M_PI);
+        auto item=Scene->addText(QString("").setNum(theta));
+        item->setPos(80*cos(theta)-10,80*sin(theta)+10);
+        item->scale(1,-1);
+    }
+    
+    //fake agent with theta=0.4
+    QGraphicsPolygonItem *agent=Scene->addPolygon(agentshape);
+    QBrush b;
+    b.setColor(QColor("red"));
+    b.setStyle( Qt::SolidPattern);
+    agent->setBrush(b); 
+    double tmp=0.4;
+    agent->setPos(0,0);
+    agent->setRotation(tmp*180.0/M_PI);
+    
+    for(int x = 0; x < 1000; x = x + 250) {
+        for(int y = 0; y < 1000; y = y + 250) {
 
             if(x % 100 == 0 && y % 100 == 0) {
                 Scene->addRect(x, y, 2, 2);
@@ -59,7 +81,7 @@ Viewer::Viewer ( const world_sim_packet& read, std::shared_ptr<std::mutex>& read
             }
         }
     }
-
+    /**/
     clock=Scene->addText("");
     clock->scale(1,-1);
     clock->setFlag(QGraphicsItem::ItemIsMovable,true);
@@ -67,7 +89,7 @@ Viewer::Viewer ( const world_sim_packet& read, std::shared_ptr<std::mutex>& read
 
 
     //Set-up the view
-//    setSceneRect(-500, -500, 1000, 1000);
+//    setSceneRect(-500, -500, 1000, 1000); if this instruction is not called, the sceneRect will include 
 
     //Use ScrollHand Drag Mode to enable Panning
     setDragMode(ScrollHandDrag);

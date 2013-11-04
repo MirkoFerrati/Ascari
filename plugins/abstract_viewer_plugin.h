@@ -54,7 +54,7 @@ public:
                 while ( tmp>M_PI )
                     tmp=tmp-2*M_PI;
                 it->second.shape->setPos(it->second.x,it->second.y);
-                it->second.shape->setRotation(tmp*180/M_PI-90);
+                it->second.shape->setRotation(tmp*180.0/M_PI);
             }
         };
 	virtual void paintBackground(QGraphicsScene */*painter*/){};
