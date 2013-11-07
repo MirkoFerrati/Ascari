@@ -1,0 +1,93 @@
+#due agenti che si vanno incontro e quando si vedono sterzano
+- WORLD:
+
+  AGENTS:
+  - agent: Agente1
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '0'
+      y: '0'
+      theta: '0'
+    STATE_START: FAST
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+    BEHAVIOR:
+    - &es4 
+      name: esempio4
+      CONTROLLERS:
+      - name: fast
+        v: 3
+        w: 0
+      - name: left
+        v: 3
+        w: 5
+      DISCRETE_STATES:
+      - name: fast
+        controller: fast
+      - name: left
+        controller: left
+      ENCODER:
+      - TOPOLOGY:
+          - topology: [t1]
+            t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+            #t1: 'abs(x-xi)<3'
+        LAMBDA:
+          - lambda: 
+      EVENTS:
+      - events: [e1,e2]
+        e1: t1
+        e2: !t1
+      AUTOMATON:
+      - name: es4
+        FAST:
+          - FAST: [e2]
+            LEFT: [e1]
+        LEFT:
+          - LEFT: [e1]
+            FAST: [e2]
+      
+  - agent: Agente2
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '10'
+      y: '0'
+      theta: '0'
+    STATE_START: FAST
+    DYNAMIC_MAP:
+    - x: '-v*cos(-theta)'
+      y: '-v*sin(-theta)'
+      theta: 'w'
+    BEHAVIOR:
+    - *es4 
+    
+  - agent: Agente3
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '10'
+      y: '4'
+      theta: '0'
+    STATE_START: FAST
+    DYNAMIC_MAP:
+    - x: '-v*cos(-theta)'
+      y: '-v*sin(-theta)'
+      theta: 'w'
+    BEHAVIOR:
+    - *es4    
+   

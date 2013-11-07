@@ -14,5 +14,5 @@ shared/wykobi/release-notes.txt
 shared/wykobi/wykobi_license.txt
 launcher-build/
 .kdev_ignore
-oldyamls/
+
 *launcher.pro.user.*
