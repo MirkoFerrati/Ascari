@@ -206,9 +206,9 @@ void Viewer::paintEvent ( QPaintEvent *event )
     if(plugins.size()==0)
     {
         paintAgents(Scene,agents);
-        clock->setPlainText(QString("").setNum(simulation_time));
+        
     }
-
+    clock->setPlainText(QString("").setNum(simulation_time));
 for (auto plugin:plugins)
     {
         plugin->paintBackground(Scene);

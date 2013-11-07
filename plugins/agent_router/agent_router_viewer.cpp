@@ -4,6 +4,9 @@
 #include <lemon/lgf_reader.h>
 #include <logog.hpp>
 
+#include "../HACK_KDEVELOP.h"
+#include "agent_router_plugin.h"
+
 using namespace std;
 
 agent_router_viewer::agent_router_viewer()
@@ -20,7 +23,7 @@ agent_router_viewer::agent_router_viewer ( Parsed_World* world )
   length=0;
   coord_x=0;
   coord_y=0;
-  auto temp=reinterpret_cast<agent_router_parsed_world*>(world->parsed_items_from_plugins[0]);
+  auto temp=reinterpret_cast<agent_router_parsed_world*>(world->parsed_items_from_plugins[AGENT_ROUTER_NAME]);
   graphName=boost::to_lower_copy(temp->graphName);
 }
 
@@ -39,43 +42,42 @@ void agent_router_viewer::init(  )
     assert(0);
   }
 	lemon::SmartDigraph::NodeIt n ( graph );
-	double maxx=( *coord_x ) [n],maxy=( *coord_y ) [n],minx=( *coord_x ) [n],miny=( *coord_y ) [n];
-    for ( lemon::SmartDigraph::NodeIt n ( graph ); n!=lemon::INVALID; ++n )
-    {
-        if ( maxx< ( *coord_x ) [n] ) maxx= ( *coord_x ) [n];
-        if ( maxy< ( *coord_y ) [n] ) maxy= ( *coord_y ) [n];
-        if ( minx> ( *coord_x ) [n] ) minx= ( *coord_x ) [n];
-        if ( miny> ( *coord_y ) [n] ) miny= ( *coord_y ) [n];
-    }
-    temp_father->setScalingAndTranslateFactor(maxx,minx,maxy,miny);
+// 	double maxx=( *coord_x ) [n],maxy=( *coord_y ) [n],minx=( *coord_x ) [n],miny=( *coord_y ) [n];
+//     for ( lemon::SmartDigraph::NodeIt n ( graph ); n!=lemon::INVALID; ++n )
+//     {
+//         if ( maxx< ( *coord_x ) [n] ) maxx= ( *coord_x ) [n];
+//         if ( maxy< ( *coord_y ) [n] ) maxy= ( *coord_y ) [n];
+//         if ( minx> ( *coord_x ) [n] ) minx= ( *coord_x ) [n];
+//         if ( miny> ( *coord_y ) [n] ) miny= ( *coord_y ) [n];
+//     }
+//     temp_father->setScalingAndTranslateFactor(maxx,minx,maxy,miny);
 }
 
-void agent_router_viewer::paintBackground ( QPainter& painter )
+void agent_router_viewer::paintBackground(QGraphicsScene* scene)
 {
   assert(father);
-        painter.save();
-        painter.setBrush ( QColor ( "lightgreen" ) );
-
+  if (!paintedBackground)
+  {
+      paintedBackground=true;
+        QPen temp;
+        QBrush brush;
+        brush.setColor ( QColor ( "lightgreen" ) );
+        
         for ( lemon::SmartDigraph::NodeIt n ( graph ); n!=lemon::INVALID; ++n )
         {
-            painter.save();
-            painter.translate ( ( *coord_x ) [n], ( *coord_y ) [n] );
-			
-			painter.scale(4,4);
-            painter.drawEllipse ( QPoint ( 0,0 ),1,1 );
-			painter.scale(1/8.0,1/8.0);
-            painter.scale ( painter.fontMetrics().height() /10.0,-painter.fontMetrics().height() /10.0 );
-            painter.drawText ( -1,-1,QString ( "" ).setNum ( graph.id ( n ) ) );
-            painter.restore();
+            scene->addEllipse(( *coord_x ) [n], ( *coord_y ) [n],4,4,temp,brush);
+         
+            auto item=scene->addText (QString ( "" ).setNum ( graph.id ( n ) ) );
+            item->setPos(( *coord_x ) [n], ( *coord_y ) [n]);
+            item->scale(1,-1);
         }
 
-        painter.setBrush ( QColor ( "black" ) );
+        temp.setBrush(QColor("black"));
         for ( lemon::SmartDigraph::ArcIt a ( graph ); a!=lemon::INVALID; ++a )
         {
-            painter.drawLine ( ( *coord_x ) [graph.source ( a )], ( *coord_y ) [graph.source ( a )], ( *coord_x ) [graph.target ( a )], ( *coord_y ) [graph.target ( a )] );
+            scene->addLine(( *coord_x ) [graph.source ( a )], ( *coord_y ) [graph.source ( a )], ( *coord_x ) [graph.target ( a )], ( *coord_y ) [graph.target ( a )],temp );
         }
-
-        painter.restore();
+  }
 }
 
 

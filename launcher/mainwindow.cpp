@@ -382,7 +382,7 @@ void MainWindow::startAgents()
         agent=new QProcess ( this );
         QFile file ( fileName );
         QDir d = QFileInfo ( file ).absoluteDir();
-        agent->setWorkingDirectory ( d.absolutePath() );
+        //agent->setWorkingDirectory ( d.absolutePath() );
         agent->setProcessChannelMode ( QProcess::MergedChannels );
         agent->start ( agentPath,arguments );
         agents[agentcontainer.at ( i )->text().toStdString()]=  agent ;

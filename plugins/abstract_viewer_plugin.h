@@ -24,6 +24,7 @@ public:
 	
 	abstract_viewer_plugin()
 	{
+            agentshape=QPolygon(QVector<QPoint>( { QPoint ( -10, 10 ),QPoint ( -10, -10 ),QPoint ( 30, 0 )}));
             
 	}
 	void setfather ( void* father )
@@ -34,6 +35,8 @@ public:
 	
 	virtual void paintAgents(QGraphicsScene* Scene, std::map<std::string,Agent>& agents)
 	{
+            if (agents.empty())
+                WARN("%s","No agents to paint\n");
             for ( std::map<std::string,Agent>::iterator it=agents.begin(); it!=agents.end(); ++it )
             {
                 if (!it->second.created)

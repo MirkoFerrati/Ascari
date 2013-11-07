@@ -43,12 +43,12 @@ public:
     agent_router( agent* a, Parsed_World* parse );
     void setGraph ( lemon::SmartDigraph& g );
     void run_plugin();
+    virtual bool initialize();
     void setSource ( lemon::SmartDigraph::Node s );
     void setTarget ( lemon::SmartDigraph::Node t );
     ~agent_router();
 
 private:
-  bool initialize( std::string graphName );
     bool findPath ( lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< bool >& useArc );
 	bool isEmergency(const std::vector<int>& nodes);
     bool setNextTarget();
@@ -71,13 +71,14 @@ private:
 	void print_state( state s );
     simulation_time getNextTime();
     double distance_to_target();
+    bool isNearNode();
 private:
     state internal_state;
     bool next_target_reachable;
     int negotiation_steps;
     double xtarget, ytarget;
-    double &speed, &omega;   //usato dal plugin per controllare il robot
-    double &x,&y,&theta;
+    double *speed, *omega;   //usato dal plugin per controllare il robot
+    double *x,*y,*theta;
     /**Informazioni del grafo*/
         lemon::SmartDigraph graph; //grafo completo
 
@@ -110,6 +111,10 @@ private:
     std::string priority;
     bool started;
     bool initialized;
+    agent* a;
+    std::string graphName;
+    double node_radius;
+    simulation_time last_time_negotiated;
 };
 
 #endif
