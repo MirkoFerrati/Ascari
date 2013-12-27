@@ -1,10 +1,10 @@
 #ifndef AGENT_ROUTER_H
 #define AGENT_ROUTER_H
 
-#include "../plugins/abstract_agent_plugin.h"
+#include "abstract_agent_plugin.h"
 
-#include "../plugins/HACK_KDEVELOP.h"
-#ifdef ISAGENT
+#include "HACK_KDEVELOP.h"
+// #ifdef ISAGENT
 
 #include <lemon/smart_graph.h>
 #include <lemon/path.h>
@@ -117,6 +117,6 @@ private:
     simulation_time last_time_negotiated;
 };
 
-#endif
+// #endif
 #endif // AGENT_ROUTER_H
 

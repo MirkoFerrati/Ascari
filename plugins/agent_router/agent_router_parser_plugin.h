@@ -4,6 +4,7 @@
 #include <objects/router_graph_good.h>
 #include "../abstract_parser_plugin.h"
 
+#define AGENT_ROUTER_NAME "AGENT_ROUTER"
 
 class agent_router_parser_plugin : public abstract_parser_plugin
 {

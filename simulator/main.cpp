@@ -8,8 +8,7 @@
 #include "simulator.h"
 #include "time.h"
 #include <communication/global.h>
-#include "../plugins/addplugins.h"
-
+#include "../plugins/add_simulator_plugins.h"
 
 
 using namespace std;
@@ -89,7 +88,7 @@ int main ( int argc, char **argv )
         }
         
         
-        auto plugins=createPlugins();
+        auto plugins=createSimulatorPlugins();
 
         yaml_parser parser;
 	for ( auto plugin:plugins )

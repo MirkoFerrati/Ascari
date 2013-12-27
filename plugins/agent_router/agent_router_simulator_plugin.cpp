@@ -1,6 +1,6 @@
 #include "agent_router_simulator_plugin.h"
-#include <../gml2lgf/graph.h>
-#include "../simulator/simulator.h"
+// #include <../gml2lgf/graph.h>
+#include <simulator.h>
 
 void agent_router_simulator_plugin::stop()
 {

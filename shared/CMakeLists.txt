@@ -4,7 +4,7 @@ else()
 add_definitions(-DAGENT=1)
 remove_definitions(-DAGENT_LIGHT)
 add_subdirectory(logog)
-endif(AGENT_LIGHT)
+endif(AGENT_LIGHT_FLAG)
 
 
 

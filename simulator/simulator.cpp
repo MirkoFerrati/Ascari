@@ -3,15 +3,15 @@
 
 #include "logog.hpp"
 #include "debug_constants.h"
-#include <objects/task_assignment_task.h>
+// #include <objects/task_assignment_task.h>
 #include <zmq_agent_communicator.h>
 #include <zmq_viewer_communicator.hpp>
 #include <condition_variable>
 #include "collisionchecker.h"
 #include "visibility/visibility.h"
 #include <map2d.h>
-#include "../plugins/agent_router/agent_router_simulator_plugin.h"
-#include "../plugins/task_assignment/task_assignment_simulator.h"
+// #include "../plugins/agent_router/agent_router_simulator_plugin.h"
+// #include "../plugins/task_assignment/task_assignment_simulator.h"
 #include <time.h>
 #include <utility>
 #include "streams_utils.h"
@@ -23,7 +23,7 @@ void simulator::create_communicator ( communicator_types communicator_type,const
 {
     if ( communicator_type==communicator_types::SIMULATED_UDP )
     {
-        communicator=new udp_agent_communicator ( num_agents );
+         communicator=std::make_shared<udp_agent_communicator> ( num_agents );
     }
     else if ( communicator_type==communicator_types::SIMULATED_TCP )
     {
@@ -33,7 +33,7 @@ void simulator::create_communicator ( communicator_types communicator_type,const
             clients.push_back ( it->first );
             std::cout<<it->first<<std::endl;
         }
-        communicator=new zmq_agent_communicator ( num_agents,clients );
+         communicator=std::make_shared<zmq_agent_communicator> ( num_agents,clients );
     }
     else if (communicator_type == communicator_types::REAL_TCP)
     {
@@ -46,15 +46,22 @@ for ( auto ag:world.agents )
                 std::cout<<ag.name<<std::endl;
             }
         }
-        communicator=new zmq_agent_communicator ( clients.size(),clients );
+        communicator=std::make_shared<zmq_agent_communicator> ( clients.size(),clients );
+        //communicator=std::make_shared<simulator_namespace::agent_communicator_abstract>(new zmq_agent_communicator ( clients.size(),clients )); //GCC BUG TRIGGER
     }
 }
+
+void simulator::set_communicator(shared_ptr< simulator_namespace::agent_communicator_abstract > communicator)
+{
+    this->communicator=communicator;
+}
+
 
 simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.time,sim_packet.object_list )
 {
     viewer_communicator=new zmq_viewer_communicator();
     max_loops=0;
-    communicator=0;
+//     communicator=0;
     num_agents=0;
     world_map=0;
     f_rndom=0;
@@ -445,7 +452,7 @@ simulator::~simulator()
     if ( communicator )
         communicator->send_broadcast ( agent_packet );
 
-    delete communicator;
+//     delete communicator;
 
     for ( unsigned int i=0; i<dynamic_modules.size(); i++ )
         delete dynamic_modules[i];

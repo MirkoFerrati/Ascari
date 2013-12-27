@@ -16,7 +16,7 @@
 #include <condition_variable>
 #include <thread>
 #include "visibility/visibility.h"
-#include "map2d.h"
+// #include "map2d.h"
 
 #include "../plugins/abstract_simulator_plugin.h"
 
@@ -25,7 +25,8 @@ enum class communicator_types
 {
   SIMULATED_UDP,
   SIMULATED_TCP,
-  REAL_TCP
+  REAL_TCP,
+  MEMORY
 };
 
 class simulator
@@ -35,7 +36,8 @@ public:
 	~simulator();
 	void start_sim(int max_loops=10000);
 	void create_communicator(communicator_types communicator_type, const Parsed_World& world);
-	void initialize_agents( const std::list< Parsed_Agent >& ag );
+        void set_communicator(std::shared_ptr< simulator_namespace::agent_communicator_abstract > communicator );
+        void initialize_agents( const std::list< Parsed_Agent >& ag );
 	void initialize (Parsed_World const&);
 	void update_bonus_variables();
 	void setPeriod(unsigned cycle_period_millisec);
@@ -51,7 +53,8 @@ private:
 	bool checkCollision;
 	CollisionCheckerAbstract *collisionChecker;
 	std::vector<dynamic_module_abstract*> dynamic_modules;
-	simulator_namespace::agent_communicator_abstract* communicator;
+        std::shared_ptr< simulator_namespace::agent_communicator_abstract > communicator;
+        //simulator_namespace::agent_communicator_abstract* communicator;
 	simulator_namespace::viewer_communicator_abstract* viewer_communicator;
 	zmq_localization_communicator_receiver localization_receiver;
 	agent_sim_packet agent_packet;

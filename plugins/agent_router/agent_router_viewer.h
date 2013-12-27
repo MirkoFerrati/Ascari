@@ -1,13 +1,14 @@
 #ifndef AGENT_ROUTER_VIEWER_H
 #define AGENT_ROUTER_VIEWER_H
 
-#include "../HACK_KDEVELOP.h"
+// #include "../HACK_KDEVELOP.h"
 #include "../abstract_viewer_plugin.h"
 
-#ifdef ISVIEWER
+//#ifdef ISVIEWER
 #include <lemon/smart_graph.h>
 #include <map>
 #include <yaml_parser.h>
+#include <abstract_viewer_plugin.h>
 
 
 
@@ -29,5 +30,5 @@ private:
     bool paintedBackground;
 };
 
-#endif
+// #endif
 #endif // AGENT_ROUTER_VIEWER_H

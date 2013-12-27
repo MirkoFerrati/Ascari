@@ -1,5 +1,6 @@
 //HACK: this is usefull for developing with kdevelop, and is completely ignored by gcc
 
+/*
 #if !defined(ISAGENT) && !defined(ISSIMULATOR) 
 #define ISVIEWER_KDEVELOP 1 
 #endif 
@@ -19,3 +20,4 @@
 #define ISSIMULATOR 1 
 #endif 
 
+*/

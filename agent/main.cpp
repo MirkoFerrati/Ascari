@@ -6,7 +6,7 @@
 #include "agent.h"
 #include "logog.hpp"
 #include "../shared/communication/global.h"
-#include "../plugins/addplugins.h"
+#include "../plugins/add_agent_plugins.h"
 #include "../shared/communication/global.h"
 #include <define.h>
 
@@ -102,13 +102,12 @@ int main ( int argc, char** argv )
            CONFIG.getMap().put(config_value.first,config_value.second.as<std::string>());
        }
        
-        auto plugins=createPlugins();
+        auto plugins=createAgentPlugins();
 
         yaml_parser parser;
 	for ( auto plugin:plugins )
 	{
-	    plugin->createParserPlugin();
-            parser.addPlugin ( plugin->getParserPlugin() );
+            parser.addPlugin ( plugin->getParserPlugin());
 	}
         world = parser.parse_file ( filename );
         int myAgent = -1;
@@ -122,19 +121,21 @@ int main ( int argc, char** argv )
             throw "agent name not found in configuration file, please check for agent names";
         }
 
-	    for ( auto it=world.agents.begin();it!=world.agents.end(); )
+        for ( auto it=world.agents.begin();it!=world.agents.end(); )
+        {
             if ( it->name.compare ( agent_name )!=0)
-	    {
-	      it=world.agents.erase(it);
-	    }
-	    else
-	      it++;
-
+            {
+                it=world.agents.erase(it);
+            }
+            else
+                it++;
+        }
+        
         s_catch_signals();
         agent a1 ( world );
 	for ( auto plugin:plugins )
         {
-            if ( plugin->getParserPlugin()->isEnabled() )
+            if ( plugin->isEnabled() )
             {
                 if ( !plugin->createAgentPlugin ( &a1 ,&world) )
 		{ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() );}
