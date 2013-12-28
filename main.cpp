@@ -144,8 +144,9 @@ int main ( int argc, char **argv )
          * Killare tutto e ripartire...come?
          */
         Parsed_World world;
+        s.setPeriod(50);
+        
         createSimulator(s,world,filename); //Costruire i plugin di simulator (come nel main di simulator)
-        s.setPeriod(0);
         createAgents(agents,world,filename);//Costruire i plugin di agent (come nel main di agent)
         
         std::shared_ptr<memory_full_communicator> communicator=std::make_shared<memory_full_communicator>(agents.size());

@@ -33,7 +33,11 @@ identifier( a->identifier ),communicator ( _mutex, &info, _io_service,identifier
 {
     this->a=a;
     this->node_radius=atof(CONFIG.getValue("NODE_RADIUS").c_str());
-    targets=(reinterpret_cast<agent_router_parsed_agent*>(parse->agents.front().parsed_items_from_plugins.at(AGENT_ROUTER_NAME)))->target_list; //funziona perche' rimane un solo agente nel mondo(gli altri vengono eliminati dal main)
+    for (list<Parsed_Agent>::const_iterator iter=parse->agents.begin();iter!=parse->agents.end();++iter)
+    {
+        if (iter->name==a->identifier)
+        targets=(reinterpret_cast<agent_router_parsed_agent*>(iter->parsed_items_from_plugins.at(AGENT_ROUTER_NAME)))->target_list;    
+    }
     this->graphName=(reinterpret_cast<agent_router_parsed_world*>(parse->parsed_items_from_plugins.at(AGENT_ROUTER_NAME)))->graphName;
 
 }
@@ -85,7 +89,8 @@ void agent_router::run_plugin()
   if (!initialized)
     return;
     priority=identifier;
-
+    if (identifier=="AGENTE2" || identifier=="AGENTE1")
+        int do_nothing_important=0;
     if ( internal_state==state::STOPPED )
     {
         prepare_stopped_packet();
@@ -517,7 +522,7 @@ void agent_router::setSpeed()
     double length = distance_to_target();
     *speed=length/delta;
     *omega=5*sin(atan2(ytarget-*y,xtarget-*x)-*theta);
-//     std::cout<<"speed="<<*speed<<",length="<<length<<"delta="<<delta<<std::endl;
+     std::cout<<identifier<<" speed="<<*speed<<",length="<<length<<"delta="<<delta<<std::endl;
 }
 
 simulation_time agent_router::getNextTime()

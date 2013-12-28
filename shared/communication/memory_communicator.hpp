@@ -117,6 +117,7 @@ public:
             send_data.state_agents.internal_map[state.first]=state.second;
         {
         std::unique_lock<std::mutex> lck(receive_data_mutex);
+//         std::cout<<"receive_data.clear()"<<std::endl;
         receive_data.clear();
         }
         sentToThreads(); //Threads can unlock and read from now on
@@ -126,6 +127,7 @@ public:
         {
         std::unique_lock<std::mutex> lck(receive_data_mutex);
         receive_data.push_back(command); //Nobody should be reading this now
+//         std::cout<<"receive_data.size="<<receive_data.size()<<command.identifier<<std::endl;
         }
         receivedAndElaborated(); //Simulator can unlock and read from now on
     }
