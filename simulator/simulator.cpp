@@ -23,7 +23,7 @@ void simulator::create_communicator ( communicator_types communicator_type,const
 {
     if ( communicator_type==communicator_types::SIMULATED_UDP )
     {
-         communicator=std::make_shared<udp_agent_communicator> ( num_agents );
+        communicator=std::make_shared<udp_agent_communicator> ( num_agents );
     }
     else if ( communicator_type==communicator_types::SIMULATED_TCP )
     {
@@ -33,7 +33,7 @@ void simulator::create_communicator ( communicator_types communicator_type,const
             clients.push_back ( it->first );
             std::cout<<it->first<<std::endl;
         }
-         communicator=std::make_shared<zmq_agent_communicator> ( num_agents,clients );
+        communicator=std::make_shared<zmq_agent_communicator> ( num_agents,clients );
     }
     else if (communicator_type == communicator_types::REAL_TCP)
     {
@@ -71,7 +71,7 @@ simulator::simulator() :agent_packet ( sim_packet.bonus_variables,sim_packet.tim
     timeSimulated=true;
     T_integration=0.01;
     if (CONFIG.exists("T_INTEGRATION"))
-      T_integration=atof(CONFIG.getValue("T_INTEGRATION").c_str());
+        T_integration=atof(CONFIG.getValue("T_INTEGRATION").c_str());
 
 }
 void simulator::addPlugin ( abstract_simulator_plugin* plugin )
@@ -109,6 +109,7 @@ for ( auto & plugin:plugins )
 void simulator::initialize ( const Parsed_World& wo )
 {
 
+    simulated_sensors=CONFIG.exists("SIMULATED_SENSORS") && atoi(CONFIG.getValue("SIMULATED_SENSORS").c_str());
     if ( wo.mapfilename!="UNSET" && wo.mapfilename!="" )
     {
         this->world_map=new map2d ( wo.mapfilename );
@@ -184,7 +185,9 @@ void simulator::initialize_agents ( const list<Parsed_Agent>& agents )
         agent_packet.identifier=ag.name;
         command_packet.identifier=ag.name;
 
-
+        this->agent_packet.state_agents.internal_map.insert(std::make_pair(ag.name,std::ref(agent_packet)));//Inizialize with all the agent states, we may need this later
+        
+        
         //We will not use a simulated time if there are any real agents in the environment
         if (!ag.simulated)
         {
@@ -270,78 +273,78 @@ void simulator::input_loop ( mutex& input_mutex,condition_variable& input_cond,v
 
 termios simulator::initializeKeyboardInput()
 {
-        termios before, after;
-        tcgetattr ( STDIN_FILENO, &before ); // fill 'before' with current termios values
-        after = before;                     // make a copy to be modified
-        after.c_lflag &= ( ~ICANON );       // Disable canonical mode, including line buffering
-        after.c_lflag &= ( ~ECHO );         // Don't echo characters on the screen (optional)
-        tcsetattr ( STDIN_FILENO, TCSANOW, &after ); // Set the modified flags
-	return before;
+    termios before, after;
+    tcgetattr ( STDIN_FILENO, &before ); // fill 'before' with current termios values
+    after = before;                     // make a copy to be modified
+    after.c_lflag &= ( ~ICANON );       // Disable canonical mode, including line buffering
+    after.c_lflag &= ( ~ECHO );         // Don't echo characters on the screen (optional)
+    tcsetattr ( STDIN_FILENO, TCSANOW, &after ); // Set the modified flags
+    return before;
 }
 
 void simulator::printTime(int clock)
 {
-            
-            if ( ( clock%10 ) !=0 )
-            {
-                cout<<".";
-                flush ( cout );
-            }
-            else
-                cout<<endl<<sim_packet.time;  
+
+    if ( ( clock%10 ) !=0 )
+    {
+        cout<<".";
+        flush ( cout );
+    }
+    else
+        cout<<endl<<sim_packet.time;
 }
 
 
 bool simulator::isVisible(map< string, agent_state_packet >::iterator agent, map< string, agent_state_packet >::iterator other)
 {
-  return (agent->first==other->first ||
-                            !agents_visibility.count ( agents_name_to_index.at ( agent->first ) ) ||
-                            !agents_visibility.count ( agents_name_to_index.at ( other->first ) ) ||
-                            (
-                                agents_visibility.at ( agents_name_to_index.at ( agent->first ) )->isVisible ( agent->second.state,other->second.state )
-                                && ( !world_map || world_map->isVisible ( agent->second.state,other->second.state ) )
-                            ));
+    return (agent->first==other->first ||
+            !agents_visibility.count ( agents_name_to_index.at ( agent->first ) ) ||
+            !agents_visibility.count ( agents_name_to_index.at ( other->first ) ) ||
+            (
+                agents_visibility.at ( agents_name_to_index.at ( agent->first ) )->isVisible ( agent->second.state,other->second.state )
+                && ( !world_map || world_map->isVisible ( agent->second.state,other->second.state ) )
+            ));
 }
 
 void simulator::main_loop()
 {
     try
     {
-	termios before=initializeKeyboardInput();
-	
-	// Start input thread
+       // termios before=initializeKeyboardInput();
+
+        // Start input thread
         std::mutex input_mutex;
         std::condition_variable input_cond;
         volatile bool input_exit=false;
         volatile bool paused=false;
-        std::thread input_thread ( &simulator::input_loop,this,std::ref ( input_mutex ),std::ref ( input_cond ),std::ref ( paused ),std::ref ( input_exit ),std::ref ( cycle_period_millisec ) );
-	
-	//Setup timing variables
-	simulation_time old_time=0;
+//         std::thread input_thread ( &simulator::input_loop,this,std::ref ( input_mutex ),std::ref ( input_cond ),std::ref ( paused ),std::ref ( input_exit ),std::ref ( cycle_period_millisec ) );
+
+        //Setup timing variables
+        simulation_time old_time=0;
         sim_packet.time=0;
         int clock=0;
         struct timespec requestStart, requestEnd, simulationStart;
         clock_gettime ( CLOCK_REALTIME, &simulationStart );
         double total_accum, step_accum;
 
-	//Main infinite Loop
-	while ( !s_interrupted )
+        //Main infinite Loop
+        while ( !s_interrupted )
         {
             clock_gettime ( CLOCK_REALTIME, &requestStart );
 
             //Check for input loop
             {
-                sleep ( 0 );
-                std::unique_lock<std::mutex> lock ( input_mutex );
-                while ( paused )
-                {
-                    input_cond.wait ( lock );
-                }
+//                 sleep ( 0 );
+//                 std::unique_lock<std::mutex> lock ( input_mutex );
+//                 while ( paused )
+//                 {
+//                     input_cond.wait ( lock );
+//                 }
             }
-	    clock++;
+            clock++;
             printTime(clock);
 
-	    //Update simulation time inside sim_packet
+            //Update simulation time inside sim_packet
             if (timeSimulated)
             {
                 sim_packet.time= ( ( simulation_time ) clock ) /10.0;
@@ -349,40 +352,44 @@ void simulator::main_loop()
             else
             {
                 total_accum= ( requestStart.tv_sec - simulationStart.tv_sec )*1000
-                       + ( requestStart.tv_nsec - simulationStart.tv_nsec )/ 1E6;
+                             + ( requestStart.tv_nsec - simulationStart.tv_nsec )/ 1E6;
                 sim_packet.time=total_accum/1000.0;
             }
 
             update_bonus_variables();
 
-            agent_sim_packet temp_buffer(sim_packet.bonus_variables,sim_packet.time,sim_packet.object_list);
-            
-	    //Compute new agent simulated sensors result
-            for ( auto agent=sim_packet.state_agents.internal_map.begin(); agent!=sim_packet.state_agents.internal_map.end(); agent++ )
+            if (simulated_sensors)
             {
-                agent_packet.state_agents.internal_map.clear();
-                for ( auto other=sim_packet.state_agents.internal_map.begin(); other!=sim_packet.state_agents.internal_map.end(); other++ )
+                //Compute new agent simulated sensors result
+                for ( auto agent=sim_packet.state_agents.internal_map.begin(); agent!=sim_packet.state_agents.internal_map.end(); agent++ )
                 {
-                    if (isVisible(agent,other))
+                    agent_packet.state_agents.internal_map.clear();
+                    for ( auto other=sim_packet.state_agents.internal_map.begin(); other!=sim_packet.state_agents.internal_map.end(); other++ )
                     {
-                        agent_packet.state_agents.internal_map.insert(std::make_pair(other->first,std::ref(other->second)));
+                        if (isVisible(agent,other))
+                        {
+                            agent_packet.state_agents.internal_map.insert(std::make_pair(other->first,std::ref(other->second)));
+                        }
                     }
+                    communicator->send_target ( agent_packet,agent->first );
                 }
-                communicator->send_target ( agent_packet,agent->first );
+            } 
+            else
+            {
+                communicator->send_broadcast(agent_packet);
             }
-
             viewer_communicator->send_target ( sim_packet,"viewer" );
 
-	    for ( auto & plugin:plugins )
+            for ( auto & plugin:plugins )
                 plugin->run_plugin();
 
-	    //Compute new agents continuous state
+            //Compute new agents continuous state
             agent_state state_tmp;
-	    //TODO(Mirko): attenzione, si perdono passi di integrazione per colpa del round, uno dovrebbe salvarsi il resto del round e usarlo al passo successivo
-	    //unsigned int integration_times=round(max(step_accum/1000.0,cycle_period_millisec/1000.0)/T_integration); 
-	    unsigned int integration_times=round((sim_packet.time-old_time)/T_integration);
-	    old_time=sim_packet.time;
-	    cout<<"integration_times:"<<integration_times<<endl;
+            //TODO(Mirko): attenzione, si perdono passi di integrazione per colpa del round, uno dovrebbe salvarsi il resto del round e usarlo al passo successivo
+            //unsigned int integration_times=round(max(step_accum/1000.0,cycle_period_millisec/1000.0)/T_integration);
+            unsigned int integration_times=round((sim_packet.time-old_time)/T_integration);
+            old_time=sim_packet.time;
+//             cout<<"integration_times:"<<integration_times<<endl;
             for ( unsigned int i=0; i<integration_times; i++ )
             {
                 for ( index_map::const_iterator iter=agents_name_to_index.begin(); iter!=agents_name_to_index.end(); ++iter )
@@ -398,7 +405,7 @@ void simulator::main_loop()
             //Update objects state
             for ( auto object_list=sim_packet.object_list.objects.begin(); object_list!=sim_packet.object_list.objects.end(); ++object_list )
             {
-	    for ( auto object:object_list->second )
+                for ( auto object:object_list->second )
                 {
                     object->updateState ( sim_packet.time,sim_packet.state_agents,agent_states_to_index );
                 }
@@ -406,13 +413,13 @@ void simulator::main_loop()
 
             collisionChecker->checkCollisions();
 
-	    //Receive and save control commands	    
-	    vector<control_command_packet> temp=communicator->receive_control_commands();
+            //Receive and save control commands
+            vector<control_command_packet> temp=communicator->receive_control_commands();
             for ( unsigned i=0; i< temp.size(); i++ )
             {
                 for ( map<int,double>::iterator it=commands.at ( temp.at ( i ).identifier ).command.begin(); it!=commands.at ( temp.at ( i ).identifier ).command.end(); ++it )
                 {
-                    it->second=temp.at(i).command.at(it->first); 
+                    it->second=temp.at(i).command.at(it->first);
                 }
             }
 
@@ -423,22 +430,22 @@ void simulator::main_loop()
 
 //             Calculate time it took
             step_accum = ( requestEnd.tv_sec - requestStart.tv_sec )*1000
-                    + ( requestEnd.tv_nsec - requestStart.tv_nsec )/ 1E6;
-            if ((cycle_period_millisec-step_accum)*1000-10 >0)
-	    {
-                usleep ( (cycle_period_millisec-step_accum)*1000-10 );
-	    }
-	    else
-	    {
-		WARN("this timestep %f took too much time: %f",sim_packet.time,step_accum);
-	    }
+                         + ( requestEnd.tv_nsec - requestStart.tv_nsec )/ 1E6;
+//             if ((cycle_period_millisec-step_accum)*1000-10 >0)
+//             {
+//                 usleep ( (cycle_period_millisec-step_accum)*1000-10 );
+//             }
+//             else
+//             {
+//                 WARN("this timestep %f took too much time: %f",sim_packet.time,step_accum);
+//             }
         }
 
-	for ( auto & plugin:plugins )
+for ( auto & plugin:plugins )
             plugin->stop();
 
         input_exit=true;
-        tcsetattr ( STDIN_FILENO, TCSANOW, &before );
+        //tcsetattr ( STDIN_FILENO, TCSANOW, &before );
     }
     catch ( const char* e )
     {

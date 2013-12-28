@@ -11,8 +11,8 @@
 
 using namespace std;
 
-agent::agent ( std::string name,const std::unique_ptr<Parsed_Behavior>& behavior, const Parsed_World & world )
-    :identifier ( name ),behavior(behavior),world(world),noStart(false)
+agent::agent ( std::string name,const std::unique_ptr<Parsed_Behavior>& behavior, const Parsed_World & world,bool noStart )
+    :identifier ( name ),behavior(behavior),world(world),noStart(noStart)
 {
     initialized=false;
     agents=0;
@@ -37,7 +37,7 @@ void agent::initialize()
       
 }
 
-void agent::setCommunicator ( std::shared_ptr<agent_namespace::world_communicator_abstract>& communicator )
+void agent::set_communicator ( std::shared_ptr<agent_namespace::world_communicator_abstract>& communicator )
 {
     world_comm=communicator;
 }
@@ -53,8 +53,6 @@ void agent::init ( const std::unique_ptr<Parsed_Behavior> & behavior, bool noSta
 {
     time=0;
     
-    int i=0;
-
     createStateFromParsedAgent ( behavior );
 
 	if ( !noStart ) 

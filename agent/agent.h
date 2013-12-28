@@ -18,7 +18,7 @@
 class agent
 {
 public:
-    agent (std::string name,  const std::unique_ptr< Parsed_Behavior >& behavior, const Parsed_World& world);
+    agent (std::string name,  const std::unique_ptr< Parsed_Behavior >& behavior, const Parsed_World& world,bool noStart = false);
     agent ( const Parsed_World& world, bool noStart = false );
     ~agent();
     void start();
@@ -28,8 +28,8 @@ public:
      * Setta il comunicatore
      */
     agent(const agent&)=delete;
-    void setCommunicator (std::shared_ptr< agent_namespace::world_communicator_abstract >& communicator);
-
+    void set_communicator ( std::shared_ptr<agent_namespace::world_communicator_abstract>& communicator );
+    
     /**
      * Setta l'identificatore
      */

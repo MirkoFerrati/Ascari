@@ -103,7 +103,7 @@ bool Parsed_Agent::load_from_node ( const YAML::Node& node )
     }
     else
     {
-        WARN ( "NO VISIBLE AREA SPECIFIED",NULL );
+//         WARN ( "NO VISIBLE AREA SPECIFIED",NULL );
     }
      if ( node.FindValue ( "SIMULATED" ) )
     {

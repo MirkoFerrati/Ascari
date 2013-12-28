@@ -9,11 +9,13 @@
 #include "agent/agent.h"
 #include <add_simulator_plugins.h>
 #include <add_agent_plugins.h>
+#include "communication/memory_communicator.hpp"
+
 using namespace std;
 
 
 
-void createSimulator(simulator& s, Parsed_World& world, std::string filename)
+void createSimulator(simulator& s,Parsed_World& world ,std::string filename)
 {
     auto plugins=createSimulatorPlugins();
     
@@ -23,8 +25,7 @@ void createSimulator(simulator& s, Parsed_World& world, std::string filename)
         plugin->createParserPlugin();
         parser.addPlugin ( plugin->getParserPlugin() );
     }
-    world = parser.parse_file ( filename );
-    
+    world=parser.parse_file ( filename );
     for ( auto plugin:plugins )
     {
         if ( plugin->isEnabled() )
@@ -43,22 +44,23 @@ void createAgents(std::map<std::string,agent*>& agents,Parsed_World& world,std::
 {
     for ( auto it=world.agents.begin();it!=world.agents.end();it++)
     {          
-        auto plugins=createAgentPlugins();
         
-        yaml_parser parser;
-        for ( auto plugin:plugins )
-        {
-            parser.addPlugin ( plugin->getParserPlugin());
-        }
-        world = parser.parse_file ( filename );
-        
-        agent* temp=new agent( world );
+    auto plugins=createAgentPlugins();
+    
+    yaml_parser parser;
+    for ( auto plugin:plugins )
+    {
+        plugin->createParserPlugin();
+        parser.addPlugin ( plugin->getParserPlugin());
+    }
+    auto world_temp = parser.parse_file ( filename );
+        agent* temp=new agent(it->name,it->behavior, world_temp,true );
         agents[temp->identifier]=temp;
         for ( auto plugin:plugins )
         {
             if ( plugin->isEnabled() )
             {
-                if ( !plugin->createAgentPlugin ( temp ,&world) )
+                if ( !plugin->createAgentPlugin ( temp ,&world_temp) )
                 {ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() );}
                 else
                     temp->addPlugin ( plugin->getAgentPlugin() );
@@ -68,8 +70,8 @@ void createAgents(std::map<std::string,agent*>& agents,Parsed_World& world,std::
         {
             WARN("Attenzione, nessun plugin è stato caricato, l'agente resterà immobile",NULL);
         }
+        temp->initialize();
     }
-    
 }
 
 int main ( int argc, char **argv )
@@ -77,11 +79,13 @@ int main ( int argc, char **argv )
     
     srand ( time ( NULL ) );
     LOGOG_INITIALIZE();
+    std::thread exiting;
+    
+    static_zmq::context=new zmq::context_t ( 1 );
     {
         logog::Cout out;
         simulator s;
         std::map<std::string,agent*> agents;
-        Parsed_World world;
         boost::program_options::options_description desc;
         boost::program_options::variables_map options;
         desc.add_options()("help,h","Get help");
@@ -130,36 +134,50 @@ int main ( int argc, char **argv )
      
      
         /**
-         * Costruire il comunicatore MEMORY
+         * Costruire il comunicatore MEMORY ODNE
          * Costruire i plugin di simulator (come nel main di simulator) DONE
          * Costruire i plugin di agent (come nel main di agent) DONE
-         * Settare i comunicatori di agent e simulator
+         * Settare i comunicatori di agent e simulator DONE
          * Avviare un thread per simulator con un limite di cicli (count)
          * Avviare N threads per agent
          * Sleep(tempomassimo)
          * Killare tutto e ripartire...come?
          */
-        
+        Parsed_World world;
         createSimulator(s,world,filename); //Costruire i plugin di simulator (come nel main di simulator)
-        
+        s.setPeriod(0);
         createAgents(agents,world,filename);//Costruire i plugin di agent (come nel main di agent)
         
+        std::shared_ptr<memory_full_communicator> communicator=std::make_shared<memory_full_communicator>(agents.size());
+        std::shared_ptr<agent_namespace::world_communicator_abstract>agent_communicator=communicator;
         
         //TODO: initialize_communication for the simulator
-        
+        s.set_communicator(communicator);
         s.initialize ( world );
-        
-        s.start_sim ( count );//TODO: start this in a thread
+
         
         //TODO: initialize_communication for the agents
+        for (auto a:agents)
+            a.second->set_communicator(agent_communicator);
+      
+        std::map<std::string,std::thread> threads;
+        
+        
+        std::thread sim(&simulator::start_sim,std::ref(s),count );//TODO: start this in a thread
         
         for (auto a:agents)
-            a.second->initialize();
-        for (auto a:agents)
-            a.second->start();//TODO: start in a thread
+        {
+            threads.insert(std::make_pair(a.first,
+                                          std::thread(&agent::start,std::ref(*a.second))
+                                         ));//TODO: start in a thread
+        }
+        sim.join();
         
+        exiting=std::thread ( []()
+        {
+            delete ( static_zmq::context );
+        } );
         
-     
     }
     LOGOG_SHUTDOWN();
     return 0;

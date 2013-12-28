@@ -26,6 +26,7 @@ public:
     virtual bool createParserPlugin()=0;
     virtual abstract_parser_plugin* getParserPlugin()=0;
     virtual bool isEnabled()=0;
+    virtual ~abstract_simulator_plugin_container(){};
 };
 
 #endif // ABSTRACT_SIMULATOR_PLUGIN_H

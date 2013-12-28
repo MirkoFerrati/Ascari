@@ -44,7 +44,7 @@ public:
     {
         return simulator_plugin;
     };
-    bool createSimulatorPlugin ( simulator* s, Parsed_World* parse )
+    bool createSimulatorPlugin ( simulator* s, Parsed_World*  )
     {
         if ( simulator_plugin!=0 )
         {

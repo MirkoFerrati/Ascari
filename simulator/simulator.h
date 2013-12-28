@@ -82,6 +82,7 @@ private:
 	void printTime(int clock);
 	   termios initializeKeyboardInput();
     double T_integration;
+    bool simulated_sensors;
 };
 
 

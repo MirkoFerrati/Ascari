@@ -212,7 +212,6 @@ void agent_router::run_plugin()
             }
             internal_state=state::LISTENING;
         }
-
     }
 
     if ( isEmergency ( node_id ) )
@@ -251,9 +250,9 @@ void agent_router::run_plugin()
     }
 
     setSpeed();
-    cout<<" stato interno: ";
-    print_state(internal_state);
-    //cout<<endl;
+//     cout<<" stato interno: ";
+//     print_state(internal_state);
+//     cout<<endl;
 }
 
 
@@ -267,7 +266,11 @@ bool agent_router::check_for_overtaking ()
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
         if ( identifier==it->first ) continue;
-        assert ( findAge ( time, it->second.timestamp ) ==0 ); //0==round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH ));
+        if (it->second.lockedNode[0]==-1 ) continue;
+        if (findAge ( time, it->second.timestamp ) != 0)
+        {
+            assert ( findAge ( time, it->second.timestamp ) ==0 ); //0==round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH ));
+        }
 //        assert ( ( *it ).second.lockedNode.size() >1 );
         int age=findAge ( time, it->second.started_moving ); //round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.started_moving * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         for ( unsigned int j = 1; j < ( *it ).second.lockedNode.size(); j++ )
@@ -356,6 +359,7 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it ) //per ogni pacchetto ricevuto
     {
         if ( identifier==it->first ) continue;
+        if (it->second.lockedNode[0]==-1 ) continue;
         if ( priority.compare ( it->second.priority ) <0 ) continue;  //se il pacchetto ha priorita' piu' alta
         int age = findAge ( time, it->second.timestamp ); //round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
         cout<<start<<it->first<<" ";
@@ -513,7 +517,7 @@ void agent_router::setSpeed()
     double length = distance_to_target();
     *speed=length/delta;
     *omega=5*sin(atan2(ytarget-*y,xtarget-*x)-*theta);
-    std::cout<<"speed="<<*speed<<",length="<<length<<"delta="<<delta<<std::endl;
+//     std::cout<<"speed="<<*speed<<",length="<<length<<"delta="<<delta<<std::endl;
 }
 
 simulation_time agent_router::getNextTime()
