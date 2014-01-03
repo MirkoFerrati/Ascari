@@ -12,6 +12,10 @@
 class zmq_localization_communicator_receiver: public zmq_receive_communicator<agent_state_packet_from_webcam,ZMQ_PULL>
 {
   public:
+      ~zmq_localization_communicator_receiver()
+      {
+          stop();
+      }
 void init(std::string owner_name)
 	{
 		this->init_full(owner_name,false,LOCALIZATION_TO_SIMULATOR,1,true);
@@ -22,6 +26,11 @@ void init(std::string owner_name)
 void stop()
 {
   exiting=true;
+  if (receiver_loop)
+      receiver_loop->join();
+  delete receiver_loop;
+  receiver_loop=0;
+  
 }
 agent_state getState(std::string agent_name){
       agent_state temp;
@@ -47,7 +56,7 @@ private:
 	 * mappa webcam-pesi
 	 * 
 	 */
-  void loop(std::mutex& agent_lock,std::map<std::string,agent_state>& agents,bool& exiting)  
+  void loop(std::mutex& agent_lock,std::map<std::string,agent_state>& agents,volatile bool& exiting)  
   {
     while(!exiting)
     {
@@ -112,7 +121,7 @@ private:
       agent_lock.unlock();
     }
   }
-  bool exiting;
+  volatile bool exiting;
   std::thread* receiver_loop;
   std::mutex agent_lock;
   std::map<std::string,std::map<std::string , double>> weights;

@@ -15,6 +15,7 @@
 #include <lemon/random.h>
 #include "../../shared/types/graph_informations.h"
 #include "udp_graph_communicator.h"
+#include "router_memory_communicator.hpp"
 #include "../agent/agent.h"
 #include <thread>
 
@@ -103,11 +104,12 @@ private:
 	
 
     /**Comunicatore*/
-    std::mutex _mutex;  
+//     std::mutex _mutex;  
     std::string identifier;
     graph_packet info;
-    boost::asio::io_service _io_service;
-    Udp_graph_communicator communicator;
+//     boost::asio::io_service _io_service;
+    //Udp_graph_communicator communicator;
+    router_memory_manager communicator;
     std::string priority;
     bool started;
     bool initialized;
@@ -115,6 +117,7 @@ private:
     std::string graphName;
     double node_radius;
     simulation_time last_time_negotiated;
+    bool already_received;
 };
 
 // #endif

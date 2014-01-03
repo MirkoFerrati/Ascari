@@ -59,7 +59,7 @@ public:
             receiver_socket->close();
             delete(receiver_socket.release());
         }
-//       std::cout<<"chiamato distruttore di zmq_communicator"<<std::endl;
+       std::cout<<"chiamato distruttore di zmq_communicator"<<std::endl;
 
     }
 
@@ -285,7 +285,7 @@ public:
 
     ~zmq_send_communicator()
     {
-
+        delete(sender_socket.release());
     }
 
 protected:

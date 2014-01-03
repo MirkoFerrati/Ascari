@@ -168,7 +168,7 @@ bool Graph_creator::parseGraph ( string graphName )
     finalizeFloor ( coords,ncolors,acolors,graph_node_size*floors );
     IdMap<SmartDigraph,SmartDigraph::Node> id ( _3Dgraph );
     Palette p;
-    lemon::graphToEps<lemon::SmartDigraph> ( _3Dgraph,"image.eps" ).
+/*     lemon::graphToEps<lemon::SmartDigraph> ( _3Dgraph,"image.eps" ).
     coords ( coords ).
     nodeColors ( composeMap ( p,ncolors ) ).
     arcColors ( composeMap ( p,acolors ) ).
@@ -181,7 +181,7 @@ bool Graph_creator::parseGraph ( string graphName )
     arrowLength ( 5 ).
     enableParallel ( true ).
     distantColorNodeTexts().
-    run();
+    run();*/
 
     std::cout << "A digraph is read from "<<graphName << std::endl;
     std::cout << "Number of nodes: " << lemon::countNodes ( _3Dgraph ) << std::endl;

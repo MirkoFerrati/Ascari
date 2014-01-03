@@ -4,6 +4,7 @@ set_property(GLOBAL APPEND PROPERTY agent_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/agent_router_utility.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/udp_graph_communicator.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/agent_router_parser_plugin.cpp
+#  ${CMAKE_CURRENT_SOURCE_DIR}/router_memory_communicator.hpp
 )
 
 #message(${agent_SOURCES})

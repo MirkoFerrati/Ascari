@@ -135,6 +135,8 @@ void agent::main_loop()
 {
     const world_sim_packet &temp = world_comm->receive_agents_status();
     time=temp.time;
+    if (time<-1)
+        return;
     agents=&temp;
     for ( std::map<std::string,int>::const_iterator it=map_bonus_variables_to_id.begin(); it!=map_bonus_variables_to_id.end(); ++it )
     {        

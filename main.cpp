@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cstdio>
+#include <ctime>
 #include <boost/program_options.hpp>
 #include <logog.hpp>
 #include "simulator/simulator.h"
@@ -11,11 +13,38 @@
 #include <add_agent_plugins.h>
 #include "communication/memory_communicator.hpp"
 
+/**
+Profiling notes:
+simulator main loop                                     74%
+        -> map<std::string,agent_state_packet>::at      09.6%  maybe we can change agent identifier type with an int? At least inside simulator? How?
+        -> map<int,double>::at                          05.8%
+        -> map<int,double>::operator=                   04.9%   MAYBE FIXED; MAYBE MUTEX WILL CRASH THE SOFTWARE                    
+    dynamic_getNextState                                25%
+        -> map<int,double>::insert                      11% This is a copy made in order to compute the new state x(k+1)=f(x(k)) without changing x(k) during the computation...
+        -> map<int,double>::at                          05.4%
+    zmq_viewer_communicator
+        -> send_target                                  18% EASY TO FIX (disable the call to send_target)
+agent_router run plugin                                 10%
+        -> logog info speed=                            3.7% Do we really need to cout all that stuff here?
+create_agents                                           12%  FIXED -> 02%
+        -> yaml_parser                                  1.3%
+        -> graph_creator::create_graph                  10%  FIXED
+                ->lemon::graphToEps                     10%  FIXED
+**/
+
+
 using namespace std;
 
+class FormatterCustom : public logog::FormatterGCC
+{
+    virtual TOPIC_FLAGS GetTopicFlags( const logog::Topic &topic )
+    {
+        return ( logog::Formatter::GetTopicFlags( topic ) &
+        ~( TOPIC_FILE_NAME_FLAG | TOPIC_LINE_NUMBER_FLAG ));
+    }
+};
 
-
-void createSimulator(simulator& s,Parsed_World& world ,std::string filename)
+void createSimulator(simulator* s,Parsed_World& world ,std::string filename)
 {
     auto plugins=createSimulatorPlugins();
     
@@ -26,16 +55,17 @@ void createSimulator(simulator& s,Parsed_World& world ,std::string filename)
         parser.addPlugin ( plugin->getParserPlugin() );
     }
     world=parser.parse_file ( filename );
+    return;
     for ( auto plugin:plugins )
     {
         if ( plugin->isEnabled() )
         {
-            if ( !plugin->createSimulatorPlugin ( &s ,&world) )
+            if ( !plugin->createSimulatorPlugin ( s ,&world) )
             {
                 ERR ( "failed to create plugin %s",plugin->getType().c_str() );
             }
             else
-                s.addPlugin ( plugin->getSimulatorPlugin() );
+                s->addPlugin ( plugin->getSimulatorPlugin() );
         }
     }
 }
@@ -83,8 +113,23 @@ int main ( int argc, char **argv )
     
     static_zmq::context=new zmq::context_t ( 1 );
     {
-        logog::Cout out;
-        simulator s;
+        char buf[85];
+        std::time_t rawtime;
+        std::tm* timeinfo;
+        char buffer [80];
+        
+        std::time(&rawtime);
+        timeinfo = std::localtime(&rawtime);
+        
+        std::strftime(buffer,80,"%Y-%m-%d-%H-%M-%S",timeinfo);
+        std::puts(buffer);
+        
+        sprintf(buf,"log_%s",buffer);
+        logog::LogFile out(buf);
+        logog::LogBuffer out_buffer(&out);
+        FormatterCustom customFormat;
+        out_buffer.SetFormatter( customFormat );
+        simulator* s=new simulator();
         std::map<std::string,agent*> agents;
         boost::program_options::options_description desc;
         boost::program_options::variables_map options;
@@ -144,7 +189,7 @@ int main ( int argc, char **argv )
          * Killare tutto e ripartire...come?
          */
         Parsed_World world;
-        s.setPeriod(50);
+        s->setPeriod(0);
         
         createSimulator(s,world,filename); //Costruire i plugin di simulator (come nel main di simulator)
         createAgents(agents,world,filename);//Costruire i plugin di agent (come nel main di agent)
@@ -153,8 +198,8 @@ int main ( int argc, char **argv )
         std::shared_ptr<agent_namespace::world_communicator_abstract>agent_communicator=communicator;
         
         //TODO: initialize_communication for the simulator
-        s.set_communicator(communicator);
-        s.initialize ( world );
+        s->set_communicator(communicator);
+        s->initialize ( world );
 
         
         //TODO: initialize_communication for the agents
@@ -164,7 +209,7 @@ int main ( int argc, char **argv )
         std::map<std::string,std::thread> threads;
         
         
-        std::thread sim(&simulator::start_sim,std::ref(s),count );//TODO: start this in a thread
+        std::thread sim(&simulator::start_sim,std::ref(*s),count );//TODO: start this in a thread
         
         for (auto a:agents)
         {
@@ -173,13 +218,23 @@ int main ( int argc, char **argv )
                                          ));//TODO: start in a thread
         }
         sim.join();
-        
         exiting=std::thread ( []()
         {
             delete ( static_zmq::context );
         } );
+        delete(s);
+        
+        std::cout<<"simulator distrutto, agenti running"<<std::endl;
+        
+        for (auto& t:threads)
+        {
+            t.second.join();
+        }
+        
         
     }
+    exiting.join();
+    
     LOGOG_SHUTDOWN();
     return 0;
 }

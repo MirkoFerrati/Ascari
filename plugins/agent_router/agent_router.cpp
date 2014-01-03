@@ -27,9 +27,12 @@
 using namespace std;
 using namespace lemon;
 
+graph_packet router_memory_manager::data;
+mutex router_memory_manager::mtx;
+
 agent_router::agent_router ( agent* a, Parsed_World* parse ):  length ( graph ),
 coord_x ( graph ), coord_y ( graph ),time( a->time ),
-identifier( a->identifier ),communicator ( _mutex, &info, _io_service,identifier )
+identifier( a->identifier ),communicator(parse->agents.size())//,communicator ( _mutex, &info, _io_service,identifier )
 {
     this->a=a;
     this->node_radius=atof(CONFIG.getValue("NODE_RADIUS").c_str());
@@ -71,8 +74,9 @@ bool agent_router::initialize()
     my_LRP.timestamp = 0;
     started=false;
 //    setTargetStop(false);
-    communicator.startReceive();
+    //communicator.startReceive();
     last_time_updated = time;
+    last_time_negotiated = 0;
     last_time_left_a_node=0;
     negotiation_steps=0;
     next_target_reachable=false;
@@ -89,6 +93,7 @@ void agent_router::run_plugin()
   if (!initialized)
     return;
     priority=identifier;
+    already_received=false;
     if (identifier=="AGENTE2" || identifier=="AGENTE1")
         int do_nothing_important=0;
     if ( internal_state==state::STOPPED )
@@ -136,9 +141,13 @@ void agent_router::run_plugin()
 
     if ( internal_state==state::EMERGENCY )
     {
-        usleep ( 2000 ); 
-        _io_service.poll();
-        _io_service.reset();
+//         usleep ( 2000 ); 
+//         _io_service.poll();
+//         _io_service.reset();
+        if (!already_received)
+            info=communicator.receive();
+        already_received=true;
+        
         if ( negotiate ) //negozio anche sugli archi, basta che sia il momento giusto
         {
             internal_state=state::NODE_HANDSHAKING;
@@ -164,7 +173,7 @@ void agent_router::run_plugin()
             last_time_left_a_node=time;
             prepare_move_packet();
             update_packet();
-            print_path();
+//             print_path();
             communicator.send ( my_LRP );
         }
     }
@@ -182,7 +191,7 @@ void agent_router::run_plugin()
         {
             prepare_move_packet();
             update_packet();
-            print_path();
+//             print_path();
             communicator.send ( my_LRP );
         }
     }
@@ -200,9 +209,13 @@ void agent_router::run_plugin()
 
     if ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING || internal_state==state::ARC_HANDSHAKING )
     {
-        usleep ( 2000 ); //serve per dare tempo alla comunicazione di girare
-        _io_service.poll();
-        _io_service.reset();
+//         usleep ( 2000 ); //serve per dare tempo alla comunicazione di girare
+//         _io_service.poll();
+//         _io_service.reset();
+        if (!already_received)
+            info=communicator.receive();
+        already_received=true;
+        
         negotiation_steps++;
         if ( detect_collision() )
         {
@@ -267,7 +280,7 @@ bool agent_router::check_for_overtaking ()
     //std::cout<<"check for overtakings";
     bool overtaking = false;
     int myage=findAge ( time,last_time_left_a_node ); //round ( ( round ( time * 1000.0 ) - round ( last_time_left_a_node * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
-    _mutex.lock();
+//     _mutex.lock();
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
         if ( identifier==it->first ) continue;
@@ -318,7 +331,7 @@ bool agent_router::check_for_overtaking ()
             }
         }
     }
-    _mutex.unlock();
+//     _mutex.unlock();
     cout.flush();
     return overtaking;
 }
@@ -331,7 +344,7 @@ bool agent_router::isEmergency ( const std::vector<int>& nodes )
         if ( identifier==it->first ) continue;
         if ( !it->second.emergency && !it->second.priority.compare ( " " ) ==0 ) continue;
 
-        cout<<"controllo se devo entrare in emergenza per colpa dell'agente:"<<it->first<<" "<<endl;
+        //cout<<"controllo se devo entrare in emergenza per colpa dell'agente:"<<it->first<<" "<<endl;
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
         {
             int id = ( *itt );// - age * graph_node_size;  //attualizzo il nodo
@@ -342,7 +355,7 @@ bool agent_router::isEmergency ( const std::vector<int>& nodes )
 //                if ( node/graph_node_size ) break;
             if ( node%graph_node_size==id%graph_node_size &&  getNextTime()-time<2*TIME_SLOT_FOR_3DGRAPH )
             {
-                cout<<"emergenza!!"<<endl;
+                WARN("%s %lf emergenza!!",identifier.c_str(),time);
                 return true;
             }
 
@@ -359,7 +372,7 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
 {
     string start="filtro i nodi:";
     string end="";
-    _mutex.lock();
+//     _mutex.lock();
 
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it ) //per ogni pacchetto ricevuto
     {
@@ -367,7 +380,7 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
         if (it->second.lockedNode[0]==-1 ) continue;
         if ( priority.compare ( it->second.priority ) <0 ) continue;  //se il pacchetto ha priorita' piu' alta
         int age = findAge ( time, it->second.timestamp ); //round ( ( round ( time * 1000.0 ) - round ( ( *it ).second.timestamp * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
-        cout<<start<<it->first<<" ";
+        //cout<<start<<it->first<<" ";
         start="";
         end="\n";
         for ( vector<int>::const_iterator itt = ( *it ).second.lockedNode.begin(); itt != ( *it ).second.lockedNode.end(); ++itt )  //per ogni nodo nel pacchetto
@@ -378,13 +391,13 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
             {
                 useArc[arc] = false;
             }
-            cout<<id<<" ";
+            //cout<<id<<" ";
         }
-        cout<<"; ";
+        //cout<<"; ";
     }
-    _mutex.unlock();
-    cout<<end;
-    cout.flush();
+//     _mutex.unlock();
+    //cout<<end;
+    //cout.flush();
 }
 
 
@@ -395,7 +408,7 @@ bool agent_router::detect_collision ( )
     out<<"ricerca collisione:";
     int my_age=findAge ( time, last_time_updated ); //round ( ( round ( time * 1000.0 ) - round ( last_time_updated * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
 
-    _mutex.lock();
+//     _mutex.lock();
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it )
     {
         if ( identifier==it->first ) continue;
@@ -421,10 +434,10 @@ bool agent_router::detect_collision ( )
             }
         }
     }
-    _mutex.unlock();
+//     _mutex.unlock();
     out<<"ricerca collisione completata"<<endl;
-    if ( collision )
-        cout<<out.str();
+    //if ( collision )
+    //    cout<<out.str();
     return collision;
 }
 
@@ -522,7 +535,8 @@ void agent_router::setSpeed()
     double length = distance_to_target();
     *speed=length/delta;
     *omega=5*sin(atan2(ytarget-*y,xtarget-*x)-*theta);
-     std::cout<<identifier<<" speed="<<*speed<<",length="<<length<<"delta="<<delta<<std::endl;
+    // std::cout<<identifier<<" speed="<<*speed<<",length="<<length<<"delta="<<delta<<std::endl;
+    INFO("%s %lf speed= %lf",identifier.c_str(),time,*speed);
 }
 
 simulation_time agent_router::getNextTime()
@@ -550,7 +564,7 @@ bool agent_router::setNextTarget()
 {
     if ( target_counter == targets.size() )
     {
-        cout << " TARGET FINALE raggiunto, mi fermo" << endl;
+        INFO("%s %lf TARGET FINALE raggiunto, mi fermo",identifier.c_str(),time);
         return false;
     }
     else
@@ -559,7 +573,7 @@ bool agent_router::setNextTarget()
         
         target_counter++;
         target = graph.nodeFromId ( id );
-        cout << time << ": TARGET raggiunto, nuovo target: " << id << " " << coord_x [target] << " " << coord_y[target] << endl;
+        INFO("%s %lf TARGET raggiunto, nuovo target: %i %i %i",identifier.c_str(),time,id,coord_x [target],coord_y[target]);
         return true;
     }
 }

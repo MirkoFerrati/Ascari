@@ -221,7 +221,7 @@ void simulator::initialize_agents ( const list<Parsed_Agent>& agents )
         }
         else
         {
-            d= new dynamic_remote_localization(&localization_receiver,ag.name,sim_packet.state_agents.internal_map.at ( ag.name ).state);
+             d= new dynamic_remote_localization(&localization_receiver,ag.name,sim_packet.state_agents.internal_map.at ( ag.name ).state);
         }
         dynamic_modules.push_back ( d );
 
@@ -342,7 +342,7 @@ void simulator::main_loop()
 //                 }
             }
             clock++;
-            printTime(clock);
+            //printTime(clock);
 
             //Update simulation time inside sim_packet
             if (timeSimulated)
@@ -414,7 +414,7 @@ void simulator::main_loop()
             collisionChecker->checkCollisions();
 
             //Receive and save control commands
-            vector<control_command_packet> temp=communicator->receive_control_commands();
+            vector<control_command_packet>& temp=communicator->receive_control_commands();//WARN TODO CHECK THIS REFERENCE FOR MUTEX!!!!
             for ( unsigned i=0; i< temp.size(); i++ )
             {
                 for ( map<int,double>::iterator it=commands.at ( temp.at ( i ).identifier ).command.begin(); it!=commands.at ( temp.at ( i ).identifier ).command.end(); ++it )
@@ -437,12 +437,14 @@ void simulator::main_loop()
             }
             else
             {
-                WARN("this timestep %f took too much time: %f",sim_packet.time,step_accum);
+//                 WARN("this timestep %f took too much time: %f",sim_packet.time,step_accum);
             }
         }
 
-for ( auto & plugin:plugins )
+        for ( auto & plugin:plugins )
             plugin->stop();
+        //sim_packet.time=-10;
+        //communicator->send_broadcast(agent_packet);
 
         input_exit=true;
         //tcsetattr ( STDIN_FILENO, TCSANOW, &before );
@@ -459,6 +461,9 @@ simulator::~simulator()
     if ( communicator )
         communicator->send_broadcast ( agent_packet );
 
+    if (viewer_communicator)
+        delete viewer_communicator;
+    
 //     delete communicator;
 
     for ( unsigned int i=0; i<dynamic_modules.size(); i++ )
