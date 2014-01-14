@@ -22,8 +22,6 @@
 #include "agent_router_parsed_world.h"
 #include "agent_router_plugin.h"
 
-
-
 using namespace std;
 using namespace lemon;
 
@@ -73,6 +71,7 @@ bool agent_router::initialize()
     ytarget =  coord_y[source];
     my_LRP.timestamp = 0;
     started=false;
+    stopping=0;
 //    setTargetStop(false);
     //communicator.startReceive();
     last_time_updated = time;
@@ -105,7 +104,21 @@ void agent_router::run_plugin()
         stopAgent();
         return;
     }
-        auto negotiate=isTimeToNegotiate ( time );
+    if (internal_state==state::STOPPING)
+    {
+        if (stopping==0)
+        {
+            *speed=1000;
+            double f = (double)rand() / RAND_MAX;
+            *omega=f * (3.0);
+        }
+        stopping++;
+        if (stopping>10)
+            internal_state=state::STOPPED;
+        return;
+    }
+    
+    auto negotiate=isTimeToNegotiate ( time );
 
     if ( internal_state==state::MOVING ||  internal_state==state::STARTING ||internal_state==state::LOADING )
     {
@@ -133,7 +146,7 @@ void agent_router::run_plugin()
                 }
                 else  //se non ci sono altri target
                 {
-                    internal_state=state::STOPPED;
+                    internal_state=state::STOPPING;
                     return;
                 }
             }

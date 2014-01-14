@@ -29,6 +29,7 @@ enum class state
     NODE_HANDSHAKING,
     ARC_HANDSHAKING,
     EMERGENCY,
+    STOPPING,
     STOPPED,
     STARTING,
 	LOADING,
@@ -120,6 +121,7 @@ private:
     double node_radius;
     simulation_time last_time_negotiated;
     bool already_received;
+    int stopping;
 };
 
 // #endif

@@ -65,6 +65,7 @@ void agent_router::print_path()
 void agent_router::stopAgent()
 {
     *speed=0;
+    *omega=0;
 }
 
 void agent_router::startAgent()
