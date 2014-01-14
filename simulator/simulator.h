@@ -46,7 +46,8 @@ public:
 	simulator(const simulator&)=delete;
     void addPlugin( abstract_simulator_plugin* plugin );
     world_sim_packet sim_packet;
-	
+    index_map agent_states_to_index;
+    
 private:
 	int max_loops;
 	int cycle_period_millisec;
@@ -58,7 +59,6 @@ private:
 	simulator_namespace::viewer_communicator_abstract* viewer_communicator;
 	zmq_localization_communicator_receiver localization_receiver;
 	agent_sim_packet agent_packet;
-	index_map agent_states_to_index;
 	std::vector<index_map> agent_commands_to_index;
 	index_map agents_name_to_index;
 	std::map<int,double> bonusVariables;

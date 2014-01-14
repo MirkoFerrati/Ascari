@@ -12,7 +12,7 @@ class CollisionChecker : public CollisionCheckerAbstract
 public:
     virtual ~CollisionChecker();
     CollisionChecker(const agents_name_to_states& states,const index_map & states_to_index);
-	bool checkCollisions();
+	bool checkCollisions(simulation_time& time);
 private:
     const std::map<std::string,agent_state_packet>& states;
 	

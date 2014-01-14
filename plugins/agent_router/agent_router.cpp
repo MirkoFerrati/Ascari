@@ -39,7 +39,7 @@ identifier( a->identifier ),communicator(parse->agents.size())//,communicator ( 
     for (list<Parsed_Agent>::const_iterator iter=parse->agents.begin();iter!=parse->agents.end();++iter)
     {
         if (iter->name==a->identifier)
-        targets=(reinterpret_cast<agent_router_parsed_agent*>(iter->parsed_items_from_plugins.at(AGENT_ROUTER_NAME)))->target_list;    
+        targets=(reinterpret_cast<agent_router_parsed_agent*>(iter->parsed_items_from_plugins.at(AGENT_ROUTER_NAME)))->target_list;   //TODO: randomize this in a centralized manager!!
     }
     this->graphName=(reinterpret_cast<agent_router_parsed_world*>(parse->parsed_items_from_plugins.at(AGENT_ROUTER_NAME)))->graphName;
 
@@ -84,6 +84,7 @@ bool agent_router::initialize()
     *speed=0;
     priority=identifier;
     initialized=true;
+    INFO("%s %lf source= %d target= %d",identifier.c_str(),time,targets[0],targets[1]);
     return true;
 }
 
@@ -145,9 +146,10 @@ void agent_router::run_plugin()
 //         _io_service.poll();
 //         _io_service.reset();
         if (!already_received)
+        {
             info=communicator.receive();
-        already_received=true;
-        
+            already_received=true;
+        }
         if ( negotiate ) //negozio anche sugli archi, basta che sia il momento giusto
         {
             internal_state=state::NODE_HANDSHAKING;
@@ -207,15 +209,17 @@ void agent_router::run_plugin()
             internal_state=state::MOVING;
     }
 
+    //The trick of the listening state avoids so many packets sent!! Do not expect each agent to send a packet each timestep, it will not!
     if ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING || internal_state==state::ARC_HANDSHAKING )
     {
 //         usleep ( 2000 ); //serve per dare tempo alla comunicazione di girare
 //         _io_service.poll();
 //         _io_service.reset();
         if (!already_received)
+        {
             info=communicator.receive();
-        already_received=true;
-        
+            already_received=true;
+        }
         negotiation_steps++;
         if ( detect_collision() )
         {

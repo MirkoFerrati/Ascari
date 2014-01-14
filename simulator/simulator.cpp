@@ -151,7 +151,7 @@ void simulator::initialize ( const Parsed_World& wo )
 
         map_bonus_variables.insert ( make_pair ( wo.bonus_variables.at ( i ),i ) );
     }
-    setCheckCollision ( false );
+    setCheckCollision ( true );
     localization_receiver.init("simulator");
 }
 
@@ -411,7 +411,7 @@ void simulator::main_loop()
                 }
             }
 
-            collisionChecker->checkCollisions();
+            collisionChecker->checkCollisions(sim_packet.time);
 
             //Receive and save control commands
             vector<control_command_packet>& temp=communicator->receive_control_commands();//WARN TODO CHECK THIS REFERENCE FOR MUTEX!!!!
@@ -431,6 +431,7 @@ void simulator::main_loop()
 //             Calculate time it took
             step_accum = ( requestEnd.tv_sec - requestStart.tv_sec )*1000
                          + ( requestEnd.tv_nsec - requestStart.tv_nsec )/ 1E6;
+            usleep(10000);
             if ((cycle_period_millisec-step_accum)*1000-10 >0)
             {
                 usleep ( (cycle_period_millisec-step_accum)*1000-10 );

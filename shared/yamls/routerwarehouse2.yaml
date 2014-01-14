@@ -9,7 +9,7 @@
       theta: 'w'
 
   WORLD:
-  - GRAPH_NAME: 'loading.gml.lgf'
+  - GRAPH_NAME: 'loading1.gml.lgf'
     GOODS: [33,33,33,33,33,34,34,34,34]
   AGENTS:
   - agent: Agente1

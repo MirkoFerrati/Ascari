@@ -49,6 +49,8 @@ public:
     void setTarget ( lemon::SmartDigraph::Node t );
     ~agent_router();
 
+    inline void setTargets(std::vector<int> targets){this->targets=targets;};
+    
 private:
     bool findPath ( lemon::DigraphExtender< lemon::SmartDigraphBase >::ArcMap< bool >& useArc );
 	bool isEmergency(const std::vector<int>& nodes);
