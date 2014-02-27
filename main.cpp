@@ -74,10 +74,6 @@ for (auto agent:agents)
     return agents_target;
 }
 
-void createRandomAgents(simulator* s,Parsed_World& world,std::map<std::string,agent*>agents)
-{
-}
-
 void createSimulator(simulator* s,Parsed_World& world ,std::string filename)
 {
     auto plugins=createSimulatorPlugins();
@@ -176,6 +172,8 @@ void createAgents(std::map<std::string,agent*>& agents,Parsed_World& world,std::
             WARN("Attenzione, nessun plugin è stato caricato, l'agente resterà immobile",NULL);
         }
         reinterpret_cast<agent_router*>(temp->plugins[0])->setTargets(agents_target.at(temp->identifier));
+        int source_temp=agents_target.at(temp->identifier).at(0);
+        INFO("%s source= %d target= %d startX=%d startY=%d",temp->identifier.c_str(),source_temp,agents_target.at(temp->identifier).at(1),coord_x[graph.nodeFromId(source_temp)],coord_y[graph.nodeFromId(source_temp)]);
         temp->initialize();
     }
 }
@@ -186,7 +184,10 @@ int main ( int argc, char **argv )
     srand ( time ( NULL ) );
     LOGOG_INITIALIZE();
     std::thread exiting;
-
+    std::map<std::string,std::thread> threads;
+    std::thread sim;
+    simulator* s;
+    
     static_zmq::context=new zmq::context_t ( 1 );
     {
         char buf[85];
@@ -206,14 +207,13 @@ int main ( int argc, char **argv )
         FormatterCustom customFormat;
         out_buffer.SetFormatter( customFormat );
         out.SetFormatter(customFormat);
-        simulator* s=new simulator();
         std::map<std::string,agent*> agents;
         boost::program_options::options_description desc;
         boost::program_options::variables_map options;
         desc.add_options()("help,h","Get help");
-
+        s=new simulator();
         std::string filename;
-        int count=500; //TODO set this in the right way
+        int count=500; 
         if (CONFIG.exists("FILENAME"))
         {
             filename=CONFIG.getValue("FILENAME");
@@ -229,6 +229,8 @@ int main ( int argc, char **argv )
         else
             desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename)->required(), "Yaml filename");
 
+        desc.add_options()("cycles,c",boost::program_options::value<int>(&count), "Number of seconds to be simulated");
+        
 for (auto config_value:CONFIG.getMap())
         {
             if (config_value.first!="filename")
@@ -287,11 +289,8 @@ for (auto config_value:CONFIG.getMap())
         for (auto a:agents)
             a.second->set_communicator(agent_communicator);
 
-        std::map<std::string,std::thread> threads;
-
-
-        std::thread sim(&simulator::start_sim,std::ref(*s),count );
-
+     
+        sim=std::thread(&simulator::start_sim,std::ref(*s),count);
         for (auto a:agents)
         {
             threads.insert(std::make_pair(a.first,
@@ -299,6 +298,8 @@ for (auto config_value:CONFIG.getMap())
                                          ));
         }
         sim.join();
+        out_buffer.Dump();
+    }
         exiting=std::thread ( []()
         {
             delete ( static_zmq::context );
@@ -313,7 +314,7 @@ for (auto& t:threads)
         }
 
 
-    }
+    
     exiting.join();
 
     LOGOG_SHUTDOWN();
