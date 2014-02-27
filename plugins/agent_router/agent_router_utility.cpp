@@ -64,8 +64,7 @@ void agent_router::print_path()
 
 void agent_router::stopAgent()
 {
-    *speed=0;
-    *omega=0;
+//TODO
 }
 
 void agent_router::startAgent()
@@ -75,10 +74,7 @@ void agent_router::startAgent()
 }
 
 
-bool agent_router::target_reached()
-{
-    return distance_to_target()<node_radius;
-}
+
 
 
 void agent_router::setSource(lemon::SmartDigraphBase::Node s)
@@ -97,32 +93,6 @@ void agent_router::setTarget(lemon::SmartDigraphBase::Node t)
 // 	return std::pair<int,int> ((coord_x)[next] , (coord_y)[next]);
 // }
 
-bool agent_router::isNearNode()
-{
- return distance_to_target()<node_radius;    
-}
-
-void agent_router::setGraph(lemon::SmartDigraph& g)
-{
-	lemon::digraphCopy<lemon::SmartDigraph,lemon::SmartDigraph>(g,graph); //graph=g;
-}
-
-
-bool agent_router::isTimeToNegotiate( simulation_time time )
-{
-    if (time-last_time_negotiated<4)
-        return false;
-    auto temp=time;
-    while (temp>TIME_SLOT_FOR_3DGRAPH)
-        temp=temp-TIME_SLOT_FOR_3DGRAPH;
-        if (temp>8.3)
-        {
-            last_time_negotiated=time;
-            return true;
-        }
-        return false;
-    //return round ( time*1000-round ( time/TIME_SLOT_FOR_3DGRAPH ) *1000*TIME_SLOT_FOR_3DGRAPH ) >=-1700;
-}
 
 
 agent_router::~agent_router()

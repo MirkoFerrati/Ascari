@@ -34,6 +34,7 @@ identifier( a->identifier ),communicator(parse->agents.size())//,communicator ( 
 {
     this->a=a;
     this->node_radius=atof(CONFIG.getValue("NODE_RADIUS").c_str());
+    this->control_node_radius=node_radius/3.0;
     for (list<Parsed_Agent>::const_iterator iter=parse->agents.begin();iter!=parse->agents.end();++iter)
     {
         if (iter->name==a->identifier)
@@ -64,11 +65,14 @@ bool agent_router::initialize()
     }
     source = graph.nodeFromId ( targets[0] );
     target = graph.nodeFromId ( targets[1] );
+    control_target=graph.nodeFromId(targets[1]);
     node_id.push_back ( targets[0] ); //next = source;
     node_id.push_back ( targets[0] ); //next = source;
     target_counter = 0;
     xtarget =  coord_x[source];
     ytarget =  coord_y[source];
+    control_xtarget=xtarget;
+    control_ytarget=ytarget;
     my_LRP.timestamp = 0;
     started=false;
     stopping=0;
@@ -104,16 +108,16 @@ void agent_router::run_plugin()
         stopAgent();
         return;
     }
-    if (internal_state==state::STOPPING)
+    if (internal_state==state::STOPPING) //This is an hack to remove agents from the map
     {
         if (stopping==0)
         {
-            *speed=1000;
+            *speed=10000;
             double f = (double)rand() / RAND_MAX;
             *omega=f * (3.0);
         }
         stopping++;
-        if (stopping>10)
+        if (stopping>0)
             internal_state=state::STOPPED;
         return;
     }
@@ -155,9 +159,6 @@ void agent_router::run_plugin()
 
     if ( internal_state==state::EMERGENCY )
     {
-//         usleep ( 2000 ); 
-//         _io_service.poll();
-//         _io_service.reset();
         if (!already_received)
         {
             info=communicator.receive();
@@ -222,7 +223,7 @@ void agent_router::run_plugin()
             internal_state=state::MOVING;
     }
 
-    //The trick of the listening state avoids so many packets sent!! Do not expect each agent to send a packet each timestep, it will not!
+    //The trick of the listening state avoids sooo many packets sent!! Do not expect each agent to send a packet each timestep, it will not!
     if ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING || internal_state==state::ARC_HANDSHAKING )
     {
 //         usleep ( 2000 ); //serve per dare tempo alla comunicazione di girare
@@ -258,7 +259,7 @@ void agent_router::run_plugin()
     }
 
     if ( ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING
-            || internal_state==state::ARC_HANDSHAKING ) && negotiation_steps==15 ) //devo aver finito per forza, per ipotesi!
+            || internal_state==state::ARC_HANDSHAKING ) && negotiation_steps==20 ) //devo aver finito per forza, per ipotesi!
     {
         if ( next_target_reachable )
         {
@@ -274,16 +275,21 @@ void agent_router::run_plugin()
         }
     }
 
+//TODO:
+//     if ( next_target_reachable )
+//     {
+//         startAgent();
+//     }
+//     else
+//     {
+//         stopAgent();
+//     }
 
-    if ( next_target_reachable )
+    if (target_reached())
     {
-        startAgent();
+        control_xtarget=xtarget;
+        control_ytarget=ytarget;
     }
-    else
-    {
-        stopAgent();
-    }
-
     setSpeed();
 //     cout<<" stato interno: ";
 //     print_state(internal_state);
@@ -538,6 +544,10 @@ double agent_router::distance_to_target()
     return sqrt((xtarget-*x)*(xtarget-*x)+(ytarget-*y)*(ytarget-*y));
 }
 
+double agent_router::distance_to_control_target()
+{
+    return sqrt((control_xtarget-*x)*(control_xtarget-*x)+(control_ytarget-*y)*(control_ytarget-*y)); 
+}
 
 void agent_router::setSpeed()
 {
@@ -549,9 +559,9 @@ void agent_router::setSpeed()
     started=true;
     assert ( node_id.size() >1 );
     simulation_time delta = getNextTime() - time;
-    double length = distance_to_target();
+    double length = distance_to_control_target();
     *speed=length/delta;
-    *omega=5*sin(atan2(ytarget-*y,xtarget-*x)-*theta);
+    *omega=5*sin(atan2(control_ytarget-*y,control_xtarget-*x)-*theta);
     // std::cout<<identifier<<" speed="<<*speed<<",length="<<length<<"delta="<<delta<<std::endl;
     INFO("%s %lf speed= %lf",identifier.c_str(),time,*speed);
 }
@@ -576,6 +586,39 @@ bool agent_router::isOnTarget()
         return true;
     return false;
 }
+
+bool agent_router::target_reached()
+{
+    return distance_to_control_target()<control_node_radius;
+}
+
+bool agent_router::isNearNode() //Communication distance
+{
+    return distance_to_target()<node_radius;    
+}
+
+void agent_router::setGraph(lemon::SmartDigraph& g)
+{
+    lemon::digraphCopy<lemon::SmartDigraph,lemon::SmartDigraph>(g,graph); //graph=g;
+}
+
+
+bool agent_router::isTimeToNegotiate( simulation_time time )
+{
+    if (time-last_time_negotiated<4)
+        return false;
+    auto temp=time;
+    while (temp>TIME_SLOT_FOR_3DGRAPH)
+        temp=temp-TIME_SLOT_FOR_3DGRAPH;
+    if (temp>7.5)
+    {
+        last_time_negotiated=time;
+        return true;
+    }
+    return false;
+    //return round ( time*1000-round ( time/TIME_SLOT_FOR_3DGRAPH ) *1000*TIME_SLOT_FOR_3DGRAPH ) >=-1700;
+}
+
 
 bool agent_router::setNextTarget()
 {

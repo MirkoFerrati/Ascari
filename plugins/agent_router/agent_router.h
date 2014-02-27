@@ -60,6 +60,10 @@ private:
     void stopAgent ();
     void startAgent ();
 	bool isOnTarget();
+        
+    /*!
+     * @return distance_to_control_target()<control_node_radius
+     */    
     bool target_reached();
     void prepare_move_packet();
     void prepare_emergency_packet();
@@ -75,12 +79,17 @@ private:
 	void print_state( state s );
     simulation_time getNextTime();
     double distance_to_target();
+    /*!
+     * @return distance_to_target()<node_radius
+     */    
     bool isNearNode();
+    double distance_to_control_target();
 private:
     state internal_state;
     bool next_target_reachable;
     int negotiation_steps;
     double xtarget, ytarget;
+    double control_xtarget,control_ytarget;
     double *speed, *omega;   //usato dal plugin per controllare il robot
     double *x,*y,*theta;
     /**Informazioni del grafo*/
@@ -96,8 +105,8 @@ private:
     std::vector<int> targets;  //lista dei targets
     unsigned int target_counter; //avanzamento dei target
     std::vector<int> node_id;  //nodi della path
-    lemon::SmartDigraph::Node source, target;//, next; //informazioni locali sui nodi
-
+    lemon::SmartDigraph::Node source, target,control_target;//informazioni locali sui nodi
+   
     /**Informazioni temporali*/
     //simulation_time next_time;
     simulation_time &time;
@@ -119,6 +128,7 @@ private:
     agent* a;
     std::string graphName;
     double node_radius;
+    double control_node_radius;
     simulation_time last_time_negotiated;
     bool already_received;
     int stopping;
