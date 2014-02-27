@@ -431,7 +431,7 @@ void simulator::main_loop()
 //             Calculate time it took
             step_accum = ( requestEnd.tv_sec - requestStart.tv_sec )*1000
                          + ( requestEnd.tv_nsec - requestStart.tv_nsec )/ 1E6;
-            usleep(100);
+            usleep(0);
             if ((cycle_period_millisec-step_accum)*1000-10 >0)
             {
                 usleep ( (cycle_period_millisec-step_accum)*1000-10 );

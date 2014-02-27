@@ -19,7 +19,8 @@ bool CollisionChecker::checkCollisions(simulation_time& time)
                 if (collision)
                 {
                     WARN("%lf Attenzione, c'e' stata una collisione tra gli agenti %s e %s",time,it->first.c_str(),itt->first.c_str());
-					ret=true;
+                    //usleep(1000*250);
+                    ret=true;
                 }
             }
         }
