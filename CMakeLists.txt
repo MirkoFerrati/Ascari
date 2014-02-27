@@ -39,4 +39,8 @@ endif()
 add_executable(singleProcess main.cpp)
 target_link_libraries(singleProcess simulatorLibrary agentLibrary agent_agent_router simulator_agent_router)
 
+include_directories( simulator/communication/)
+add_executable(viewerReplay viewer_replay.cpp)
+target_link_libraries(viewerReplay simulatorLibrary ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a boost_system boost_thread boost_serialization boost_program_options pthread zmq )
+
 #add_subdirectory(yaml_checker)
