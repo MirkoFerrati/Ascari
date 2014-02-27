@@ -1,0 +1,175 @@
+#LOADING/UNLOADING
+- BEHAVIORS:
+  - name: LGV
+    states: [x,y,theta]
+    control_commands: [v,w]
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+
+  WORLD:
+  - GRAPH_NAME: 'maxiwarehouse.lgf'
+    GOODS: [33,33,33,33,33,34,34,34,34]
+  AGENTS:
+  - agent: Agente01
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [0,4,6,8,1,33,33,33,33,3,5,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente02
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente03
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente04
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente05
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente06
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV
+    
+  - agent: Agente07
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [0,4,6,8,1,33,33,33,33,3,5,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente08
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente09
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente10
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente11
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente12
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV
+    
+  - agent: Agente13
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [0,4,6,8,1,33,33,33,33,3,5,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente14
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente15
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente16
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente17
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: Agente18
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV
