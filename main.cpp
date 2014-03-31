@@ -262,8 +262,8 @@ for (auto config_value:CONFIG.getMap())
          * Costruire i plugin di simulator (come nel main di simulator) DONE
          * Costruire i plugin di agent (come nel main di agent) DONE
          * Settare i comunicatori di agent e simulator DONE
-         * Avviare un thread per simulator con un limite di cicli (count)
-         * Avviare N threads per agent
+         * Avviare un thread per simulator con un limite di cicli (count) DONE
+         * Avviare N threads per agent DONE
          * Sleep(tempomassimo)
          * Killare tutto e ripartire...come?
          */
