@@ -152,7 +152,6 @@ void simulator::initialize ( const Parsed_World& wo )
         map_bonus_variables.insert ( make_pair ( wo.bonus_variables.at ( i ),i ) );
     }
     setCheckCollision ( true );
-    localization_receiver.init("simulator");
 }
 
 
@@ -221,7 +220,12 @@ void simulator::initialize_agents ( const list<Parsed_Agent>& agents )
         }
         else
         {
-             d= new dynamic_remote_localization(&localization_receiver,ag.name,sim_packet.state_agents.internal_map.at ( ag.name ).state);
+            if (!localization_receiver)
+            {
+                localization_receiver=new zmq_localization_communicator_receiver();
+                localization_receiver->init("simulator");
+            }
+             d= new dynamic_remote_localization(localization_receiver,ag.name,sim_packet.state_agents.internal_map.at ( ag.name ).state);
         }
         dynamic_modules.push_back ( d );
 

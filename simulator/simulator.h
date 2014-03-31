@@ -57,7 +57,7 @@ private:
         std::shared_ptr< simulator_namespace::agent_communicator_abstract > communicator;
         //simulator_namespace::agent_communicator_abstract* communicator;
 	simulator_namespace::viewer_communicator_abstract* viewer_communicator;
-	zmq_localization_communicator_receiver localization_receiver;
+	zmq_localization_communicator_receiver* localization_receiver;
 	agent_sim_packet agent_packet;
 	std::vector<index_map> agent_commands_to_index;
 	index_map agents_name_to_index;
