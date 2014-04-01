@@ -3,9 +3,13 @@
 
 #define COLLISION_RANGE 5
 
+extern std::map<std::string,bool> collisions;
+
 bool CollisionChecker::checkCollisions(simulation_time& time)
 {
-	bool ret=false;
+    bool ret=false;
+    for (auto t:collisions)
+        t.second=false;
     for (std::map<std::string,agent_state_packet>::const_iterator it=states.begin();it!=states.end();++it) {
         for (std::map<std::string,agent_state_packet>::const_iterator itt=states.begin();itt!=states.end();++itt) {
             if (it.operator!=(itt))
@@ -19,6 +23,8 @@ bool CollisionChecker::checkCollisions(simulation_time& time)
                 if (collision)
                 {
                     WARN("%lf Attenzione, c'e' stata una collisione tra gli agenti %s e %s",time,it->first.c_str(),itt->first.c_str());
+                    collisions[it->first]=true;
+                    collisions[itt->first]=true;                    
                     //usleep(1000*250);
                     ret=true;
                 }

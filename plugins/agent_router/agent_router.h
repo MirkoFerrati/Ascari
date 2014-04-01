@@ -21,6 +21,7 @@
 
 #define TIME_SLOT_FOR_3DGRAPH 10.0
 
+extern std::map<std::string,bool> collisions;
 
 enum class state
 {
@@ -72,11 +73,11 @@ private:
     bool check_for_overtaking( );
     void update_packet();
     bool isTimeToNegotiate(simulation_time time);
-    void print_path();
+    void print_path(std::ostringstream& out);
 	int findAge(simulation_time present_time, simulation_time old_time);
     void prepare_stopped_packet();
 	void prepare_loading_packet();
-	void print_state( state s );
+	void print_state( state s, std::ostream& out );
     simulation_time getNextTime();
     double distance_to_target();
     /*!
@@ -112,9 +113,11 @@ private:
     simulation_time &time;
     simulation_time last_time_updated;
     simulation_time last_time_left_a_node;
-	state old_state;
-	
+    state old_state;
 
+
+    std::vector<std::string> log_buffer;
+    
     /**Comunicatore*/
 //     std::mutex _mutex;  
     std::string identifier;

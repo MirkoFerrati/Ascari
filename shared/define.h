@@ -1,7 +1,7 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 #include <string>
-
+#include <map>
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
@@ -41,6 +41,7 @@ private:
 };
 
 extern configuration_reader CONFIG;
+extern std::map<std::string,bool> collisions;
 
 
 

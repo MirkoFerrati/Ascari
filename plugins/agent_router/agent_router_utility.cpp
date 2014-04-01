@@ -21,7 +21,7 @@
 using namespace std;
 
 
-void agent_router::print_state(state s)
+void agent_router::print_state(state s,ostream& out)
 {
 	stringstream os;
 		switch( s )
@@ -36,7 +36,7 @@ void agent_router::print_state(state s)
 			case state::STOPPED: os << "stopped"; break;
 			default: assert(0);
 		}
-		cout<<os.str();
+		out<<os.str();
 	
 }
 
@@ -46,18 +46,19 @@ int agent_router::findAge(simulation_time present_time, simulation_time old_time
 	return round ( ( round ( present_time * 1000.0 ) - round ( old_time * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
 }
 
-void agent_router::print_path()
+void agent_router::print_path(ostringstream& out)
 {
     int j=0;
-     std::cout<<time<<": path calcolata= ";
+    
+     out<<time<<": path calcolata= ";
     for ( unsigned int i=0; i<node_id.size(); i++ )
     {
         j++;
         if ( j>4 )
             break;
-       cout << node_id[i]  << "(" <<  node_id[i]  % graph_node_size << ")" << ">>";
+       out << node_id[i]  << "(" <<  node_id[i]  % graph_node_size << ")" << ">>";
     }
-    cout<<endl;
+    out<<endl;
    // std::cout << " next_time=" << next_time << std::endl;
 
 }

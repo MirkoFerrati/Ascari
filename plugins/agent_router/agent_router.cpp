@@ -28,6 +28,7 @@ using namespace lemon;
 graph_packet router_memory_manager::data;
 mutex router_memory_manager::mtx;
 
+
 agent_router::agent_router ( agent* a, Parsed_World* parse ):  length ( graph ),
 coord_x ( graph ), coord_y ( graph ),time( a->time ),
 identifier( a->identifier ),communicator(parse->agents.size())//,communicator ( _mutex, &info, _io_service,identifier )
@@ -108,6 +109,9 @@ void agent_router::run_plugin()
         stopAgent();
         return;
     }
+    if (collisions[identifier])
+        for (auto log:log_buffer)
+        std::cout<<log;
     if (internal_state==state::STOPPING) //This is an hack to remove agents from the map
     {
         if (stopping==0)
@@ -131,12 +135,14 @@ void agent_router::run_plugin()
         {
             internal_state=state::ARC_HANDSHAKING;
             negotiation_steps=0;
+            log_buffer.clear();
         }
         //if ( abs ( getNextTime()- ( time+1.7 ) ) <0.001 )  
         if (negotiate && isNearNode()) //se sono su un nodo invece faccio di piu' che negoziare
         {
             internal_state=state::NODE_HANDSHAKING;
             negotiation_steps=0;
+            log_buffer.clear();
             if ( isOnTarget() ) //se il nodo e' il mio target
             {
                 auto oldtarget=graph.id ( target );
@@ -189,7 +195,11 @@ void agent_router::run_plugin()
             last_time_left_a_node=time;
             prepare_move_packet();
             update_packet();
-//             print_path();
+            ostringstream temp;
+            temp<<time<<" ";
+            print_path(temp);
+            log_buffer.push_back(temp.str());
+            
             communicator.send ( my_LRP );
         }
     }
@@ -256,6 +266,7 @@ void agent_router::run_plugin()
         prepare_emergency_packet();
         update_packet();
         communicator.send ( my_LRP );
+        log_buffer.push_back("emergency state");
     }
 
     if ( ( internal_state==state::LISTENING || internal_state==state::NODE_HANDSHAKING
@@ -291,6 +302,10 @@ void agent_router::run_plugin()
         control_ytarget=ytarget;
     }
     setSpeed();
+    ostringstream temp;
+    temp<<time<<" ";
+    print_state(internal_state,temp);
+    log_buffer.push_back(temp.str());
 //     cout<<" stato interno: ";
 //     print_state(internal_state);
 //     cout<<endl;
