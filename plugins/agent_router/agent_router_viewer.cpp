@@ -53,6 +53,7 @@ void agent_router_viewer::init(  )
 //     temp_father->setScalingAndTranslateFactor(maxx,minx,maxy,miny);
 }
 
+
 void agent_router_viewer::paintBackground(QGraphicsScene* scene)
 {
   assert(father);

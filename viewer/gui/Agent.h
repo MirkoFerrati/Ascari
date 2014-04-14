@@ -68,7 +68,7 @@ class Agent
     double charge;
     
     //written by Alessandro Settimi
-    
+    QGraphicsTextItem* text;
     QGraphicsPolygonItem *shape;
     bool created=false;
     

@@ -14,6 +14,7 @@
 #include <memory>
 #include <qt4/QtGui/QGraphicsScene>
 #include <qt4/QtGui/QGraphicsItem>
+#include <qt4/QtGui/qpolygon.h>
 
 #define TYPE_AGENT 1234
 #define TYPE_TEXT 5678
@@ -41,6 +42,12 @@ public:
             {
                 if (!it->second.created)
                 {
+                    QGraphicsTextItem *text=Scene->addText(QString::fromStdString(it->first));
+                    text->scale(1,-1);
+                    text->setData(0,TYPE_TEXT);
+                    text->setFlag(QGraphicsItem::ItemIsMovable,false);
+                    text->setFlag(QGraphicsItem::ItemIsSelectable,true); //TODO: show item details on selection (x,y,theta)?
+                    
                     QGraphicsPolygonItem *agent=Scene->addPolygon(agentshape);
                     std::cout<<"creato nuovo agente"<<std::endl;
                     QBrush b;
@@ -51,12 +58,15 @@ public:
                     agent->setFlag(QGraphicsItem::ItemIsMovable,false);
                     agent->setFlag(QGraphicsItem::ItemIsSelectable,true); //TODO: show item details on selection (x,y,theta)?
                     it->second.shape=agent;
+                    it->second.text=text;
                     it->second.created=true;
                 }
                 double tmp=it->second.angle;
                 while ( tmp>M_PI )
                     tmp=tmp-2*M_PI;
                 it->second.shape->setPos(it->second.x,it->second.y);
+                it->second.text->setPos(it->second.x,it->second.y);
+                
                 it->second.shape->setRotation(tmp*180.0/M_PI);
             }
         };

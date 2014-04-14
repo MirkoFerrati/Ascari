@@ -2,6 +2,7 @@
 #define AGENT_ROUTER_H
 
 #include "abstract_agent_plugin.h"
+#include <boost/circular_buffer.hpp>
 
 #include "HACK_KDEVELOP.h"
 // #ifdef ISAGENT
@@ -21,7 +22,6 @@
 
 #define TIME_SLOT_FOR_3DGRAPH 10.0
 
-extern std::map<std::string,bool> collisions;
 
 enum class state
 {
@@ -116,8 +116,8 @@ private:
     state old_state;
 
 
-    std::vector<std::string> log_buffer;
-    
+    //std::vector<std::string> log_buffer;
+    boost::circular_buffer<std::string> log_buffer;
     /**Comunicatore*/
 //     std::mutex _mutex;  
     std::string identifier;

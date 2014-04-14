@@ -35,7 +35,7 @@ identifier( a->identifier ),communicator(parse->agents.size())//,communicator ( 
 {
     this->a=a;
     this->node_radius=atof(CONFIG.getValue("NODE_RADIUS").c_str());
-    this->control_node_radius=node_radius/3.0;
+    this->control_node_radius=node_radius/10.0;
     for (list<Parsed_Agent>::const_iterator iter=parse->agents.begin();iter!=parse->agents.end();++iter)
     {
         if (iter->name==a->identifier)
@@ -89,13 +89,14 @@ bool agent_router::initialize()
     priority=identifier;
     initialized=true;
     INFO("%s %lf source= %d target= %d",identifier.c_str(),time,targets[0],targets[1]);
+    log_buffer.set_capacity(150);
     return true;
 }
 
 
 void agent_router::run_plugin()
 {
-  if (!initialized)
+    if (!initialized)
     return;
     priority=identifier;
     already_received=false;
@@ -109,11 +110,22 @@ void agent_router::run_plugin()
         stopAgent();
         return;
     }
+//     if (log_buffer.size()>100)
+//         log_buffer.clear();
+    collisions_mutex.lock();
     if (collisions[identifier])
+    {
+        std::ostringstream temp;
+        temp<<identifier<<" ";
         for (auto log:log_buffer)
-        std::cout<<log;
+            temp<<log;
+        std::cout<<temp.str()<<std::endl;
+        log_buffer.clear();
+    }
+    collisions_mutex.unlock();
     if (internal_state==state::STOPPING) //This is an hack to remove agents from the map
     {
+        should_check[identifier]=false;//This is way better (I will keep the hack anyway because of graphical reason)
         if (stopping==0)
         {
             *speed=10000;
@@ -135,14 +147,14 @@ void agent_router::run_plugin()
         {
             internal_state=state::ARC_HANDSHAKING;
             negotiation_steps=0;
-            log_buffer.clear();
+//             log_buffer.clear();
         }
         //if ( abs ( getNextTime()- ( time+1.7 ) ) <0.001 )  
         if (negotiate && isNearNode()) //se sono su un nodo invece faccio di piu' che negoziare
         {
             internal_state=state::NODE_HANDSHAKING;
             negotiation_steps=0;
-            log_buffer.clear();
+//             log_buffer.clear();
             if ( isOnTarget() ) //se il nodo e' il mio target
             {
                 auto oldtarget=graph.id ( target );
@@ -189,6 +201,8 @@ void agent_router::run_plugin()
         {
             last_time_left_a_node=-1;
             cout<<"path not found"<<endl;
+            log_buffer.push_back("path not found");
+            
         }
         else
         {
@@ -212,12 +226,16 @@ void agent_router::run_plugin()
         if ( !next_target_reachable )
         {
             cout<<"path not found"<<endl;
+            log_buffer.push_back("path not found");
         }
         else
         {
             prepare_move_packet();
             update_packet();
-//             print_path();
+            ostringstream temp;
+            temp<<time<<" ";
+            print_path(temp);
+            log_buffer.push_back(temp.str());
             communicator.send ( my_LRP );
         }
     }

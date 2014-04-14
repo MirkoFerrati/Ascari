@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
+#include <mutex>
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <fstream>
@@ -42,7 +43,9 @@ private:
 
 extern configuration_reader CONFIG;
 extern std::map<std::string,bool> collisions;
-
+extern std::map<std::string,bool> should_check;
+extern std::mutex collisions_mutex;
+extern std::mutex should_check_mutex;
 
 
 // #define MULTICAST_PORT  30000

@@ -136,7 +136,11 @@ void createAgents(std::map<std::string,agent*>& agents,Parsed_World& world,std::
     }
     //Randomize starting and ending targets for all agents
     //Save agents target in a map so that createAgents will set their targets accordingly
-    agents_target=randomizeTargets(world.agents,node_ids);
+    std::vector<int> temp_nodes;
+    for (int i=0;i<64;i++)
+        temp_nodes.push_back(i);
+    
+    agents_target=randomizeTargets(world.agents,temp_nodes);
 
     
     //Substitute the call to parserPlugin with a call to setTarget (or call setTarget after plugin was created and overwrite target list)
@@ -299,7 +303,7 @@ for (auto config_value:CONFIG.getMap())
         }
         sim.join();
         out_buffer.Dump();
-    }
+    
         exiting=std::thread ( []()
         {
             delete ( static_zmq::context );
@@ -308,11 +312,11 @@ for (auto config_value:CONFIG.getMap())
 
         std::cout<<"simulator distrutto, agenti running"<<std::endl;
 
-for (auto& t:threads)
+        for (auto& t:threads)
         {
             t.second.join();
         }
-
+    }
 
     
     exiting.join();

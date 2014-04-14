@@ -65,7 +65,8 @@ void agent_router::print_path(ostringstream& out)
 
 void agent_router::stopAgent()
 {
-//TODO
+    *speed=0;
+    *omega=0;
 }
 
 void agent_router::startAgent()
