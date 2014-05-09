@@ -42,8 +42,21 @@ std::vector<Point> CollisionChecker::getPoints(Point center,double theta, double
 
 bool CollisionChecker::checkCollisions(simulation_time& time)
 {
+    
+    /*
+     * Copy old collision status (to avoid printing the same warning again and again)
+     * reset new collision status
+     * For all agents i
+     *  For all agents j
+     *   if (agents are near) collision=true;
+     *   if (collision) verify real collision condition
+     *   if (collision & not collision before) warn about collision       
+     *   update collision status
+     */
+    
     bool ret=false;
     collisions_mutex.lock();
+    auto collisions_old=collisions;
     for (auto t=collisions.begin();t!=collisions.end();++t)
         t->second=false;
     collisions_mutex.unlock();
@@ -74,16 +87,16 @@ bool CollisionChecker::checkCollisions(simulation_time& time)
                     if (!pointInside)
                         collision=false;
                 }
-                if (collision)
+                collisions_mutex.lock();
+                if (collision && !collisions_old[it->first] && !collisions_old[itt->first])
                 {
-                    WARN("%lf Attenzione, c'e' stata una collisione tra gli agenti %s e %s",time,it->first.c_str(),itt->first.c_str());
-                    collisions_mutex.lock();
+                    WARN("Collision: %lf %s %s",time,it->first.c_str(),itt->first.c_str());
                     collisions[it->first]=true;
                     collisions[itt->first]=true;
-                    collisions_mutex.unlock();
                     //usleep(1000*500);
                     ret=true;
                 }
+                collisions_mutex.unlock();
             }
         }
     }
