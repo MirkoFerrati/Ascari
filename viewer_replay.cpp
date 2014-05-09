@@ -25,6 +25,7 @@ int main ( int argc, char **argv )
 
     static_zmq::context=new zmq::context_t ( 1 );
     {
+        int csleep=5000;
         logog::Cout out;
         std::ifstream ifs;
         world_sim_packet packet;
@@ -35,7 +36,7 @@ int main ( int argc, char **argv )
         std::string filename;
         
         desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename)->required(), "Log filename");
-
+        desc.add_options()("sleep useconds,s",boost::program_options::value<int>(&csleep), "useconds to sleep between each simulated timestep");
         for (auto config_value:CONFIG.getMap())
         {
             if (config_value.first!="filename")
@@ -71,7 +72,7 @@ int main ( int argc, char **argv )
         double x,y,theta;
         
         while (ifs.good()) {
-            usleep(5000);
+            usleep(csleep);
             ifs>>header>>header;
             if (header=="Position:")
             {
