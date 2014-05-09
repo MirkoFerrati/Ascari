@@ -17,6 +17,7 @@
 #include "../../shared/types/graph_informations.h"
 #include "udp_graph_communicator.h"
 #include "router_memory_communicator.hpp"
+#include "agent_router_logging.h"
 #include "../agent/agent.h"
 #include <thread>
 
@@ -74,10 +75,12 @@ private:
     void update_packet();
     bool isTimeToNegotiate(simulation_time time);
     void print_path(std::ostringstream& out);
-	int findAge(simulation_time present_time, simulation_time old_time);
+    int findAge(simulation_time present_time, simulation_time old_time);
     void prepare_stopped_packet();
-	void prepare_loading_packet();
-	void print_state( state s, std::ostream& out );
+    void prepare_loading_packet();
+    void print_state( state s, std::ostream& out );
+    std::string print_state( state s );
+        
     simulation_time getNextTime();
     double distance_to_target();
     /*!
@@ -135,6 +138,10 @@ private:
     simulation_time last_time_negotiated;
     bool already_received;
     int stopping;
+    bool there_was_a_collision;
+    
+    agent_router_logging logger;
+    
 };
 
 // #endif

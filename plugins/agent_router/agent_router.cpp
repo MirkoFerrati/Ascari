@@ -30,7 +30,7 @@ mutex router_memory_manager::mtx;
 
 
 agent_router::agent_router ( agent* a, Parsed_World* parse ):  length ( graph ),
-coord_x ( graph ), coord_y ( graph ),time( a->time ),
+coord_x ( graph ), coord_y ( graph ),time( a->time ),logger(a->time,a->identifier),
 identifier( a->identifier ),communicator(parse->agents.size())//,communicator ( _mutex, &info, _io_service,identifier )
 {
     this->a=a;
@@ -88,14 +88,24 @@ bool agent_router::initialize()
     *speed=0;
     priority=identifier;
     initialized=true;
-    INFO("%s %lf source= %d target= %d",identifier.c_str(),time,targets[0],targets[1]);
-    log_buffer.set_capacity(150);
+    int best_distance;
+    int j=0;
+    dijkstra ( graph, length ).path ( computed_path ).dist ( best_distance ).run ( source, target);
+    for ( PathNodeIt<Path<SmartDigraph> > i ( graph, computed_path ); i != INVALID; ++i )
+    {
+        j++;
+    }
+    logger.logBestLength(j);
+    //NFO("%s %lf source= %d target= %d",identifier.c_str(),time,targets[0],targets[1]);
+    log_buffer.set_capacity(200);
     return true;
 }
 
 
 void agent_router::run_plugin()
 {
+    //NFO("Position: %lf %s %lf %lf %lf",time,identifier.c_str(),x,y,theta);
+    logger.logPosition(*x,*y,*theta);
     if (!initialized)
     return;
     priority=identifier;
@@ -194,6 +204,7 @@ void agent_router::run_plugin()
 
     if ( internal_state==state::NODE_HANDSHAKING )
     {
+        log_buffer.push_back("node handshaking");
         lemon::SmartDigraph::ArcMap<bool> useArc ( graph, true );
         filter_graph ( useArc );
         next_target_reachable=findPath ( useArc );
@@ -220,6 +231,7 @@ void agent_router::run_plugin()
 
     if ( internal_state==state::ARC_HANDSHAKING )
     {
+        log_buffer.push_back("arc handshaking");
         lemon::SmartDigraph::ArcMap<bool> useArc ( graph, true );
         filter_graph ( useArc );
         next_target_reachable=findPath ( useArc );
@@ -267,6 +279,8 @@ void agent_router::run_plugin()
         {
             if (internal_state!=state::NODE_HANDSHAKING && internal_state!=state::ARC_HANDSHAKING) //if I am not in a handshaking, I go back to handshaking
                 internal_state=old_state;
+            //log_buffer.push_back("new state after detecting collision: "+print_state(internal_state));
+            cout<<time<<" "<<identifier<<" new state after future collision: "<<print_state(internal_state)<<endl;
         }
         else
         {
@@ -367,10 +381,10 @@ bool agent_router::check_for_overtaking ()
                 if ( ( my_id - other_id ) % graph_node_size == 0 &&
                         ( my_id1 - other_id1 ) % graph_node_size == 0 )
                 {
-                    if ( my_id==other_id )
-                        WARN ( "collisione su un nodo durante il controllo sorpassi? %d %d",my_id,other_id );
-                    if ( my_id1==other_id1 )
-                        WARN ( "collisione su un nodo durante il controllo sorpassi? %d %d",my_id1,other_id1 );
+//                     if ( my_id==other_id )
+//                         WARN ( "collisione su un nodo durante il controllo sorpassi? %d %d",my_id,other_id );
+//                     if ( my_id1==other_id1 )
+//                         WARN ( "collisione su un nodo durante il controllo sorpassi? %d %d",my_id1,other_id1 );
                     if ( my_id > other_id && my_id1< other_id1 )
                     {
                         overtaking = true;
@@ -429,7 +443,14 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
     string start="filtro i nodi:";
     string end="";
 //     _mutex.lock();
-
+    if (there_was_a_collision)
+    {
+//         std::cout<<time<<" "<<identifier<<"filtering graph after a collision"<<std::endl;
+        ostringstream temp;
+        temp<<time<<" "<<identifier<<"filtering graph after a collision";
+        log_buffer.push_back(temp.str());
+        
+    }
     for ( graph_packet::const_iterator it = info.begin(); it != info.end(); ++it ) //per ogni pacchetto ricevuto
     {
         if ( identifier==it->first ) continue;
@@ -443,6 +464,13 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
         {
             int id = ( *itt ) - age * graph_node_size;  //attualizzo il nodo
             if ( id < graph_node_size ) continue; //Se il nodo e' finito nel passato oppure al piano terra lo ignoro
+            if (there_was_a_collision)
+            {
+//                 std::cout<<time<<" "<<identifier<<"nodo filtrato: "<<id%graph_node_size<<std::endl;
+                ostringstream temp;
+                temp<<time<<" "<<identifier<<"nodo filtrato: "<<id%graph_node_size;
+                log_buffer.push_back(temp.str());
+            }
             for ( SmartDigraph::InArcIt arc ( graph, graph.nodeFromId ( id ) ); arc != INVALID; ++arc )  //filtro gli archi entranti nel nodo
             {
                 useArc[arc] = false;
@@ -454,6 +482,7 @@ void agent_router::filter_graph ( lemon::DigraphExtender< lemon::SmartDigraphBas
 //     _mutex.unlock();
     //cout<<end;
     //cout.flush();
+    there_was_a_collision=false;
 }
 
 
@@ -461,7 +490,7 @@ bool agent_router::detect_collision ( )
 {
     bool collision = false;
     std::ostringstream out;
-    out<<"ricerca collisione:";
+    //out<<"ricerca collisione:";
     int my_age=findAge ( time, last_time_updated ); //round ( ( round ( time * 1000.0 ) - round ( last_time_updated * 1000.0 ) ) / 1000.0 / TIME_SLOT_FOR_3DGRAPH );
 
 //     _mutex.lock();
@@ -482,18 +511,21 @@ bool agent_router::detect_collision ( )
             {
                 if ( node_id[i]-my_age*graph_node_size == id )
                 {
-                    {
-                        out << time << " rilevata una collisione con "<<it->first<<" tra "<<node_id[i]-my_age*graph_node_size <<"("<<i <<") e "<<id << ";    ";
-                    }
+                    out << time <<" "<<identifier << " rilevata una collisione con "<<it->first<<" sul nodo "<<node_id[i]-my_age*graph_node_size <<"("<<node_id[i]%graph_node_size <<") tra "<<i << " steps;    " <<endl;
+                    //NFO("FutureCollision: %lf %s %s %d %d",time, identifier.c_str(),it->first.c_str(),id,id%graph_node_size);
+                    logger.logFutureCollision(it->first,id,id%graph_node_size);
                     collision = true;
+                    there_was_a_collision=true;
                 }
             }
         }
     }
 //     _mutex.unlock();
-    out<<"ricerca collisione completata"<<endl;
-    //if ( collision )
-    //    cout<<out.str();
+    //out<<"ricerca collisione completata"<<endl;
+    if ( collision )
+    {
+        cout<<out.str();
+    }
     return collision;
 }
 
@@ -596,7 +628,8 @@ void agent_router::setSpeed()
     *speed=length/delta;
     *omega=5*sin(atan2(control_ytarget-*y,control_xtarget-*x)-*theta);
     // std::cout<<identifier<<" speed="<<*speed<<",length="<<length<<"delta="<<delta<<std::endl;
-    INFO("%s %lf speed= %lf",identifier.c_str(),time,*speed);
+    //NFO("Speed: %lf %s %lf %lf",time, identifier.c_str(),*speed,*omega);
+    logger.logSpeed(*speed,*omega);
 }
 
 simulation_time agent_router::getNextTime()
@@ -657,7 +690,8 @@ bool agent_router::setNextTarget()
 {
     if ( target_counter == targets.size() )
     {
-        INFO("%s %lf TARGET FINALE raggiunto, mi fermo",identifier.c_str(),time);
+        //NFO("%s %lf TARGET FINALE raggiunto, mi fermo",identifier.c_str(),time);
+        logger.logFinalTarget();
         return false;
     }
     else
@@ -666,7 +700,8 @@ bool agent_router::setNextTarget()
         
         target_counter++;
         target = graph.nodeFromId ( id );
-        INFO("%s %lf TARGET raggiunto, nuovo target: %i %i %i",identifier.c_str(),time,id,coord_x [target],coord_y[target]);
+        //NFO("%s %lf TARGET raggiunto, nuovo target: %i %i %i",identifier.c_str(),time,id,coord_x [target],coord_y[target]);
+        logger.logNewTarget(id,coord_x[target],coord_y[target]);
         return true;
     }
 }

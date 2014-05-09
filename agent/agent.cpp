@@ -163,8 +163,6 @@ void agent::main_loop()
         state.at ( it->first ) =it->second;
 	//cout<<it->first<<":"<<it->second<<endl;
     }
-
-    INFO("Position: %lf %s %lf %lf %lf",this->time,this->identifier.c_str(),state.at(0),state.at(1),state.at(2));
     
     sleep ( 0 );
 

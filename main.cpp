@@ -17,6 +17,7 @@
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include <random>
+#include <agent_router/agent_router_logging.h>
 /**
 Profiling notes:
 simulator main loop                                     74%
@@ -177,7 +178,8 @@ void createAgents(std::map<std::string,agent*>& agents,Parsed_World& world,std::
         }
         reinterpret_cast<agent_router*>(temp->plugins[0])->setTargets(agents_target.at(temp->identifier));
         int source_temp=agents_target.at(temp->identifier).at(0);
-        INFO("%s source= %d target= %d startX=%d startY=%d",temp->identifier.c_str(),source_temp,agents_target.at(temp->identifier).at(1),coord_x[graph.nodeFromId(source_temp)],coord_y[graph.nodeFromId(source_temp)]);
+        //NFO("StartInfo: %lf %s source %d target %d startX %d startY %d",0.0,temp->identifier.c_str(),source_temp,agents_target.at(temp->identifier).at(1),coord_x[graph.nodeFromId(source_temp)],coord_y[graph.nodeFromId(source_temp)]);
+        agent_router_logging::logStartInfo(0.0,temp->identifier,source_temp,agents_target.at(temp->identifier).at(1),coord_x[graph.nodeFromId(source_temp)],coord_y[graph.nodeFromId(source_temp)]);
         temp->initialize();
     }
 }
@@ -207,9 +209,9 @@ int main ( int argc, char **argv )
 
         sprintf(buf,"log_%s",buffer);
         logog::LogFile out(buf);
-        logog::LogBuffer out_buffer(&out);
+        //logog::LogBuffer out_buffer(&out);
         FormatterCustom customFormat;
-        out_buffer.SetFormatter( customFormat );
+        //out_buffer.SetFormatter( customFormat );
         out.SetFormatter(customFormat);
         std::map<std::string,agent*> agents;
         boost::program_options::options_description desc;
@@ -302,8 +304,9 @@ for (auto config_value:CONFIG.getMap())
                                          ));
         }
         sim.join();
-        out_buffer.Dump();
-    
+//         dumper.join();
+        //out_buffer.Dump();
+        
         exiting=std::thread ( []()
         {
             delete ( static_zmq::context );

@@ -20,24 +20,26 @@
 
 using namespace std;
 
+std::string agent_router::print_state(state s)
+{
+    switch( s )
+    {
+        case state::MOVING: return "moving"; break;
+        case state::LISTENING: return "listening"; break;
+        case state::LOADING: return "loading"; break;
+        case state::ARC_HANDSHAKING: return "arc_handshaking"; break;
+        case state::NODE_HANDSHAKING: return "node_handshaking"; break;
+        case state::EMERGENCY: return "emergency"; break;
+        case state::STARTING: return "starting"; break;
+        case state::STOPPED: return "stopped"; break;
+        default: assert(0);
+    }
+   
+}
 
 void agent_router::print_state(state s,ostream& out)
 {
-	stringstream os;
-		switch( s )
-		{
-			case state::MOVING: os << "moving"; break;
-			case state::LISTENING: os << "listening"; break;
-			case state::LOADING: os << "loading"; break;
-			case state::ARC_HANDSHAKING: os << "arc_handshaking"; break;
-			case state::NODE_HANDSHAKING: os << "node_handshaking"; break;
-			case state::EMERGENCY: os << "emergency"; break;
-			case state::STARTING: os << "starting"; break;
-			case state::STOPPED: os << "stopped"; break;
-			default: assert(0);
-		}
-		out<<os.str();
-	
+            out<<print_state(s);
 }
 
 
