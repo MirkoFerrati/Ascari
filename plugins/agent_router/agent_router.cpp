@@ -69,7 +69,7 @@ bool agent_router::initialize()
     control_target=graph.nodeFromId(targets[1]);
     node_id.push_back ( targets[0] ); //next = source;
     node_id.push_back ( targets[0] ); //next = source;
-    target_counter = 0;
+    target_counter = 2;
     xtarget =  coord_x[source];
     ytarget =  coord_y[source];
     control_xtarget=xtarget;
