@@ -427,7 +427,19 @@ void simulator::main_loop()
                 }
             }
 
-            if ( sim_packet.time>max_loops )
+            bool stop=true;
+            should_check_mutex.lock();
+            for (auto flag:should_check)
+            {
+                if (flag.second)
+                {
+                    stop=false;
+                    break;
+                }
+            }
+            should_check_mutex.unlock();
+            
+            if ( sim_packet.time>max_loops || stop )
                 break;
             // Calculate time taken by a request
             clock_gettime ( CLOCK_REALTIME, &requestEnd );
