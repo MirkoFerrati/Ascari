@@ -220,6 +220,7 @@ int main ( int argc, char **argv )
         s=new simulator();
         std::string filename;
         int count=500; 
+        int sleep=0;
         if (CONFIG.exists("FILENAME"))
         {
             filename=CONFIG.getValue("FILENAME");
@@ -236,6 +237,7 @@ int main ( int argc, char **argv )
             desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename)->required(), "Yaml filename");
 
         desc.add_options()("cycles,c",boost::program_options::value<int>(&count), "Number of seconds to be simulated");
+        desc.add_options()("sleep,s",boost::program_options::value<int>(&sleep),"Number of milliseconds to be slept during each cycle");
         
 for (auto config_value:CONFIG.getMap())
         {
@@ -274,7 +276,7 @@ for (auto config_value:CONFIG.getMap())
          * Killare tutto e ripartire...come?
          */
         Parsed_World world;
-        s->setPeriod(0);
+        s->setPeriod(sleep);
 
         createSimulator(s,world,filename); //Costruire i plugin di simulator (come nel main di simulator)
         createAgents(agents,world,filename);//Costruire i plugin di agent (come nel main di agent)
