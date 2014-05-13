@@ -66,7 +66,7 @@ private:
     /*!
      * @return distance_to_control_target()<control_node_radius
      */    
-    bool target_reached();
+    bool control_target_reached();
     void prepare_move_packet();
     void prepare_emergency_packet();
     bool detect_collision();
@@ -141,6 +141,7 @@ private:
     bool there_was_a_collision;
     
     agent_router_logging logger;
+    simulation_time control_time;
     
 };
 

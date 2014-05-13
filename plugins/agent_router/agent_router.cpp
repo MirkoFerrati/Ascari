@@ -74,6 +74,7 @@ bool agent_router::initialize()
     ytarget =  coord_y[source];
     control_xtarget=xtarget;
     control_ytarget=ytarget;
+    control_time=getNextTime();
     my_LRP.timestamp = 0;
     started=false;
     stopping=0;
@@ -218,6 +219,7 @@ void agent_router::run_plugin()
         else
         {
             last_time_left_a_node=time;
+            started=true;
             prepare_move_packet();
             update_packet();
             ostringstream temp;
@@ -328,10 +330,17 @@ void agent_router::run_plugin()
 //         stopAgent();
 //     }
 
-    if (target_reached())
+    if (next_target_reachable)
+    {
+        auto next= graph.nodeFromId(node_id[1]);
+        xtarget =  coord_x[next];
+        ytarget =  coord_y[next];
+    }
+    if (control_target_reached())
     {
         control_xtarget=xtarget;
         control_ytarget=ytarget;
+        control_time=getNextTime();
     }
     setSpeed();
     ostringstream temp;
@@ -621,9 +630,8 @@ void agent_router::setSpeed()
         *speed=0;
         return;
     }
-    started=true;
     assert ( node_id.size() >1 );
-    simulation_time delta = getNextTime() - time;
+    simulation_time delta = control_time-time;//getNextTime() - time;
     double length = distance_to_control_target();
     *speed=length/delta;
     *omega=5*sin(atan2(control_ytarget-*y,control_xtarget-*x)-*theta);
@@ -637,8 +645,6 @@ simulation_time agent_router::getNextTime()
     if ( !started ) return TIME_SLOT_FOR_3DGRAPH;
     assert ( node_id.size() >1 );
     SmartDigraphBase::Node next=graph.nodeFromId ( node_id[1] );
-    xtarget =  coord_x[next];
-    ytarget =  coord_y[next];
     unsigned int floor = graph.id ( next ) / graph_node_size;
     int next_time = round ( last_time_updated/TIME_SLOT_FOR_3DGRAPH ) *TIME_SLOT_FOR_3DGRAPH + TIME_SLOT_FOR_3DGRAPH * floor;
     return next_time;
@@ -653,7 +659,7 @@ bool agent_router::isOnTarget()
     return false;
 }
 
-bool agent_router::target_reached()
+bool agent_router::control_target_reached()
 {
     return distance_to_control_target()<control_node_radius;
 }
