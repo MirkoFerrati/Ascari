@@ -2,6 +2,19 @@
 #define AGENT_ROUTER_LOGGING_H
 #include <types.h>
 #include <logog.hpp>
+
+#define position_string "%s %g %s %g %g %g"
+#define speed_string "%s %g %s %g %g"
+#define bestLength_string "%s %g %s %d"
+#define futureCollision_string "%s %g %s %s %d %d"
+#define finalTarget_string "%s %g %s"
+#define position_tag "P:"
+#define speed_tag "S:"
+#define bestLength_tag "B:"
+#define futureCollision_tag "F:"
+#define finalTarget_tag "T:"
+#define startInfo_tag "I:"
+
 struct startInfo{
     std::string name;
     simulation_time time;
@@ -50,7 +63,7 @@ public:
     agent_router_logging(simulation_time& time, std::string name);
     static inline void logStartInfo(simulation_time time, std::string identifier, int source, int target, double startx, double starty)
     {
-        INFO("StartInfo: %g %s source %d target %d startX %g startY %g",time,identifier.c_str(),source,target,startx,starty);
+        INFO("%s %g %s s %d t %d sX %g sY %g",startInfo_tag,time,identifier.c_str(),source,target,startx,starty);
     }
     
     static collision parseCollision(std::string line_to_parse);

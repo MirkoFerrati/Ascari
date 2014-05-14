@@ -83,12 +83,12 @@ int main ( int argc, char **argv )
 
                 if (type=="info:")
                 {
-                    if (line_to_parse.find("Position:")!=string::npos)
+                    if (line_to_parse.find(position_tag)!=string::npos)
                     {
                         auto position=parser.parsePosition(line_to_parse);
 //                         std::cout<<"Position: "<<position.name<<" "<<position.time<<" "<<position.x<<" "<<position.y<<" "<<position.theta<<std::endl;
                     }
-                    if (line_to_parse.find("Speed:")!=string::npos)
+                    if (line_to_parse.find(speed_tag)!=string::npos)
                     {
                         auto speed=parser.parseSpeed(line_to_parse);
                         if (abs(infos[speed.name].speed_profile.back().second-speed.speed)>TOLERANCE)
@@ -96,7 +96,7 @@ int main ( int argc, char **argv )
                             infos[speed.name].speed_profile.push_back(std::make_pair(speed.time,speed.speed));
                         }
                     }
-                    if (line_to_parse.find("StartInfo:")!=string::npos)
+                    if (line_to_parse.find(startInfo_tag)!=string::npos)
                     {
                         auto start_info=parser.parseStartInfo(line_to_parse);
                         infos[start_info.name].speed_profile.push_back(std::make_pair(0.0,0.0));
@@ -105,17 +105,17 @@ int main ( int argc, char **argv )
                         infos[start_info.name].x=start_info.startx;
                         infos[start_info.name].y=start_info.starty;
                     }
-                    if (line_to_parse.find("FutureCollision:")!=string::npos)
+                    if (line_to_parse.find(futureCollision_tag)!=string::npos)
                     {
                         auto collision=parser.parseFutureCollision(line_to_parse);
                         future_collisions++;
                     }
-                    if (line_to_parse.find("BestLength:")!=string::npos)
+                    if (line_to_parse.find(bestLength_tag)!=string::npos)
                     {
                         auto best_length=parser.parseBestLength(line_to_parse);
                         infos[best_length.first].best_length=best_length.second;
                     }
-                    if (line_to_parse.find("Target_reached:")!=string::npos)
+                    if (line_to_parse.find(finalTarget_tag)!=string::npos)
                     {
                         auto target_reached=parser.parseFinalTarget(line_to_parse);
                         infos[target_reached.first].time_of_arrival=target_reached.second;
@@ -133,9 +133,8 @@ int main ( int argc, char **argv )
                 }
 
             }
-            std::cout<<"FutureCollisions: "<<future_collisions<<std::endl;
-            std::cout<<"RealCollisions: "<<real_collisions<<std::endl;
-            std::cout<<"Speed profile agent "<<infos.begin()->first<<std::endl;
+            std::cout<<"FutureCollisions: "<<future_collisions<<" RealCollisions: "<<real_collisions<<std::endl;
+            //std::cout<<"Speed profile agent "<<infos.begin()->first<<std::endl;
             for (auto speed:infos.begin()->second.speed_profile)
             {
                 //std::cout<<speed.first<<" "<<speed.second<<std::endl;

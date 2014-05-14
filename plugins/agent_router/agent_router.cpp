@@ -90,11 +90,12 @@ bool agent_router::initialize()
     priority=identifier;
     initialized=true;
     int best_distance;
-    int j=0;
+    int j=-2;
     dijkstra ( graph, length ).path ( computed_path ).dist ( best_distance ).run ( source, target);
     for ( PathNodeIt<Path<SmartDigraph> > i ( graph, computed_path ); i != INVALID; ++i )
     {
         j++;
+        //cout<<graph.id(i)<<endl;
     }
     logger.logBestLength(j);
     //NFO("%s %lf source= %d target= %d",identifier.c_str(),time,targets[0],targets[1]);
@@ -165,6 +166,7 @@ void agent_router::run_plugin()
         {
             internal_state=state::NODE_HANDSHAKING;
             negotiation_steps=0;
+                        
 //             log_buffer.clear();
             if ( isOnTarget() ) //se il nodo e' il mio target
             {
@@ -282,7 +284,7 @@ void agent_router::run_plugin()
             if (internal_state!=state::NODE_HANDSHAKING && internal_state!=state::ARC_HANDSHAKING) //if I am not in a handshaking, I go back to handshaking
                 internal_state=old_state;
             //log_buffer.push_back("new state after detecting collision: "+print_state(internal_state));
-            cout<<time<<" "<<identifier<<" new state after future collision: "<<print_state(internal_state)<<endl;
+            //cout<<time<<" "<<identifier<<" new state after future collision: "<<print_state(internal_state)<<endl;
         }
         else
         {
@@ -520,7 +522,7 @@ bool agent_router::detect_collision ( )
             {
                 if ( node_id[i]-my_age*graph_node_size == id )
                 {
-                    out << time <<" "<<identifier << " rilevata una collisione con "<<it->first<<" sul nodo "<<node_id[i]-my_age*graph_node_size <<"("<<node_id[i]%graph_node_size <<") tra "<<i << " steps;    " <<endl;
+//                     out << time <<" "<<identifier << " rilevata una collisione con "<<it->first<<" sul nodo "<<node_id[i]-my_age*graph_node_size <<"("<<node_id[i]%graph_node_size <<") tra "<<i << " steps;    " <<endl;
                     //NFO("FutureCollision: %lf %s %s %d %d",time, identifier.c_str(),it->first.c_str(),id,id%graph_node_size);
                     logger.logFutureCollision(it->first,id,id%graph_node_size);
                     collision = true;
@@ -706,6 +708,7 @@ bool agent_router::setNextTarget()
         
         target_counter++;
         target = graph.nodeFromId ( id );
+
         //NFO("%s %lf TARGET raggiunto, nuovo target: %i %i %i",identifier.c_str(),time,id,coord_x [target],coord_y[target]);
         logger.logNewTarget(id,coord_x[target],coord_y[target]);
         return true;
