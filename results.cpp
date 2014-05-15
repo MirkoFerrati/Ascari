@@ -15,7 +15,7 @@
 #include <agent_router/agent_router_logging.h>
 using namespace std;
 
-#define TOLERANCE 0.1
+#define TOLERANCE 0.7
 
 struct agent_info
 {
@@ -27,6 +27,8 @@ struct agent_info
     int source;
     double x;
     double y;
+    double energy_saved;
+    double energy_used;
 };
 
 int main ( int argc, char **argv )
@@ -66,7 +68,9 @@ int main ( int argc, char **argv )
             std::cerr << desc << std::endl;
             return 2;
         }
-
+        std::cout<<"Agent ";
+        std::cout<<"BestLength "<<"Time_arrival "<<"source "<<"target "<<"energy_used "<<"energy_saved "<<std::endl;
+        int failed_simulations=0;
         for (auto filename:filenames)
         {
             ifs.open (filename.c_str(), std::ifstream::in);
@@ -91,9 +95,18 @@ int main ( int argc, char **argv )
                     if (line_to_parse.find(speed_tag)!=string::npos)
                     {
                         auto speed=parser.parseSpeed(line_to_parse);
-                        if (abs(infos[speed.name].speed_profile.back().second-speed.speed)>TOLERANCE)
+//                        if (abs(infos[speed.name].speed_profile.back().second-speed.speed))
                         {
-                            infos[speed.name].speed_profile.push_back(std::make_pair(speed.time,speed.speed));
+                            if (speed.speed<TOLERANCE*infos[speed.name].speed_profile.back().second)  //if I lowered my speed more than 70% instead of stopping, I saved energy
+                            {
+                                infos[speed.name].energy_saved+=speed.speed*speed.speed;
+                                infos[speed.name].speed_profile.push_back(std::make_pair(speed.time,speed.speed));                                
+                            }
+                            else if (speed.speed>(1.0/TOLERANCE)*infos[speed.name].speed_profile.back().second)//energy used to speed up
+                            {
+                                infos[speed.name].energy_used+=speed.speed*speed.speed-infos[speed.name].speed_profile.back().second*infos[speed.name].speed_profile.back().second;
+                                infos[speed.name].speed_profile.push_back(std::make_pair(speed.time,speed.speed));
+                            }
                         }
                     }
                     if (line_to_parse.find(startInfo_tag)!=string::npos)
@@ -133,17 +146,29 @@ int main ( int argc, char **argv )
                 }
 
             }
-            std::cout<<"FutureCollisions: "<<future_collisions<<" RealCollisions: "<<real_collisions<<std::endl;
+            ifs.close();
+            
+            //std::cout<<"FutureCollisions: "<<future_collisions<<" RealCollisions: "<<real_collisions<<std::endl;
             //std::cout<<"Speed profile agent "<<infos.begin()->first<<std::endl;
-            for (auto speed:infos.begin()->second.speed_profile)
+            for (auto speed:infos["A30"].speed_profile)
             {
                 //std::cout<<speed.first<<" "<<speed.second<<std::endl;
             }
+            bool skip=false;
             for (auto agent:infos)
             {
-                std::cout<<"Agent "<<agent.first<<" BestLength: "<<agent.second.best_length<<" Time of arrival: "<<agent.second.time_of_arrival<<" source:"<<agent.second.source<<" target:"<<agent.second.target<<std::endl;
+                if (agent.second.time_of_arrival<10)
+                {
+                    failed_simulations++;
+                    skip=true;
+                }
+            }            
+            if (skip) continue;
+            for (auto agent:infos)
+            {
+                std::cout<<agent.first<<" ";
+                std::cout<<agent.second.best_length<<" "<<agent.second.time_of_arrival<<" "<<agent.second.source<<" "<<agent.second.target<<" "<<agent.second.energy_used<<" "<<agent.second.energy_saved<<std::endl;
             }
-            ifs.close();
             //TODO save single filename result
         }
     }
