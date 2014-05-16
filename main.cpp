@@ -75,18 +75,26 @@ for (auto agent:agents)
     return agents_target;
 }
 
-void createSimulator(simulator* s,Parsed_World& world ,std::string filename)
+void createSimulator(simulator* s,Parsed_World& world ,std::string filename,int number_of_agents=0)
 {
     auto plugins=createSimulatorPlugins();
 
     yaml_parser parser;
-for ( auto plugin:plugins )
+    for ( auto plugin:plugins )
     {
         plugin->createParserPlugin();
         parser.addPlugin ( plugin->getParserPlugin() );
     }
     world=parser.parse_file ( filename );
-for ( auto plugin:plugins )
+    if (number_of_agents)
+    {
+        int size=world.agents.size()-number_of_agents;
+        for (int i=0;i<size;i++)
+        {
+            world.agents.pop_back();
+        }
+    }
+    for ( auto plugin:plugins )
     {
         if ( plugin->isEnabled() )
         {
@@ -221,6 +229,7 @@ int main ( int argc, char **argv )
         std::string filename;
         int count=500; 
         int sleep=0;
+        int number_of_agents=0;
         if (CONFIG.exists("FILENAME"))
         {
             filename=CONFIG.getValue("FILENAME");
@@ -238,8 +247,9 @@ int main ( int argc, char **argv )
 
         desc.add_options()("cycles,c",boost::program_options::value<int>(&count), "Number of seconds to be simulated");
         desc.add_options()("sleep,s",boost::program_options::value<int>(&sleep),"Number of milliseconds to be slept during each cycle");
+        desc.add_options()("agents,n",boost::program_options::value<int>(&number_of_agents), "Number of agents to be simulated (override yaml file)");
         
-for (auto config_value:CONFIG.getMap())
+        for (auto config_value:CONFIG.getMap())
         {
             if (config_value.first!="filename")
                 desc.add_options()(config_value.first.c_str(),config_value.second.data().c_str());
@@ -261,6 +271,8 @@ for (auto config_value:CONFIG.getMap())
         {
             std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
             std::cerr << desc << std::endl;
+            for (int i=0;i<argc;i++)
+                std::cerr << argv[i] <<std::endl;
             return 2;
         }
 
@@ -278,7 +290,7 @@ for (auto config_value:CONFIG.getMap())
         Parsed_World world;
         s->setPeriod(sleep);
 
-        createSimulator(s,world,filename); //Costruire i plugin di simulator (come nel main di simulator)
+        createSimulator(s,world,filename,number_of_agents); //Costruire i plugin di simulator (come nel main di simulator)
         createAgents(agents,world,filename);//Costruire i plugin di agent (come nel main di agent)
         
 

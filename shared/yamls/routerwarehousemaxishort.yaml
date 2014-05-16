@@ -173,3 +173,471 @@
       theta: '0'
     TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
     BEHAVIOR: LGV
+
+  - agent: A19
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [0,4,6,8,1,33,33,33,33,3,5,35]
+    BEHAVIOR: LGV
+
+  - agent: A20
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: A21
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A22
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A23
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: A24
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV
+    
+  - agent: A25
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [0,4,6,8,1,33,33,33,33,3,5,35]
+    BEHAVIOR: LGV
+
+  - agent: A26
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: A27
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A28
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A29
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: A30
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV
+    
+  - agent: A31
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [0,4,6,8,1,33,33,33,33,3,5,35]
+    BEHAVIOR: LGV
+
+  - agent: A32
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: A33
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A34
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A35
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: A36
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: A37
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: A38
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A39
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A40
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: A41
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV
+    
+  - agent: A42
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [0,4,6,8,1,33,33,33,33,3,5,35]
+    BEHAVIOR: LGV
+
+  - agent: A43
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: A44
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A45
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A46
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: A47
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV
+    
+  - agent: A48
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [0,4,6,8,1,33,33,33,33,3,5,35]
+    BEHAVIOR: LGV
+
+  - agent: A49
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: A50
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A51
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A52
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: A53
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: A54
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: A55
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A56
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A57
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: A58
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV
+    
+  - agent: A59
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [0,4,6,8,1,33,33,33,33,3,5,35]
+    BEHAVIOR: LGV
+
+  - agent: A60
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: A61
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A62
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A63
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: A64
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV
+    
+  - agent: A65
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [0,4,6,8,1,33,33,33,33,3,5,35]
+    BEHAVIOR: LGV
+
+  - agent: A66
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '15'
+      theta: '0'
+    TARGET_LIST: [8,4,2,33,33,33,33,3,6,7,1,3,35]
+    BEHAVIOR: LGV
+
+  - agent: A67
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [5,4,34,34,34,3,6,7,1,3,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A68
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '-135'
+      y: '17'
+      theta: '0'
+    TARGET_LIST: [7,8,2,33,33,33,33,3,5,1,7,2,35]
+    BEHAVIOR: LGV
+
+  - agent: A69
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '15'
+      y: '-135'
+      theta: '0'
+    TARGET_LIST: [6,2,7,34,34,34,34,3,5,1,7,35]
+    BEHAVIOR: LGV
+
+  - agent: A70
+    COMMUNICATION_AREA: =  circle(10)
+    INITIAL:
+    - x: '165'
+      y: '165'
+      theta: '0'
+    TARGET_LIST: [2,6,3,7,33,33,33,33,5,2,1,7,35]
+    BEHAVIOR: LGV

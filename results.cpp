@@ -13,7 +13,12 @@
 #include <time.h>       /* time */
 #include <thread>
 #include <agent_router/agent_router_logging.h>
+#include <boost/timer/timer.hpp>
+
 using namespace std;
+using boost::timer::cpu_timer;
+using boost::timer::cpu_times;
+using boost::timer::nanosecond_type;
 
 #define TOLERANCE 0.7
 
@@ -39,17 +44,20 @@ int main ( int argc, char **argv )
     {
         logog::Cout out;
         std::ifstream ifs;
+        std::string output,summary;
         double fake=0;
         agent_router_logging parser(fake,"");
         std::vector<std::string> filenames;
         boost::program_options::options_description desc;
         boost::program_options::variables_map options;
         desc.add_options()("help,h","Get help");
-
         desc.add_options()("files,f",boost::program_options::value<std::vector<std::string>>(&filenames)->required(), "Log files");
+        desc.add_options()("output_file,o",boost::program_options::value<std::string>(&output), "Output file");
+        desc.add_options()("summary_file,s",boost::program_options::value<std::string>(&summary), "Summary file");
+        
         boost::program_options::positional_options_description p;
         p.add("files",-1);
-
+        
         try
         {
             boost::program_options::store(boost::program_options::command_line_parser(argc,argv).options(desc).positional(p).run(),options);//Overwrite default file values with shell one
@@ -68,11 +76,41 @@ int main ( int argc, char **argv )
             std::cerr << desc << std::endl;
             return 2;
         }
-        std::cout<<"Agent ";
-        std::cout<<"BestLength "<<"Time_arrival "<<"source "<<"target "<<"energy_used "<<"energy_saved "<<std::endl;
+        ofstream temp;
+        streambuf* buf;
+        if (options.count("output_file"))
+        {
+                temp.open(output);
+                buf=temp.rdbuf();
+        }
+        else
+            buf=std::cout.rdbuf();
+        ostream output_file(buf);
+        
+        ofstream summary_file;
+        if (options.count("summary_file"))
+            summary_file.open(summary);
+        else
+            summary_file.open("summary.txt");
+        summary_file<<"FileName "<<"FutureCollisions "<<"RealCollisions "<<std::endl;
+        output_file<<"Agent ";
+        output_file<<"BestLength "<<"Time_arrival "<<"source "<<"target "<<"energy_used "<<"energy_saved "<<std::endl;
         int failed_simulations=0;
+        int i=0;
+        int max=filenames.size();
+        cpu_timer timer;
+        
+        
         for (auto filename:filenames)
         {
+            i++;
+            if (i%5==0)
+            {
+            cpu_times const elapsed_times(timer.elapsed());
+            nanosecond_type const elapsed(elapsed_times.system+elapsed_times.user);
+            std::cout<<"elapsed:"<<setw(10)<<elapsed/1E9<<" remaining: "<<setw(10)<<(elapsed/1E9)/i*(max-i)<<setw(10)<<100*(1.0*i/max)<<"%"<<"\r";
+            flush(cout);
+            }
             ifs.open (filename.c_str(), std::ifstream::in);
             if (!ifs.is_open())
                 return 1;
@@ -80,6 +118,7 @@ int main ( int argc, char **argv )
             int future_collisions=0;
             int real_collisions=0;
             std::map<std::string,agent_info> infos;
+            //std::vector<collision> collisions;
             while (ifs.good()) {
                 ifs>>type;
                 if (!ifs.eof())
@@ -148,12 +187,11 @@ int main ( int argc, char **argv )
             }
             ifs.close();
             
-            //std::cout<<"FutureCollisions: "<<future_collisions<<" RealCollisions: "<<real_collisions<<std::endl;
-            //std::cout<<"Speed profile agent "<<infos.begin()->first<<std::endl;
+            /*std::cout<<"Speed profile agent "<<infos.begin()->first<<std::endl;
             for (auto speed:infos["A30"].speed_profile)
             {
-                //std::cout<<speed.first<<" "<<speed.second<<std::endl;
-            }
+                std::cout<<speed.first<<" "<<speed.second<<std::endl;
+            }*/
             bool skip=false;
             for (auto agent:infos)
             {
@@ -161,16 +199,19 @@ int main ( int argc, char **argv )
                 {
                     failed_simulations++;
                     skip=true;
+                    break;
                 }
             }            
             if (skip) continue;
+            summary_file<<filename<<" "<<future_collisions<<" "<<real_collisions<<std::endl;
             for (auto agent:infos)
             {
-                std::cout<<agent.first<<" ";
-                std::cout<<agent.second.best_length<<" "<<agent.second.time_of_arrival<<" "<<agent.second.source<<" "<<agent.second.target<<" "<<agent.second.energy_used<<" "<<agent.second.energy_saved<<std::endl;
+                output_file<<agent.first<<" ";
+                output_file<<agent.second.best_length<<" "<<agent.second.time_of_arrival<<" "<<agent.second.source<<" "<<agent.second.target<<" "<<agent.second.energy_used<<" "<<agent.second.energy_saved<<std::endl;
             }
             //TODO save single filename result
         }
+        std::cout<<std::endl<<"Failed simulations:"<<failed_simulations<<std::endl;
     }
     catch(const char* ex)
     {

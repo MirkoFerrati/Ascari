@@ -74,7 +74,7 @@ int main ( int argc, char **argv )
         while (ifs.good()) {
             usleep(csleep);
             ifs>>header>>header;
-            if (header=="Position:")
+            if (header=="P:")
             {
                 ifs>>time;
                 ifs>>agent_name;

@@ -90,7 +90,10 @@ bool CollisionChecker::checkCollisions(simulation_time& time)
                 collisions_mutex.lock();
                 if (collision && !collisions_old[it->first] && !collisions_old[itt->first])
                 {
-                    WARN("Collision: %lf %s %s",time,it->first.c_str(),itt->first.c_str());
+                    WARN("Collision: %lf %s %s",time,it->first.c_str(),itt->first.c_str()); //We write a warning only once
+                }
+                if (collision)
+                {
                     collisions[it->first]=true;
                     collisions[itt->first]=true;
                     //usleep(1000*500);
