@@ -92,7 +92,7 @@ void agent::start()
     {
         inputs.identifier = identifier;
         int cicli = 0;
-        std::cout<<"agent main infinite loop started"<<std::endl;
+//         std::cout<<"agent main infinite loop started"<<std::endl;
         while ( !s_interrupted )
         {
             main_loop();

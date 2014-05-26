@@ -24,16 +24,16 @@ using boost::timer::nanosecond_type;
 
 struct agent_info
 {
-    int best_length;
-    int time_of_arrival;
+    int best_length=0;
+    int time_of_arrival=0;
     std::vector<std::pair<double,double>> speed_profile;
-    std::string name;
-    int target;
-    int source;
-    double x;
-    double y;
-    double energy_saved;
-    double energy_used;
+    std::string name="";
+    int target=-1;
+    int source=-1;
+    double x=0;
+    double y=0;
+    double energy_saved=0;
+    double energy_used=0;
 };
 
 int main ( int argc, char **argv )
@@ -95,7 +95,7 @@ int main ( int argc, char **argv )
         summary_file<<"FileName "<<"FutureCollisions "<<"RealCollisions "<<std::endl;
         output_file<<"Agent ";
         output_file<<"BestLength "<<"Time_arrival "<<"source "<<"target "<<"energy_used "<<"energy_saved "<<std::endl;
-        int failed_simulations=0;
+        std::vector<std::string> failed_simulations;
         int i=0;
         int max=filenames.size();
         cpu_timer timer;
@@ -197,7 +197,7 @@ int main ( int argc, char **argv )
             {
                 if (agent.second.time_of_arrival<10)
                 {
-                    failed_simulations++;
+                    failed_simulations.push_back(filename);
                     skip=true;
                     break;
                 }
@@ -211,7 +211,10 @@ int main ( int argc, char **argv )
             }
             //TODO save single filename result
         }
-        std::cout<<std::endl<<"Failed simulations:"<<failed_simulations<<std::endl;
+        summary_file<<std::endl<<"Failed simulations:"<<failed_simulations.size()<<std::endl;
+        for (auto sim:failed_simulations)
+            summary_file<<sim<<" ";
+        summary_file<<std::endl;
     }
     catch(const char* ex)
     {

@@ -211,10 +211,9 @@ int main ( int argc, char **argv )
 
         std::time(&rawtime);
         timeinfo = std::localtime(&rawtime);
-
+        
         std::strftime(buffer,80,"%Y-%m-%d-%H-%M-%S",timeinfo);
-        std::puts(buffer);
-
+        //std::puts(buffer);
         sprintf(buf,"log_%s",buffer);
         logog::LogFile out(buf);
         //logog::LogBuffer out_buffer(&out);
@@ -327,7 +326,7 @@ int main ( int argc, char **argv )
         } );
         delete(s);
 
-        std::cout<<"simulator distrutto, agenti running"<<std::endl;
+//         std::cout<<"simulator distrutto, agenti running"<<std::endl;
 
         for (auto& t:threads)
         {

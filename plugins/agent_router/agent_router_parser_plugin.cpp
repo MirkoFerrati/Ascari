@@ -44,6 +44,6 @@ abstract_parsed_agent_plugin* agent_router_parser_plugin::parseAgent ( const YAM
 
 bool agent_router_parser_plugin::isEnabled()
 {
-std::cout<<"classe derivata router parser,enabled="<<enabled<<std::endl;
+// std::cout<<"classe derivata router parser,enabled="<<enabled<<std::endl;
 return enabled;
 }

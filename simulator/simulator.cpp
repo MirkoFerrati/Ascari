@@ -160,8 +160,11 @@ void simulator::createObjects ( const Parsed_World& world )
 for ( auto & plugin:plugins )
     {
         std::list<abstract_object*>* app = plugin->create_objects();
-        if(app!=NULL) sim_packet.object_list.objects[plugin->get_objects_type()] = *app;
-        std::cout<<plugin->get_objects_type()<<" objects : "<<sim_packet.object_list.objects[plugin->get_objects_type()].size()<<std::endl;
+        if(app!=NULL) 
+        {
+            sim_packet.object_list.objects[plugin->get_objects_type()] = *app;
+        }
+//      std::cout<<plugin->get_objects_type()<<" objects : "<<sim_packet.object_list.objects[plugin->get_objects_type()].size()<<std::endl;
         //for(auto i:sim_packet.object_list.objects[plugin->get_objects_type()])i->print(std::cout);
     }
 }

@@ -183,8 +183,8 @@ bool Graph_creator::parseGraph ( string graphName )
     distantColorNodeTexts().
     run();*/
 
-    std::cout << "A digraph is read from "<<graphName << std::endl;
-    std::cout << "Number of nodes: " << lemon::countNodes ( _3Dgraph ) << std::endl;
-    std::cout << "Number of arcs: " << lemon::countArcs ( _3Dgraph ) << std::endl;
+//     std::cout << "A digraph is read from "<<graphName << std::endl;
+//     std::cout << "Number of nodes: " << lemon::countNodes ( _3Dgraph ) << std::endl;
+//     std::cout << "Number of arcs: " << lemon::countArcs ( _3Dgraph ) << std::endl;
     return true;
 }

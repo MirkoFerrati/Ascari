@@ -22,6 +22,8 @@
 #include "agent_router_parsed_world.h"
 #include "agent_router_plugin.h"
 
+#define COUT 0
+
 using namespace std;
 using namespace lemon;
 
@@ -131,7 +133,7 @@ void agent_router::run_plugin()
         temp<<identifier<<" ";
         for (auto log:log_buffer)
             temp<<log;
-        std::cout<<temp.str()<<std::endl;
+        if (COUT) std::cout<<temp.str()<<std::endl;
         log_buffer.clear();
     }
     collisions_mutex.unlock();
@@ -399,13 +401,13 @@ bool agent_router::check_for_overtaking ()
                     if ( my_id > other_id && my_id1< other_id1 )
                     {
                         overtaking = true;
-                        std::cout << time << ": sto rischiando di sorpassare l'agente " << ( *it ).second.id << " tra il nodo " << other_id << " e " << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
+                        if (COUT) std::cout << time << ": sto rischiando di sorpassare l'agente " << ( *it ).second.id << " tra il nodo " << other_id << " e " << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
                         node_id[i]=other_id1;
                     }
                     if ( my_id < other_id && my_id1 > other_id1 )
                     {
                         overtaking = true;
-                        std::cout << time << ": sto rischiando di essere sorpassato dall'agente " << ( *it ).second.id << " tra il nodo " << other_id << " e " << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
+                        if (COUT) std::cout << time << ": sto rischiando di essere sorpassato dall'agente " << ( *it ).second.id << " tra il nodo " << other_id << " e " << other_id1 << "passando da " << my_id << " e " << my_id1 << "\n"; //<<std::endl;
                         node_id[i]=other_id1;
                     }
                 }
