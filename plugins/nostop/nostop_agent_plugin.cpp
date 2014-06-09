@@ -11,6 +11,9 @@
 
 #include "../agent/agent.h"
 
+#include <thread>
+#include <mutex>
+
 namespace NoStop 
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -354,7 +357,7 @@ namespace NoStop
 	//////////////////////////////////////////////////////////////////////////
 	void Agent_plugin::resetDiscretizedAreaCounter()
 	{
-		Lock lock(m_mutex);
+		Lock  lock(m_mutex);
 		if(m_area)
 			m_area->resetCounter();
 	}

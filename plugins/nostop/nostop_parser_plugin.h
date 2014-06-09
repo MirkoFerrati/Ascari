@@ -6,6 +6,8 @@
 
 #include <list>
 
+#define _PRINT_COMMENT
+
 namespace NoStop
 {
 	class Real2D;

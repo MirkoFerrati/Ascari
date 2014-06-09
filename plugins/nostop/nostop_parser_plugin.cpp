@@ -28,6 +28,9 @@ namespace NoStop
 			wo->m_agents.push_back(tmp_ag_name); 
 		}
 
+		#ifdef _PRINT_COMMENT
+		std::cout << "- NoStop: Parsed World!" << std::endl;
+#endif
 		// Collect external environments information
 		if ( node[0].FindValue ( "WORLD" ) )
 		{
@@ -38,18 +41,24 @@ namespace NoStop
 				{
 					m_enabled=true;
 
-					if( node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_DISCRETIZATION") )
+					if( node[0]["WORLD"][0].FindValue("NOSTOP_DISCRETIZATION") )
 					{
-						node[0]["WORLD"][0]["NOSTOP_AREA"][0]["NOSTOP_DISCRETIZATION"] >> wo->m_numDiscretization;
+						node[0]["WORLD"][0]["NOSTOP_DISCRETIZATION"] >> wo->m_numDiscretization;
+						#ifdef _PRINT_COMMENT
+						std::cout << "- NoStop: DISCRETIZATION:" << wo->m_numDiscretization <<  std::endl;
+#endif
 					}
 
-					if( node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_NUMBER_OF_VERTEX_EXTERNAL") &&
-						node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_VERTICES_EXTERNAL") )
+					if( node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_NUMBER_OF_EXTERNAL_VERTEX") &&
+						node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_EXTERNAL_VERTEX_LIST") )
 					{
 						int l_numVert = 0;
-						node[0]["WORLD"][0]["NOSTOP_AREA"][0]["NOSTOP_NUMBER_OF_VERTEX_EXTERNAL"] >> l_numVert;
-
-						wo->m_external = Parsed_world::createExternalVertexList( node[0]["WORLD"][0]["NOSTOP_VERTICES_EXTERNAL"], l_numVert );
+						node[0]["WORLD"][0]["NOSTOP_AREA"][0]["NOSTOP_NUMBER_OF_EXTERNAL_VERTEX"] >> l_numVert;
+						
+						#ifdef _PRINT_COMMENT
+						std::cout << "- NoStop: NUMBER_OF_EXTERNAL_VERTEX:" << l_numVert <<  std::endl;
+						#endif
+						wo->m_external = Parsed_world::createExternalVertexList( node[0]["WORLD"][0]["NOSTOP_AREA"][0]["NOSTOP_EXTERNAL_VERTEX_LIST"], l_numVert );
 					}
 
 					if( node[0]["WORLD"][0]["NOSTOP_AREA"][0].FindValue("NOSTOP_NUMBER_OF_OBSTACLES") &&
@@ -58,6 +67,10 @@ namespace NoStop
 					{
 						int l_numObs = 0;
 						node[0]["WORLD"][0]["NOSTOP_AREA"][0]["NOSTOP_NUMBER_OF_OBSTACLES"] >> l_numObs;
+						
+						#ifdef _PRINT_COMMENT
+						std::cout << "- NoStop: NUMBER_OF_OBSTACLES:" << l_numObs <<  std::endl;
+						#endif
 
 						std::vector<int> l_numVertInObs = Parsed_world::readingObstaclesVertices( 
 							node[0]["WORLD"][0]["NOSTOP_NUMBER_OF_VERTEX_OBSTACLES"], l_numObs );
@@ -108,6 +121,11 @@ namespace NoStop
 		{
 			node[2*i + 0] >> result[i][0];
 			node[2*i + 1] >> result[i][1];
+			
+			#ifdef _PRINT_COMMENT
+		std::cout << "- NoStop: Vertex " << i << " coordinate: " << result[i][0] << ", " << result[i][1] <<  std::endl;
+#endif
+			
 		}
 		return result;
 	}
@@ -120,6 +138,11 @@ namespace NoStop
 		result.resize(l_numObs);
 		for ( unsigned int i=0; i<l_numObs; ++i )
 			node[i] >> result[i];
+		
+		#ifdef _PRINT_COMMENT
+		std::cout << "- NoStop: Obstacle vertex list has been read." <<  std::endl;
+		#endif
+		
 		return result;
 	}
 
@@ -144,6 +167,11 @@ namespace NoStop
 			}
 			result.insert( result.end(), l_bound );
 		}
+		
+		#ifdef _PRINT_COMMENT
+		std::cout << "- NoStop: Obstacle vertex list has been created." <<  std::endl;
+		#endif
+		
 		return result;
 	}
 

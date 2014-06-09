@@ -2,7 +2,7 @@
 - WORLD:
   - NOSTOP_AREA:
     - NOSTOP_NUMBER_OF_EXTERNAL_VERTEX: 4
-      NOSTOP_VERTICES: [0,0,10,0,10,10,0,10]
+      NOSTOP_EXTERNAL_VERTEX_LIST: [0,0,10,0,10,10,0,10]
     NOSTOP_DISCRETIZATION: 100
     
   BEHAVIORS:
@@ -17,7 +17,7 @@
     CONTROLLERS:
     - name: go
       v: v_t
-      w: w_t_diff
+      w: w_t
     - name: wait
       v: 0
       w: 0
@@ -34,7 +34,7 @@
           t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
       LAMBDA:
         - lambda: [Lreached] 
-          Lreached: 'abs(x-x_task)<0.1 and abs(y-y_task)<0.1'
+          Lreached: 'abs(x-x_target)<0.1 and abs(y-y_target)<0.1'
     EVENTS:
     - events: [reached, new_target, stopped, started]
       reached: 'Lreached'
@@ -49,7 +49,7 @@
         - GO: [started]
 
   AGENTS:
-  - agent: Agente1
+  - agent: Agente,1,1
     COMMUNICATION_AREA:   circle(50)
     INITIAL:
     - &initial
@@ -61,7 +61,7 @@
     NOSTOP_ID: 1
     NOSTOP_CAMERA: circle(25)
     
-  - agent: Agente2
+  - agent: Agente,2,1
     COMMUNICATION_AREA:   circle(50)
     INITIAL:
     - x: '8'
@@ -72,29 +72,29 @@
     NOSTOP_ID: 2
     NOSTOP_CAMERA: circle(25)
     
-  - agent: Agente3
+  - agent: Agente,3,1
     COMMUNICATION_AREA:   circle(50)
     INITIAL:
-    - x: '9'
-      y: '9'
+    - x: '1'
+      y: '2'
       theta: '2'
     STATE_START: GO
     BEHAVIOR: Guard
     NOSTOP_ID: 3
     NOSTOP_CAMERA: circle(25)
     
-  - agent: Agente4
+  - agent: Agente,4,1
     COMMUNICATION_AREA:   circle(50)
     INITIAL:
-    - x: '9'
-      y: '9'
+    - x: '3'
+      y: '4'
       theta: '2'
     STATE_START: GO
     BEHAVIOR: Guard
     NOSTOP_ID: 4
     NOSTOP_CAMERA: circle(25)
     
-  - agent: Agente5
+  - agent: Agente,5,1
     COMMUNICATION_AREA:   circle(50)
     INITIAL:
     - x: '9'
@@ -105,7 +105,7 @@
     NOSTOP_ID: 5
     NOSTOP_CAMERA: circle(25)
 
-#   - agent: Agente6
+#   - agent: Ladro,1
 #     COMMUNICATION_AREA:   circle(50)
 #     INITIAL:
 #     - x: '1'

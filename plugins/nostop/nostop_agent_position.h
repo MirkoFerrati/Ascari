@@ -41,7 +41,7 @@ namespace NoStop
 		double m_angle;
 
 	public:
-		CameraPosition(double _farRadius = 0., double _nearRadius = 0., double _orientation = 0., double _angle = Math::TwoPi) 
+		CameraPosition(double _farRadius = 3., double _nearRadius = 0., double _orientation = 0., double _angle = Math::TwoPi) 
 			: m_farRadius(_farRadius), m_nearRadius(_nearRadius), m_orientation(_orientation), m_angle(_angle) {}
 
 		std::vector<AreaCoordinate> getCoverage(AreaCoordinate _center, std::shared_ptr<DiscretizedArea> _area) const;
