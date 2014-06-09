@@ -65,7 +65,7 @@ public:
 
 protected:
 
-    std::list<std::string> clients;
+    std::list<std::string> clients,acceptedClients;
 
     void setClientsName ( const std::list<std::string>& clients )
     {
@@ -176,7 +176,7 @@ public:
         results.clear();
         bool end=false;
         bool found=false;
-        while(!end)
+        while(!end && !s_interrupted)
         {
             try
             {
@@ -191,6 +191,7 @@ public:
                     bool rc=internal_receive(&receive_buffer);
                     if(rc)
                     {
+			found=true;
                         received_strings[0]=( reinterpret_cast<char*> ( receive_buffer.data() ));
                     }
                 }
@@ -425,6 +426,11 @@ protected:
                     rejected=true;
                 }
             }
+            else
+	    {
+	        auto client = std::find ( this->acceptedClients.begin(), this->acceptedClients.end(), name );
+                rejected= ( client != this->acceptedClients.end()); //if i found it, I reject the same name
+   	    }
             agent_simulator_handshake_packet infos;
             if ( !rejected || !this->clientsNamed )
             {
@@ -436,6 +442,7 @@ protected:
                 infos.message = result;
                 std::cout << name << " accepted" << std::endl;
                 subscribers++;
+		this->acceptedClients.push_back(name);
             }
             else
             {
@@ -475,7 +482,7 @@ protected:
 
     bool askSync ( std::string sync_protocol )
     {
-        /**      Publisher opens PUB socket and starts sending "Hello" messages (not data).
+        /**   TODO(Mirko): Publisher opens PUB socket and starts sending "Hello" messages (not data).
                  Subscribers connect SUB socket and when they receive a Hello message they tell the publisher via a REQ/REP socket pair.
                  When the publisher has had all the necessary confirmations, it starts to send real data.
                */
@@ -488,16 +495,18 @@ protected:
         int temp=0;
 
 
-        while ( !exit )
+        while ( !exit && !s_interrupted)
         {
             sync_socket = new zmq::socket_t ( *static_zmq::context, ZMQ_REQ );
             sync_socket->setsockopt ( ZMQ_LINGER, &temp, sizeof ( temp ) );
             sync_socket->connect ( !sync_protocol.compare ( "" ) ? SYNC_PROTOCOL : sync_protocol.c_str() );
             std::cout  << "."<<std::flush;
             zmq::message_t message ( owner_name.size() );
+	    usleep(250000); //HACK:between connect and send we need some time, or we delete the socket too early
             memcpy ( message.data(), owner_name.data(), owner_name.size() );
             bool rc = sync_socket->send ( message );
-            assert ( rc );
+	    usleep(250000); //HACK:between send and receive we need some time, or we delete the socket too early
+            if (!rc) assert ( rc ); //When we compile without assertion, do not warn about unused variable
             message.rebuild ( MAX_PACKET_LENGTH );
             try
             {

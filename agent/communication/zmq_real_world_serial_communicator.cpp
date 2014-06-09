@@ -1,7 +1,6 @@
 #include "zmq_real_world_serial_communicator.h"
-
+#include <string>
 using namespace std;
-using namespace LibSerial;
 
 // Record the execution time of some code, in milliseconds.
 
@@ -25,50 +24,101 @@ int64_t get_tick_count()
 zmq_real_world_serial_communicator::zmq_real_world_serial_communicator(std::string agent_name, index_map& input_map)
     :map_inputs_name_to_id(input_map)
 {
-    init(agent_name);
+    init_full(agent_name,true,AGENT_TO_SIMULATOR,1,false);
 
-    command_old[map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE)]=0;
-    command_old[map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE)]=0;
+    string portname="/dev/ttyACM0";
+    if (CONFIG.exists("portname"))
+    {
+        portname=CONFIG.getValue("portname");
+    }
+    if (CONFIG.exists("PORTNAME"))
+    {
+        portname=CONFIG.getValue("portname");
+    }
+    fd = open (portname.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
+    if (fd < 0)
+    {
+        //  error_message ("error %d opening %s: %s", errno, portname, strerror (errno));
+        return;
+    }
+
+    set_interface_attribs (fd, B115200, 0);  // set speed to 115,200 bps, 8n1 (no parity)
+    set_blocking (fd, 0);                // set no blocking
+
+    write (fd, "1;2;", 4);           // send 7 character greeting
+    char buf [100];
+    int n = read (fd, buf, sizeof buf);  // read up to 100 characters if ready to read
+    std::cout<<buf<<endl;
+    sleep(1);
+}
+
+
+void zmq_real_world_serial_communicator::set_blocking(int fd, int should_block)
+{
+    struct termios tty;
+    memset (&tty, 0, sizeof tty);
+    if (tcgetattr (fd, &tty) != 0)
+    {
+        printf("error %d from tggetattr", errno);
+        return;
+    }
+
+    tty.c_cc[VMIN]  = should_block ? 1 : 0;
+    tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+
+    if (tcsetattr (fd, TCSANOW, &tty) != 0)
+        printf("error %d setting term attributes", errno);
+
+}
 
 
 
-    /* Serial Port to Arduino initialization */
-    /*
-    serial_port.Open("/dev/ttyACM0");
-    assert(serial_port.good());
+int zmq_real_world_serial_communicator::set_interface_attribs(int fd, int speed, int parity)
+{
+    struct termios tty;
+    memset (&tty, 0, sizeof tty);
+    if (tcgetattr (fd, &tty) != 0)
+    {
+        printf("error %d from tcgetattr", errno);
+        return -1;
+    }
 
-    serial_port.SetBaudRate( SerialStreamBuf::BAUD_115200 );
-    assert(serial_port.good());
+    cfsetospeed (&tty, speed);
+    cfsetispeed (&tty, speed);
 
-    serial_port.SetCharSize( SerialStreamBuf::CHAR_SIZE_8 );
-    assert(serial_port.good());
+    tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
+    // disable IGNBRK for mismatched speed tests; otherwise receive break
+    // as \000 chars
+    tty.c_iflag &= ~IGNBRK;         // ignore break signal
+    tty.c_lflag = 0;                // no signaling chars, no echo,
+    // no canonical processing
+    tty.c_oflag = 0;                // no remapping, no delays
+    tty.c_cc[VMIN]  = 0;            // read doesn't block
+    tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
 
-    serial_port.SetParity( SerialStreamBuf::PARITY_NONE );
-    assert(serial_port.good());
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
 
-    serial_port.SetNumOfStopBits( 1 );
-    assert(serial_port.good());
+    tty.c_cflag |= (CLOCAL | CREAD);// ignore modem controls,
+    // enable reading
+    tty.c_cflag &= ~(PARENB | PARODD);      // shut off parity
+    tty.c_cflag |= parity;
+    tty.c_cflag &= ~CSTOPB;
+    tty.c_cflag &= ~CRTSCTS;
 
-    serial_port.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_NONE );
-    assert(serial_port.good());
+    if (tcsetattr (fd, TCSANOW, &tty) != 0)
+    {
+        printf("error %d from tcsetattr", errno);
+        return -1;
+    }
+    return 0;
 
-    */
 }
 
 
 const world_sim_packet& zmq_real_world_serial_communicator::receive_agents_status()
 {
     try {
-        agent_sim_packet_receiver tmp=receive_last_one();
-
-        packet_received.state_agents.internal_map.clear();
-        packet_received.bonus_variables.swap(tmp.bonus_variables);
-        packet_received.time=tmp.time;
-        packet_received.object_list.objects.swap(tmp.objects.objects);
-        for (auto agent=tmp.state_agents.internal_map.begin(); agent!=tmp.state_agents.internal_map.end(); ++agent) {
-            packet_received.state_agents.internal_map[agent->first]=*(agent->second);
-        }
-
+        packet_received=receive_last_one();
         return  packet_received;
     }
     catch (zmq::error_t ex)
@@ -86,24 +136,19 @@ const world_sim_packet& zmq_real_world_serial_communicator::receive_agents_statu
 
 void zmq_real_world_serial_communicator::send_control_command(control_command_packet& packet, const target_abstract& /*target*/)
 {
-    send(packet);
     DECLARE_TIMING(myTimer);
+    START_TIMING(myTimer);
 
 
-
-    if (abs(packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))-command_old.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE)))>0.01 || abs(packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))-command_old.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE)))>0.01)
-    {
-        START_TIMING(myTimer);
-
-
-        //serial_port << setprecision(6)<<ARDUINO_COMMAND_CODE<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<";"<<endl;
-        cout << "SerialMessage Sent:" << packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<  endl;
-        STOP_TIMING(myTimer);
-        printf("Execution time: %f ms.\n", GET_TIMING(myTimer) );
-        printf("Average time: %f ms per iteration.\n", GET_AVERAGE_TIMING(myTimer) );
-    }
-    command_old.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))=packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE));
-    command_old.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))=packet.default_command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE));
+    char buf[100];
+    sprintf(buf,"%i,%f,%f;",ARDUINO_COMMAND_CODE,packet.command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE)),packet.command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE)));
+    //tcflush(fd,TCIOFLUSH);
+    write(fd,buf,strlen(buf));
+    //tcdrain(fd);
+    cout << "SerialMessage Sent: " <<ARDUINO_COMMAND_CODE<<","<< packet.command.at(map_inputs_name_to_id.at(DEFAULT_VELOCITY_VARIABLE))<<","<<packet.command.at(map_inputs_name_to_id.at(DEFAULT_OMEGA_VARIABLE))<<";"<<endl;
+    STOP_TIMING(myTimer);
+    printf("Execution time: %f ms.\n", GET_TIMING(myTimer) );
+    printf("Average time: %f ms per iteration.\n", GET_AVERAGE_TIMING(myTimer) );
 
 }
 

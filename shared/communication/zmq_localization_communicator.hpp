@@ -87,7 +87,10 @@ private:
       }
       
       //create agent state
-      webcams.at(temp.webcam_id).at(temp.data.identifier)=temp.data.state;
+      for(auto single_webcam=webcams.begin();single_webcam!=webcams.end();++single_webcam)
+      {
+	single_webcam->second[temp.data.identifier];
+      }
       agent_state medium_state=temp.data.state;
       for (auto coordinate:medium_state)
       {	
@@ -98,7 +101,7 @@ private:
 	for(auto single_webcam=webcams.begin();single_webcam!=webcams.end();++single_webcam)
 	{ 
 	  num_webcams++;
-	  coordinate.second+=single_webcam->second.at(temp.data.identifier).at(coordinate.first);
+	  coordinate.second+=weights[single_webcam->first][temp.data.identifier]*single_webcam->second.at(temp.data.identifier)[coordinate.first];
 	} 
 	coordinate.second=coordinate.second/num_webcams;
 	

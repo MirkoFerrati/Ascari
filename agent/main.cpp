@@ -2,10 +2,10 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <boost/program_options.hpp>
 #include "agent.h"
-#include "../shared/logog/include/logog.hpp"
+#include "logog.hpp"
 #include "../shared/communication/global.h"
-#include "lemon/arg_parser.h"
 #include "../plugins/addplugins.h"
 #include "../shared/communication/global.h"
 #include <define.h>
@@ -19,41 +19,89 @@ int main ( int argc, char** argv )
     static_zmq::context=new zmq::context_t ( 1 );
 
     {
-        std::cout << argc << argv[0] << argv[1] << argv[2] << std::endl;
         logog::Cout out;
         Parsed_World world;
-        lemon::ArgParser ap ( argc, argv );
-        int count;
+        boost::program_options::options_description desc;
+        boost::program_options::variables_map options;
+        desc.add_options()("help,h","Get help");
+        
+        //boost::program_options::variables_map& options=CONFIG.file_map; //we already parsed the file, let's use the values found there
         std::string agent_name;
         std::string filename;
-	bool filename_obbl=true;
-	if (CONFIG.exists("FILENAME"))
-	  filename_obbl=false;
-        ap.refOption ( "n", "Number of simulator cycle", count );
-        ap.refOption ( "a", "Agent name", agent_name, true );
-        ap.refOption ( "f", "Yaml filename", filename, filename_obbl );
-        ap.synonym ( "filename", "f" );
-        ap.synonym ( "agent", "a" );
-        ap.throwOnProblems();
+              
+        
+        if (CONFIG.exists("FILENAME"))
+        {
+            filename=CONFIG.getValue("FILENAME");
+            desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename), "Yaml filename");
+            INFO("Using %s as filename, read from config file",filename.c_str());
+        }
+        else if (CONFIG.exists("filename"))
+        {
+            filename=CONFIG.getValue("filename");
+            desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename), "Yaml filename");
+            INFO("Using %s as filename, read from config file",filename.c_str());
+        }    
+        else
+            desc.add_options()("filename,f",boost::program_options::value<std::string>(&filename)->required(), "Yaml filename");
+        
+        if (CONFIG.exists("AGENT"))
+        {
+            agent_name=CONFIG.getValue("AGENT");
+            desc.add_options()( "agent,a",boost::program_options::value<std::string>(&agent_name), "Agent name");
+        }
+        else if (CONFIG.exists("agent"))
+        {
+            agent_name=CONFIG.getValue("agent");            
+            desc.add_options()( "agent,a",boost::program_options::value<std::string>(&agent_name), "Agent name");
+        }
+        else
+            desc.add_options()( "agent,a",boost::program_options::value<std::string>(&agent_name)->required(), "Agent name");
+            
+        for (auto config_value:CONFIG.getMap())
+        {
+            if ((config_value.first!="agent")&&(config_value.first!="filename"))
+            desc.add_options()(config_value.first.c_str(),boost::program_options::value<std::string>()->default_value(config_value.second.data().c_str()),"");
+        }
+        
+        
+        boost::program_options::positional_options_description p;
+        p.add("agent",-1);
+        
         try
         {
-            ap.parse();
+            boost::program_options::store(boost::program_options::command_line_parser(argc,argv).options(desc).positional(p).run(),options);//Overwrite default file values with shell one
+            
+            if (options.count("help"))
+            {
+                std::cout << "Basic Command Line Parameter App" << std::endl 
+                << desc << std::endl;
+                return 0;
+            }
+            boost::program_options::notify(options);
         }
-        catch ( lemon::ArgParserException const& ex )
+        catch (boost::program_options::error& e)
         {
-            ERR ( "errore nella lettura dei parametri %s", ex.reason() );
-            return 0;
+            std::cerr << "ERROR: " << e.what() << std::endl << std::endl; 
+            std::cerr << desc << std::endl; 
+            return 2;    
         }
-        std::cout << "Parameters of '" << ap.commandName() << "':\n";
         std::cout << "  Value of -a: " << agent_name << std::endl;
-        if (ap.given("filename"))
+        std::cout<< "   Value of -f: " <<filename <<std::endl;
+        
+       /* if (ap.given("filename"))
 	  std::cout << "  Value of -f: " << filename << std::endl;
-
-	if (!ap.given("filename"))
+        else
 	{
 	  filename=CONFIG.getValue("FILENAME");
   	  INFO("Using %s as filename, read from config file",filename.c_str());
-	}
+	}*/
+	
+       for (auto config_value:options)
+       {
+           CONFIG.getMap().put(config_value.first,config_value.second.as<std::string>());
+       }
+       
         auto plugins=createPlugins();
 
         yaml_parser parser;
@@ -74,23 +122,6 @@ int main ( int argc, char** argv )
             throw "agent name not found in configuration file, please check for agent names";
         }
 
-
-        //TODO(Simone): questo codice NON DEVE STARE QUA
-//         std::vector<std::string>tmp_erase_behavior;
-//         if ( world.agents.at ( myAgent ).known_behaviors.size() !=0 )
-//         {
-//             for ( auto behavior=world.behaviors.begin(); behavior!=world.behaviors.end(); behavior++ )
-//             {
-//                 if ( ! ( find ( world.agents.at ( myAgent ).known_behaviors.begin(),world.agents.at ( myAgent ).known_behaviors.end(),behavior->first ) !=world.agents.at ( myAgent ).known_behaviors.end() ) )
-//                     tmp_erase_behavior.push_back ( behavior->first );
-//             }
-// 
-//             for ( unsigned ii=0; ii< tmp_erase_behavior.size(); ii++ )
-//             {
-//                 world.behaviors.erase ( tmp_erase_behavior.at ( ii ) );
-//             }
-//         }
-
 	    for ( auto it=world.agents.begin();it!=world.agents.end(); )
             if ( it->name.compare ( agent_name )!=0)
 	    {
@@ -106,11 +137,15 @@ int main ( int argc, char** argv )
             if ( plugin->getParserPlugin()->isEnabled() )
             {
                 if ( !plugin->createAgentPlugin ( &a1 ,&world) )
-		   ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() )
+		{ERR ( "impossibile creare il plugin %s",plugin->getType().c_str() );}
                 else
                     a1.addPlugin ( plugin->getAgentPlugin() );
             }
         }
+        if(a1.plugins.empty())
+	{
+	  WARN("Attenzione, nessun plugin è stato caricato, l'agente resterà immobile",NULL);
+	}
         a1.initialize();
         a1.start();
         std::cout << agent_name <<" e' terminato" << std::endl;

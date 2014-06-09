@@ -39,7 +39,7 @@ bool task_assignment::convergence_control_routine()
 	  step=0;
      }
       
-     a = a && (step>10);
+     a = a && (step>50);
 	 
      if(a)
      {
@@ -123,12 +123,31 @@ task_id task_assignment ::subgradient_algorithm()
 			
 
 			  
-			ta_problem.set_cost_vector(F);
+			//ta_problem.set_cost_vector(F);
 			
 			
-			ta_problem.solve(solution);
-		
-		      
+			//ta_problem.solve(solution);
+			//***********************************
+			double prev=0;
+			int min=-1;
+			
+			for(int i=0;i<F.size();i++)
+			{
+			    if (prev > F[i])
+			    {
+				prev=F[i];
+				min=i;
+			    }
+			    
+			    solution.push_back(0);
+			}
+			
+			if (min != -1)
+			{
+			    solution[min]=1;
+			}
+			//***********************************
+			
 			for(unsigned int j=0;j<num_task;j++)//copy_solution_to_TA_vector
 			{
 				agent_task_assignment_vector->at(tasks_id.at(j))=solution.at(j);
@@ -176,7 +195,7 @@ task_id task_assignment ::subgradient_algorithm()
 		}
 		std::cout<<std::endl;
 		
-		alpha=-0.1;
+		alpha=compute_alpha();
 		
 		if(1) //TODO: RIFLETTERE SUL FATTO CHE MU_T NON CONVERGE SE CI SONO PIU' TASKS
 		{
@@ -194,21 +213,52 @@ task_id task_assignment ::subgradient_algorithm()
 						
 			control_print();
 						
-			converge=convergence_control_routine();
+			//converge=convergence_control_routine();
 			
 			passi++;
 		}
 		
-		ptr_subgradient_packet.get()->x=x.value();
-		ptr_subgradient_packet.get()->y=y.value();
-		ptr_subgradient_packet.get()->theta=theta.value();
+		ptr_subgradient_packet.get()->x=*x;
+		ptr_subgradient_packet.get()->y=*y;
+		ptr_subgradient_packet.get()->theta=*theta;
 		ta_communicator->send();
+// 		std::cout<<std::endl<<"size of sent packet: "<<sizeof(*ptr_subgradient_packet.get())<<std::endl<<std::endl;
 		//std::cout<<"MANDO "<<((ptr_subgradient_packet.get()->busy)?("occupato"):("libero"))<<std::endl;
-// 		std::cout<<"MANDO x:"<<x.value()<<" y:"<<y.value()<<std::endl;
+// 		std::cout<<"MANDO x:"<<x<<" y:"<<y<<std::endl;
 
 	}
 
 	if (selected_task=="") return "TASK_ASSIGNMENT_FAILED";
 	else return selected_task;
 	
+}
+
+double task_assignment::compute_alpha()
+{	
+        //così converge più in fretta, c'è da vedere se dal punto di vista teorico da problemi per convergere all'ottimo
+        //la convergenza all'ottimo è garantita se i robot hanno alpha diversi?
+        
+	double alpha;
+	
+	double min=INF;
+	
+	for(int i=0;i<F.size();i++)
+	{
+	    if (min > F[i])
+	    {
+		min=F[i];
+	    }
+	}
+	
+	if((min/10)>1)
+	{
+	     alpha=-10;
+	}
+	else if(min>1)
+	{
+	     alpha=-1;
+	}
+	else alpha=-0.1;
+	
+	return alpha;
 }

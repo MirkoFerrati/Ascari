@@ -3,12 +3,21 @@
 #define TASK_ASSIGNMENT_VIEWER_H
 #include "../plugins/abstract_viewer_plugin.h"
 
+#include "../HACK_KDEVELOP.h"
 #ifdef ISVIEWER
 
 #include "yaml_parser.h"
 #include <boost/circular_buffer.hpp>
 #include "objects/task_assignment_task.h"
 #include "viewer.h"
+
+struct task_viewer_agent
+{
+        QGraphicsEllipseItem* initial_pos;
+        boost::circular_buffer<QGraphicsRectItem*> positions;
+        QGraphicsTextItem* charge;
+        boost::circular_buffer<QGraphicsRectItem*>::iterator it;
+};
 
 
 class task_assignment_viewer:public abstract_viewer_plugin
@@ -17,19 +26,20 @@ public:
     task_assignment_viewer();
     task_assignment_viewer ( std::shared_ptr< std::mutex >& mutex, const world_sim_packet& infos );
     void timerEvent(std::shared_ptr<std::mutex>& mutex,const world_sim_packet& infos);
-    void paintBackground ( QPainter& painter );
-    void paintAgents ( QPainter& painter,const std::map<std::string,Agent>& agents );  
+    void paintBackground ( QGraphicsScene* scene );
+    void paintAgents ( QGraphicsScene* scene, std::map<std::string,Agent>& agents );  
     ~task_assignment_viewer();
 
 private:
-    std::map<task_assignment_namespace::agent_id,std::vector<double>> initial_pos;
+    std::map<task_assignment_namespace::agent_id,task_viewer_agent> my_agents;
     bool started;
     double old_time,now_time;
-    //const int& time;
-    std::map<task_assignment_namespace::agent_id,boost::circular_buffer<double>> positions;
     std::map<task_assignment_namespace::task_id,task_assignment_namespace::task> tasks;
-   // const std::shared_ptr< std::mutex >& mutex;
-   // const world_sim_packet& infos;
+    std::map<task_assignment_namespace::task_id,QGraphicsRectItem*> viewer_tasks;
+    std::map<task_assignment_namespace::task_id,QGraphicsTextItem*> viewer_text_tasks;
+    std::map<task_assignment_namespace::task_id,QGraphicsTextItem*> viewer_deadline_tasks;
+    
+    double size;
 
 };
 

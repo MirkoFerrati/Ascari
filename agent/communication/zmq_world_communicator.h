@@ -6,7 +6,7 @@
 
 
 class zmq_world_communicator : public agent_namespace::world_communicator_abstract,
-public zmq_agent_to_simulator_communicator<agent_sim_packet_receiver,control_command_packet>
+public zmq_agent_to_simulator_communicator<world_sim_packet,control_command_packet>
 {
 public:
 zmq_world_communicator(std::string agent_name);

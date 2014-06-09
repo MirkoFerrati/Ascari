@@ -10,7 +10,7 @@
 #include <boost/asio.hpp>
 #include <viewer.h>
 #include <udp_world_sniffer.h>
-#include "../shared/types/monitor_packet.h"
+
 #include "../plugins/abstract_plugin.h"
 namespace Ui
 {
@@ -72,9 +72,12 @@ private:
     boost::asio::io_service io_service;
     //std::vector<char> buffer;
     world_sim_packet buffer;
-    std::map<std::string,monitor_packet> monitor_buffer;
-    std::shared_ptr<std::mutex> mutex, monitor_mutex;
+    std::map<std::string,int> config_to_row;
+    std::shared_ptr<std::mutex> mutex;
     void openFile();
+    void addConfigRow(std::string name, QString value);
+    void addConfigRow(std::string name, std::string value);
+
     QSettings *settings;
     Parsed_World world;
     Viewer * insideViewer;

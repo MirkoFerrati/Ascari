@@ -31,8 +31,7 @@ public:
   bool isCreated=true;
   virtual bool isEnabled()=0;
   virtual std::string getType()=0;
-private:
-  bool enabled;
+
 };
 
 #endif // ABSTRACT_PARSER_PLUGIN_H

@@ -1,0 +1,64 @@
+#agente che gira nel magazzino con il modulo router attivo
+- WORLD:
+  - bonus_variables: [c]
+    c: 1
+    GRAPH_NAME: 'test5.gml.lgf'
+  AGENTS:
+  - agent: Agente1
+    VISIBLE_AREA: circle(9)
+    COMMUNICATION_AREA: =  circle(10)
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - &initial
+      x: '420'
+      y: '240'
+      theta: '3'
+    STATE_START: GO
+    TARGET_LIST: [1,0,20,0,1,0,20,0,1]
+    DYNAMIC_MAP:
+    - &dynamic
+      x: 'v*cos(w)'
+      y: 'v*sin(w)'
+      theta: 'sin(w-theta)'
+    BEHAVIOR:
+    - &machine
+      name: machine 
+      CONTROLLERS:
+      - name: go
+        v: v_router
+        w: atan2(ytarget-y,xtarget-x)
+      - name: wait
+        v: 0
+        w: 0
+      DISCRETE_STATES:
+      - name: go
+        controller: go
+      - name: wait
+        controller: wait
+      - name: wait_for_target
+        controller: wait
+      ENCODER:
+      - TOPOLOGY:
+          - topology: [t1]
+            t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+        LAMBDA:
+          - lambda: [Lreached] 
+            Lreached: 'abs(x-xtarget)<3 and abs(y-ytarget)<3'
+      EVENTS:
+      - events: [reached, new_target, stopped, started]
+        reached: 'Lreached'
+        new_target: '!Lreached'
+        stopped: ''
+        started: ''
+      AUTOMATON:
+      - name: aut_machine
+        GO:
+          - WAIT: [stopped]
+            WAIT_FOR_TARGET: [reached]
+        WAIT:
+          - GO: [started]
+        WAIT_FOR_TARGET:
+          - GO: [new_target]

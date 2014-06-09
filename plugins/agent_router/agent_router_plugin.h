@@ -3,7 +3,7 @@
 #include "../abstract_plugin.h"
 #include "agent_router_parser_plugin.h"
 
-
+#define AGENT_ROUTER_NAME "AGENT_ROUTER"
 #ifdef ISAGENT
 #include "agent_router.h"
 #endif
@@ -39,7 +39,7 @@ public:
 
     std::string getType()
     {
-        return "AGENT_ROUTER";
+        return AGENT_ROUTER_NAME;
     };
 
 

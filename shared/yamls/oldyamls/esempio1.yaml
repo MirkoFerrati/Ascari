@@ -1,0 +1,40 @@
+###Agente che va dritto
+- WORLD:
+  - bonus_variables: [b1,b2]
+    b1: 'rndom(1,10)'
+    b2: 'XAGENTE1'
+  AGENTS:
+  - agent: Agente1
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y]
+    control_commands: [v]
+    INITIAL:
+    - x: '1'
+      y: '4'
+    STATE_START: FAST
+    DYNAMIC_MAP:
+    - x: 'v*2'
+      y: 'v/2'
+    BEHAVIOR:
+    - name: Esempio 
+      CONTROLLERS:
+      - name: fast
+        v: 'b1'
+      DISCRETE_STATES:
+      - name: fast
+        controller: fast
+      ENCODER:
+      - TOPOLOGY:
+          - topology: 
+        LAMBDA:
+          - lambda: 
+      EVENTS:
+      - events: 
+      AUTOMATON:
+      - name: es1
+        FAST:
+          - FAST: 
+                

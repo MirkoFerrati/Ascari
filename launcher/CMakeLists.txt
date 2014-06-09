@@ -6,10 +6,9 @@ include(${QT_USE_FILE})
 
 set(launcher_MOC_HEADERS mainwindow.h )
 add_definitions(-DISVIEWER)
-set_property(GLOBAL APPEND PROPERTY launcher_SOURCES main.cpp mainwindow.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../shared/communication/zmq_identifier_communicator.hpp
-../viewer/communication/zmq_identifier_sniffer.hpp 
+set_property(GLOBAL APPEND PROPERTY launcher_SOURCES main.cpp mainwindow.cpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp 
 ../simulator/visibility/map2d.cpp ../gml2lgf/utils.cpp ../gml2lgf/gmlreader.hpp  ../gml2lgf/node.cpp ../gml2lgf/graph.cpp ../gml2lgf/arc.cpp
-../shared/objects/router_graph_good.cpp
+../shared/objects/router_graph_good.cpp ../shared/define.cpp
 ../viewer/gui/viewer.cpp ../viewer/communication/udp_world_sniffer.cpp ../viewer/gui/Agent.cpp ../shared/communication/global.cpp ../shared/objects/task_assignment_task.cpp)
 SET(launcher_UIS mainwindow.ui)
 

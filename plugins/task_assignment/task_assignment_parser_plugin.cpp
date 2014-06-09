@@ -86,13 +86,21 @@ abstract_parsed_agent_plugin* task_assignment_parser_plugin::parseAgent ( const 
             reinterpret_cast<task_assignment_parsed_agent*> (ag)->agent_task_cost_vector.insert ( make_pair ( id,cost ) );
             i=i+2;
         }
-            return ag;
 
+    
+    
+	if( node.FindValue ( "HOME" ) )
+	{
+	    const YAML::Node& h=node["HOME"];
+	    h[0] >> reinterpret_cast<task_assignment_parsed_agent*> (ag)->home_x;
+	    h[1] >> reinterpret_cast<task_assignment_parsed_agent*> (ag)->home_y;
+	}
+    
+	return ag;
+      
     }
-    else
-      return 0;
-    //written by Alessandro Settimi
-    //return std::dynamic_pointer_cast<abstract_parsed_agent_plugin>(std::make_shared<task_assignment_parsed_agent>(ag));
+    
+    else return 0;
 }
 
 //written by Alessandro Settimi

@@ -64,6 +64,7 @@ private:
 	void main_loop();
 	void input_loop( std::mutex& input_mutex, std::condition_variable& input_cond, volatile bool& paused, volatile bool& exit, volatile int& cycle_period_millisec );
 	simulation_time time;
+	bool timeSimulated;
 	unsigned int num_agents;
 	rndom<double> *f_rndom;
 	std::vector<exprtk::expression<double> > bonus_expressions;
@@ -71,9 +72,13 @@ private:
 	std::map<std::string,int> map_bonus_variables;
 	void createObjects(const Parsed_World& world);
 	void initialize_plugins ( const Parsed_World& world );
+	bool isVisible(std::map< std::string, agent_state_packet >::iterator agent, std::map< std::string, agent_state_packet >::iterator other);
 	std::vector<abstract_simulator_plugin*> plugins;
 	std::map<int,std::shared_ptr<visibleArea> > agents_visibility;
 	visibleArea* world_map;
+	void printTime(int clock);
+	   termios initializeKeyboardInput();
+    double T_integration;
 };
 
 

@@ -147,7 +147,7 @@ int main ( int argc, char** argv )
       //getNewCoord(i,x,y,theta);
       
 	getNewCoord(get_tick_count()/20000000,x,y,theta);
-      usleep(50000);
+      usleep(100000);
         START_TIMING(myTimer);
 	state[agent_state_index["X"]]=x*10+offsetx-maxdelta/2.0+int(maxdelta*rand()/(RAND_MAX + 1.0));
 	state[agent_state_index["Y"]]=y*10+offsety-maxdelta/2.0+int(maxdelta*rand()/(RAND_MAX + 1.0));;

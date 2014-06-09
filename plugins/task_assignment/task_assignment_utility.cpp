@@ -5,7 +5,7 @@
 using namespace task_assignment_namespace;
 
  
-void task_assignment ::addReservedVariables(exprtk::symbol_table< double >& symbol_table)
+/*void task_assignment ::addReservedVariables(exprtk::symbol_table< double >& symbol_table)
 {
 	symbol_table.add_variable("X_TASK",my_task_x,false);
 	symbol_table.add_variable("Y_TASK",my_task_y,false);
@@ -13,10 +13,10 @@ void task_assignment ::addReservedVariables(exprtk::symbol_table< double >& symb
 	symbol_table.add_variable("W_T_DIFF",omega,false);
 	symbol_table.add_variable("W_T_DUBINS",omega_dubins,false);
 	symbol_table.add_variable("SET_CHARGE",set_charge,false);
-}
+}*/
 
  
-void task_assignment ::compileExpressions(exprtk::symbol_table< double >& symbol_table)
+/*void task_assignment ::compileExpressions(exprtk::symbol_table< double >& symbol_table)
 {
 	exprtk::parser<double> parser;
 	
@@ -54,14 +54,20 @@ void task_assignment ::compileExpressions(exprtk::symbol_table< double >& symbol
 		ERR("impossibile creare l'espressione: %s","CHARGE");
 		throw "impossibile creare l'espressione";
 	}
+}*/
+
+
+bool task_assignment::reached()
+{
+	return ((fabs(*x-my_task_x)<0.1) && (fabs(*y-my_task_y)<0.1));
 }
 
- 
-void task_assignment ::setTaskStop(bool stop)
+
+double task_assignment::distance_to_target()
 {
-	events.at(events_to_index.at("STOPPED"))=stop?Events::_TRUE:Events::_FALSE;
-	events.at(events_to_index.at("STARTED"))=!stop?Events::_TRUE:Events::_FALSE;
+	return sqrt((my_task_x-*x)*(my_task_x-*x)+(my_task_y-*y)*(my_task_y-*y));
 }
+
 
  
 bool task_assignment ::task_made()

@@ -1,0 +1,115 @@
+#4 agenti che frenano e sterzano random se sono vicini, e che sterzano se oltrepassano i 20 metri dall'origine sull'asse x o y
+- WORLD:
+  - bonus_variables: [b1]
+    b1: '1'
+  AGENTS:
+  - agent: Agente1
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '0'
+      y: '0'
+      theta: '0'
+    STATE_START: FAST
+    DYNAMIC_MAP:
+    - &dyn
+      x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+    BEHAVIOR:
+    - &es4 
+      name: esempio4
+      CONTROLLERS:
+      - name: fast
+        v: 3*b1
+        w: 0
+      - name: left
+        v: 1
+        w: 0.5*rndom(0.5,1.5)
+      DISCRETE_STATES:
+      - name: fast
+        controller: fast
+      - name: left
+        controller: left
+      ENCODER:
+      - TOPOLOGY:
+          - topology: [t1]
+            t1: '((abs(x-xi)<3) and abs(y-yi)<3)'
+            #t1: 'abs(x-xi)<3'
+        LAMBDA:
+          - lambda: [l1]
+            l1: 'abs(x)>20 or abs(y)>20'
+      EVENTS:
+      - events: [e1,e2,e3,e4]
+        e1: t1 
+        e2: '!t1 !l1'
+        e3: l1
+        e4: !l1
+      AUTOMATON:
+      - name: es4
+        FAST:
+          - FAST: [e2]
+            LEFT: [e1,e3]
+        LEFT:
+          - LEFT: [e1,e3]
+            FAST: [e2]
+      
+  - agent: Agente2
+    visibleArea: circle(x,y,5)
+    agentDimension: circle(x,y,5)
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '10'
+      y: '0'
+      theta: '0'
+    STATE_START: FAST
+    DYNAMIC_MAP:
+    - *dyn
+    BEHAVIOR:
+    - *es4 
+    
+  - agent: Agente3
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '10'
+      y: '10'
+      theta: '0'
+    STATE_START: FAST
+    DYNAMIC_MAP:
+    - *dyn
+    BEHAVIOR:
+    - *es4 
+    
+    
+  - agent: Agente4
+    #VISIBLE AREA: ./battle/exp_t_visuale.txt
+    #NEIGHBORHOOD =  ./battle/exp_t_visuale.txt
+    #MONITORING = 0
+    #COLLABORATIVE = 1
+    states: [x,y,theta]
+    control_commands: [v,w]
+    INITIAL:
+    - x: '0'
+      y: '10'
+      theta: '0'
+    STATE_START: FAST
+    DYNAMIC_MAP:
+    - *dyn
+    BEHAVIOR:
+    - *es4    
+
+   

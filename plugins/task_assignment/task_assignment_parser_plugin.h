@@ -10,7 +10,7 @@ class task_assignment_parsed_agent: public abstract_parsed_agent_plugin
 public:
       task_assignment_namespace::task_cost_vector agent_task_cost_vector;
     std::string getType(){return "task_assignment_parsed_agent";};
-
+double home_x,home_y;
 };
 class task_assignment_parsed_world: public abstract_parsed_world_plugin
 {

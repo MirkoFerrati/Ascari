@@ -1,0 +1,65 @@
+#REAL_1
+- WORLD:
+  - TASK_ASSIGNMENT_ALGORITHM: SUBGRADIENT
+    TASK_NUMBER: 2
+    TASK_LIST: [T1,20,80,0,1,100,0,0,T2,80,30,0,1,50,0,0]
+
+  BEHAVIORS:
+  - name: dubins
+    states: [x,y,theta,charge]
+    control_commands: [v,w,c]
+    
+    DYNAMIC_MAP:
+    - x: 'v*cos(theta)'
+      y: 'v*sin(theta)'
+      theta: 'w'
+      charge: 'c'
+    CONTROLLERS:
+    - name: go
+      v: v_t
+      w: w_t_dubins
+      c: set_charge
+    DISCRETE_STATES:
+    - name: go
+      controller: go
+    ENCODER:
+    - TOPOLOGY:
+        - topology: []
+      LAMBDA:
+        - lambda: []
+    EVENTS:
+    - events: []
+    
+    AUTOMATON:
+    - name: aut_machine
+      GO:
+        - GO: []
+    
+  AGENTS:
+  - agent: Agente1
+    COMMUNICATION_AREA:   circle(50)
+    INITIAL:
+    - x: '0'
+      y: '0'
+      theta: '0'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: dubins
+    TASK_COST_VECTOR: [T1,56,T2,16]
+    SIMULATED: 0
+    MARKER: 1
+    HOME: [143.75,114.75]
+    
+  - agent: Agente2
+    COMMUNICATION_AREA:   circle(50)
+    INITIAL:
+    - x: '0'
+      y: '0'
+      theta: '0'
+      charge: '100'
+    STATE_START: GO
+    BEHAVIOR: dubins
+    TASK_COST_VECTOR: [T1,20,T2,80]
+    SIMULATED: 0
+    MARKER: 2
+    HOME: [122.5,151.75]

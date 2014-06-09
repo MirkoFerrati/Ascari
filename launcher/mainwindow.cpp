@@ -2,14 +2,12 @@
 #include "ui_mainwindow.h"
 #include <QtGui>
 #include <viewer.h>
-#include "../plugins/monitor/monitor_viewer.h"
 #include <udp_world_sniffer.h>
 #include <zmq_world_sniffer.hpp>
-#include <zmq_identifier_sniffer.hpp>
-#include "../plugins/agent_router/agent_router_viewer.h"
-#include "../plugins/task_assignment/task_assignment_viewer.h"
+//#include "../plugins/agent_router/agent_router_viewer.h"
+//#include "../plugins/task_assignment/task_assignment_viewer.h"
 #include "../plugins/abstract_viewer_plugin.h"
-#include "../plugins/agent_router/agent_router_parsed_world.h"
+//#include "../plugins/agent_router/agent_router_parsed_world.h"
 #include "../plugins/addplugins.h"
 
 MainWindow::MainWindow ( QWidget *parent ) :
@@ -31,7 +29,7 @@ MainWindow::MainWindow ( QWidget *parent ) :
     QList<int> sizes;
     sizes.push_back ( 500 );
     sizes.push_back ( 500 );
-    ui->HorizSplitter->setSizes ( sizes );
+    ui->ViewerSplitter->setSizes ( sizes );
     sizes.clear();
     sizes.push_back ( 300 );
     sizes.push_back ( 300 );
@@ -42,11 +40,30 @@ MainWindow::MainWindow ( QWidget *parent ) :
     restoreGeometry ( settings->value ( "mainWindowGeometry" ).toByteArray() );
     restoreState ( settings->value ( "mainWindowState" ).toByteArray() );
 
+    auto filesTable=ui->tableWidget;
+    QStringList labels;
+    labels << tr("Config Variable") << tr("Value");
+    filesTable->setHorizontalHeaderLabels(labels);
+    filesTable->setColumnCount( labels.size() );
+    filesTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+    filesTable->verticalHeader()->hide();
+    filesTable->setShowGrid(false);
+    filesTable->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
     agentPath=settings->value ( "paths/agent","" ).toString();
     simulatorPath=settings->value ( "paths/simulator","" ).toString();
     yamlsPath=settings->value ( "paths/yamls","" ).toString();
     fileName = settings->value ( "paths/lastopen","" ).toString();
-        generic_plugins=createPlugins();
+
+    QFile file ( fileName );
+    QDir d = QFileInfo ( file ).absoluteDir();
+
+    addConfigRow("paths/agent",agentPath);
+    addConfigRow("paths/simulator",simulatorPath);
+    addConfigRow("paths/yamls",yamlsPath);
+    addConfigRow("paths/lastopen",fileName);
+    addConfigRow("paths/fullfilepath",d.absolutePath());
+
+    generic_plugins=createPlugins();
 
     if ( fileName.compare ( "" ) !=0 )
     {
@@ -66,6 +83,35 @@ for ( auto plugin:generic_plugins )
         ui->selectViewType->addItem ( QString::fromStdString(plugin->getType()) );
     }
 
+}
+
+
+void MainWindow::addConfigRow(std::string name, std::string value)
+{
+  addConfigRow(name,QString::fromStdString(value));
+}
+void MainWindow::addConfigRow(std::string name, QString value)
+{
+     auto filesTable=ui->tableWidget;
+    int row=-1;
+     if (!config_to_row.count(name))
+     {
+    row = filesTable->rowCount();
+    filesTable->insertRow(row);
+    config_to_row[name]=row;
+     }
+    else
+    {
+         row=config_to_row[name];
+     }
+     QTableWidgetItem *nameItem = new QTableWidgetItem;
+     nameItem->setText(QString::fromStdString(name));
+     QTableWidgetItem *valueItem = new QTableWidgetItem;
+     valueItem->setText(value);
+    filesTable->setItem(row, 0, nameItem);
+    filesTable->setItem(row, 1, valueItem);
+        filesTable->resizeColumnsToContents();
+  
 }
 
 void MainWindow::closeEvent ( QCloseEvent *event )
@@ -131,6 +177,7 @@ void MainWindow::openFile()
     if ( !file.open ( QIODevice::ReadOnly ) )
     {
         QMessageBox::information ( 0, "error", file.errorString() );
+        addConfigRow("ERROR",QString("Cannot open file"));
         return;
     }
 
@@ -335,7 +382,7 @@ void MainWindow::startAgents()
         agent=new QProcess ( this );
         QFile file ( fileName );
         QDir d = QFileInfo ( file ).absoluteDir();
-        agent->setWorkingDirectory ( d.absolutePath() );
+        //agent->setWorkingDirectory ( d.absolutePath() );
         agent->setProcessChannelMode ( QProcess::MergedChannels );
         agent->start ( agentPath,arguments );
         agents[agentcontainer.at ( i )->text().toStdString()]=  agent ;

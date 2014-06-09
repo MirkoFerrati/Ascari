@@ -25,19 +25,122 @@
 #include <define.h>
 #define VIEWER_BORDER atof(CONFIG.getValue("VIEWER_BORDER").c_str())
 
+
 using namespace std;
 
 
 Viewer::Viewer ( const world_sim_packet& read, std::shared_ptr<std::mutex>& read_mutex, QWidget* parent) :
-    QWidget ( parent ),infos ( read ), mutex ( read_mutex )
+    QGraphicsView ( parent ),infos ( read ), mutex ( read_mutex )
 {
     simulation_time=0;
+    agentshape=QPolygon(QVector<QPoint>( { QPoint ( -10, 10 ),QPoint ( -10, -10 ),QPoint ( 30, 0 )}));
+
+    setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+
+    //Set-up the scene
+    Scene = new QGraphicsScene(this);
+    setScene(Scene);
+    scale(1,-1);
+    
+    /*
+     * Use the following set of instruction to see the coordinate system of viewer.
+     */
+    /*for (double theta=0;theta<M_PI;theta=theta+0.4)
+    {
+        auto line=Scene->addLine(0,0,50,0);
+        line->setRotation(theta*180.0/M_PI);
+        auto item=Scene->addText(QString("").setNum(theta));
+        item->setPos(80*cos(theta)-10,80*sin(theta)+10);
+        item->scale(1,-1);
+    }
+    
+    //fake agent with theta=0.4
+    QGraphicsPolygonItem *agent=Scene->addPolygon(agentshape);
+    QBrush b;
+    b.setColor(QColor("red"));
+    b.setStyle( Qt::SolidPattern);
+    agent->setBrush(b); 
+    double tmp=0.4;
+    agent->setPos(0,0);
+    agent->setRotation(tmp*180.0/M_PI);
+    
+    for(int x = 0; x < 1000; x = x + 250) {
+        for(int y = 0; y < 1000; y = y + 250) {
+
+            if(x % 100 == 0 && y % 100 == 0) {
+                Scene->addRect(x, y, 2, 2);
+
+                QString pointString;
+                QTextStream stream(&pointString);
+                stream << "(" << x << "," << y << ")";
+                QGraphicsTextItem* item = Scene->addText(pointString);
+                item->scale(1,-1);
+                item->setPos(x, y);
+            } else {
+                Scene->addRect(x, y, 1, 1);
+            }
+        }
+    }
+    /**/
+    clock=Scene->addText("");
+    clock->scale(1,-1);
+    clock->setFlag(QGraphicsItem::ItemIsMovable,true);
+    clock->setFlag(QGraphicsItem::ItemIsSelectable,true);
+
+
+    //Set-up the view
+//    setSceneRect(-500, -500, 1000, 1000); if this instruction is not called, the sceneRect will include 
+
+    //Use ScrollHand Drag Mode to enable Panning
+    setDragMode(ScrollHandDrag);
 }
+
+void Viewer::wheelEvent(QWheelEvent* event)
+{
+    bool selected=false;
+for (auto item:Scene->selectedItems())
+    {
+        selected=true;
+        if (item==clock)
+        {
+            QFont temp=clock->font();
+            temp.setPointSize(temp.pointSize()+((event->delta()>0)*2-1));
+            clock->setFont(temp);
+        }
+        else if (item->data(0)==TYPE_AGENT)
+        {
+            item->setScale(item->scale()*((event->delta()>0)*0.2+0.9));
+        }
+        else if (item->data(0)==TYPE_TEXT)
+        {
+
+        }
+    }
+
+    if (!selected)
+    {
+        setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+
+        // Scale the view / do the zoom
+        double scaleFactor = 1.15;
+        if(event->delta() > 0) {
+            // Zoom in
+            scale(scaleFactor, scaleFactor);
+        } else {
+            // Zooming out
+            scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+        }
+    }
+    // Don't call superclass handler here
+    // as wheel is normally used for moving scrollbars
+    // QGraphicsView::wheelEvent(event);
+}
+
 
 void Viewer::addPlugin ( abstract_viewer_plugin* plugin )
 {
-  assert(plugin);
-  plugins.push_back(plugin);
+    assert(plugin);
+    plugins.push_back(plugin);
 }
 
 
@@ -46,54 +149,26 @@ void Viewer::init ( std::string filename )
 {
     simulation_time=0;
     backImage="";
-    scalingFactorX=10;
-    scalingFactorY=10;
-    translateX=0;
-    translateY=0;
-    maxX=-500000;
-    maxY=-500000;
-    minX=500000;
-    minY=500000;
-    
-    for (auto plugin:plugins)
-      plugin->init();
-
-   // setScalingAndTranslateFactor(0,0,0,0);	
+for (auto plugin:plugins)
+        plugin->init();
 
 }
 
 void Viewer::setScalingAndTranslateFactor ( double maxX, double minX, double maxY, double minY )
 {
-    if ( this->maxX<maxX )
-        this->maxX=maxX +(maxX+minX)/2.0*VIEWER_BORDER;
-    if ( this->minX>minX )
-		this->minX=minX -(maxX+minX)/2.0*VIEWER_BORDER;
-    if ( this->minY>minY )
-		this->minY=minY -(maxY+minY)/2.0*VIEWER_BORDER;
-    if ( this->maxY<maxY )
-		this->maxY=maxY +(maxY+minY)/2.0*VIEWER_BORDER;
-	
-	setScalingFactor ( this->maxX-this->minX,this->maxY-this->minY );
-	setTranslateFactor ( ( this->maxX+this->minX ) /2.0, ( this->maxY+this->minY ) /2.0 );
-
-	
+    setSceneRect(minX, minY, maxX-minX, maxY-minY);
 }
 
 
 void Viewer::setScalingFactor ( double scalingFactorX,double scalingFactorY )
 {
-    if ( this->scalingFactorX<scalingFactorX )
-        this->scalingFactorX=scalingFactorX;
-    if ( this->scalingFactorY<scalingFactorY )
-        this->scalingFactorY=scalingFactorY;
+    //scale(scalingFactorX, scalingFactorY);
 }
 
 void Viewer::setTranslateFactor ( double translateX, double translateY )
 {
-    this->translateX=translateX;
-    this->translateY=translateY;
-}
 
+}
 
 void Viewer::setBackImage ( string path )
 {
@@ -107,149 +182,72 @@ void Viewer::setBackImage ( string path )
     pixmap.convertFromImage ( immagine );
 }
 
- void Viewer::closeEvent(QCloseEvent *event)
- {
-QSettings settings("K2BRobotics","Viewer");
-      settings.setValue("mainWindowGeometry", saveGeometry());
-     QWidget::closeEvent(event);
-
- }
+void Viewer::closeEvent(QCloseEvent *event)
+{
+    QSettings settings("Ascari","Viewer");
+    settings.setValue("mainWindowGeometry", saveGeometry());
+    QWidget::closeEvent(event);
+}
 
 
 Viewer::~Viewer()
 {
-  {
-  QSettings settings;
-      settings.setValue("mainWindowGeometry", this->saveGeometry());
-  }
-}
-
-void Viewer::paintTextPoint(QPainter *painter,double x,double y)
-{
-	painter->save();
-	painter->setPen(QColor("blue"));
-	QFont f = painter->font();
-	f.setPointSizeF ( 20 );
-	painter->setFont ( f );
-	QString s;
-	s.append(QString("").setNum(x*0.9));
-	s.append(",");
-	s.append(QString("").setNum(y*0.9));
-	painter->translate(x*0.9,y*0.9);
-	painter->scale(1,-1);
-	painter->drawText(0,0,s);
-	painter->restore();
-	
-}
-
-void Viewer::paintAgents(QPainter &painter,const std::map<std::string,Agent>& agents)
-{
-    auto agentshape=QPolygon(QVector<QPoint>({ QPoint ( 2, -2 ),QPoint ( -2, -2 ),QPoint ( 0, 2 )})); 
-    
-    for ( std::map<std::string,Agent>::const_iterator it=agents.begin(); it!=agents.end(); ++it )
     {
-	painter.save();
-	painter.setBrush ( QColor ( "red" ) );
-	painter.translate ( it->second.x,it->second.y );
-	//lo zero degli angoli parte dall'asse y invece che da x
-	double tmp=it->second.angle;
-	while ( tmp>M_PI )
-		tmp=tmp-2*M_PI;
-	painter.rotate ( ( tmp*180/M_PI )-90 );
-	
-	painter.scale(3,3);
-	painter.drawConvexPolygon(agentshape);
-	painter.restore();
-	painter.save();
-	painter.translate ( it->second.x,it->second.y );
-	painter.scale(painter.fontMetrics().height()/1,-painter.fontMetrics().height()/1);
-	painter.drawText(0,0,QString(it->first.substr(6).c_str()));
-	
-	painter.restore();
-	    
+        QSettings settings;
+        settings.setValue("mainWindowGeometry", this->saveGeometry());
     }
 }
 
-void Viewer::paintEvent ( QPaintEvent */*event*/ )
+void Viewer::paintEvent ( QPaintEvent *event )
 {
     double sidex=width();
     double sidey=height();
-    QPainter painter ( this );
-    painter.save();
-    painter.translate ( sidex/2,sidey/2 );
-    painter.scale ( sidex/scalingFactorX,-sidey/scalingFactorY );
-    painter.translate ( -translateX,-translateY );
-// 	paintTextPoint(&painter,maxX,maxY);
-// 	paintTextPoint(&painter,maxX,minY);
-// 	paintTextPoint(&painter,minX,maxY);
-// 	paintTextPoint(&painter,minX,minY);
-
-
-    if ( backImage.compare ( "" ) )
-    {
-        painter.drawPixmap ( 0,0,sidex,sidey,pixmap );
-    }
 
     if(plugins.size()==0)
     {
-	paintAgents(painter,agents);
-	
-	painter.save();
-	QFont f = painter.font();
-	f.setPointSizeF (  std::max(height() /2500.0,0.04 ));
-	painter.setFont ( f );
-	painter.setPen ( QColor ( "blue" ) );
-	painter.translate(translateX,maxY-1.1*painter.fontMetrics().height());
-	painter.scale(1,-1);
-	painter.drawText (0,0, QString("").setNum(simulation_time) );
-	painter.restore();
+        paintAgents(Scene,agents);
+        
     }
-    
-    for (auto plugin:plugins)
+    clock->setPlainText(QString("").setNum(simulation_time));
+for (auto plugin:plugins)
     {
-	painter.save();
-	plugin->paintBackground(painter);
-	painter.restore();
+        plugin->paintBackground(Scene);
     }
-    for (auto plugin:plugins)
+for (auto plugin:plugins)
     {
-	painter.save();
-	plugin->paintAgents(painter,agents);
-	painter.restore();	
+        plugin->paintAgents(Scene,agents);
     }
-	
-   
-    painter.restore();
+    QGraphicsView::paintEvent(event);
 }
 
 
 void Viewer::timerEvent ( QTimerEvent */*event*/ )
 {
+
     mutex->lock();
     for ( map<string, agent_state_packet>::const_iterator it=infos.state_agents.internal_map.begin(); it!=infos.state_agents.internal_map.end(); ++it )
     {
         agents[it->first].translate ( (it->second) );
-        setScalingAndTranslateFactor ( agents[it->first].getMaxX(),agents[it->first].getMinX(),agents[it->first].getMaxY(),agents[it->first].getMinY() );
+        //setScalingAndTranslateFactor ( agents[it->first].getMaxX(),agents[it->first].getMinX(),agents[it->first].getMaxY(),agents[it->first].getMinY() );
     }
     simulation_time=infos.time;
     mutex->unlock();
-    
     for (auto plugin:plugins)
     {
-      plugin->timerEvent(mutex,infos);
+        plugin->timerEvent(mutex,infos);
     }
-    
+
     repaint();
 
 }
 
 void Viewer::keyPressEvent ( QKeyEvent *event )
 {
-  
-   for (auto plugin:plugins)
-   {
-     plugin->keypress();
-   }
+
+for (auto plugin:plugins)
+    {
+        plugin->keypress();
+    }
     switch ( event->key() )
     {
 
@@ -276,7 +274,7 @@ void Viewer::keyPressEvent ( QKeyEvent *event )
 void Viewer::start()
 {
 
-    timerId = startTimer ( 25 );
+    timerId = startTimer ( 40 );
     cout<<"timer started"<<endl;
     repaint();
 
@@ -284,6 +282,12 @@ void Viewer::start()
 
 void Viewer::pause()
 {
-    throw "not implemented";
+    if (timerId)
+    {
+        killTimer(timerId);
+        timerId=0;
+    }
+    else
+        start();
 }
 

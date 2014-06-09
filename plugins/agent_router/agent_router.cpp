@@ -20,48 +20,50 @@
 #include "graph_creator.h"
 #include "agent_router_parsed_agent.h"
 #include "agent_router_parsed_world.h"
-
+#include "agent_router_plugin.h"
 
 
 
 using namespace std;
 using namespace lemon;
 
-agent_router::agent_router ( std::vector< int > tarlist, std::map< transition, Events >& events,
-                             const std::map<std::string, transition>& events_to_index, string identifier,
-                             simulation_time& time, std::string graphName
-                           )
-    :  events ( events ), events_to_index ( events_to_index ), length ( graph ),
-       coord_x ( graph ), coord_y ( graph ),
-       targets ( tarlist ),time ( time ),identifier ( identifier ),communicator ( _mutex, &info, _io_service,identifier )
+agent_router::agent_router ( agent* a, Parsed_World* parse ):  length ( graph ),
+coord_x ( graph ), coord_y ( graph ),time( a->time ),
+identifier( a->identifier ),communicator ( _mutex, &info, _io_service,identifier )
 {
- initialize(graphName);
+    this->a=a;
+    this->node_radius=atof(CONFIG.getValue("NODE_RADIUS").c_str());
+    targets=(reinterpret_cast<agent_router_parsed_agent*>(parse->agents.front().parsed_items_from_plugins.at(AGENT_ROUTER_NAME)))->target_list; //funziona perche' rimane un solo agente nel mondo(gli altri vengono eliminati dal main)
+    this->graphName=(reinterpret_cast<agent_router_parsed_world*>(parse->parsed_items_from_plugins.at(AGENT_ROUTER_NAME)))->graphName;
+
 }
 
-agent_router::agent_router ( agent* a, Parsed_World* parse ):  events ( a->events ), events_to_index ( a->events_to_index ), length ( graph ),
-       coord_x ( graph ), coord_y ( graph ),
-       /*targets ( tarlist ),*/time ( a->time ),identifier ( a->identifier ),communicator ( _mutex, &info, _io_service,identifier )
+bool agent_router::initialize()
 {
-  targets=(reinterpret_cast<agent_router_parsed_agent*>(parse->agents.front().parsed_items_from_plugins[0]))->target_list; //funziona perche' rimane un solo agente nel mondo(gli altri vengono eliminati dal main)
-  std::string graphName=(reinterpret_cast<agent_router_parsed_world*>(parse->parsed_items_from_plugins[0]))->graphName;
-initialize(graphName);
-}
-
-bool agent_router::initialize(std::string graphName)
-{
-   Graph_creator c ( graph, length, coord_x, coord_y );
+    speed=&(a->inputs.command.at(a->map_inputs_name_to_id.at("V")));
+    omega=&(a->inputs.command.at(a->map_inputs_name_to_id.at("W")));
+    x=&(a->state.at(a->map_statename_to_id.at("X")));
+    y=&(a->state.at(a->map_statename_to_id.at("Y")));
+    theta=&(a->state.at(a->map_statename_to_id.at("THETA")));
+    Graph_creator c ( graph, length, coord_x, coord_y );
     graph_node_size = c.createGraph ( MAXFLOORS, graphName );
     if ( !graph_node_size )
+    {
         ERR ( "attenzione, impossibile creare il grafo", 0 );
+	return false;
+    }
     if ( targets.size() < 2 )
-        ERR ( "attenzione, la lista dei target e' troppo corta", 0 );
+    {
+      ERR ( "attenzione, la lista dei target e' troppo corta", 0 );
+      return false;
+    }
     source = graph.nodeFromId ( targets[0] );
     target = graph.nodeFromId ( targets[1] );
     node_id.push_back ( targets[0] ); //next = source;
     node_id.push_back ( targets[0] ); //next = source;
-    target_counter = 2;
-    xtarget = 0;//coord_x[next];
-    ytarget = 0;//coord_y[next];
+    target_counter = 0;
+    xtarget =  coord_x[source];
+    ytarget =  coord_y[source];
     my_LRP.timestamp = 0;
     started=false;
 //    setTargetStop(false);
@@ -71,14 +73,17 @@ bool agent_router::initialize(std::string graphName)
     negotiation_steps=0;
     next_target_reachable=false;
     internal_state=state::STARTING;
-    speed=0;
+    *speed=0;
     priority=identifier;
+    initialized=true;
     return true;
 }
 
 
 void agent_router::run_plugin()
 {
+  if (!initialized)
+    return;
     priority=identifier;
 
     if ( internal_state==state::STOPPED )
@@ -89,15 +94,18 @@ void agent_router::run_plugin()
         stopAgent();
         return;
     }
+        auto negotiate=isTimeToNegotiate ( time );
 
     if ( internal_state==state::MOVING ||  internal_state==state::STARTING ||internal_state==state::LOADING )
     {
-        if ( isTimeToNegotiate ( time ) ) //negozio anche sugli archi, basta che sia il momento giusto
+        //TODO: check that this isTimeToNegotiate is called only once during the same 10 seconds (maybe use a reset?)
+        if ( negotiate ) //negozio anche sugli archi, basta che sia il momento giusto
         {
             internal_state=state::ARC_HANDSHAKING;
             negotiation_steps=0;
         }
-        if ( abs ( getNextTime()- ( time+1.7 ) ) <0.001 )  //se sono su un nodo invece faccio di piu' che negoziare
+        //if ( abs ( getNextTime()- ( time+1.7 ) ) <0.001 )  
+        if (negotiate && isNearNode()) //se sono su un nodo invece faccio di piu' che negoziare
         {
             internal_state=state::NODE_HANDSHAKING;
             negotiation_steps=0;
@@ -110,7 +118,6 @@ void agent_router::run_plugin()
                     {
                         internal_state=state::LOADING;
                         negotiation_steps=0;
-
                     }
                 }
                 else  //se non ci sono altri target
@@ -127,7 +134,7 @@ void agent_router::run_plugin()
         usleep ( 2000 ); 
         _io_service.poll();
         _io_service.reset();
-        if ( isTimeToNegotiate ( time ) ) //negozio anche sugli archi, basta che sia il momento giusto
+        if ( negotiate ) //negozio anche sugli archi, basta che sia il momento giusto
         {
             internal_state=state::NODE_HANDSHAKING;
             negotiation_steps=0;
@@ -194,7 +201,8 @@ void agent_router::run_plugin()
         negotiation_steps++;
         if ( detect_collision() )
         {
-            internal_state=old_state;
+            if (internal_state!=state::NODE_HANDSHAKING && internal_state!=state::ARC_HANDSHAKING) //if I am not in a handshaking, I go back to handshaking
+                internal_state=old_state;
         }
         else
         {
@@ -243,8 +251,8 @@ void agent_router::run_plugin()
     }
 
     setSpeed();
-    //cout<<"stato interno: ";
-    //print_state(internal_state);
+    cout<<" stato interno: ";
+    print_state(internal_state);
     //cout<<endl;
 }
 
@@ -486,20 +494,26 @@ void agent_router::prepare_loading_packet()
     last_time_updated = time;
 }
 
+double agent_router::distance_to_target()
+{
+    return sqrt((xtarget-*x)*(xtarget-*x)+(ytarget-*y)*(ytarget-*y));
+}
+
 
 void agent_router::setSpeed()
 {
     if ( !last_time_left_a_node || last_time_left_a_node==-1||internal_state==state::EMERGENCY )
     {
-        speed=0;
+        *speed=0;
         return;
     }
     started=true;
     assert ( node_id.size() >1 );
     simulation_time delta = getNextTime() - time;
-    double length = distance_to_target.value();
-    speed=length/delta;
-    //cout<<"speed="<<speed<<",length="<<length<<"delta="<<delta<<endl;
+    double length = distance_to_target();
+    *speed=length/delta;
+    *omega=5*sin(atan2(ytarget-*y,xtarget-*x)-*theta);
+    std::cout<<"speed="<<*speed<<",length="<<length<<"delta="<<delta<<std::endl;
 }
 
 simulation_time agent_router::getNextTime()
@@ -533,6 +547,7 @@ bool agent_router::setNextTarget()
     else
     {
         int id = targets[target_counter];
+        
         target_counter++;
         target = graph.nodeFromId ( id );
         cout << time << ": TARGET raggiunto, nuovo target: " << id << " " << coord_x [target] << " " << coord_y[target] << endl;

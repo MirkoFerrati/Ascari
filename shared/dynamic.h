@@ -22,7 +22,7 @@ public:
 	
 	dynamic(agent_state& StateReferenceWARN,control_command& controlReferenceWARN, 
 		std::map< std::string, std::string > expression, std::vector< std::string > state_variables_name, 
-	 std::vector< std::string > control_variables_name, float tcamp=T_CAMP);
+	 std::vector< std::string > control_variables_name, float t_integration);
 	
 	
 	agent_state getNextState();

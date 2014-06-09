@@ -53,8 +53,13 @@ class task_assignment_router: public simulator_to_agent_ta_communicator<datatype
 
     public:
 
-	task_assignment_router(unsigned int num_agent)
+	task_assignment_router(unsigned int num_agent, std::vector<std::string> agents)
 	{
+		std::list<std::string> clients;
+		
+		for(auto i:agents) clients.push_back(i);;
+		
+	        simulator_to_agent_ta_communicator<datatype,datatype>::setClientsName(clients);
 		init(num_agent);
 		this->start_thread();
 	}

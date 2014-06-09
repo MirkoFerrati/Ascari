@@ -2,7 +2,9 @@
 #ifndef TASK_ASSIGNMENT_H
 #define TASK_ASSIGNMENT_H
 
+//Open the following file in kdevelop to enable the parser
 #include "../HACK_KDEVELOP.h"
+
 #ifdef ISAGENT
 
 #include <vector>
@@ -10,10 +12,9 @@
 #include <yaml_parser.h>
  
 #include "task_assignment_communicator.h"
-#include "assignment_problem.h"
+//#include "assignment_problem.h"
 #include <random.hpp>
 #include "../shared/objects/task_assignment_task.h"
-#include <types/events.h>
 
 #include "../plugins/abstract_agent_plugin.h"
 #include "../agent/agent.h"
@@ -22,7 +23,7 @@ class task_assignment: public abstract_agent_plugin
 {
 	
 public:
- 	task_assignment( const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, std::map< transition, Events >& events, const std::map< std::string, transition >& events_to_index, const objects_container& tasks );
+//  	task_assignment( const Parsed_World& world, const Parsed_Agent& agent, simulation_time& time, const objects_container& objects );
 	task_assignment(agent* a, Parsed_World* parse);
 	void createAgentIdAndTaskIdVectorFromParsedWorld(const Parsed_World& wo);
 	void createTaskCostMatrixFromParsedWorld(const Parsed_Agent& a);
@@ -39,21 +40,34 @@ public:
 	void update_remaining_times();
 	bool recharge_is_present();
 	double dubins_dist(double Ax,double Ay, double theta, double Tx, double Ty, double r);
-	void solve_assignment_problem(assignment_problem& p, task_assignment_namespace::task_assignment_vector& a, std::vector<task_assignment_namespace::task_id>& t,unsigned int n);
+	//void solve_assignment_problem(assignment_problem& p, task_assignment_namespace::task_assignment_vector& a, std::vector<task_assignment_namespace::task_id>& t,unsigned int n);
 	double norm2(double x1,double y1,double x2,double y2);
 	void receive_from_others();
 	~task_assignment();
 	void avoid_collision(double& a);
 	void compute_speeds(double x_t, double y_t);
 	void createAusiliarVariables();
+	bool reached();
+	double compute_alpha();
+	double distance_to_target();
+	bool initialize();
+	double compute_speed(double x_t, double y_t);
+	double compute_omega(double x_t, double y_t);
 
+	double *x,*y,*theta,*charge_;
+	
+	double *speed;
+	double omega;
+	double *omega_dubins;
+	double *set_charge;
+	double my_task_x,my_task_y;
 	
 private:
   
 	std::map<task_assignment_namespace::agent_id,std::vector<double>> positions;
 
-	double set_charge;
 	
+	agent* a;
 	double lambda_u;
 	double omega_tilde;
 	double beta_p;
@@ -76,7 +90,7 @@ private:
 	
 	task_assignment_namespace::task_id my_task;
 	
-	double my_task_x,my_task_y;
+	
 		
 	std::vector<task_assignment_namespace::agent_id> agents_id;
 	
@@ -96,17 +110,15 @@ private:
 	bool task_started;
 	bool stop;
 	
-	double speed;
-	double omega;
-	double omega_dubins;
+	
 	double max_omega=0.2;
-	exprtk::expression<double> distance_to_target;
-	exprtk::expression<double> x;
-	exprtk::expression<double> y;
-	exprtk::expression<double> theta;
-	exprtk::expression<double> charge_;
-	std::map< transition, Events >& events;
-	const std::map<std::string,transition>& events_to_index;
+	//exprtk::expression<double> distance_to_target;
+	//exprtk::expression<double> x;
+	//exprtk::expression<double> y;
+	//exprtk::expression<double> theta;
+	//exprtk::expression<double> charge_;
+	
+	
 	
 	
 	
@@ -148,7 +160,6 @@ private:
 
 	//
 	
-	void setTaskStop(bool stop);
 	bool task_made();
 	
 	std::shared_ptr<std::mutex> ptr_receive_mutex;
@@ -166,7 +177,7 @@ private:
 	std::shared_ptr<task_assignment_namespace::subgradient_packet> ptr_subgradient_packet;
 	//
 	
-	assignment_problem ta_problem;
+	//assignment_problem ta_problem;
 	void initialize_assignment_problem();
 	std::vector<double> C;
 	std::vector<double> D;
@@ -175,9 +186,9 @@ private:
 	void copy_solution_to_TA_vector(std::vector<double>& solution);
 	void copy_cost_vector_to_C();
 	void control_print();
-	void initialize( const Parsed_World& world );
 
 	std::map<task_assignment_namespace::agent_id,std::vector< double >> others_subgradient;
+    const Parsed_World* world;
 };
 	#endif
 

@@ -34,7 +34,7 @@ public:
         control_command controllo;
         controllo[0]=1;
         controllo[1]=2;
-        dynamic d(stato,controllo,mappa_id_espressioni,nomi_variabili,nomi_controllo);
+        dynamic d(stato,controllo,mappa_id_espressioni,nomi_variabili,nomi_controllo,0.01);
 	
 	agent_state new_state=d.getNextState();
 	
