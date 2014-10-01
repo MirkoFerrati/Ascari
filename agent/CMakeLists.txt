@@ -8,7 +8,13 @@ else()
 add_definitions(-DAGENT=1)
 remove_definitions(-DAGENT_LIGHT)
 endif()
+set(CMAKE_MODULE_PATH
+  ${CMAKE_MODULE_PATH}
+  "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
+find_package(PkgConfig)
+find_package(YamlCpp REQUIRED)
+pkg_check_modules(YAML yaml-cpp true true)
 
 set_property(GLOBAL APPEND PROPERTY agent_SOURCES 
    agent.cpp main.cpp ../shared/define.cpp
@@ -31,7 +37,7 @@ target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 include_directories(../shared/logog/include)
 endif()
 
-target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
+target_link_libraries(agent ${YAMLCPP_LIBRARY})
 
 #comment the following lines if you are not compiling agent router plugin
 target_link_libraries(agent ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
@@ -42,7 +48,7 @@ target_link_libraries(agent zmq)
 
 include_directories(../agent)
 include_directories(../shared)
-include_directories(../shared/parserYAML/include)
+# include_directories(../shared/parserYAML/include)
 include_directories(plugins)
 
 find_package(Boost COMPONENTS REQUIRED system thread serialization program_options)

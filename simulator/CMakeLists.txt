@@ -8,6 +8,8 @@ communication/zmq_agent_communicator.cpp ../shared/communication/global.cpp visi
 	../shared/communication/zmq_full_communicator.hpp ../shared/communication/zmq_communicator.hpp 
 	../shared/objects/task_assignment_task.cpp visibility/map2d.cpp ../gml2lgf/graph.cpp ../gml2lgf/node.cpp ../gml2lgf/arc.cpp ../gml2lgf/gmlreader.hpp
 )
+find_package(PkgConfig)
+pkg_check_modules(YAML yaml-cpp)
 
 add_definitions(-DISSIMULATOR)
 get_property(sources GLOBAL PROPERTY simulator_SOURCES)
@@ -23,9 +25,9 @@ include_directories(communication)
 target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 #target_link_libraries(simulator liblogog.a)
 
-target_link_libraries(simulator ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
+target_link_libraries(simulator ${YAMLCPP_LIBRARY})
 
-#target_link_libraries(simulator libyaml-cpp.a)
+target_link_libraries(simulator libyaml-cpp.a)
 
 target_link_libraries(simulator zmq)
 
@@ -38,7 +40,7 @@ target_link_libraries(simulator rt)
 
 include_directories(../shared)
 include_directories(../shared/logog/include)
-include_directories(../shared/parserYAML/include)
+# include_directories(../shared/parserYAML/include)
 
 message("Configurazione di ${CMAKE_BUILD_TYPE}")
 file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/simulator" "../shared/yamls/*.yaml")

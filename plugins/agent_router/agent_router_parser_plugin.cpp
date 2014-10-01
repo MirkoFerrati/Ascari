@@ -9,11 +9,11 @@ abstract_parsed_world_plugin* agent_router_parser_plugin::parseWorld ( const YAM
     enabled=false;
     auto wo=new agent_router_parsed_world();
      wo ->graphName="UNSET";
-    if ( node[0]["WORLD"][0].FindValue ( "GRAPH_NAME" ) )
+    if ( node[0]["WORLD"][0][ "GRAPH_NAME" ] )
     {
         const YAML::Node &world_node=node[0]["WORLD"][0];
 
-        world_node["GRAPH_NAME"]>> wo->graphName;
+        wo->graphName= world_node["GRAPH_NAME"].as<std::string>();//>> wo->graphName;
         enabled=true;
     }
     return enabled?wo:0;
@@ -24,13 +24,13 @@ abstract_parsed_agent_plugin* agent_router_parser_plugin::parseAgent ( const YAM
     if ( !enabled )
         return 0;
     auto ag=new agent_router_parsed_agent();
-    if ( node.FindValue ( "TARGET_LIST" ) )
+    if ( node["TARGET_LIST"] )
     {
         int toint=0;
         std::vector<target_id>& temp  = ( reinterpret_cast<agent_router_parsed_agent*> ( ag ) )->target_list;
         for ( unsigned int i=0; i<node["TARGET_LIST"].size(); i++ )
         {
-            node["TARGET_LIST"][i]>>toint;
+            toint=node["TARGET_LIST"][i].as<int>();
             temp.push_back ( toint );
         }
     }

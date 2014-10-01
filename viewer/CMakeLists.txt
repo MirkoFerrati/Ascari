@@ -3,13 +3,15 @@ add_definitions(-DISVIEWER)
 
 include_directories(gui communication)
 include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
-include_directories(../shared/parserYAML/include)
+# include_directories(../shared/parserYAML/include)
 include_directories(../shared/)
 include_directories(../shared/logog/include)
 
 find_package(Qt4 REQUIRED QtCore QtGui QtNetwork)
 include(${QT_USE_FILE})
 
+find_package(PkgConfig)
+pkg_check_modules(YAML yaml-cpp true false)
 
 set(viewer_HEADERS gui/Agent.h gui/viewer.h ../shared/communication/global.h)
 set_property(GLOBAL APPEND PROPERTY viewer_SOURCES gui/baseball_viewer.cpp 
@@ -40,7 +42,7 @@ target_link_libraries(viewer ${QT_LIBRARIES})
 target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
  find_package(Boost REQUIRED system thread serialization)
   
-  target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
+  target_link_libraries(viewer ${YAMLCPP_LIBRARY})
   
 target_link_libraries(viewer boost_system boost_thread boost_serialization boost_program_options pthread zmq)
 target_link_libraries(viewer ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)

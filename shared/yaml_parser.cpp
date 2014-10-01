@@ -1,5 +1,5 @@
 #include "yaml_parser.h"
-#include "parserYAML/include/yaml-cpp/node.h"
+#include <yaml-cpp/node/node.h>
 #include "../plugins/task_assignment/task_assignment_parser_plugin.h"
 #include "../plugins/agent_router/agent_router_parser_plugin.h"
 #include "logog.hpp"
@@ -40,17 +40,18 @@ Parsed_World yaml_parser::parse_file ( string file_name )
     boost::algorithm::to_upper ( new_str );
     std::stringstream new_new_str;
     new_new_str<<new_str;
-    YAML::Parser parser ( new_new_str );
-    YAML::Node doc;
-    parser.GetNextDocument ( doc );
+//     YAML::Parser parser ( new_new_str );
+//     YAML::Node doc;
+//     parser.getNextDocument(doc );
+    YAML::Node doc=YAML::Load(new_new_str);
     Parsed_World World;
     World.parsedSuccessfully=true;
     World.plugins=plugins;
 
-    if (doc.FindValue("REQUIRED_PLUGINS"))
+    if (doc["REQUIRED_PLUGINS"])
     {
-	std::vector<std::string> temp;
-	doc["REQUIRED_PLUGINS"]>>temp;
+	std::vector<std::string> temp=doc["REQUIRED_PLUGINS"].as<std::vector<std::string>>();
+//	doc["REQUIRED_PLUGINS"]>>temp;
 	for (auto plugin_name:temp)
 	{
 	  bool found=false;
@@ -78,14 +79,14 @@ Parsed_World yaml_parser::parse_file ( string file_name )
 
 bool Parsed_Behavior::load_from_node ( const YAML::Node& node )
 {
-    node["STATES"]>>state;//behavior->state;
-    node["CONTROL_COMMANDS"]>>inputs;//behavior->inputs;
-    node["NAME"]>>name;//behavior->name;
+    state=node["STATES"].as<std::vector<stateVariable>>();//>>state;//behavior->state;
+    inputs=node["CONTROL_COMMANDS"].as<std::vector<controlVariable>>();//>>inputs;//behavior->inputs;
+    name=node["NAME"].as<std::string>();//>>name;//behavior->name;
 
     for ( unsigned int i=0; i<state.size(); i++ ) //behavior->state.size(); i++ )
     {
         dynamic_expression tmp_exp;
-        node["DYNAMIC_MAP"][0][state[i]]>>tmp_exp;
+        tmp_exp=node["DYNAMIC_MAP"][0][state[i]].as<std::string>();//>>tmp_exp;
         expressions.insert ( std::pair<stateVariable,dynamic_expression> ( state[i],tmp_exp ) );
     }
 
@@ -97,20 +98,17 @@ bool Parsed_Behavior::load_from_node ( const YAML::Node& node )
 
 bool Parsed_Agent::load_from_node ( const YAML::Node& node )
 {
-    if ( node.FindValue ( "VISIBLE_AREA" ) )
+    if ( node["VISIBLE_AREA"] )
     {
-        node["VISIBLE_AREA"]>>visibility;
+        node["VISIBLE_AREA"].as<std::string>();//>>visibility;
     }
     else
     {
         WARN ( "NO VISIBLE AREA SPECIFIED",NULL );
     }
-     if ( node.FindValue ( "SIMULATED" ) )
+     if ( node["SIMULATED"] )
     {
-	int tmp_simulated;
-        
-	
-	node["SIMULATED"]>>tmp_simulated;
+	int tmp_simulated=node["SIMULATED"].as<int>();//>>tmp_simulated;
 	
 	if (tmp_simulated==1)
 	  simulated=true;
@@ -118,9 +116,9 @@ bool Parsed_Agent::load_from_node ( const YAML::Node& node )
 	{
 	  simulated=false;
 		
-	if ( node.FindValue ( "MARKER" ) )
+	if ( node[ "MARKER" ])
       {
-	node["MARKER"]>>marker;
+          marker=node["MARKER"].as<marker_type>();//>>marker;
       }
       else
       {
@@ -135,7 +133,7 @@ bool Parsed_Agent::load_from_node ( const YAML::Node& node )
     for ( unsigned int i=0; i<behavior->state.size(); i++ )
     {
         initial_state_value tmp_initial=0;
-        node["INITIAL"][0][behavior->state[i]]>>tmp_initial;
+        tmp_initial=node["INITIAL"][0][behavior->state[i]].as<initial_state_value>();//>>tmp_initial;
         initial_states.insert ( pair<stateVariable,initial_state_value> ( behavior->state[i],tmp_initial ) );
     }
     return true;
@@ -147,26 +145,25 @@ bool Parsed_World::load_from_node ( const YAML::Node& node )
 {
     mapfilename="UNSET";
 
-    if ( node[0].FindValue ( "WORLD" ) )
+    if ( node[0]["WORLD" ] )
     {
         if ( node[0]["WORLD"].size() >0 )
         {
 
-            if ( node[0]["WORLD"][0].FindValue ( "BONUS_VARIABLES" ) )
+            if ( node[0]["WORLD"][0]["BONUS_VARIABLES"] )
             {
                 const YAML::Node &world_node=node[0]["WORLD"][0];
-                world_node["BONUS_VARIABLES"]>> bonus_variables;
+                bonus_variables=world_node["BONUS_VARIABLES"].as<std::vector<bonusVariable>>();//>> bonus_variables;
                 for ( unsigned int i=0; i<bonus_variables.size(); i++ )
                 {
-                    string bonus_exp;
-                    world_node[bonus_variables[i]]>>bonus_exp;
+                    string bonus_exp=world_node[bonus_variables[i]].as<std::string>();//>>bonus_exp;
                     bonus_expressions.insert ( make_pair ( bonus_variables.at ( i ),bonus_exp ) );
                 }
             }
-            if ( node[0]["WORLD"][0].FindValue ( "WORLD_MAP" ) )
+            if ( node[0]["WORLD"][0]["WORLD_MAP" ] )
             {
                 const YAML::Node &world_node=node[0]["WORLD"][0];
-                world_node["WORLD_MAP"]>> mapfilename;
+                mapfilename=world_node["WORLD_MAP"].as<std::string>();//>> mapfilename;
                 boost::algorithm::to_lower ( mapfilename );
             }
         }
@@ -185,12 +182,12 @@ for ( auto plugin:plugins )
     for ( unsigned int i=0; i<behaviors_nodes.size(); i++ )
     {
         std::string tmp_beh_name;
-        if ( !behaviors_nodes[i].FindValue ( "NAME" ) )
+        if ( !behaviors_nodes[i]["NAME"] )
         {
             ERR ( "BEHAVIOR NAME UNDEFINED: BEHAVIOR NUMBER %d", i );
             return false;
         }
-        behaviors_nodes[i]["NAME"]>> tmp_beh_name;
+        tmp_beh_name= behaviors_nodes[i]["NAME"].as<std::string>();//>> tmp_beh_name;
         if ( behaviors.find ( tmp_beh_name ) !=behaviors.end() )
         {
             ERR ( "DUPLICATED BEHAVIOR %s", tmp_beh_name.c_str() );
@@ -208,14 +205,13 @@ for ( auto plugin:plugins )
     for ( unsigned int i=0; i<agent_nodes.size(); i++ )
     {
         std::string tmp_ag_name;
-        agent_nodes[i]["AGENT"]>>tmp_ag_name;
-        if ( !agent_nodes[i].FindValue ( "BEHAVIOR" ) )
+        tmp_ag_name= agent_nodes[i]["AGENT"].as<std::string>();//>>tmp_ag_name;
+        if ( !agent_nodes[i]["BEHAVIOR" ] )
         {
             ERR ( "BEHAVIOR NAME UNSPECIFIED FOR AGENT %s", tmp_ag_name.c_str() );
             return false;
         }
-        std::string tmp_agent_behavior_name;
-        agent_nodes[i]["BEHAVIOR"]>>tmp_agent_behavior_name;
+        std::string tmp_agent_behavior_name=agent_nodes[i]["BEHAVIOR"].as<std::string>();//>>tmp_agent_behavior_name;
         if ( !behaviors.count ( tmp_agent_behavior_name ) )
         {
             ERR ( "UNDEFINED BEHAVIOR %s FOR AGENT %s", tmp_agent_behavior_name.c_str(), tmp_ag_name.c_str() );

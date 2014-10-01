@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8)
 set( RUNTIME_OUTPUT_DIRECTORY bin/ )
 set( ARCHIVE_OUTPUT_DIRECTORY bin/ )
 #set( LIBRARY_OUTPUT_DIRECTORY bin/ )
-find_package(thread)
+# find_package(thread)
 include_directories(include )
 add_library( logog
 	src/api.cpp 

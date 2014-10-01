@@ -14,7 +14,7 @@ SET(launcher_UIS mainwindow.ui)
 
 include_directories(../shared)
 include_directories(../shared/logog/include)
-include_directories(../shared/parserYAML/include)
+# include_directories(../shared/parserYAML/include)
 include_directories(../viewer/communication)
 include_directories(../viewer/gui)
 include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
@@ -42,7 +42,7 @@ find_package(Boost REQUIRED system thread serialization)
 target_link_libraries(launcher boost_system boost_thread boost_serialization boost_program_options  pthread zmq)
 target_link_libraries(launcher ${QT_LIBRARIES})
 target_link_libraries(launcher ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
-target_link_libraries(launcher ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
+target_link_libraries(launcher ${YAMLCPP_LIBRARY})
 
 
 file(GLOB yaml_files RELATIVE  "${CMAKE_SOURCE_DIR}/launcher" "../shared/graphs/*.lgf")

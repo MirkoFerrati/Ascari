@@ -16,7 +16,7 @@ void init(std::string owner_name)
 	{
 		this->init_full(owner_name,false,LOCALIZATION_TO_SIMULATOR,1,true);
 		exiting=false;
-		receiver_loop=new std::thread(&zmq_localization_communicator_receiver::loop,std::ref(*this),std::ref(agent_lock),std::ref(agents),std::ref(exiting));
+		receiver_loop=new std::thread(&zmq_localization_communicator_receiver::loop,this,std::ref(agent_lock),std::ref(agents),std::ref(exiting));
 	}
 	
 void stop()

@@ -9,7 +9,7 @@ endif()
 
 include_directories(../shared)
 include_directories(../shared/logog/include)
-include_directories(../shared/parserYAML/include)
+#include_directories(../shared/parserYAML/include)
 include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
 include_directories(plugins)
 
@@ -20,7 +20,6 @@ include_directories(plugins)
 # 	../shared/objects/task_assignment_task.cpp)
 # add_executable(test_udp_agent  ../shared/yaml_parser.cpp fake_agent_for_udp_tester.cpp ../agent/communication/udp_agent_communicator.cpp ../shared/communication/global.cpp)
  find_package(Boost REQUIRED system thread serialization)
- include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
 
 add_executable(fake_localization fake_localization.cpp ../shared/define.cpp ../shared/communication/zmq_localization_communicator.hpp ../shared/yaml_parser.cpp ../shared/yaml_parser_cout.cpp ../shared/communication/global.cpp)
 #add_executable(fake_simulator fake_simulator.cpp main.cpp ../shared/communication/global.cpp ../shared/yaml_parser.cpp zmq_agent_communicator.cpp ../shared/dynamic.cpp
@@ -34,7 +33,7 @@ add_executable(fake_localization fake_localization.cpp ../shared/define.cpp ../s
 
 target_link_libraries(fake_localization zmq boost_system boost_thread boost_serialization boost_program_options pthread ) 
 target_link_libraries(fake_localization ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
-target_link_libraries(fake_localization ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
+target_link_libraries(fake_localization ${YAMLCPP_LIBRARY})
 target_link_libraries(fake_localization ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
 
 

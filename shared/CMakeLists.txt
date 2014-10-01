@@ -4,11 +4,11 @@ else()
 add_definitions(-DAGENT=1)
 remove_definitions(-DAGENT_LIGHT)
 add_subdirectory(logog)
-endif(AGENT_LIGHT)
+endif(AGENT_LIGHT_FLAG STREQUAL "YES")
 
 
 
-add_subdirectory(parserYAML)
+#add_subdirectory(parserYAML)
 add_subdirectory(lemon/lemon)
 include_directories(../shared/lemon/lemon)
 include_directories(yamls)

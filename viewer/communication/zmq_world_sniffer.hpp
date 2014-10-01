@@ -21,7 +21,7 @@ public:
 	void start_receiving()
 	{
 		is_running=true;
-		receiver=new std::thread(&zmq_world_sniffer::receive_loop,std::ref(*this),std::ref(data),std::ref(data_mutex),std::ref(is_running));
+		receiver=new std::thread(&zmq_world_sniffer::receive_loop,this,std::ref(data),std::ref(data_mutex),std::ref(is_running));
 	};
 
     void stop_receiving()

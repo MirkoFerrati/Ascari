@@ -40,7 +40,7 @@ include_directories(../simulator/communication)
 add_executable(checker ${agent_SOURCES} ${checker_SOURCES} ${simulator_SOURCES})
 
 target_link_libraries(checker ${CMAKE_BINARY_DIR}/shared/logog/liblogog.a)
-target_link_libraries(checker ${CMAKE_BINARY_DIR}/shared/parserYAML/libyaml-cpp.a)
+target_link_libraries(checker ${YAMLCPP_LIBRARY})
 target_link_libraries(checker ${CMAKE_BINARY_DIR}/shared/lemon/lemon/lemon/liblemon.a)
 target_link_libraries(checker zmq)
 
@@ -53,7 +53,7 @@ endif (${GLPK_FOUND})
 include_directories(../agent)
 include_directories(../shared)
 include_directories(../shared/logog/include)
-include_directories(../shared/parserYAML/include)
+# include_directories(../shared/parserYAML/include)
 include_directories(../shared/lemon/lemon) #fa schifo, ma non è colpa mia se hanno fatto un progetto configurato di merda
 include_directories(decoder)
 include_directories(graph_routing)

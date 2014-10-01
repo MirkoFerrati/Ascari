@@ -7,6 +7,13 @@ project (ascari)
 list ( APPEND CMAKE_CXX_FLAGS "-std=c++0x -Wall -pedantic -Wmissing-field-initializers -W -Wunused -Wuninitialized -Wformat=2 -Wctor-dtor-privacy -Wnon-virtual-dtor -Wwrite-strings -Wno-char-subscripts -Wreturn-type -Wcast-qual -Wcast-align -Wsign-promo -Woverloaded-virtual -fno-strict-aliasing  -Werror=address -Werror=parentheses  ${CMAKE_CXX_FLAGS}" )
 link_directories(/usr/local/lib)
 
+set(CMAKE_MODULE_PATH
+  ${CMAKE_MODULE_PATH}
+  "${CMAKE_CURRENT_SOURCE_DIR}")
+
+find_package(PkgConfig)
+find_package(YamlCpp REQUIRED)
+pkg_check_modules(YAML yaml-cpp true true)
 add_subdirectory(plugins)
 
 add_subdirectory(agent)
@@ -15,7 +22,7 @@ message(STATUS ${agent_SOURCES})
 add_subdirectory(gml2lgf)
 add_subdirectory(shared)
 include_directories(shared)
-include_directories(../shared/parserYAML/include)
+#include_directories(../shared/parserYAML/include)
 add_subdirectory(testing)
 
 

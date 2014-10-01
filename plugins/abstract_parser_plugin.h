@@ -1,6 +1,6 @@
 #ifndef ABSTRACT_PARSER_PLUGIN_H
 #define ABSTRACT_PARSER_PLUGIN_H
-#include <parserYAML/include/yaml-cpp/node.h>
+#include <yaml-cpp/node/node.h>
 
 
 class abstract_parsed_agent_plugin

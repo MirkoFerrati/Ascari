@@ -1,6 +1,6 @@
 
 #include "yaml_parser.h"
-#include "parserYAML/include/yaml-cpp/node.h"
+#include <yaml-cpp/node/node.h>
 
 #include "streams_utils.h"
 
