@@ -1,7 +1,7 @@
 #ifndef TASK_ASSIGNMENT_PARSER_PLUGIN_H
 #define TASK_ASSIGNMENT_PARSER_PLUGIN_H
 
-#include <../plugins/abstract_parser_plugin.h>
+#include "../abstract_parser_plugin.h"
 #include "task_assignment_types.h"
 
 

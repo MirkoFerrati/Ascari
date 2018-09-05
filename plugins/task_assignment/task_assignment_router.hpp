@@ -71,7 +71,7 @@ class task_assignment_router: public simulator_to_agent_ta_communicator<datatype
 	
 	void start_thread()
 	{
-		sender_receiver=new std::thread(&task_assignment_router::loop,std::ref(*this),std::ref(data));
+		sender_receiver=new std::thread(&task_assignment_router::loop,this,std::ref(data));
 	}
 
 	~task_assignment_router()

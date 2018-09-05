@@ -1,4 +1,6 @@
 #include "task_assignment_parser_plugin.h"
+#include "yaml_parser.h"
+#include <yaml-cpp/node/node.h>
 #include <logog.hpp>
 
   task_assignment_parser_plugin::task_assignment_parser_plugin(std::string type):type(type)
@@ -23,25 +25,20 @@ abstract_parsed_world_plugin* task_assignment_parser_plugin::parseWorld ( const 
     wo->agents.reserve ( agent_nodes.size() );
      for ( unsigned int i=0; i<agent_nodes.size(); i++ )
     {
-        std::string tmp_ag_name;
-        agent_nodes[i]["AGENT"]>>tmp_ag_name;
+        std::string tmp_ag_name = agent_nodes[i]["AGENT"].as<std::string>();
       wo->agents.push_back(tmp_ag_name); 
     }
    
-  if ( node[0].FindValue ( "WORLD" ) )
+  if ( node[0]["WORLD"] )
     {
         if ( node[0]["WORLD"].size() >0 )
         {
 
-            if ( node[0]["WORLD"][0].FindValue ( "TASK_ASSIGNMENT_ALGORITHM" ) && node[0]["WORLD"][0].FindValue ( "TASK_NUMBER" ) && node[0]["WORLD"][0].FindValue ( "TASK_LIST" ) )
+            if ( node[0]["WORLD"][0]["TASK_ASSIGNMENT_ALGORITHM"] && node[0]["WORLD"][0]["TASK_NUMBER"] && node[0]["WORLD"][0]["TASK_LIST"])
             {
 	      enabled=true;
-                unsigned int task_number;
-                std::string algorithm;
-
-                node[0]["WORLD"][0]["TASK_NUMBER"]>>task_number;
-
-                node[0]["WORLD"][0]["TASK_ASSIGNMENT_ALGORITHM"]>>algorithm;
+                unsigned int task_number = node[0]["WORLD"][0]["TASK_NUMBER"].as<unsigned int>();
+                std::string algorithm = node[0]["WORLD"][0]["TASK_ASSIGNMENT_ALGORITHM"].as<std::string>();
 
                 if ( algorithm == "SUBGRADIENT" ) wo->task_assignment_algorithm = SUBGRADIENT;
 
@@ -68,7 +65,7 @@ abstract_parsed_agent_plugin* task_assignment_parser_plugin::parseAgent ( const 
     return 0;
    //written by Alessandro Settimi
     abstract_parsed_agent_plugin* ag=new task_assignment_parsed_agent();
-    if ( node.FindValue ( "TASK_COST_VECTOR" ) )
+    if ( node["TASK_COST_VECTOR"] )
     {
         const YAML::Node& co=node["TASK_COST_VECTOR"];
         task_assignment_namespace::task_cost_vector app;
@@ -78,10 +75,11 @@ abstract_parsed_agent_plugin* task_assignment_parser_plugin::parseAgent ( const 
 
         for ( unsigned int i=0; i<co.size(); )
         {
-            co[i] >> id;
-            co[i+1] >> temp;
+	    id = co[i].as<std::string>();
+	    temp = co[i+1].as<std::string>();
+
             if ( temp=="INF" ) cost=INF;
-            else co[i+1] >> cost;
+            else cost = co[i+1].as<double>();
 
             reinterpret_cast<task_assignment_parsed_agent*> (ag)->agent_task_cost_vector.insert ( make_pair ( id,cost ) );
             i=i+2;
@@ -89,11 +87,11 @@ abstract_parsed_agent_plugin* task_assignment_parser_plugin::parseAgent ( const 
 
     
     
-	if( node.FindValue ( "HOME" ) )
+	if( node["HOME"] )
 	{
 	    const YAML::Node& h=node["HOME"];
-	    h[0] >> reinterpret_cast<task_assignment_parsed_agent*> (ag)->home_x;
-	    h[1] >> reinterpret_cast<task_assignment_parsed_agent*> (ag)->home_y;
+	    reinterpret_cast<task_assignment_parsed_agent*> (ag)->home_x = h[0].as<double>();
+	    reinterpret_cast<task_assignment_parsed_agent*> (ag)->home_y = h[1].as<double>();
 	}
     
 	return ag;
@@ -111,21 +109,19 @@ void task_assignment_parser_plugin::createTaskList ( const YAML::Node& node, tas
 
     for ( unsigned int i=0; i<task_number*8; )
     {
-        task_assignment_namespace::task_id temp1;
-        node[i] >> temp1;
+        task_assignment_namespace::task_id temp1 = node[i].as<std::string>();
         tasks_id.push_back ( temp1 );
 
         task_assignment_namespace::task temp2;
 
-        node[i] >> temp2.id;
-        node[i+1] >> temp2.task_position[0];
-        node[i+2] >> temp2.task_position[1];
-        node[i+3] >> temp2.task_position[2];
-        node[i+4] >> temp2.task_type;
-        node[i+5] >> temp2.task_execution_time;
-        node[i+6] >> temp2.period;
-        node[i+7] >> temp2.task_deadline;
-
+	temp2.id = node[i].as<std::string>();
+	temp2.task_position[0] = node[i+1].as<double>();
+	temp2.task_position[1] = node[i+2].as<double>();
+	temp2.task_position[2] = node[i+3].as<double>();
+	temp2.task_type = node[i+4].as<int>();
+	temp2.task_execution_time = node[i+5].as<double>();
+	temp2.period = node[i+6].as<double>();
+	temp2.task_deadline = node[i+7].as<double>();
         temp2.executing=false;
         temp2.owner="";
         temp2.time=0;

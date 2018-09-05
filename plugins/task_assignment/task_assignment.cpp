@@ -106,7 +106,7 @@ bool task_assignment::initialize()
     alpha=-1;
     
     if(recharge_is_present()) *set_charge=-0.05;
-    else set_charge=0;
+    else *set_charge=0;
     
     lambda_u=0;
 			  
@@ -435,12 +435,12 @@ void task_assignment ::run_plugin()
 		}
 
 
-		if(recharge_is_present()) std::cout<<"CARICA: "<<charge_<<'%'<<std::endl;
+		if(recharge_is_present()) std::cout<<"CARICA: "<<*charge_<<'%'<<std::endl;
 
-		if(recharge_is_present() && charge_ <= 0)
+		if(recharge_is_present() && *charge_ <= 0)
 		{
 		    std::cout<<"BATTERIA SCARICA... SHUTDOWN..."<<std::endl;
-		    set_charge=0;
+		    *set_charge=0;
 		    *speed=0;
 		    omega=0;
 		    *omega_dubins=0;

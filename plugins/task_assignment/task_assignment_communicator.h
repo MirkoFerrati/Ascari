@@ -97,7 +97,7 @@ public:
 
 	void start_threads()
 	{
-		receiver=new std::thread(&task_assignment_communicator::receive_loop,std::ref(*this),std::ref(data_receive),std::ref(data_receive_mutex),std::ref(neighbour),std::ref(my_id),std::ref(fresh_data));
+		receiver=new std::thread(&task_assignment_communicator::receive_loop,this,std::ref(data_receive),std::ref(data_receive_mutex),std::ref(neighbour),std::ref(my_id),std::ref(fresh_data));
 	}
 	
 	void* get_data()
