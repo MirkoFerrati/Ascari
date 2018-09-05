@@ -510,7 +510,7 @@ protected:
             message.rebuild ( MAX_PACKET_LENGTH );
             try
             {
-                zmq::pollitem_t items[] = { { *sync_socket, 0, ZMQ_POLLIN, 0 } };
+                zmq::pollitem_t items[] = { { (void*)(*sync_socket), 0, ZMQ_POLLIN, 0 } };
                 zmq::poll ( &items[0], 1, 1 * 1000 );
                 //  If we got a reply, process it
                 if ( items[0].revents & ZMQ_POLLIN )

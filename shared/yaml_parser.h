@@ -11,7 +11,7 @@
 #include <yaml-cpp/yaml.h>
 #include "../plugins/abstract_parser_plugin.h"
 #include <boost/algorithm/string.hpp>
-#include <boost/strong_typedef.hpp>
+#include <boost/serialization/strong_typedef.hpp>
 
 typedef std::string bonusVariable;
 typedef std::string bonus_expression;
